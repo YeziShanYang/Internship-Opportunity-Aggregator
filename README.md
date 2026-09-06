@@ -1,0 +1,189 @@
+# opportunity-tracker
+
+A daily job that watches a fixed list of sources for quant / math / CS opportunities
+relevant to one specific person — a Stanford first-year, class of 2030 — and emails a
+digest by opening a GitHub Issue.
+
+Runs on GitHub Actions, so it does not care whether your laptop is awake. State lives in
+this repo as CSVs, which makes **git the database**: `git log` answers "which page
+changed on which morning" forever, for free.
+
+**Status: Phase 1 shipped.** Tier 1 (five GitHub repo trackers) is live, with Issue
+delivery, the health block and the change-only cadence. Tiers 2 and 3 are not built —
+see [What is not built yet](#what-is-not-built-yet).
+
+---
+
+## Setup (once)
+
+1. Create a **private** GitHub repo and push this code.
+2. Add repo secrets (Settings → Secrets and variables → Actions):
+   - `GH_PAT` — a fine-grained PAT, **read-only, public repositories**. Lifts the GitHub
+     API limit from 60 requests/hour to 5,000. Optional but recommended.
+   - `ANTHROPIC_API_KEY` — for the relevance classifier. **Optional.** Without it the job
+     still runs and still reports everything; changes simply arrive unclassified rather
+     than being dropped.
+   - `GITHUB_TOKEN` is provided automatically. No SMTP, no mail credentials.
+3. Enable Actions and confirm `daily` appears in the Actions tab.
+4. Run it once manually: Actions → `daily` → **Run workflow**. It should open an Issue.
+5. **Set a recurring monthly calendar reminder: "check opportunity-tracker Actions tab."**
+   This one matters — see [Failure modes](#failure-modes) below.
+
+After that it is unattended.
+
+## Running it locally
+
+```bash
+python -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+.venv/bin/python check.py --dry-run     # fetch everything, print the digest, change nothing
+.venv/bin/python check.py --only nuft-2027 --dry-run
+.venv/bin/python build_xlsx.py          # regenerate out/programs.xlsx
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+`--dry-run` opens no Issue and writes no state. Use it freely.
+
+## How it works
+
+```
+check.py                 orchestrates: check → classify → render → deliver → save state
+sources/github_repos.py  Tier 1: repo READMEs, diffed at the row level
+classify.py              one Claude call per change; the class-year and identity gates
+digest.py                renders the digest, opens the Issue
+calendar_reminders.py    standing reminders for what cannot be automated
+build_xlsx.py            CSVs → out/programs.xlsx (4 sheets)
+seed_programs.py         one-time seed from the original spreadsheet
+data/programs.csv        CANONICAL program list — edit this, not the xlsx
+data/sources.csv         what to check, and how
+data/manual.csv          what this tool CANNOT tell you about → "Manual Watch" sheet
+data/priority.csv        ranked shortlist to watch yourself → "Priority" sheet
+data/snapshots/*.tsv     one canonical line per listing row, committed
+data/proposals.log       append-only: proposed edits the tool refused to make itself
+out/programs.xlsx        GENERATED — never hand-edit
+```
+
+### Why the snapshots are TSV, not the READMEs
+
+The stored snapshot is a sorted, canonical `section → key → value` rendering rather than
+the README itself. A newly posted role is then exactly **one added line** in `git diff`,
+instead of a 700KB blob reflowing. It also means the diff is keyed on company + role, so
+badge churn and emoji edits cannot produce a false positive.
+
+Each repo needs its own parser config, because the five READMEs share almost nothing:
+NUFT puts the company in the `##` heading above a two-column table; Cruz-Lopez has seven
+different header layouts; Simplify uses HTML `<table>` and a **relative** `Age` column
+(`1d`, `2mo`) that is excluded from the diff, because diffing it would report all 490
+rows as changed every single day.
+
+### Cadence
+
+Send **only on changes**, plus **one health summary every Monday**. A daily "0 changes"
+email trains you to archive unread — which is exactly when the FTTP notice arrives. But a
+silent failure must never look like a quiet day, hence the Monday heartbeat: **if no
+email arrives on a Monday, something is broken.**
+
+### What the classifier will not do
+
+It never rewrites the `eligible` column. That column is hand-verified research, and a
+model overwriting it destroys work. Proposed changes go to `data/proposals.log` and into
+the digest, for you to apply or ignore.
+
+## Failure modes
+
+1. **Silent success** — a page redesigns, the fetch returns nothing, the job exits 0, and
+   you conclude nothing has opened for four months. Mitigated: every source returns a
+   result object; "returned zero rows" and "fetch failed" are first-class alerts;
+   `consecutive_failures` and `last_success` are tracked per source; **three consecutive
+   failures escalates the source into ACT NOW**, not the health footnote. Each source also
+   has a plausibility floor — and for NUFT that floor is on *section* count, not row
+   count, because its row count legitimately drains to near zero out of season.
+2. **GitHub disables scheduled workflows on inactive repos.** This is the classic way
+   projects like this die around month six. Whether the bot's own state commits reset that
+   clock is not worth relying on. **Mitigation: the monthly calendar reminder in step 5.**
+3. **Cron is best-effort.** Scheduled Actions get delayed when GitHub is busy. The
+   schedule deliberately avoids the top of the hour and nothing assumes an exact run time.
+4. **Notification fatigue** — see Cadence.
+
+## Politeness
+
+Requests are serialised with a delay, identify themselves as
+`opportunity-tracker/1.0 (+mailto:jasonshi@stanford.edu)`, and are never retried
+aggressively. `robots.txt` was checked against every target domain: **no watched path is
+disallowed.** Where a site blocks automation, it is marked `manual` in `sources.csv` and
+moved to the Manual Watch sheet rather than worked around. The tool never logs in to
+anything.
+
+## The two manual sheets
+
+`out/programs.xlsx` has four sheets. Two of them exist because automation cannot cover
+everything, and pretending otherwise is how you miss a deadline:
+
+- **Manual Watch** (23 rows) — things this tool provably cannot alert you about, each
+  with the reason, how to check, and when. Three groups: sites that return 403 to every
+  automated client (all of Citadel, IAS/PCMI, MAA/Putnam), competitions announced on
+  Instagram and listservs *before* the website changes (Cornell CTC, UChicago UTC,
+  Traders@MIT, Berkeley), and pages with nothing to diff (The Deck Game yields ~28
+  characters of text).
+- **Priority** (30 rows) — a ranked shortlist to keep an eye on yourself in case this
+  repo breaks. Band A is high value with real selection risk (Jane Street FTTP first);
+  Band B is Stanford-internal, where your odds are genuinely best (CURIS, SURIM, VPUE
+  grants, Directed Reading, Section Leading); Band C is open entry, where showing up is
+  the only gate. Every row states **whether this tool will actually alert you** — 11 of
+  the 30 are named in the repos already tracked, 13 need Phase 3, and 4 are never
+  automatable.
+
+## Verified source facts (probed 2026-09-05)
+
+Worth knowing before extending this, because several came out differently than expected:
+
+- **All of Citadel blocks automation** — `citadel.com`, `citadelsecurities.com` and the
+  datathon page return 403 to a bot user-agent *and* a browser user-agent. Discover
+  Citadel is freshman-eligible and marked YES, and this tool is structurally blind to it.
+  It is the largest gap in the system.
+- **~10 of the ~40 Tier 3 pages are JS shells**: AQR university jobs returns *zero*
+  characters of text from 62KB of HTML; CURIS 5; SLAC 4; SIG Discovery 520 from a 402KB
+  page. These need Playwright.
+- **Google Careers ASDI search is server-rendered** (21KB of text) — no browser needed.
+  Search for `Associate Software Developer Intern`; it was renamed from STEP.
+- **Stale URLs**: Berkeley's `competition.html` is a 404 (site rebuilt in Astro; use
+  `/competition/`), D. E. Shaw's `/fellowships` path is gone, DRW 308-redirects to
+  `/work-at-drw/listings?filterType=campus&value=Campus`.
+- **`LuisaE/opportunities` is on `master`**, and SimplifyJobs is on `dev` — which is why
+  the branch is read from the API rather than assumed.
+- **Kaggle** listing pages are JS shells and its official API 401s without credentials
+  (free: `KAGGLE_USERNAME` / `KAGGLE_KEY`). An unauthenticated internal RPC endpoint does
+  return 200, but building a daily job on an undocumented endpoint is not worth it.
+- **MIT Pokerbots** is pollable over plain HTTP, but the sheet already marks it `NO`: the
+  competition server requires a teammate with MIT certificates.
+
+## Acceptance tests
+
+Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHub client.
+
+| # | What it checks | Status |
+|---|---|---|
+| 14.1 | `workflow_dispatch` completes and opens an Issue | needs the repo to exist |
+| 14.2 | Hand-edited snapshot → reported in ACT NOW | passing |
+| 14.3 | A 404 → HEALTH, not a change; `consecutive_failures` increments | passing |
+| 14.4 | A new "Freshman Insight Program" row → discovery candidate | passing |
+| 14.5 | Women-only program → `relevant: false`, identity gate cited | **needs `ANTHROPIC_API_KEY`** |
+| 14.6 | Two quiet runs → no Issue; Monday → health Issue regardless | passing |
+| 14.7 | `build_xlsx.py` matches the seed formatting | passing |
+| 14.8 | `git log --follow data/programs.csv` is line-level readable | needs the repo to exist |
+
+## What is not built yet
+
+- **Phase 2** — resolve the 47 NUFT firms to their ATS and wire the Greenhouse / Lever /
+  Ashby JSON endpoints, plus the Kaggle API. The endpoints work (Greenhouse `akunacapital`
+  returns 35 jobs, `jumptrading` 109, `imc` 175; Ashby `ramp` 142), but slug resolution is
+  genuinely manual per firm — guessing fails often, and Optiver, DRW, Citadel and Five
+  Rings are not on Lever at all.
+- **Phase 3** — the ~45 page watchers. Playwright runs in the Actions job for the ~10
+  JS-shell pages; note that changedetection.io, which the spec suggests, is a *persistent
+  service* and cannot run inside an ephemeral Actions job. Budget ~3–6 min per run
+  (~150 of your 2,000 free private-repo minutes/month), not the spec's "~30 seconds".
+- **Phase 4** — classifier tuning.
+
+Tiers 1 and 2 should work unchanged for years. Tier 3 is where the effort goes, and it is
+only worth doing cheaply.

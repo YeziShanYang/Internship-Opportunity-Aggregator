@@ -1,0 +1,2 @@
+2026-09-06T01:08:31+00:00	optiver-ready-trader	Optiver Ready Trader Go	proposed website=https://readytradergo.optiver.com/	Verified live (HTTP 200, plain HTML, ~1KB of text); the sheet currently points at the generic Optiver careers page.
+2026-09-06T01:08:31+00:00	pokerbots	MIT Pokerbots	no change proposed	Sheet says NO because the competition server requires a teammate with MIT certificates; the site is pollable but the eligibility gate is the binding constraint, so it stays NO.
