@@ -84,6 +84,19 @@ Cruz-Lopez uses `🔥` differently — as `Status=🔥 [CLOSING SOON]`, which is
 so the strip is scoped per repo, not global. `tests/test_acceptance.py::NoiseRegressionTests`
 locks all four behaviours down.
 
+### Reading the git log
+
+Every run commits, because `last_checked` and `last_success` advance whether or not
+anything moved. The message tells you which kind it was:
+
+```
+state: heartbeat 2026-09-06 (no upstream changes)   <- the job ran, nothing changed
+state: 2026-09-06 upstream changes detected         <- something actually moved
+```
+
+So `git log --oneline --grep="upstream changes"` is the list of real change days, and the
+heartbeat commits are independent evidence the schedule is still alive.
+
 ### Cadence
 
 Send **only on changes**, plus **one health summary every Monday**. A daily "0 changes"
