@@ -152,6 +152,30 @@ def probe(url: str) -> dict:
 
 # --------------------------------------------------------------------------- add
 
+def _slugify(name: str, taken: set[str], limit: int = 40) -> str:
+    """A readable, unique source_id.
+
+    Truncates on word boundaries rather than mid-word -- a naive slice produced ids like
+    `harvard-undergraduate-trading-competitio`, which are both ugly and prone to
+    colliding with each other once truncated.
+    """
+    words = [w for w in re.split(r"[^a-z0-9]+", name.lower()) if w]
+    slug = ""
+    for word in words:
+        candidate = f"{slug}-{word}" if slug else word
+        if len(candidate) > limit:
+            break
+        slug = candidate
+    slug = slug or (words[0][:limit] if words else "source")
+    if slug not in taken:
+        return slug
+    for suffix in range(2, 100):
+        candidate = f"{slug}-{suffix}"
+        if candidate not in taken:
+            return candidate
+    raise ValueError(f"could not build a unique source_id for {name!r}")
+
+
 def _load(path: pathlib.Path, columns: list[str]) -> list[dict[str, str]]:
     if not path.exists():
         return []
@@ -233,7 +257,7 @@ def add(entries: list[dict], dry_run: bool, source_article: str = "") -> int:
 
         source = entry.get("source")
         if source:
-            source_id = source.get("source_id") or re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:40]
+            source_id = source.get("source_id") or _slugify(name, existing_sources)
             if source_id not in existing_sources:
                 source_row = {column: "" for column in state.SOURCE_COLUMNS}
                 source_row.update(
