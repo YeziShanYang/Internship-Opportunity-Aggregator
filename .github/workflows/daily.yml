@@ -1,11 +1,15 @@
 name: daily
 
 on:
-  # Spec section 10.3: scheduled runs are best-effort and can be delayed when GitHub is
-  # busy, so this deliberately avoids the top of the hour and nothing downstream assumes
-  # an exact run time. 13:17 UTC is roughly 06:17 Pacific.
+  # 06:30 America/Chicago, which is where this is run from. GitHub cron is UTC-only and
+  # has no notion of DST, so this is pinned to CDT: 11:30 UTC = 06:30 CDT in summer and
+  # 05:30 CST in winter. Drifting earlier in winter is deliberate -- a morning digest
+  # that arrives early is fine, one that arrives at 07:30 is not.
+  #
+  # Spec section 10.3: scheduled runs are best-effort and GitHub delays them when it is
+  # busy, so nothing downstream assumes an exact run time.
   schedule:
-    - cron: "17 13 * * *"
+    - cron: "30 11 * * *"
   workflow_dispatch:
 
 permissions:
