@@ -76,6 +76,14 @@ different header layouts; Simplify uses HTML `<table>` and a **relative** `Age` 
 (`1d`, `2mo`) that is excluded from the diff, because diffing it would report all 490
 rows as changed every single day.
 
+Simplify also needs two markers neutralised: a bare `↳` in the Company cell meaning
+"same company as above" (resolved into both the key *and* the value, so a row shifting
+position within its group does not churn), and `🔥` meaning "recently posted", which
+falls off after a few days and would otherwise make a posting look removed and re-added.
+Cruz-Lopez uses `🔥` differently — as `Status=🔥 [CLOSING SOON]`, which is real signal —
+so the strip is scoped per repo, not global. `tests/test_acceptance.py::NoiseRegressionTests`
+locks all four behaviours down.
+
 ### Cadence
 
 Send **only on changes**, plus **one health summary every Monday**. A daily "0 changes"
