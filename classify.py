@@ -162,7 +162,10 @@ def classify_one(client, change: state.Change) -> Judgment:
     try:
         response = client.messages.create(
             model=MODEL,
-            max_tokens=1024,
+            # Must cover adaptive thinking AND the JSON response. Billing is per token
+            # generated, not per token allowed, so a generous ceiling costs nothing and
+            # avoids truncating the response on a long diff.
+            max_tokens=4096,
             system=SYSTEM_PROMPT,
             thinking={"type": "adaptive"},
             output_config={
