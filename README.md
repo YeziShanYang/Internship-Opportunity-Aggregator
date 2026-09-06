@@ -97,6 +97,32 @@ It never rewrites the `eligible` column. That column is hand-verified research, 
 model overwriting it destroys work. Proposed changes go to `data/proposals.log` and into
 the digest, for you to apply or ignore.
 
+## Adding opportunities from an article
+
+There is a Claude Code skill for this: paste a link to an article and it opens the page,
+extracts every opportunity in it, probes each one to see whether it can actually be
+monitored, and files it into `programs.csv` plus the right watchlist.
+
+```
+.claude/skills/add-opportunity/SKILL.md
+```
+
+The same file is copied one level up, in the workspace's `.claude/skills/`, so the skill
+is found whether your working directory is this repo or its parent. **If you edit one,
+copy it over the other.**
+
+It leans on `add_opportunity.py`, which is also useful directly:
+
+```bash
+.venv/bin/python add_opportunity.py --probe "https://some-program"   # can this be watched?
+.venv/bin/python add_opportunity.py --add opps.json --dry-run        # validate, write nothing
+```
+
+Three guardrails, because an agent drives it: additions are append-only and deduplicated
+by name, so hand-verified rows cannot be clobbered; `eligible: "YES"` is **rejected**
+(the agent must use `CHECK` and let you confirm); and a `robots.txt` disallow or a 403
+routes an opportunity to Manual Watch rather than being worked around.
+
 ## Failure modes
 
 1. **Silent success** — a page redesigns, the fetch returns nothing, the job exits 0, and
