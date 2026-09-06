@@ -43,17 +43,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python check.py
 
-      - name: Regenerate the spreadsheet
-        run: python build_xlsx.py
-
+      # The xlsx is rebuilt only when the CSVs actually changed. openpyxl output is not
+      # byte-stable (zip timestamps), so rebuilding it unconditionally would put a
+      # binary diff in every single commit and bury the line-level CSV history that is
+      # the whole reason state lives in this repo.
       - name: Commit state
         run: |
           git config user.name "opportunity-tracker"
           git config user.email "actions@github.com"
-          git add data out
+          git add data
           if git diff --cached --quiet; then
             echo "no state changes to commit"
           else
+            python build_xlsx.py
+            git add out
             git commit -m "state: $(date -u +%Y-%m-%d) run"
             git push
           fi
