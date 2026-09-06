@@ -57,6 +57,14 @@ jobs:
           else
             python build_xlsx.py
             git add out
-            git commit -m "state: $(date -u +%Y-%m-%d) run"
+            # Timestamps advance on every run, so a commit happens daily whether or not
+            # anything upstream moved. The snapshots change only on real content
+            # changes, which makes them a precise discriminator -- so say which kind of
+            # commit this is and keep `git log` scannable for change days.
+            if git diff --cached --quiet -- data/snapshots; then
+              git commit -q -m "state: heartbeat $(date -u +%Y-%m-%d) (no upstream changes)"
+            else
+              git commit -q -m "state: $(date -u +%Y-%m-%d) upstream changes detected"
+            fi
             git push
           fi
