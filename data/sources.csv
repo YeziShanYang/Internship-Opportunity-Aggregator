@@ -15,3 +15,4 @@ optiver-futurefocus-chicago-2026,3,page_text,https://optiver.com/recruitment-eve
 hedgewest-sf-meetup-series,3,page_text,https://hedgewestsf.org/,HedgeWest SF Meetup Series,,false,,0,high,"Probed 2026-09-06: 200, 837 chars of text over plain HTTP."
 iaqf-academic-paper-competition,3,page_text,https://www.iaqf.org/upcoming-events,IAQF Academic Paper Competition,,false,,0,high,"Probed 2026-09-06: 200, 8194 chars of text over plain HTTP."
 open-source-quantitative-finance,3,page_text,https://osqf.org/,Open Source Quantitative Finance Conference,,false,,0,high,"Probed 2026-09-06: 200, 1966 chars of text over plain HTTP."
+mit-battlecode-2027,3,page_text,https://battlecode.org/,MIT Battlecode 2027,,false,,0,high,"Probed: HTTP 200, 1,627 chars of visible text over plain HTTP, no robots.txt. Home page carries the live season banner ('Battlecode 2026 ended on January 31st, 2026!'), so a text diff should catch the 2027 announcement."
