@@ -56,6 +56,10 @@ class RepoConfig:
     # Extra columns folded into the row key. Simplify lists the same company and role
     # once per office, so company+role alone collides ~79 times and would hide roles.
     qualifier_columns: tuple[str, ...] = ()
+    # Decorations that churn independently of the posting. Simplify's "🔥" means
+    # "recently posted", so it silently falls off every row after a few days; left in
+    # the key it makes a posting look removed and re-added.
+    volatile_markers: tuple[str, ...] = ()
     section_include: re.Pattern[str] | None = None
     section_exclude: re.Pattern[str] | None = None
     # Spec section 10.1 plausibility floors. Pick whichever quantity is *stable* for
@@ -102,6 +106,7 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         # row as changed every single day.
         ignore_columns=("Age",),
         qualifier_columns=("Location",),
+        volatile_markers=("🔥",),
         min_rows=150,
     ),
 }
@@ -278,6 +283,12 @@ _URL = re.compile(r"https?://[^\s)\]]+")
 _CARRY_FORWARD = ("↳", "->", "⤷")
 
 
+def _strip_markers(text: str, markers: tuple[str, ...]) -> str:
+    for marker in markers:
+        text = text.replace(marker, "")
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def extract(text: str, config: RepoConfig) -> Snapshot:
     """Flatten every table in the README into canonical `(section, key, value)` rows."""
     parser = parse_markdown_tables if config.table_format == "markdown" else parse_html_tables
@@ -297,10 +308,14 @@ def extract(text: str, config: RepoConfig) -> Snapshot:
         previous_entity = ""
         for cells in table.rows:
             entity = table.heading if config.heading_as_entity else cells.get(entity_column, "")
+            entity = _strip_markers(entity, config.volatile_markers)
             if entity.strip() in _CARRY_FORWARD:
                 entity = previous_entity
             elif entity.strip():
                 previous_entity = entity
+            if entity_column:
+                # Write the resolved entity back so the value is position-independent.
+                cells = {**cells, entity_column: entity}
             role = cells.get(role_column, "") if role_column else ""
             entity, role = entity.strip(), role.strip()
             if not entity and not role:
@@ -311,7 +326,7 @@ def extract(text: str, config: RepoConfig) -> Snapshot:
                 if value_:
                     key = f"{key} @ {value_}"
             value_parts = [
-                f"{header}={cells[header]}"
+                f"{header}={_strip_markers(cells[header], config.volatile_markers)}"
                 for header in table.headers
                 if header and header not in config.ignore_columns and cells.get(header)
             ]

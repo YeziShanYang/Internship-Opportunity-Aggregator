@@ -299,5 +299,74 @@ class AcceptanceTests(unittest.TestCase):
         self.assertIn("muted", state.PROGRAM_COLUMNS)
 
 
+class NoiseRegressionTests(unittest.TestCase):
+    """Regressions for false positives that reached a real digest.
+
+    The first live run reported four "changed" rows whose keys were identical. The
+    cause: Simplify writes a bare "↳" in the Company cell to mean "same company as
+    above", and the carry-forward was applied to the row key but not to the row value.
+    A row shifting position within its company group therefore churned the value while
+    the posting itself had not changed at all.
+    """
+
+    CONFIG = github_repos.REPO_CONFIGS["simplify-2027"]
+
+    def _rows(self, body: str):
+        html = f"""## 💻 Software Engineering Internship Roles
+<table><thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Age</th></tr></thead>
+{body}</table>"""
+        return github_repos.extract(html, self.CONFIG).rows
+
+    def test_carry_forward_is_resolved_in_the_value_not_just_the_key(self):
+        leading = self._rows(
+            "<tbody><tr><td>Acme</td><td>SWE Intern</td><td>NYC</td><td>1d</td></tr>"
+            "<tr><td>↳</td><td>Data Intern</td><td>NYC</td><td>1d</td></tr></tbody>"
+        )
+        # Same two postings, but now the second row leads its group with the full name.
+        trailing = self._rows(
+            "<tbody><tr><td>Acme</td><td>Data Intern</td><td>NYC</td><td>2d</td></tr>"
+            "<tr><td>↳</td><td>SWE Intern</td><td>NYC</td><td>2d</td></tr></tbody>"
+        )
+        before = {row.key: row.value for row in leading}
+        after = {row.key: row.value for row in trailing}
+        self.assertEqual(set(before), set(after), "keys must be position-independent")
+        for key in before:
+            self.assertEqual(
+                before[key], after[key], f"value for {key!r} must not depend on row order"
+            )
+        self.assertNotIn("↳", "".join(before.values()), "no raw marker may reach the value")
+
+    def test_the_relative_age_column_is_excluded(self):
+        """`Age` is "1d"/"2mo" and would report all 490 rows changed every day."""
+        first = self._rows("<tbody><tr><td>Acme</td><td>SWE Intern</td><td>NYC</td><td>1d</td></tr></tbody>")
+        later = self._rows("<tbody><tr><td>Acme</td><td>SWE Intern</td><td>NYC</td><td>3mo</td></tr></tbody>")
+        self.assertEqual(first[0].value, later[0].value)
+
+    def test_the_hot_marker_is_stripped_for_simplify(self):
+        """"🔥" means "recently posted" and falls off after a few days."""
+        hot = self._rows("<tbody><tr><td>🔥 Acme</td><td>SWE Intern</td><td>NYC</td><td>1d</td></tr></tbody>")
+        cold = self._rows("<tbody><tr><td>Acme</td><td>SWE Intern</td><td>NYC</td><td>9d</td></tr></tbody>")
+        self.assertEqual(hot[0].key, cold[0].key, "the marker must not split one posting in two")
+
+    def test_cruz_keeps_its_status_markers(self):
+        """Cruz uses "🔥 [CLOSING SOON]" as real signal - it must NOT be stripped."""
+        config = github_repos.REPO_CONFIGS["underclassmen-cruz"]
+        markdown = (
+            "## Scholarships\n"
+            "| Status | Organization | Scholarship | Application | Deadline |\n"
+            "| --- | --- | --- | --- | --- |\n"
+            "| ✅ **[OPEN]** | Unigo | Make Me Laugh | x | Dec 1 |\n"
+        )
+        closing = markdown.replace("✅ **[OPEN]**", "🔥 **[CLOSING SOON]**")
+        open_rows = github_repos.extract(markdown, config).rows
+        closing_rows = github_repos.extract(closing, config).rows
+        self.assertEqual(open_rows[0].key, closing_rows[0].key, "same posting, same key")
+        self.assertNotEqual(
+            open_rows[0].value,
+            closing_rows[0].value,
+            "an OPEN -> CLOSING SOON transition is exactly what must be reported",
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
