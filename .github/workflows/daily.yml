@@ -1,0 +1,59 @@
+name: daily
+
+on:
+  # Spec section 10.3: scheduled runs are best-effort and can be delayed when GitHub is
+  # busy, so this deliberately avoids the top of the hour and nothing downstream assumes
+  # an exact run time. 13:17 UTC is roughly 06:17 Pacific.
+  schedule:
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write # commit state back: git is the database
+  issues: write # deliver the digest
+
+concurrency:
+  group: daily-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check sources and deliver the digest
+        env:
+          # Fine-grained, read-only, public repos. Lifts the GitHub API limit from 60
+          # requests/hour to 5,000.
+          GH_PAT: ${{ secrets.GH_PAT }}
+          # Optional. Without it the run still works; changes are surfaced unclassified
+          # rather than dropped.
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python check.py
+
+      - name: Regenerate the spreadsheet
+        run: python build_xlsx.py
+
+      - name: Commit state
+        run: |
+          git config user.name "opportunity-tracker"
+          git config user.email "actions@github.com"
+          git add data out
+          if git diff --cached --quiet; then
+            echo "no state changes to commit"
+          else
+            git commit -m "state: $(date -u +%Y-%m-%d) run"
+            git push
+          fi

@@ -1,0 +1,73 @@
+"""Standing calendar reminders (spec section 7).
+
+The most schedule-critical items are the least automatable. Intercollegiate competition
+announcements go out on Instagram, university listservs and club mailing lists *before*
+the website changes, and Jane Street's ETC and Symposium arrive by email through campus
+recruiting. Rather than pretend to watch those, the digest prints a reminder during the
+window when each one historically opens.
+
+Pure data, no network. Anything added here should be something a page diff genuinely
+cannot catch.
+"""
+from __future__ import annotations
+
+import datetime
+
+# month number -> reminders printed in that month's digests
+BY_MONTH: dict[int, list[str]] = {
+    1: [
+        "SULI deadline this month.",
+        "CURIS opens late January.",
+        "GSoC: start contributing to open source NOW. Pre-application contributions are "
+        "the strongest predictor of selection.",
+        "MIT Pokerbots runs this month, but it is marked NO in your sheet: the "
+        "competition server needs a teammate with MIT certificates. Only worth revisiting "
+        "if you have an MIT teammate.",
+    ],
+    2: [
+        "SURIM (~Feb 26), CURIS (Jan 27-Feb 10), UChicago REU (~Feb 6), VPUE Faculty "
+        "Grant (Feb 15). Draft one personal statement in early January and adapt it.",
+    ],
+    3: [
+        "IMC Prosperity tutorial round.",
+        "GSoC applications ~Mar 16-31.",
+        "VPUE Major Grant mentor letter due Mar 8.",
+    ],
+    9: [
+        "Cornell CTC opens early fall - check the club's Instagram and your "
+        "Traders @ Stanford channels.",
+    ],
+    10: [
+        "SIG First Year Discovery event is this month.",
+        "Jane Street FTTP is rolling and slots have reportedly filled by late October. "
+        "If you have not applied, this is the week.",
+    ],
+    11: [
+        "UChicago UTC applications open this month.",
+        "Google Student Researcher closes Nov 27.",
+    ],
+    12: [
+        "The Deck Game and similar invitational card/trading competitions announce "
+        "winter rounds around now. The Deck Game's site is a JS shell with nothing to "
+        "diff, so this reminder is the only coverage you get - check it directly.",
+        "Optiver Ready Trader Go has historically announced registration on "
+        "readytradergo.optiver.com. It has skipped years, so absence is not a bug.",
+    ],
+}
+
+# Printed every month: sources that are verified un-pollable, so the only thing that
+# will ever surface them is the owner opening the page.
+ALWAYS: list[str] = [
+    "Citadel and Citadel Securities (including Discover Citadel) block automated "
+    "access entirely - 403 to every client. Open the programs-and-events pages by hand "
+    "this month; Discover Citadel is freshman-eligible and this tool cannot see it.",
+    "IAS/PCMI also blocks automation. Check it by hand if you are considering it.",
+    "Kaggle competitions are always open and rolling - browse kaggle.com/competitions "
+    "when you want a project, not on a deadline.",
+]
+
+
+def for_month(when: datetime.date | None = None) -> tuple[str, list[str]]:
+    """Return (month name, reminders) for the given date."""
+    when = when or datetime.date.today()
+    return when.strftime("%B"), list(BY_MONTH.get(when.month, []))
