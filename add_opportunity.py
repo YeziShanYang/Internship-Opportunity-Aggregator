@@ -63,19 +63,37 @@ def _visible_text(html: str) -> str:
 
 
 def _robots_allows(url: str) -> tuple[bool | None, str]:
+    """Check robots.txt, distinguishing "disallowed" from "could not be read".
+
+    urllib's RobotFileParser treats a 401/403 on robots.txt itself as disallow-all,
+    which conflates a site protecting its robots.txt with a site actually forbidding
+    the path. Those warrant different notes, so fetch it directly instead -- and with a
+    timeout, which RobotFileParser.read() does not accept and which otherwise lets a
+    slow host hang the probe indefinitely.
+    """
     parts = urllib.parse.urlparse(url)
     robots_url = f"{parts.scheme}://{parts.netloc}/robots.txt"
-    parser = urllib.robotparser.RobotFileParser()
-    parser.set_url(robots_url)
+    request = urllib.request.Request(robots_url, headers={"User-Agent": state.USER_AGENT})
     try:
-        parser.read()
+        with urllib.request.urlopen(request, timeout=10) as response:
+            body = response.read(500_000).decode("utf-8", "replace")
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return True, "no robots.txt (404) - nothing disallowed"
+        return None, f"robots.txt itself returned HTTP {exc.code} - could not verify"
     except Exception as exc:
-        return None, f"could not read robots.txt ({type(exc).__name__})"
+        return None, f"robots.txt unreachable ({type(exc).__name__}) - could not verify"
+
+    if not body.strip() or "<html" in body[:200].lower():
+        return None, "robots.txt is missing or not a robots file - could not verify"
+
+    parser = urllib.robotparser.RobotFileParser()
+    parser.parse(body.splitlines())
     try:
         allowed = parser.can_fetch(state.USER_AGENT, url)
     except Exception:
-        return None, "robots.txt unparseable"
-    return allowed, "allowed" if allowed else "DISALLOWED by robots.txt"
+        return None, "robots.txt unparseable - could not verify"
+    return allowed, "allowed by robots.txt" if allowed else "DISALLOWED by robots.txt"
 
 
 def probe(url: str) -> dict:
@@ -112,6 +130,11 @@ def probe(url: str) -> dict:
 
     if robots_ok is False:
         result["recommendation"] = "MANUAL - robots.txt disallows this path; do not poll it"
+    elif len(text) < 50:
+        result["recommendation"] = (
+            f"MANUAL - only {len(text)} characters of visible text; there is likely "
+            "nothing to diff even with a browser"
+        )
     elif len(text) < 200:
         result["recommendation"] = (
             f"TIER 3 with render_js=true - only {len(text)} characters of visible text "
