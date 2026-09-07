@@ -104,6 +104,11 @@ email trains you to archive unread — which is exactly when the FTTP notice arr
 silent failure must never look like a quiet day, hence the Monday heartbeat: **if no
 email arrives on a Monday, something is broken.**
 
+The morning schedule fires three times (see failure mode 3), but you still get at most
+one digest per quiet day: `data/last_delivered.txt` records the date of the last delivery
+and suppresses a repeat heartbeat. It suppresses the heartbeat *only* — a retry that
+finds real changes or a failing source still mails, because that is news.
+
 ### What the classifier will not do
 
 It never rewrites the `eligible` column. That column is hand-verified research, and a
@@ -148,8 +153,15 @@ routes an opportunity to Manual Watch rather than being worked around.
 2. **GitHub disables scheduled workflows on inactive repos.** This is the classic way
    projects like this die around month six. Whether the bot's own state commits reset that
    clock is not worth relying on. **Mitigation: the monthly calendar reminder in step 5.**
-3. **Cron is best-effort.** Scheduled Actions get delayed when GitHub is busy. The
-   schedule deliberately avoids the top of the hour and nothing assumes an exact run time.
+3. **Cron is best-effort — and worse than "delayed".** GitHub does not merely postpone a
+   scheduled tick when it is busy, it silently drops it, and there is no run, no log and
+   no notification to tell you so. This was observed live: the first two days of the
+   schedule produced *zero* scheduled runs while `workflow_dispatch` worked perfectly.
+   **Mitigation: the schedule fires three times each morning (13:30 / 14:30 / 15:30 UTC)
+   and the run is idempotent**, so all three ticks have to be dropped to lose a day. The
+   change-driven digest cannot repeat because the snapshots advance on the first success;
+   the Monday heartbeat is held down by `data/last_delivered.txt`. Ticks avoid the top of
+   the hour, and nothing assumes an exact run time.
 4. **Notification fatigue** — see Cadence.
 
 ## Politeness
@@ -216,6 +228,7 @@ Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHu
 | 14.4 | A new "Freshman Insight Program" row → discovery candidate | passing |
 | 14.5 | Women-only program → `relevant: false`, identity gate cited | **needs `ANTHROPIC_API_KEY`** |
 | 14.6 | Two quiet runs → no Issue; Monday → health Issue regardless | passing |
+| 14.6b | A schedule retry re-mails no heartbeat, but still mails real changes | passing |
 | 14.7 | `build_xlsx.py` matches the seed formatting | passing |
 | 14.8 | `git log --follow data/programs.csv` is line-level readable | needs the repo to exist |
 

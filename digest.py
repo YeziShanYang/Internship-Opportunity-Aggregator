@@ -154,19 +154,30 @@ def render(
 
 
 def should_send(
-    judgments: list[Judgment], results: list[state.SourceResult], is_monday: bool
+    judgments: list[Judgment],
+    results: list[state.SourceResult],
+    is_monday: bool,
+    already_delivered_today: bool = False,
 ) -> tuple[bool, bool]:
     """Return (send, health_only).
 
     Send when there is something to say, or when it is Monday. The Monday heartbeat is
     the thing that makes silence diagnostic.
+
+    `already_delivered_today` suppresses the heartbeat only. The morning schedule fires
+    several times so that a dropped cron tick is not a missed day (see daily.yml), and
+    the heartbeat is the one path with no natural interlock -- a change-driven digest
+    cannot repeat, because the snapshots advance on the first success. Three identical
+    health summaries every Monday would train the owner to archive the digest unread,
+    which is the exact failure the change-only cadence exists to prevent. A retry that
+    finds real changes still delivers: that is news, not a duplicate.
     """
     has_changes = bool(judgments)
     has_failures = any(not result.ok for result in results)
     has_baseline = any(result.baseline for result in results)
     if has_changes or has_failures or has_baseline:
         return True, False
-    if is_monday:
+    if is_monday and not already_delivered_today:
         return True, True
     return False, False
 

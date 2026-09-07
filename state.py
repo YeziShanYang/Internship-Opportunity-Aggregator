@@ -20,6 +20,10 @@ PROGRAMS_CSV = DATA / "programs.csv"
 SOURCES_CSV = DATA / "sources.csv"
 SNAPSHOTS = DATA / "snapshots"
 PROPOSALS_LOG = DATA / "proposals.log"
+# The date of the last digest actually delivered. The schedule fires several times
+# each morning so that a dropped cron tick is not a missed day (see daily.yml), and
+# this is what stops the retries from mailing the same heartbeat two or three times.
+LAST_DELIVERED = DATA / "last_delivered.txt"
 OUT_XLSX = ROOT / "out" / "programs.xlsx"
 
 # Spec section 11: identify ourselves, with a contact address.
@@ -152,6 +156,18 @@ def append_proposal(line: str) -> None:
     PROPOSALS_LOG.parent.mkdir(parents=True, exist_ok=True)
     with PROPOSALS_LOG.open("a", encoding="utf-8") as fh:
         fh.write(f"{iso()}\t{line}\n")
+
+
+def read_last_delivered() -> str:
+    """The ISO date of the last delivered digest, or "" if none was ever delivered."""
+    if not LAST_DELIVERED.exists():
+        return ""
+    return LAST_DELIVERED.read_text(encoding="utf-8").strip()
+
+
+def write_last_delivered(date: str | None = None) -> None:
+    LAST_DELIVERED.parent.mkdir(parents=True, exist_ok=True)
+    LAST_DELIVERED.write_text(f"{date or today_iso()}\n", encoding="utf-8")
 
 
 @dataclass
