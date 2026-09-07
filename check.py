@@ -166,7 +166,16 @@ def main(argv: list[str] | None = None) -> int:
     update_program_state(programs, sources, results, judgments)
 
     is_monday = datetime.date.today().weekday() == 0 or args.force_health
-    send, health_only = digest.should_send(judgments, results, is_monday)
+    # A schedule retry must not mail the Monday heartbeat a second time; --force-health
+    # is a deliberate manual override and ignores the marker.
+    delivered_today = (
+        state.read_last_delivered() == state.today_iso() and not args.force_health
+    )
+    send, health_only = digest.should_send(
+        judgments, results, is_monday, already_delivered_today=delivered_today
+    )
+    suppressed = not send and is_monday and delivered_today
+
     title, body = digest.render(judgments, results, by_id, health_only=health_only)
 
     print(f"{len(results)} sources checked, {len(changes)} changes, {len(judgments)} judged")
@@ -189,6 +198,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if send:
         print(digest.deliver(title, body))
+        state.write_last_delivered()
+    elif suppressed:
+        print(
+            f"a digest was already delivered on {state.today_iso()}: heartbeat "
+            "suppressed so a schedule retry does not mail twice"
+        )
     else:
         print("no changes and not Monday: no issue opened (spec section 9 cadence)")
     return 0

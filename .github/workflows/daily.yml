@@ -2,15 +2,24 @@ name: daily
 
 on:
   # 06:30 America/Los_Angeles -- the owner's timezone, which is NOT the timezone of the
-  # machine this was authored on. GitHub cron is UTC-only with no notion of DST, so this
-  # is pinned to PDT: 13:30 UTC = 06:30 PDT in summer and 05:30 PST in winter. Drifting
-  # earlier in winter is deliberate -- a morning digest that arrives early is fine, one
-  # that arrives at 07:30 is not.
+  # machine this was authored on. GitHub cron is UTC-only with no notion of DST, so
+  # 13:30 UTC = 06:30 PDT in summer and 05:30 PST in winter. Drifting earlier in winter
+  # is deliberate -- a morning digest that arrives early is fine, one that arrives at
+  # 07:30 is not.
   #
-  # Spec section 10.3: scheduled runs are best-effort and GitHub delays them when it is
-  # busy, so nothing downstream assumes an exact run time.
+  # Three ticks, not one. Spec section 10.3 says scheduled runs are best-effort, and
+  # that is understated: GitHub does not merely delay a cron tick under load, it drops
+  # it, and a dropped tick on the single-tick schedule was a silently missed day. Each
+  # later tick is a retry, and the run is idempotent -- the snapshots advance on the
+  # first success so a retry sees a quiet day, and check.py suppresses a repeat Monday
+  # heartbeat via data/last_delivered.txt. So the cost of a redundant tick is one
+  # 30-second no-op run, and the benefit is that all three have to fail to lose a day.
+  #
+  # The ladder also covers the winter DST shift: 14:30 UTC is exactly 06:30 PST.
   schedule:
-    - cron: "30 13 * * *"
+    - cron: "30 13 * * *" # 06:30 PDT / 05:30 PST
+    - cron: "30 14 * * *" # 07:30 PDT / 06:30 PST -- retry
+    - cron: "30 15 * * *" # 08:30 PDT / 07:30 PST -- last retry
   workflow_dispatch:
 
 permissions:

@@ -82,8 +82,10 @@ class AcceptanceTests(unittest.TestCase):
         root = pathlib.Path(self._tmp.name)
         self._snapshots = state.SNAPSHOTS
         self._proposals = state.PROPOSALS_LOG
+        self._last_delivered = state.LAST_DELIVERED
         state.SNAPSHOTS = root / "snapshots"
         state.PROPOSALS_LOG = root / "proposals.log"
+        state.LAST_DELIVERED = root / "last_delivered.txt"
         state.SNAPSHOTS.mkdir()
         # A relaxed floor: the fixture README is deliberately tiny.
         self._config = github_repos.REPO_CONFIGS["nuft-2027"]
@@ -109,6 +111,7 @@ class AcceptanceTests(unittest.TestCase):
         github_repos.REPO_CONFIGS["nuft-2027"] = self._config
         state.SNAPSHOTS = self._snapshots
         state.PROPOSALS_LOG = self._proposals
+        state.LAST_DELIVERED = self._last_delivered
         self._tmp.cleanup()
 
     def _baseline(self, readme=BASE_README):
@@ -263,6 +266,57 @@ class AcceptanceTests(unittest.TestCase):
         )
         title, _ = digest.render([], [healthy], {}, health_only=True)
         self.assertIn("Weekly health summary", title)
+
+    def test_14_6b_a_schedule_retry_does_not_mail_the_heartbeat_twice(self):
+        """The morning schedule fires three times; only the first tick may deliver.
+
+        The change-driven digest is self-interlocking (the snapshots advance on the
+        first success), but the Monday heartbeat is not, so it needs the delivery marker.
+        Delivering three identical health summaries every Monday would teach the owner
+        to archive the digest unread, which is the exact failure the cadence exists to
+        prevent.
+        """
+        healthy = state.SourceResult(source_id="nuft-2027", ok=True)
+
+        # Tick 1 on a Monday: nothing delivered yet, so the heartbeat goes out.
+        self.assertEqual(state.read_last_delivered(), "", "no marker before the first run")
+        self.assertEqual(
+            digest.should_send([], [healthy], True, already_delivered_today=False),
+            (True, True),
+        )
+
+        # Tick 2, an hour later, after tick 1 recorded a delivery: silence.
+        state.write_last_delivered()
+        self.assertEqual(state.read_last_delivered(), state.today_iso())
+        self.assertEqual(
+            digest.should_send([], [healthy], True, already_delivered_today=True),
+            (False, False),
+            "a retry must not mail a second identical heartbeat",
+        )
+
+        # But a retry that finds real news still delivers -- that is not a duplicate.
+        change = state.Change(
+            source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
+        )
+        judgment = classify.Judgment(change=change, relevant=True, classified=True)
+        self.assertEqual(
+            digest.should_send([judgment], [healthy], True, already_delivered_today=True),
+            (True, False),
+            "the marker suppresses the heartbeat only, never real changes",
+        )
+        failing = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
+        self.assertEqual(
+            digest.should_send([], [failing], True, already_delivered_today=True),
+            (True, False),
+            "a broken source must break through the retry guard too",
+        )
+
+        # A marker from a previous day suppresses nothing.
+        state.write_last_delivered("2020-01-01")
+        self.assertNotEqual(state.read_last_delivered(), state.today_iso())
+
+        # And the default keeps the old three-argument call sites correct.
+        self.assertEqual(digest.should_send([], [healthy], True), (True, True))
 
     # --- extra: the eligible column is never rewritten (rule 5) -----------------
     def test_eligible_column_is_never_rewritten(self):
