@@ -1,25 +1,32 @@
 name: daily
 
 on:
-  # 06:30 America/Los_Angeles -- the owner's timezone, which is NOT the timezone of the
-  # machine this was authored on. GitHub cron is UTC-only with no notion of DST, so
-  # 13:30 UTC = 06:30 PDT in summer and 05:30 PST in winter. Drifting earlier in winter
-  # is deliberate -- a morning digest that arrives early is fine, one that arrives at
-  # 07:30 is not.
+  # 00:00 America/Los_Angeles -- midnight Pacific, deliberately ~6.5 hours ahead of the
+  # 06:30 morning read rather than aimed at it.
   #
-  # Three ticks, not one. Spec section 10.3 says scheduled runs are best-effort, and
-  # that is understated: GitHub does not merely delay a cron tick under load, it drops
-  # it, and a dropped tick on the single-tick schedule was a silently missed day. Each
-  # later tick is a retry, and the run is idempotent -- the snapshots advance on the
-  # first success so a retry sees a quiet day, and check.py suppresses a repeat Monday
-  # heartbeat via data/last_delivered.txt. So the cost of a redundant tick is one
-  # 30-second no-op run, and the benefit is that all three have to fail to lose a day.
+  # Aiming at 06:30 does not work. GitHub cron is best-effort (spec section 10.3) and in
+  # this repo -- private, free personal account, the worst bucket for scheduler priority
+  # -- "best-effort" measured as 3h27m to 4h48m late on every tick observed, plus one
+  # tick dropped outright. A 13:30 UTC cron delivered at 17:18 UTC, i.e. 10:18 Pacific.
+  # No cron value can fix that, because the delay is unbounded. Headroom can: scheduling
+  # at midnight means even the worst delay seen so far still lands before 05:00 Pacific,
+  # and a digest that arrives early is fine while one that arrives at lunchtime is not.
   #
-  # The ladder also covers the winter DST shift: 14:30 UTC is exactly 06:30 PST.
+  # GitHub cron is UTC-only with no notion of DST, so 07:00 UTC is exactly midnight PDT
+  # in summer and 23:00 PST in winter. The winter hour of drift is earlier, which is the
+  # harmless direction; note the UTC date is already the new day at 07:00 either way, so
+  # the digest is still labelled -- and still counted, for the one-a-day lock -- as the
+  # day the owner wakes up into.
+  #
+  # Three ticks, not one, because GitHub does not merely delay a tick under load, it
+  # drops it. Each later tick is a retry. Delivery is capped at one issue a day by
+  # digest.should_send, so a redundant tick costs one 30-second no-op run and cannot
+  # produce a second email. The retries sit off :00 and :30, the two most contended cron
+  # minutes.
   schedule:
-    - cron: "30 13 * * *" # 06:30 PDT / 05:30 PST
-    - cron: "30 14 * * *" # 07:30 PDT / 06:30 PST -- retry
-    - cron: "30 15 * * *" # 08:30 PDT / 07:30 PST -- last retry
+    - cron: "0 7 * * *" # 00:00 PDT / 23:00 PST -- midnight Pacific
+    - cron: "20 8 * * *" # retry
+    - cron: "40 9 * * *" # last retry
   workflow_dispatch:
 
 permissions:
