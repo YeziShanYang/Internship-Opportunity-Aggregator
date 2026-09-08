@@ -4,10 +4,17 @@ Issues rather than email: GitHub emails the owner when an issue is opened in the
 repo, so there is no SMTP, no API key that expires silently, and no deliverability
 problem. It also doubles as a lightweight application tracker -- comment and close.
 
-Cadence is change-only plus a Monday heartbeat. A daily "0 changes" email trains the
-owner to archive unread, which is precisely when the FTTP notice arrives; but a silent
-failure must never look like a quiet day, so if no email arrives on a Monday, something
-is broken.
+Cadence is exactly one digest a day, every day -- no more and no less. The owner asked
+for a reminder they can rely on, and a fixed daily arrival is what makes silence
+diagnostic: no issue on a given morning means the job is broken, with no "maybe nothing
+changed" ambiguity to explain it away. The cost is that quiet days mail too, so a quiet
+day says so in the title ("(no changes)") and stays short enough to archive in a glance.
+
+The "no more" half is load-bearing in the other direction. The morning schedule fires
+three ticks so that a dropped cron tick is not a missed day, and every one of those
+ticks would otherwise be free to open its own issue. Two digests for the same date is
+the same notification-fatigue failure as a daily "0 changes" email, so delivery is
+capped -- see should_send and delivered_issue_exists.
 """
 from __future__ import annotations
 
@@ -86,9 +93,14 @@ def render(
     judgments: list[Judgment],
     results: list[state.SourceResult],
     sources: dict[str, dict[str, str]],
-    health_only: bool = False,
+    status_only: bool = False,
 ) -> tuple[str, str]:
-    """Return (issue title, issue body)."""
+    """Return (issue title, issue body).
+
+    `status_only` says there was no news -- it only picks the title. The body is the
+    same shape every day: on a quiet day that is the calendar block and the health
+    block, which is exactly what a reminder with nothing to report should look like.
+    """
     today = state.today_iso()
     health_lines, escalated = _health_lines(results, sources)
 
@@ -96,10 +108,12 @@ def render(
     worth_a_look = [j for j in judgments if j.relevant and not j.urgent]
     ruled_out = [j for j in judgments if not j.relevant]
 
-    if health_only:
-        title = f"Weekly health summary — {today}"
-    elif escalated:
+    if escalated:
         title = f"Opportunity digest — {today} (source failing)"
+    elif status_only:
+        # Quiet days mail now, so the title has to carry the whole message for an owner
+        # triaging a notification list without opening anything.
+        title = f"Opportunity digest — {today} (no changes)"
     else:
         title = f"Opportunity digest — {today}"
 
@@ -156,30 +170,85 @@ def render(
 def should_send(
     judgments: list[Judgment],
     results: list[state.SourceResult],
-    is_monday: bool,
     already_delivered_today: bool = False,
 ) -> tuple[bool, bool]:
-    """Return (send, health_only).
+    """Return (send, status_only).
 
-    Send when there is something to say, or when it is Monday. The Monday heartbeat is
-    the thing that makes silence diagnostic.
+    Exactly one digest a day, every day. There is no "nothing to say" branch any more:
+    a reminder the owner can set their morning around is worth more than an inbox saved
+    from a short status mail, and it removes the one genuinely bad state the change-only
+    cadence had -- a silent morning that could mean either "quiet day" or "broken job".
 
-    `already_delivered_today` suppresses the heartbeat only. The morning schedule fires
-    several times so that a dropped cron tick is not a missed day (see daily.yml), and
-    the heartbeat is the one path with no natural interlock -- a change-driven digest
-    cannot repeat, because the snapshots advance on the first success. Three identical
-    health summaries every Monday would train the owner to archive the digest unread,
-    which is the exact failure the change-only cadence exists to prevent. A retry that
-    finds real changes still delivers: that is news, not a duplicate.
+    `already_delivered_today` is the whole of the "exactly once" guarantee and it is
+    absolute: it suppresses real changes and failing sources too, which the old
+    change-only cadence deliberately did not. That is the point. A retry firing after a
+    successful delivery has nothing new to tell the owner that the morning's issue did
+    not already contain, and mailing the same date twice is the fatigue failure this
+    cadence exists to avoid. The digest is not the only record -- the state commit and
+    data/proposals.log still capture everything the retry saw.
     """
-    has_changes = bool(judgments)
-    has_failures = any(not result.ok for result in results)
-    has_baseline = any(result.baseline for result in results)
-    if has_changes or has_failures or has_baseline:
-        return True, False
-    if is_monday and not already_delivered_today:
-        return True, True
-    return False, False
+    if already_delivered_today:
+        return False, False
+    has_news = (
+        bool(judgments)
+        or any(not result.ok for result in results)
+        or any(result.baseline for result in results)
+    )
+    return True, not has_news
+
+
+def delivered_issue_exists(date: str) -> bool | None:
+    """Has a digest for `date` already been opened? None when GitHub cannot be asked.
+
+    data/last_delivered.txt cannot answer this on its own. A run reads that marker from
+    the commit it checked out, and the SHA is pinned when GitHub *dispatches* the run --
+    which, given ticks that arrive 3-5 hours late, is not necessarily in cron order. A
+    tick nominally scheduled first can dispatch second and check out a tree from before
+    the other tick pushed its state, see a stale marker, and mail a duplicate.
+
+    The issue list has no such problem. The issue *is* the email, so the open issues are
+    the delivery log itself, and every run sees the same one regardless of what it
+    checked out. Matching on the date in the title covers all three title shapes.
+
+    Returns None rather than False when the question cannot be answered, so the caller
+    can fall back to the marker instead of treating "I could not check" as "not yet
+    delivered" and mailing twice.
+    """
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
+    if not repo or not token:
+        return None
+    try:
+        response = httpx.get(
+            f"{GITHUB_API}/repos/{repo}/issues",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "User-Agent": state.USER_AGENT,
+            },
+            # Sorted newest first, so 50 covers any plausible backlog of same-day ticks
+            # without paginating.
+            params={
+                "state": "all",
+                "sort": "created",
+                "direction": "desc",
+                "per_page": 50,
+            },
+            timeout=state.HTTP_TIMEOUT_SECONDS,
+        )
+        if response.status_code >= 300:
+            return None
+        issues = response.json()
+    except (httpx.HTTPError, ValueError):
+        return None
+    if not isinstance(issues, list):
+        return None
+    return any(
+        date in (issue.get("title") or "")
+        for issue in issues
+        # The issues endpoint returns pull requests too; they are not digests.
+        if isinstance(issue, dict) and "pull_request" not in issue
+    )
 
 
 def deliver(title: str, body: str) -> str:

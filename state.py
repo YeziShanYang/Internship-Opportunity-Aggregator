@@ -21,8 +21,11 @@ SOURCES_CSV = DATA / "sources.csv"
 SNAPSHOTS = DATA / "snapshots"
 PROPOSALS_LOG = DATA / "proposals.log"
 # The date of the last digest actually delivered. The schedule fires several times
-# each morning so that a dropped cron tick is not a missed day (see daily.yml), and
-# this is what stops the retries from mailing the same heartbeat two or three times.
+# each morning so that a dropped cron tick is not a missed day (see daily.yml), and the
+# cadence is exactly one digest a day, so something has to stop ticks two and three from
+# mailing again. This marker is the *fallback* half of that cap -- it is read from
+# whatever commit the run checked out, so it can be stale. digest.delivered_issue_exists
+# holds the authoritative answer.
 LAST_DELIVERED = DATA / "last_delivered.txt"
 OUT_XLSX = ROOT / "out" / "programs.xlsx"
 

@@ -252,71 +252,91 @@ class AcceptanceTests(unittest.TestCase):
         self.assertIn("Unverified", body)
 
     # --- 14.6 -------------------------------------------------------------------
-    def test_14_6_change_only_cadence_with_a_monday_heartbeat(self):
-        """No changes -> no issue. Monday -> a health issue regardless."""
-        healthy = state.SourceResult(source_id="nuft-2027", ok=True)
-        self.assertEqual(digest.should_send([], [healthy], is_monday=False), (False, False))
-        self.assertEqual(digest.should_send([], [healthy], is_monday=True), (True, True))
-
-        failing = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
-        self.assertEqual(
-            digest.should_send([], [failing], is_monday=False),
-            (True, False),
-            "a failure must break the silence even on a quiet day",
-        )
-        title, _ = digest.render([], [healthy], {}, health_only=True)
-        self.assertIn("Weekly health summary", title)
-
-    def test_14_6b_a_schedule_retry_does_not_mail_the_heartbeat_twice(self):
-        """The morning schedule fires three times; only the first tick may deliver.
-
-        The change-driven digest is self-interlocking (the snapshots advance on the
-        first success), but the Monday heartbeat is not, so it needs the delivery marker.
-        Delivering three identical health summaries every Monday would teach the owner
-        to archive the digest unread, which is the exact failure the cadence exists to
-        prevent.
-        """
+    def test_14_6_exactly_one_digest_a_day_every_day(self):
+        """Every day mails, including quiet ones, and the quiet title says so."""
         healthy = state.SourceResult(source_id="nuft-2027", ok=True)
 
-        # Tick 1 on a Monday: nothing delivered yet, so the heartbeat goes out.
-        self.assertEqual(state.read_last_delivered(), "", "no marker before the first run")
+        # A quiet day still delivers -- that is what makes a silent morning diagnostic.
         self.assertEqual(
-            digest.should_send([], [healthy], True, already_delivered_today=False),
+            digest.should_send([], [healthy]),
             (True, True),
+            "a quiet day must still mail; silence has to mean the job is broken",
         )
+        title, body = digest.render([], [healthy], {}, status_only=True)
+        self.assertIn("(no changes)", title)
+        self.assertIn("HEALTH", body)
 
-        # Tick 2, an hour later, after tick 1 recorded a delivery: silence.
-        state.write_last_delivered()
-        self.assertEqual(state.read_last_delivered(), state.today_iso())
-        self.assertEqual(
-            digest.should_send([], [healthy], True, already_delivered_today=True),
-            (False, False),
-            "a retry must not mail a second identical heartbeat",
-        )
+        # A failing source is news, so it is not a status-only day.
+        failing = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
+        self.assertEqual(digest.should_send([], [failing]), (True, False))
+        title, _ = digest.render([], [failing], {})
+        self.assertNotIn("(no changes)", title)
 
-        # But a retry that finds real news still delivers -- that is not a duplicate.
+        # So is a real change.
         change = state.Change(
             source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
         )
         judgment = classify.Judgment(change=change, relevant=True, classified=True)
-        self.assertEqual(
-            digest.should_send([judgment], [healthy], True, already_delivered_today=True),
-            (True, False),
-            "the marker suppresses the heartbeat only, never real changes",
-        )
+        self.assertEqual(digest.should_send([judgment], [healthy]), (True, False))
+
+    def test_14_6b_a_schedule_retry_never_mails_a_second_time(self):
+        """The morning schedule fires three ticks; only the first may deliver.
+
+        The lock is absolute -- unlike the old change-only cadence it suppresses real
+        changes and failing sources too. A retry has nothing to tell the owner that the
+        morning's issue did not already contain, and two issues for one date is the
+        notification-fatigue failure the cadence exists to prevent.
+        """
+        healthy = state.SourceResult(source_id="nuft-2027", ok=True)
         failing = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
-        self.assertEqual(
-            digest.should_send([], [failing], True, already_delivered_today=True),
-            (True, False),
-            "a broken source must break through the retry guard too",
+        change = state.Change(
+            source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
         )
+        judgment = classify.Judgment(change=change, relevant=True, classified=True)
+
+        # Tick 1: nothing delivered yet, so the digest goes out.
+        self.assertEqual(state.read_last_delivered(), "", "no marker before the first run")
+        self.assertEqual(digest.should_send([], [healthy], False), (True, True))
+
+        # Tick 2, an hour later, after tick 1 recorded a delivery: silence, whatever
+        # this run happened to find.
+        state.write_last_delivered()
+        self.assertEqual(state.read_last_delivered(), state.today_iso())
+        for name, judgments, results in (
+            ("a quiet retry", [], [healthy]),
+            ("a retry that found changes", [judgment], [healthy]),
+            ("a retry that found a broken source", [], [failing]),
+        ):
+            self.assertEqual(
+                digest.should_send(judgments, results, already_delivered_today=True),
+                (False, False),
+                f"{name} must not mail a second issue for the same date",
+            )
 
         # A marker from a previous day suppresses nothing.
         state.write_last_delivered("2020-01-01")
         self.assertNotEqual(state.read_last_delivered(), state.today_iso())
+        self.assertEqual(digest.should_send([], [healthy]), (True, True))
 
-        # And the default keeps the old three-argument call sites correct.
-        self.assertEqual(digest.should_send([], [healthy], True), (True, True))
+    def test_14_6c_the_delivery_lock_falls_back_when_github_cannot_be_asked(self):
+        """"Could not check" must never be read as "not yet delivered".
+
+        The local marker is read from the commit a run checked out, and late ticks do
+        not dispatch in cron order, so digest.delivered_issue_exists asks GitHub for the
+        authoritative answer. When it cannot, it has to say so rather than guess, or the
+        caller would treat an unanswerable question as a green light and mail twice.
+        """
+        names = ("GITHUB_REPOSITORY", "GITHUB_TOKEN", "GH_PAT")
+        saved = {name: os.environ.pop(name, None) for name in names}
+        try:
+            self.assertIsNone(
+                digest.delivered_issue_exists(state.today_iso()),
+                "without a repo and token the answer is unknown, not False",
+            )
+        finally:
+            for name, value in saved.items():
+                if value is not None:
+                    os.environ[name] = value
 
     # --- extra: the eligible column is never rewritten (rule 5) -----------------
     def test_eligible_column_is_never_rewritten(self):

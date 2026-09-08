@@ -99,15 +99,29 @@ heartbeat commits are independent evidence the schedule is still alive.
 
 ### Cadence
 
-Send **only on changes**, plus **one health summary every Monday**. A daily "0 changes"
-email trains you to archive unread — which is exactly when the FTTP notice arrives. But a
-silent failure must never look like a quiet day, hence the Monday heartbeat: **if no
-email arrives on a Monday, something is broken.**
+**Exactly one digest a day, every day** — no more and no less.
 
-The morning schedule fires three times (see failure mode 3), but you still get at most
-one digest per quiet day: `data/last_delivered.txt` records the date of the last delivery
-and suppresses a repeat heartbeat. It suppresses the heartbeat *only* — a retry that
-finds real changes or a failing source still mails, because that is news.
+This replaced a changes-only cadence on 2026-09-08. That version kept the inbox quieter,
+but a morning with no email meant either "nothing changed" or "the job is broken" and you
+could not tell which without opening the Actions tab. A fixed daily arrival removes the
+ambiguity: **silence now always means broken.** Notification fatigue is handled in the
+content instead of by withholding mail — a quiet day is titled `(no changes)` and its body
+is just the calendar and health blocks, which you can triage without opening it.
+
+The **no more** half matters just as much. The morning schedule fires three ticks (see
+failure mode 3) and each one would otherwise open its own issue; two digests for one date
+is the same fatigue failure as an unread daily. So delivery is capped at one issue per
+date, and the cap is **absolute** — it suppresses real changes and failing sources too,
+because a retry has nothing to tell you that the morning's issue did not already carry.
+Nothing is lost either way: the state commit and `data/proposals.log` still record
+everything the retry saw.
+
+The cap cannot rest on `data/last_delivered.txt` alone, because a run reads that marker
+from the commit it checked out and late ticks do not always dispatch in cron order — so a
+tick can see a stale marker and mail a duplicate. The authoritative check is the issue
+list itself: the issue *is* the email, so the issues **are** the delivery log, and every
+run sees the same one whatever it checked out. The marker is the fallback for when GitHub
+cannot be reached.
 
 ### What the classifier will not do
 
@@ -157,11 +171,18 @@ routes an opportunity to Manual Watch rather than being worked around.
    scheduled tick when it is busy, it silently drops it, and there is no run, no log and
    no notification to tell you so. This was observed live: the first two days of the
    schedule produced *zero* scheduled runs while `workflow_dispatch` worked perfectly.
-   **Mitigation: the schedule fires three times each morning (13:30 / 14:30 / 15:30 UTC)
-   and the run is idempotent**, so all three ticks have to be dropped to lose a day. The
-   change-driven digest cannot repeat because the snapshots advance on the first success;
-   the Monday heartbeat is held down by `data/last_delivered.txt`. Ticks avoid the top of
-   the hour, and nothing assumes an exact run time.
+   **Mitigation: the schedule fires three times each morning (07:00 / 08:20 / 09:40 UTC)
+   and delivery is capped at one issue per date**, so all three ticks have to be dropped
+   to lose a day and a redundant tick costs one 30-second no-op run.
+
+   The ticks GitHub *does* run, it runs badly late. Measured 2026-09-07/08: every tick
+   ran 3h27m–4h48m behind its cron, because a private repo on a free personal account
+   sits in the lowest scheduler priority tier. A 13:30 UTC cron aimed at 06:30 Pacific
+   opened its issue at 10:18 Pacific. No cron value fixes that — the delay is unbounded.
+   **Mitigation: schedule with headroom instead of on target.** The job runs at midnight
+   Pacific, so even the worst delay seen still lands before 05:00. Arriving early is
+   harmless; arriving at lunchtime is not. Nothing assumes an exact run time, and after
+   this nothing assumes the ticks arrive in cron order either.
 4. **Notification fatigue** — see Cadence.
 
 ## Politeness
@@ -227,8 +248,9 @@ Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHu
 | 14.3 | A 404 → HEALTH, not a change; `consecutive_failures` increments | passing |
 | 14.4 | A new "Freshman Insight Program" row → discovery candidate | passing |
 | 14.5 | Women-only program → `relevant: false`, identity gate cited | **needs `ANTHROPIC_API_KEY`** |
-| 14.6 | Two quiet runs → no Issue; Monday → health Issue regardless | passing |
-| 14.6b | A schedule retry re-mails no heartbeat, but still mails real changes | passing |
+| 14.6 | A quiet run → an Issue anyway, titled `(no changes)` | passing |
+| 14.6b | A same-day retry mails nothing, even when it finds changes or a failure | passing |
+| 14.6c | "Cannot ask GitHub" answers `None`, never "not yet delivered" | passing |
 | 14.7 | `build_xlsx.py` matches the seed formatting | passing |
 | 14.8 | `git log --follow data/programs.csv` is line-level readable | needs the repo to exist |
 

@@ -13,7 +13,6 @@ that anything happened.
 from __future__ import annotations
 
 import argparse
-import datetime
 import os
 import sys
 import time
@@ -131,7 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--force-health",
         action="store_true",
-        help="render the weekly health summary regardless of the day",
+        help="render the quiet-day (status only) digest and ignore the once-a-day lock",
     )
     args = parser.parse_args(argv)
 
@@ -165,18 +164,32 @@ def main(argv: list[str] | None = None) -> int:
     update_source_state(sources, results)
     update_program_state(programs, sources, results, judgments)
 
-    is_monday = datetime.date.today().weekday() == 0 or args.force_health
-    # A schedule retry must not mail the Monday heartbeat a second time; --force-health
-    # is a deliberate manual override and ignores the marker.
+    # Exactly one digest a day (spec section 9). The morning schedule fires three ticks
+    # so a dropped cron tick is not a missed day, so between one and three runs reach
+    # this line every morning and only the first may mail.
+    #
+    # Ask GitHub first and treat the local marker as the fallback, not the other way
+    # round: the marker comes from whatever commit this run checked out, and late ticks
+    # do not necessarily dispatch in cron order, so it can be stale. See
+    # digest.delivered_issue_exists. Either source saying "delivered" is enough --
+    # a stale marker cannot cause a duplicate, only a redundant suppression, and the
+    # marker is only ever stale in the direction of a delivery this run did not see.
+    today = state.today_iso()
+    marker_delivered = state.read_last_delivered() == today
+    issue_delivered = digest.delivered_issue_exists(today)
     delivered_today = (
-        state.read_last_delivered() == state.today_iso() and not args.force_health
+        marker_delivered if issue_delivered is None else (issue_delivered or marker_delivered)
     )
-    send, health_only = digest.should_send(
-        judgments, results, is_monday, already_delivered_today=delivered_today
-    )
-    suppressed = not send and is_monday and delivered_today
 
-    title, body = digest.render(judgments, results, by_id, health_only=health_only)
+    send, status_only = digest.should_send(
+        judgments, results, already_delivered_today=delivered_today
+    )
+    if args.force_health:
+        # A deliberate manual override: render the quiet-day shape on demand and ignore
+        # the once-a-day lock.
+        send, status_only = True, True
+
+    title, body = digest.render(judgments, results, by_id, status_only=status_only)
 
     print(f"{len(results)} sources checked, {len(changes)} changes, {len(judgments)} judged")
     for result in results:
@@ -184,7 +197,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {result.source_id}: {status} rows={result.extra.get('rows', '-')}")
 
     if args.dry_run:
-        print("\n--- would send ---" if send else "\n--- would NOT send (no changes) ---")
+        print(
+            "\n--- would send ---"
+            if send
+            else f"\n--- would NOT send: already delivered on {today} ---"
+        )
         print(f"TITLE: {title}\n")
         print(body)
         print("\n(dry run: no issue opened, no state written)")
@@ -199,13 +216,11 @@ def main(argv: list[str] | None = None) -> int:
     if send:
         print(digest.deliver(title, body))
         state.write_last_delivered()
-    elif suppressed:
-        print(
-            f"a digest was already delivered on {state.today_iso()}: heartbeat "
-            "suppressed so a schedule retry does not mail twice"
-        )
     else:
-        print("no changes and not Monday: no issue opened (spec section 9 cadence)")
+        print(
+            f"a digest was already delivered on {today}: this run is a schedule retry, "
+            "and the cadence is exactly one digest a day (spec section 9)"
+        )
     return 0
 
 
