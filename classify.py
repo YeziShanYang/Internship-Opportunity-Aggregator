@@ -1,18 +1,35 @@
 """Relevance judgment for observed changes (spec section 8).
 
-One Claude call per change that survives triage. The owner profile is passed verbatim
+One model call per change that survives triage. The owner profile is passed verbatim
 because the class-year and identity gates are the whole point: most of what these
 sources surface is aimed at juniors or at groups this owner is not part of, and reading
 that off a posting is exactly what an LLM is good at and a regex is not.
 
-Two deliberate safety properties:
+Two providers are supported, and the prompt, the schema and the `Judgment` contract are
+identical across both -- only the transport differs:
 
-* Without an API key, nothing is dropped. Every change is emitted unclassified into
+* **Anthropic** (`ANTHROPIC_API_KEY`), running Claude. Preferred whenever it is
+  configured, because the system prompt above was written and tuned against it.
+* **Azure OpenAI** (`AZURE_OPENAI_API_KEY`), running a `gpt-5-mini` deployment on a
+  Microsoft Foundry resource. This exists because Azure for Students grants $100 of
+  credit that covers first-party OpenAI models but grants *zero* deployment quota for
+  Claude on Azure -- Claude there is Marketplace-billed, and Marketplace purchases are
+  excluded from student credit. gpt-5-mini is a small-tier model, weaker than Sonnet;
+  it is accepted here because reading a graduation window or an identity gate off
+  posting text is a far easier task than the benchmarks that separate the tiers.
+
+Three deliberate safety properties:
+
+* Without any API key, nothing is dropped. Every change is emitted unclassified into
   WORTH A LOOK. Spec section 8 rule 3 is explicit that a false negative -- FTTP opens
   and the tool calls it noise -- is the failure that costs real money, so the
-  degraded mode surfaces more, not less.
+  degraded mode surfaces more, not less. Adding a second provider must not weaken
+  this: an unreachable provider degrades exactly like a missing key.
 * The `eligible` column is never rewritten. A proposed change is logged and reported
   (rule 5); hand-verified research is not overwritten by a model.
+* A provider failure is never silently swallowed. Every failure path returns a
+  `Judgment` carrying `error`, so the digest reports it rather than showing a change
+  as benignly unclassified (spec 10.1: a failure must never look like a quiet day).
 """
 from __future__ import annotations
 
@@ -23,6 +40,13 @@ from dataclasses import dataclass, field
 import state
 
 MODEL = "claude-opus-5"
+
+# The Azure side is pinned to the Foundry deployment created for this project. Both are
+# overridable by env so the repo is not welded to one resource, but defaulting them here
+# means the workflow needs exactly one new secret (the key) rather than three.
+AZURE_DEFAULT_DEPLOYMENT = "gpt-5-mini"
+AZURE_DEFAULT_ENDPOINT = "https://opptracker-ai-jshi.openai.azure.com/"
+AZURE_DEFAULT_API_VERSION = "2024-12-01-preview"
 
 # Bounds the daily bill. Any overflow still reaches the digest, just unclassified.
 MAX_CLASSIFICATIONS_PER_RUN = 60
@@ -85,6 +109,16 @@ RESULT_SCHEMA = {
         "suggested_action",
     ],
     "additionalProperties": False,
+}
+
+# OpenAI's strict json_schema mode requires every declared property to appear in
+# `required`; Anthropic's does not. `eligible_proposal` is genuinely optional -- rule 5
+# means it is present only when the model wants to propose a value -- so the strict
+# variant lists it and lets the empty string carry "no proposal". Derived rather than
+# copied so the two schemas cannot drift apart.
+STRICT_RESULT_SCHEMA = {
+    **RESULT_SCHEMA,
+    "required": list(RESULT_SCHEMA["properties"]),
 }
 
 
@@ -158,10 +192,75 @@ def _render_change(change: state.Change) -> str:
     return "\n".join(lines)
 
 
-def classify_one(client, change: state.Change) -> Judgment:
+ANTHROPIC = "anthropic"
+AZURE = "azure"
+
+
+def select_provider() -> str | None:
+    """Which backend to use, or None for degraded (unclassified) mode.
+
+    Anthropic wins when both are configured: the system prompt was written against
+    Claude, and gpt-5-mini is a deliberate cost substitution rather than an equal.
+    `CLASSIFIER_PROVIDER` forces one either way, which is what the tests use to
+    exercise a specific path without unsetting real credentials.
+    """
+    forced = (os.environ.get("CLASSIFIER_PROVIDER") or "").strip().lower()
+    if forced in (ANTHROPIC, AZURE):
+        return forced
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return ANTHROPIC
+    if os.environ.get("AZURE_OPENAI_API_KEY"):
+        return AZURE
+    return None
+
+
+def build_client(provider: str):
+    """Return (client, deployment). Raises; the caller degrades on any exception."""
+    if provider == ANTHROPIC:
+        import anthropic
+
+        key = os.environ.get("ANTHROPIC_API_KEY")
+        if not key:
+            raise RuntimeError("CLASSIFIER_PROVIDER=anthropic but ANTHROPIC_API_KEY is unset")
+        return anthropic.Anthropic(api_key=key), MODEL
+
+    from openai import AzureOpenAI
+
+    key = os.environ.get("AZURE_OPENAI_API_KEY")
+    if not key:
+        raise RuntimeError("CLASSIFIER_PROVIDER=azure but AZURE_OPENAI_API_KEY is unset")
+    client = AzureOpenAI(
+        api_key=key,
+        azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT", AZURE_DEFAULT_ENDPOINT),
+        api_version=os.environ.get("AZURE_OPENAI_API_VERSION", AZURE_DEFAULT_API_VERSION),
+    )
+    return client, os.environ.get("AZURE_OPENAI_DEPLOYMENT", AZURE_DEFAULT_DEPLOYMENT)
+
+
+def _judgment_from_text(change: state.Change, text: str) -> Judgment:
+    """Parse a provider's JSON body into a Judgment. Shared by both backends."""
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return Judgment(change=change, error="could not parse the model's JSON response")
+
+    return Judgment(
+        change=change,
+        relevant=bool(payload.get("relevant", True)),
+        program_name=payload.get("program_name", "") or change.program_name,
+        new_status=payload.get("new_status", "unknown"),
+        why=payload.get("why", ""),
+        confidence=payload.get("confidence", "low"),
+        suggested_action=payload.get("suggested_action", ""),
+        eligible_proposal=payload.get("eligible_proposal", ""),
+        classified=True,
+    )
+
+
+def _classify_anthropic(client, model: str, change: state.Change) -> Judgment:
     try:
         response = client.messages.create(
-            model=MODEL,
+            model=model,
             # Must cover adaptive thinking AND the JSON response. Billing is per token
             # generated, not per token allowed, so a generous ceiling costs nothing and
             # avoids truncating the response on a long diff.
@@ -184,22 +283,53 @@ def classify_one(client, change: state.Change) -> Judgment:
     text = "".join(
         block.text for block in response.content if getattr(block, "type", "") == "text"
     )
-    try:
-        payload = json.loads(text)
-    except json.JSONDecodeError:
-        return Judgment(change=change, error="could not parse the model's JSON response")
+    return _judgment_from_text(change, text)
 
-    return Judgment(
-        change=change,
-        relevant=bool(payload.get("relevant", True)),
-        program_name=payload.get("program_name", "") or change.program_name,
-        new_status=payload.get("new_status", "unknown"),
-        why=payload.get("why", ""),
-        confidence=payload.get("confidence", "low"),
-        suggested_action=payload.get("suggested_action", ""),
-        eligible_proposal=payload.get("eligible_proposal", ""),
-        classified=True,
-    )
+
+def _classify_azure(client, deployment: str, change: state.Change) -> Judgment:
+    try:
+        response = client.chat.completions.create(
+            model=deployment,
+            # gpt-5-mini is a reasoning model: the ceiling is `max_completion_tokens`
+            # (`max_tokens` is rejected) and it must cover the hidden reasoning tokens
+            # as well as the JSON, so the same generous 4096 applies here.
+            max_completion_tokens=4096,
+            reasoning_effort="low",
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "judgment",
+                    "strict": True,
+                    "schema": STRICT_RESULT_SCHEMA,
+                },
+            },
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": _render_change(change)},
+            ],
+        )
+    except Exception as exc:
+        return Judgment(change=change, error=f"{type(exc).__name__}: {exc}")
+
+    choice = response.choices[0] if response.choices else None
+    if choice is None:
+        return Judgment(change=change, error="Azure returned no choices")
+    # Azure's content filter and the token ceiling both produce a usable HTTP 200 with
+    # an empty or partial body. Neither is a quiet day (spec 10.1), so both become an
+    # error on the Judgment rather than a silently unclassified change.
+    if choice.finish_reason == "content_filter":
+        return Judgment(change=change, error="Azure content filter declined this change")
+    if choice.finish_reason == "length":
+        return Judgment(change=change, error="response hit max_completion_tokens before completing")
+
+    return _judgment_from_text(change, choice.message.content or "")
+
+
+def classify_one(provider: str, client, deployment: str, change: state.Change) -> Judgment:
+    """Dispatch one change to whichever backend is configured."""
+    if provider == ANTHROPIC:
+        return _classify_anthropic(client, deployment, change)
+    return _classify_azure(client, deployment, change)
 
 
 def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> list[Judgment]:
@@ -215,23 +345,22 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
         for change in summarise_only
     ]
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
+    provider = select_provider()
+    if provider is None:
         for change in to_classify:
             judgments.append(
                 Judgment(
                     change=change,
                     program_name=change.program_name,
-                    why="Not classified: ANTHROPIC_API_KEY is not set, so this is "
+                    why="Not classified: no classifier credentials are configured "
+                    "(neither ANTHROPIC_API_KEY nor AZURE_OPENAI_API_KEY), so this is "
                     "surfaced unjudged rather than dropped.",
                 )
             )
         return judgments
 
     try:
-        import anthropic
-
-        client = anthropic.Anthropic(api_key=api_key)
+        client, deployment = build_client(provider)
     except Exception as exc:
         for change in to_classify:
             judgments.append(
@@ -240,7 +369,7 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
         return judgments
 
     for change in to_classify:
-        judgment = classify_one(client, change)
+        judgment = classify_one(provider, client, deployment, change)
         if judgment.eligible_proposal:
             state.append_proposal(
                 f"{change.source_id}\t{change.key}\tproposed eligible="

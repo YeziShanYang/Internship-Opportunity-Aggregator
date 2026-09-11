@@ -4,10 +4,13 @@ Offline: the GitHub client is stubbed, so these run in a second and prove the di
 health logic rather than the network. Tests 14.1 and 14.8 need a real repo and are
 documented in the README as the post-deploy checks.
 
-Test 14.5 exercises the classifier's identity gate and needs ANTHROPIC_API_KEY. Without
-one it asserts the *degraded* contract instead -- that the change is surfaced
-unclassified rather than silently dropped -- because that is the behaviour that actually
-ships when the key is missing.
+Tests 14.5 and 14.5c exercise the classifier's identity gate against the two backends
+and need ANTHROPIC_API_KEY and AZURE_OPENAI_API_KEY respectively; each skips without its
+key. 14.5b asserts the *degraded* contract with every provider unset -- that the change
+is surfaced unclassified rather than silently dropped -- because that is the behaviour
+that actually ships when no key is present. The gate is re-tested per backend rather
+than assumed to carry over, since gpt-5-mini is a smaller model than the one the system
+prompt was written against.
 """
 from __future__ import annotations
 
@@ -238,18 +241,60 @@ class AcceptanceTests(unittest.TestCase):
         change = state.Change(
             source_id="nuft-2027", kind="added", key="Some Firm / Insight", detail="x"
         )
-        saved = os.environ.pop("ANTHROPIC_API_KEY", None)
+        # Every provider must be unset, not just Anthropic. With a second backend
+        # wired in, popping only ANTHROPIC_API_KEY would leave this test quietly
+        # making real Azure calls and asserting nothing about degraded mode.
+        names = ("ANTHROPIC_API_KEY", "AZURE_OPENAI_API_KEY", "CLASSIFIER_PROVIDER")
+        saved = {n: os.environ.pop(n, None) for n in names}
         try:
             judgments = classify.classify([change], {"nuft-2027": self.source})
         finally:
-            if saved is not None:
-                os.environ["ANTHROPIC_API_KEY"] = saved
+            for name, value in saved.items():
+                if value is not None:
+                    os.environ[name] = value
         self.assertEqual(len(judgments), 1)
         self.assertFalse(judgments[0].classified)
         self.assertTrue(judgments[0].relevant, "unclassified changes must still surface")
         _, body = digest.render(judgments, [], {})
         self.assertIn("WORTH A LOOK", body)
         self.assertIn("Unverified", body)
+
+    @unittest.skipUnless(
+        os.environ.get("AZURE_OPENAI_API_KEY"),
+        "needs AZURE_OPENAI_API_KEY (live model call)",
+    )
+    def test_14_5c_azure_backend_applies_the_same_identity_gate(self):
+        """The gpt-5-mini path must enforce rule 2 exactly as the Claude path does.
+
+        This is the whole risk of the cheaper backend: it is a smaller model than the
+        one the prompt was tuned against, so the identity gate is re-tested against it
+        rather than assumed to carry over.
+        """
+        change = state.Change(
+            source_id="nuft-2027",
+            kind="added",
+            key="Jane Street / INSIGHT",
+            detail=(
+                "New row: Role=INSIGHT; Links=Jane Street INSIGHT is a program for women "
+                "and gender-expansive students in their first year of university. "
+                "Applications open now."
+            ),
+            program_name="Jane Street INSIGHT",
+        )
+        saved = os.environ.get("CLASSIFIER_PROVIDER")
+        os.environ["CLASSIFIER_PROVIDER"] = "azure"
+        try:
+            judgments = classify.classify([change], {"nuft-2027": self.source})
+        finally:
+            if saved is None:
+                os.environ.pop("CLASSIFIER_PROVIDER", None)
+            else:
+                os.environ["CLASSIFIER_PROVIDER"] = saved
+        self.assertEqual(len(judgments), 1)
+        judgment = judgments[0]
+        self.assertTrue(judgment.classified, judgment.error)
+        self.assertFalse(judgment.relevant, judgment.why)
+        self.assertRegex(judgment.why.lower(), r"wom|gender|identity")
 
     # --- 14.6 -------------------------------------------------------------------
     def test_14_6_exactly_one_digest_a_day_every_day(self):

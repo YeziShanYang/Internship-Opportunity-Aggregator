@@ -20,9 +20,13 @@ see [What is not built yet](#what-is-not-built-yet).
 2. Add repo secrets (Settings → Secrets and variables → Actions):
    - `GH_PAT` — a fine-grained PAT, **read-only, public repositories**. Lifts the GitHub
      API limit from 60 requests/hour to 5,000. Optional but recommended.
-   - `ANTHROPIC_API_KEY` — for the relevance classifier. **Optional.** Without it the job
-     still runs and still reports everything; changes simply arrive unclassified rather
-     than being dropped.
+   - `ANTHROPIC_API_KEY` — for the relevance classifier, running Claude. **Optional.**
+   - `AZURE_OPENAI_API_KEY` — the alternative classifier backend: a `gpt-5-mini`
+     deployment on a Microsoft Foundry resource, funded by Azure for Students credit.
+     **Optional.** Used only when `ANTHROPIC_API_KEY` is absent.
+   - Either key is enough, and neither is required. Without both, the job still runs and
+     still reports everything; changes simply arrive unclassified rather than being
+     dropped. Set `CLASSIFIER_PROVIDER` to `anthropic` or `azure` to force one.
    - `GITHUB_TOKEN` is provided automatically. No SMTP, no mail credentials.
 3. Enable Actions and confirm `daily` appears in the Actions tab.
 4. Run it once manually: Actions → `daily` → **Run workflow**. It should open an Issue.
@@ -248,6 +252,7 @@ Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHu
 | 14.3 | A 404 → HEALTH, not a change; `consecutive_failures` increments | passing |
 | 14.4 | A new "Freshman Insight Program" row → discovery candidate | passing |
 | 14.5 | Women-only program → `relevant: false`, identity gate cited | **needs `ANTHROPIC_API_KEY`** |
+| 14.5c | Same identity gate, enforced on the `gpt-5-mini` backend | **needs `AZURE_OPENAI_API_KEY`** |
 | 14.6 | A quiet run → an Issue anyway, titled `(no changes)` | passing |
 | 14.6b | A same-day retry mails nothing, even when it finds changes or a failure | passing |
 | 14.6c | "Cannot ask GitHub" answers `None`, never "not yet delivered" | passing |
