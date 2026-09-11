@@ -48,6 +48,13 @@ BY_MONTH: dict[int, list[str]] = {
         "is gated to winter 2028 / spring 2029 graduates, so it is NOT open to you "
         "(class of 2030). Your cycle should be posted around autumn 2027, feeding "
         "Summer 2029. sig-phenom now watches the board automatically.",
+        "Group One Trading is at a STANFORD CAREER FAIR on Oct 6 - found on their "
+        "careers page 2026-09-11. They post Trading Analyst Intern and Software "
+        "Developer Intern roles; an on-campus fair is the cheapest referral you will get "
+        "all year.",
+        "Voloridge ASCEND PROGRAM 2027 (Jupiter, FL) is open to FIRST and second-year "
+        "undergraduates - one of the few programmes you are eligible for right now. "
+        "20 places per cohort, travel and hotel covered. Watched by voloridge-greenhouse.",
         "Jane Street FTTP is rolling and slots have reportedly filled by late October. "
         "If you have not applied, this is the week.",
     ],
