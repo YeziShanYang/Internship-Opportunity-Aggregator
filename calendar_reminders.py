@@ -38,7 +38,16 @@ BY_MONTH: dict[int, list[str]] = {
         "Traders @ Stanford channels.",
     ],
     10: [
-        "SIG First Year Discovery event is this month.",
+        # Corrected 2026-09-11 from the postings themselves. The programme called
+        # "First Year Discovery Event" is SIG's SYDNEY listing, and it is consistent
+        # with a first-year only because Australian bachelor's degrees run three
+        # years. Every US Discovery Program reads "planning to graduate in the winter
+        # of 2028 or the spring of 2029", which on a four-year US degree is a current
+        # sophomore. Do not restore the old wording; a label is not an eligibility gate.
+        "SIG Discovery Programs (New York, Bala Cynwyd) close Nov 16 - but this cycle "
+        "is gated to winter 2028 / spring 2029 graduates, so it is NOT open to you "
+        "(class of 2030). Your cycle should be posted around autumn 2027, feeding "
+        "Summer 2029. sig-phenom now watches the board automatically.",
         "Jane Street FTTP is rolling and slots have reportedly filled by late October. "
         "If you have not applied, this is the week.",
     ],
