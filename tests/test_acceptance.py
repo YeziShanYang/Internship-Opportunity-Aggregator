@@ -847,6 +847,33 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         added = [c for c in second.changes if "Data Intern" in c.key]
         self.assertTrue(added and "rising junior" in added[0].posting_text)
 
+    def test_14_9j_international_is_not_an_internship(self):
+        """Both halves of a lookahead bug that shipped once. "Internal" was excluded
+        with (?!al), but "International" is intern + *at*, so it slipped through --
+        live, on RBC's board, as "International Equity Fund Analyst"."""
+        for title in ("Internal Audit Analyst", "Internal Sales Consultant",
+                      "International Equity Fund Analyst", "Internationalisation Lead"):
+            with self.subTest(title=title):
+                self.assertFalse(job_boards.STUDENT_TITLE.search(title), title)
+                self.assertFalse(job_boards.STUDENT_TITLE_WORKDAY.search(title), title)
+        for title in ("Software Engineer Intern", "Winternship 2027",
+                      "Internship - Trading", "Interns Program"):
+            with self.subTest(title=title):
+                self.assertTrue(job_boards.STUDENT_TITLE.search(title), title)
+
+    def test_14_9k_a_foreign_workday_row_is_dropped_before_its_detail_fetch(self):
+        """RBC Early Talent: 136 of 152 titles pass the title filter and all but ~36
+        are Canadian. Paying for a description before screening the location pushed
+        the board past WORKDAY_MAX_DETAILS and reported it as failing."""
+        self.assertTrue(job_boards.NON_US_LOCATION.search("TORONTO, Ontario, Canada"))
+        self.assertTrue(job_boards.NON_US_LOCATION.search("Bengaluru, India"))
+        # Unrecognised and multi-location rows must survive to the detail fetch --
+        # dropping a real US role to tidy the digest is the expensive error.
+        for keep in ("2 Locations", "", "Chicago, Illinois, United States of America",
+                     "Springfield"):
+            with self.subTest(location=keep):
+                self.assertFalse(job_boards.NON_US_LOCATION.search(keep), keep)
+
 
 class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
     PAGE = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 40 + "</body></html>"

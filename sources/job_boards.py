@@ -67,17 +67,19 @@ WORKDAY_MAX_DETAILS = 80
 # "Internal Sales Manager" and "International Fund Administration" -- no English word
 # starts "interna" except those -- harmless on the
 # quant boards, which have none, but Capital Group's Workday board alone has 28 such
-# titles and they would all be classified as student roles. The winternship alternative
-# is there because Virtu really does run one and the word buries "intern" mid-token,
-# so a plain word-boundary fix would drop a genuine programme.
-STUDENT_TITLE = re.compile(r"\bintern(?!al)|winternship", re.IGNORECASE)
-STUDENT_TYPE = re.compile(r"\bintern(?!al)|co.?op", re.IGNORECASE)
+# titles and they would all be classified as student roles. The lookahead is (?!a), not
+# (?!al): "International" is intern + *at*, so excluding only "al" still let RBC's
+# "International Equity Fund Analyst" and every "Internationa..." title through. The
+# winternship alternative is there because Virtu really does run one and the word
+# buries "intern" mid-token, so a plain word-boundary fix would drop a real programme.
+STUDENT_TITLE = re.compile(r"\bintern(?!a)|winternship", re.IGNORECASE)
+STUDENT_TYPE = re.compile(r"\bintern(?!a)|co.?op", re.IGNORECASE)
 
 # Workday's list response carries no employment type, so the title is all there is at
 # list time. A future year in the title is the signal that catches the campus programmes
 # whose names avoid the word entirely -- Capital Group's is "CAP Associate - US (2027)".
 STUDENT_TITLE_WORKDAY = re.compile(
-    r"\bintern(?!al)|winternship|co.?op|campus|\b20(2[6-9]|3\d)\b", re.IGNORECASE
+    r"\bintern(?!a)|winternship|co.?op|campus|\b20(2[6-9]|3\d)\b", re.IGNORECASE
 )
 
 # The owner is a US citizen, US-based (spec section 8 profile). Jane Street alone posts
@@ -91,6 +93,35 @@ US_LOCATION = re.compile(
     r"|,\s*(NY|CA|IL|TX|NJ|MA|WA|PA|FL|CT|MO|GA|MN|CO|OH|AZ|UT|NC|VA|MD|WI|IA|DC)\b",
     re.IGNORECASE,
 )
+
+# Clearly-foreign locations, used to skip a detail fetch at list time. This is the
+# mirror image of US_LOCATION and its bias runs the other way on purpose: US_LOCATION
+# keeps anything it does not recognise, so it cannot narrow a Workday board at all --
+# "TORONTO, Ontario, Canada" is simply unrecognised. Only an explicit country match
+# drops a row, so an unfamiliar location is still fetched and still judged.
+#
+# Measured on RBC Early Talent, which is why this exists: 37 of 40 titles pass the
+# Workday title filter and all but three are Canadian. Without this the board exceeds
+# WORKDAY_MAX_DETAILS and is reported as failing, which is correct but useless.
+NON_US_LOCATION = re.compile(
+    r"\b(canada|ontario|quebec|alberta|manitoba|saskatchewan|british columbia"
+    r"|nova scotia|new brunswick|newfoundland"
+    r"|toronto|montr[e\u00e9]al|vancouver|calgary|ottawa|halifax|winnipeg|edmonton"
+    r"|united kingdom|england|scotland|ireland|london, (uk|england)|dublin|edinburgh|glasgow"
+    r"|india|bengaluru|bangalore|mumbai|hyderabad|chennai|pune|gurgaon|gurugram|noida"
+    r"|china|hong kong|singapore|japan|tokyo|australia|sydney|melbourne"
+    r"|germany|frankfurt|munich|berlin|france|paris|netherlands|amsterdam"
+    r"|switzerland|zurich|geneva|poland|warsaw|krak[o\u00f3]w|spain|madrid|barcelona"
+    r"|italy|milan|sweden|stockholm|denmark|copenhagen|norway|oslo|finland|helsinki"
+    r"|belgium|brussels|luxembourg|austria|vienna|portugal|lisbon"
+    r"|brazil|s[a\u00e3]o paulo|mexico|mexico city|argentina|chile|colombia"
+    r"|israel|tel aviv|dubai|abu dhabi|united arab emirates|saudi arabia|qatar"
+    r"|south africa|johannesburg|kenya|nigeria|egypt|turkey|istanbul"
+    r"|malaysia|kuala lumpur|indonesia|jakarta|philippines|manila|thailand|bangkok"
+    r"|vietnam|korea|seoul|taiwan|taipei|new zealand|auckland)\b",
+    re.IGNORECASE,
+)
+
 
 # A board with more changes than this has been restructured, not restocked. Collapsing
 # is what stands between a Greenhouse schema tweak and a 1,400-item digest.
@@ -224,10 +255,16 @@ def fetch_workday(client: httpx.Client, base: str) -> list[Posting]:
             "silently partial, so it is reported as failing instead"
         )
 
-    # Filter on the title first; only then pay for a description.
+    # Filter on the title first; only then pay for a description. The location screen
+    # runs here too, before the per-job request, because a global employer's board is
+    # mostly foreign: RBC's is 37 student titles of which 34 are Canadian, and paying
+    # for 37 descriptions to discard 34 is what pushed it past WORKDAY_MAX_DETAILS.
+    # Only an explicit foreign country drops a row -- "2 Locations" and anything
+    # unrecognised is kept and screened again by `is_us` after the detail fetch.
     matched = [
         job for job in listed
         if STUDENT_TITLE_WORKDAY.search(job.get("title") or "")
+        and not NON_US_LOCATION.search(job.get("locationsText") or "")
     ]
     interesting = matched[:WORKDAY_MAX_DETAILS]
     if len(matched) > WORKDAY_MAX_DETAILS:
