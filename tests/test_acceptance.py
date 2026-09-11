@@ -24,9 +24,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import check
 import classify
+import discover
 import digest
 import state
-from sources import github_repos, postings
+from sources import github_repos, job_boards, page_watch, postings, snapshot
 
 REPO = "northwesternfintech/2027QuantInternships"
 
@@ -687,6 +688,260 @@ class PostingJudgementTests(unittest.TestCase):
             "field. All undergraduate years are encouraged to apply."))
         self.assertTrue(j.classified, j.error)
         self.assertTrue(j.relevant, f"must not rule out a quant role: {j.why}")
+
+
+class _IsolatedState:
+    """Redirect every state path at a temp dir.
+
+    Without this the new suites write snapshots, applied.tsv and discovered.csv into
+    the real data/ directory -- which they did, until this was added. Test runs must
+    not touch the database the job commits.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        root = pathlib.Path(self._tmp.name)
+        self._saved = {
+            name: getattr(state, name)
+            for name in ("SNAPSHOTS", "PROPOSALS_LOG", "LAST_DELIVERED", "APPLIED_TSV",
+                         "DISCOVERED_CSV", "LAST_DISCOVERY", "DATA")
+        }
+        state.DATA = root
+        state.SNAPSHOTS = root / "snapshots"
+        state.PROPOSALS_LOG = root / "proposals.log"
+        state.LAST_DELIVERED = root / "last_delivered.txt"
+        state.APPLIED_TSV = root / "applied.tsv"
+        state.DISCOVERED_CSV = root / "discovered.csv"
+        state.LAST_DISCOVERY = root / "last_discovery.txt"
+        state.SNAPSHOTS.mkdir()
+
+    def tearDown(self):
+        for name, value in self._saved.items():
+            setattr(state, name, value)
+        self._tmp.cleanup()
+
+
+# --- 14.9: Phase 2 ---------------------------------------------------------------
+class FakeJSONClient:
+    """Returns a fixed JSON payload for any URL. Stands in for an ATS."""
+
+    def __init__(self, payload, status=200, text=""):
+        self.payload, self.status, self.text = payload, status, text
+
+    def get(self, url, *args, **kwargs):
+        return FakeResponse(text=self.text or "", payload=self.payload, status=self.status)
+
+
+class FakeHTMLClient:
+    def __init__(self, html, status=200):
+        self.html, self.status = html, status
+
+    def get(self, url, *args, **kwargs):
+        return FakeResponse(text=self.html, status=self.status)
+
+
+def _gh(title, location="New York, United States", employment_type=None, content="<p>x</p>"):
+    job = {"title": title, "location": {"name": location},
+           "departments": [{"name": "Engineering"}],
+           "absolute_url": f"https://example.invalid/{title}", "content": content}
+    if employment_type:
+        job["metadata"] = [{"name": "Employment Type", "value": employment_type}]
+    return job
+
+
+class Phase2ConfigTests(unittest.TestCase):
+    """The registry, and the silent-skip bug it replaced."""
+
+    def test_14_9_every_method_in_sources_csv_has_a_handler(self):
+        """A typo'd method must be caught here rather than going unwatched in prod."""
+        methods = {(r.get("method") or "").strip() for r in state.read_sources()}
+        unknown = methods - set(check.CHECKERS) - {check.UNWATCHED}
+        self.assertEqual(unknown, set(), f"sources.csv has unhandled methods: {unknown}")
+
+    def test_14_9b_an_unknown_method_is_a_failure_not_a_silent_skip(self):
+        """The bug this replaced: `continue` produced no SourceResult at all, so a
+        typo'd row looked exactly like a quiet source (spec 10.1)."""
+        results = check.run_sources(
+            [{"source_id": "typo", "method": "githb_readme", "url": "x"}], only=None
+        )
+        self.assertEqual(len(results), 1)
+        self.assertFalse(results[0].ok)
+        self.assertIn("no module handles", results[0].error)
+
+    def test_14_9c_the_github_token_never_reaches_a_job_board(self):
+        """Sharing one client would send GH_PAT to every ATS and careers page."""
+        with postings.build_client() as web:
+            headers = {k.lower() for k in web.headers}
+        self.assertNotIn("authorization", headers)
+
+
+class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
+    def test_14_9d_jane_street_survives_despite_no_intern_in_any_title(self):
+        """The trap that nearly shipped. Jane Street's 48 student roles are titled
+        "Machine Learning Researcher" and the like; the student-ness is in metadata."""
+        payload = {"jobs": [
+            _gh("Machine Learning Researcher", employment_type="Summer Internship"),
+            _gh("Quantitative Trader", employment_type="Summer Internship"),
+            _gh("Software Engineer", employment_type="Full-Time: Experienced"),
+        ]}
+        r = job_boards.check(
+            {"source_id": "js", "method": "greenhouse", "url": "janestreet", "program_names": ""},
+            FakeJSONClient(payload),
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertEqual(r.extra["rows"], 2, "both student roles must survive")
+        self.assertNotIn("intern", r.snapshot_text.lower().replace("internship", ""))
+
+    def test_14_9e_non_us_postings_are_dropped_and_counted(self):
+        payload = {"jobs": [
+            _gh("Software Engineer Intern", location="New York, United States"),
+            _gh("Software Engineer Intern", location="Hong Kong"),
+            _gh("Software Engineer Intern", location="London, United Kingdom"),
+        ]}
+        r = job_boards.check(
+            {"source_id": "b", "method": "greenhouse", "url": "s", "program_names": ""},
+            FakeJSONClient(payload),
+        )
+        self.assertEqual(r.extra["rows"], 1)
+        self.assertEqual(r.extra["suppressed_not_us"], 2, "suppression must be counted")
+
+    def test_14_9f_a_reworded_description_does_not_churn_the_snapshot(self):
+        """Greenhouse bumps updated_at on trivial edits. If the description or its
+        hash were in the snapshot, all 230 Jane Street rows would change daily."""
+        a = {"jobs": [_gh("SWE Intern", content="<p>original blurb</p>")]}
+        b = {"jobs": [_gh("SWE Intern", content="<p>completely rewritten blurb</p>")]}
+        src = {"source_id": "b", "method": "greenhouse", "url": "s", "program_names": ""}
+        first = job_boards.check(src, FakeJSONClient(a)).snapshot_text
+        second = job_boards.check(src, FakeJSONClient(b)).snapshot_text
+        self.assertEqual(first, second)
+
+    def test_14_9g_a_homoglyph_title_cannot_forge_a_new_row(self):
+        """Boards plant lookalike canaries; unnormalised they become phantom rows."""
+        self.assertEqual(
+            snapshot.fold("\uA4DFachine \uA4E1earning \uA4E3esearcher"),
+            "Machine Learning Researcher",
+        )
+
+    def test_14_9h_a_board_that_empties_is_a_failure_not_a_quiet_day(self):
+        src = {"source_id": "empties", "method": "greenhouse", "url": "s", "program_names": ""}
+        payload = {"jobs": [_gh("SWE Intern")]}
+        first = job_boards.check(src, FakeJSONClient(payload))
+        self.assertTrue(first.baseline)
+        state.write_snapshot("empties", first.snapshot_text, ext="tsv")
+        second = job_boards.check(src, FakeJSONClient({"jobs": []}))
+        self.assertFalse(second.ok)
+        self.assertIn("0 postings", second.error)
+
+    def test_14_9i_posting_text_rides_along_so_no_second_fetch_is_needed(self):
+        """The description arrives in the same response, so rule 6 works on Tier 2."""
+        src = {"source_id": "t", "method": "greenhouse", "url": "s", "program_names": ""}
+        first = job_boards.check(src, FakeJSONClient({"jobs": [_gh("SWE Intern")]}))
+        state.write_snapshot("t", first.snapshot_text, ext="tsv")
+        second = job_boards.check(
+            src,
+            FakeJSONClient({"jobs": [
+                _gh("SWE Intern"),
+                _gh("Data Intern", content="<p>Requirements: rising junior.</p>"),
+            ]}),
+        )
+        added = [c for c in second.changes if "Data Intern" in c.key]
+        self.assertTrue(added and "rising junior" in added[0].posting_text)
+
+
+class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
+    PAGE = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 40 + "</body></html>"
+
+    def _src(self, **kw):
+        base = {"source_id": "p", "url": "https://example.invalid/", "render_js": "false",
+                "selector": "", "program_names": "Test Page"}
+        base.update(kw)
+        return base
+
+    def test_14_9j_render_js_true_is_refused_loudly(self):
+        r = page_watch.check(self._src(render_js="true"), FakeHTMLClient(self.PAGE))
+        self.assertFalse(r.ok)
+        self.assertIn("render_js=true", r.error)
+
+    def test_14_9k_a_configured_selector_is_refused_rather_than_ignored(self):
+        r = page_watch.check(self._src(selector=".main"), FakeHTMLClient(self.PAGE))
+        self.assertFalse(r.ok)
+        self.assertIn("selector", r.error)
+
+    def test_14_9l_a_javascript_shell_is_a_failure(self):
+        shell = "<html>" + "<script>var x=1;</script>" * 3000 + "<body><p>Menu</p></body></html>"
+        r = page_watch.check(self._src(), FakeHTMLClient(shell))
+        self.assertFalse(r.ok)
+
+    def test_14_9m_a_page_that_shrinks_is_a_failure(self):
+        r = page_watch.check(self._src(source_id="shrink"), FakeHTMLClient(self.PAGE))
+        state.write_snapshot("shrink", r.snapshot_text, ext="txt")
+        # Above the absolute floor but well under 40% of the baseline, so the ratio
+        # rule is what fires rather than the character minimum.
+        small = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 12 + "</body></html>"
+        second = page_watch.check(self._src(source_id="shrink"), FakeHTMLClient(small))
+        self.assertFalse(second.ok)
+        self.assertIn("shrank", second.error)
+
+    def test_14_9n_one_change_per_page_and_discovery_reads_added_text_only(self):
+        r = page_watch.check(self._src(source_id="one"), FakeHTMLClient(self.PAGE))
+        state.write_snapshot("one", r.snapshot_text, ext="txt")
+        grown = self.PAGE.replace("</body>", "<p>New freshman track announced.</p></body>")
+        second = page_watch.check(self._src(source_id="one"), FakeHTMLClient(grown))
+        self.assertEqual(len(second.changes), 1, "a page must never emit one change per line")
+        self.assertTrue(second.changes[0].is_discovery_candidate)
+
+        # A programme going away must not read as a find. Baseline the page *with* a
+        # freshman line, then remove it: the only "Freshman" text is in the removed
+        # side, so the change must not be a discovery candidate.
+        had = self.PAGE.replace("</body>", "<p>Freshman track is open.</p></body>")
+        base = page_watch.check(self._src(source_id="gone"), FakeHTMLClient(had))
+        state.write_snapshot("gone", base.snapshot_text, ext="txt")
+        third = page_watch.check(self._src(source_id="gone"), FakeHTMLClient(self.PAGE))
+        self.assertEqual(len(third.changes), 1)
+        self.assertFalse(third.changes[0].is_discovery_candidate,
+                         "a closure must not be flagged as a discovery")
+
+
+class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
+    def test_14_9o_discovery_never_writes_sources_csv(self):
+        before = state.SOURCES_CSV.read_bytes()
+        discover.record([discover.Candidate("repo", "repo:a/b", "a/b", "u", "e")])
+        self.assertEqual(state.SOURCES_CSV.read_bytes(), before)
+
+    def test_14_9p_a_candidate_already_on_file_is_never_re_proposed(self):
+        """Including rejected ones: that status is a permanent tombstone."""
+        state.write_discovered([{
+            "first_proposed": "2026-01-01", "last_proposed": "2026-01-01", "kind": "repo",
+            "key": "repo:seen/repo", "title": "seen/repo", "url": "u",
+            "evidence": "e", "status": "rejected",
+        }])
+        seen = {r["key"] for r in state.read_discovered()}
+        self.assertIn("repo:seen/repo", seen)
+
+    def test_14_9q_discovery_only_runs_on_monday_or_after_a_missed_week(self):
+        self.assertTrue(discover.due("2026-09-14"))   # a Monday
+        self.assertFalse(discover.due("2026-09-16"))  # a Wednesday, ran recently
+
+
+class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
+    def test_14_9r_a_ticked_item_is_hidden_and_next_cycle_resurfaces(self):
+        """Keys hash source_id + row key, so the Summer 2028 repost differs from the
+        Summer 2027 one and comes back on its own -- no expiry logic needed."""
+        k27 = state.change_key("b", "SWE Intern, Summer 2027")
+        k28 = state.change_key("b", "SWE Intern, Summer 2028")
+        self.assertNotEqual(k27, k28)
+        state.write_applied({k27: "2026-09-11"})
+        self.assertIn(k27, state.read_applied())
+        self.assertNotIn(k28, state.read_applied())
+
+    def test_14_9s_the_digest_marks_each_item_with_its_key(self):
+        judgment = classify.Judgment(
+            change=state.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
+            relevant=True, classified=True, confidence="low",
+        )
+        _, body = digest.render([judgment], [], {})
+        self.assertIn("- [ ]", body)
+        self.assertIn(f"<!--k:{state.change_key('b', 'SWE Intern')}-->", body)
 
 
 if __name__ == "__main__":
