@@ -116,7 +116,20 @@ US_LOCATION = re.compile(
     r"united states|\bu\.?s\.?a?\b|remote"
     r"|new york|chicago|austin|boston|san francisco|seattle|houston|miami|atlanta"
     r"|philadelphia|dallas|denver|minneapolis|charlotte|washington|los angeles"
-    r"|,\s*(NY|CA|IL|TX|NJ|MA|WA|PA|FL|CT|MO|GA|MN|CO|OH|AZ|UT|NC|VA|MD|WI|IA|DC)\b",
+    r"|,\s*(NY|CA|IL|TX|NJ|MA|WA|PA|FL|CT|MO|GA|MN|CO|OH|AZ|UT|NC|VA|MD|WI|IA|DC)\b"
+    # Spelled-out state names, not just the postal abbreviations. Voloridge posts the
+    # same Jupiter office as both "Jupiter, FL" and "Jupiter, Florida", and the one
+    # spelled out was its Ascend Program -- a programme explicitly open to first- and
+    # second-year undergraduates, i.e. the single most relevant posting on the board.
+    # It was being dropped as non-US. Swept across every ATS board afterwards: the only
+    # remaining unmatched locations are genuinely foreign (London, Shanghai, Budapest).
+    r"|\b(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware"
+    r"|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana"
+    r"|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana"
+    r"|nebraska|nevada|new hampshire|new jersey|new mexico|north carolina|north dakota"
+    r"|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota"
+    r"|tennessee|texas|utah|vermont|virginia|west virginia|wisconsin|wyoming"
+    r"|district of columbia)\b",
     re.IGNORECASE,
 )
 
