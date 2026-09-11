@@ -37,7 +37,9 @@ import httpx
 import state
 from sources import postings, snapshot
 
-GREENHOUSE, LEVER, ASHBY, WORKDAY = "greenhouse", "lever", "ashby", "workday"
+GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM = (
+    "greenhouse", "lever", "ashby", "workday", "phenom",
+)
 
 ENDPOINTS = {
     GREENHOUSE: "https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true",
@@ -46,6 +48,8 @@ ENDPOINTS = {
     # Workday's slug is the whole CXS base URL, because the tenant, the site and the
     # wd1/wd3/wd5 shard all vary independently and guessing any of them is guesswork.
     WORKDAY: "{slug}/jobs",
+    # Phenom, like Workday, takes the whole endpoint URL as its slug.
+    PHENOM: "{slug}",
 }
 
 # Workday rejects a limit above 20 (50 and 100 return an empty list), and it keeps
@@ -120,6 +124,27 @@ NON_US_LOCATION = re.compile(
     r"|malaysia|kuala lumpur|indonesia|jakarta|philippines|manila|thailand|bangkok"
     r"|vietnam|korea|seoul|taiwan|taipei|new zealand|auckland)\b",
     re.IGNORECASE,
+)
+
+
+# Phenom pages 100 at a time and reports `totalCount`, so pagination is bounded the
+# same way Workday's is. Measured on Susquehanna: 263 postings over three pages.
+PHENOM_PAGE = 100
+PHENOM_MAX_PAGES = 30
+
+# Phenom carries a real recruiting category per posting, which is better evidence than
+# any title regex and is why this method exists as its own fetcher. Measured on
+# Susquehanna's 263 postings the field takes exactly four values: "Interns + Co-ops"
+# (57), "New Graduates" (35), "Student Discovery Program" (10) and "Experienced
+# Professionals" (161). Filtering on it needs no guessing at all.
+#
+# "Student Discovery Program" is the reason the shared STUDENT_TYPE regex is not reused
+# here: SIG's Discovery postings are titled "Discovery Program: Quantitative Trading"
+# with no "intern" anywhere, exactly the trap Jane Street set on Greenhouse. New
+# Graduates is kept because it is the full-time-out-of-university category -- the
+# Jane Street FTTP equivalent, which this project treats as top priority.
+PHENOM_STUDENT_CATEGORY = re.compile(
+    r"\bintern(?!a)|co.?op|student|new graduate|campus|discovery", re.IGNORECASE
 )
 
 
@@ -215,7 +240,7 @@ def parse_ashby(payload: dict) -> list[Posting]:
     return out
 
 
-def fetch_workday(client: httpx.Client, base: str) -> list[Posting]:
+def fetch_workday(client: httpx.Client, base: str) -> tuple[list[Posting], int]:
     """List a Workday board, then fetch descriptions for the survivors only.
 
     Workday is why "the firm has no public API" was wrong for so many employers. A
@@ -298,13 +323,101 @@ def fetch_workday(client: httpx.Client, base: str) -> list[Posting]:
                 text=text,
             )
         )
-    return out
+    # Reported, not swallowed. This screen runs inside the fetcher so the shared one in
+    # check() sees nothing to remove, and for a while that meant a 152-posting board
+    # showed "0 suppressed" in HEALTH -- precisely the silent filter this project has
+    # been bitten by twice.
+    return out, len(listed) - len(matched)
+
+
+def _phenom_field(value) -> str:
+    """Flatten a Phenom field to a string.
+
+    Not defensive boilerplate: `category` really does arrive as a one-element list
+    (`["Interns + Co-ops"]`) while `title`, `city` and `country` arrive as plain
+    strings, and the first version of this fetcher called .strip() on the list and
+    failed the whole board. Field types are per-field and undocumented, so coerce
+    rather than assume.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, (list, tuple)):
+        return ", ".join(_phenom_field(item) for item in value if item).strip()
+    if isinstance(value, dict):
+        return _phenom_field(value.get("name") or value.get("value"))
+    return str(value).strip()
+
+
+def fetch_phenom(client: httpx.Client, endpoint: str) -> tuple[list[Posting], int]:
+    """Read a Phenom-hosted career site's JSON API.
+
+    Phenom is why "this firm blocks automation" needed re-testing. Susquehanna's careers
+    page is the canonical JavaScript shell in this codebase -- 221 characters of text out
+    of 402KB of HTML, the very measurement MIN_TEXT_HTML_RATIO was calibrated against --
+    so the firm sat at method=manual as unreachable. The JSON behind it answers our
+    honest User-Agent with 263 postings, descriptions and recruiting categories included.
+    Nothing was blocked; only the rendering was.
+
+    Unlike Workday there is no second request per posting: the description and the
+    qualifications both arrive in the list payload.
+    """
+    listed: list[dict] = []
+    total = None
+    for page in range(1, PHENOM_MAX_PAGES + 1):
+        response = client.get(
+            endpoint, params={"page": page, "limit": PHENOM_PAGE},
+            headers={"Accept": "application/json"},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if total is None:
+            total = payload.get("totalCount") or 0
+        batch = payload.get("jobs") or []
+        if not batch:
+            break
+        listed += batch
+        if len(listed) >= total:
+            break
+
+    # Same refusal as Workday: half a board that looks healthy is worse than a board
+    # that reports itself broken.
+    if total and len(listed) < total:
+        raise RuntimeError(
+            f"site reports {total} postings but only {len(listed)} could be paged; "
+            "this source would be silently partial, so it is reported as failing"
+        )
+
+    out = []
+    for job in listed:
+        data = job.get("data") or {}
+        category = _phenom_field(data.get("category"))
+        if not PHENOM_STUDENT_CATEGORY.search(category):
+            continue
+        city = _phenom_field(data.get("city"))
+        country = _phenom_field(data.get("country"))
+        out.append(
+            Posting(
+                title=_phenom_field(data.get("title")),
+                # City plus country, because the US screen keys off the country name and
+                # "Bala Cynwyd (Philadelphia Area)" matches no city list anywhere.
+                location=", ".join(part for part in (city, country) if part),
+                department=category or "(no department)",
+                employment_type=category,
+                url=_phenom_field(data.get("apply_url")),
+                text=_clean(
+                    _phenom_field(data.get("description"))
+                    + " "
+                    + _phenom_field(data.get("qualifications"))
+                ),
+            )
+        )
+    return out, len(listed) - len(out)
 
 
 PARSERS = {GREENHOUSE: parse_greenhouse, LEVER: parse_lever, ASHBY: parse_ashby}
 # Workday needs POST + pagination + a second request per survivor, so it does not fit
 # the parse-one-payload shape the other three share.
-FETCHERS = {WORKDAY: fetch_workday}
+FETCHERS = {WORKDAY: fetch_workday, PHENOM: fetch_phenom}
 
 
 def to_snapshot(kept: list[Posting]) -> snapshot.Snapshot:
@@ -358,9 +471,10 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             error=f"no parser for method={method!r} or empty slug",
         )
 
+    prefiltered_out = 0
     try:
         if fetcher is not None:
-            parsed = fetcher(client, slug.rstrip("/"))
+            parsed, prefiltered_out = fetcher(client, slug.rstrip("/"))
         else:
             response = client.get(ENDPOINTS[method].format(slug=slug))
             response.raise_for_status()
@@ -370,9 +484,16 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}"
         )
 
-    students = parsed if method == WORKDAY else [p for p in parsed if is_student_posting(p)]
+    # Workday screens on the title and Phenom on the recruiting category, both inside
+    # their fetcher, so re-running the shared title/type screen here would drop rows
+    # those methods deliberately kept -- "Discovery Program: Quantitative Trading"
+    # contains no "intern" at all.
+    students = (
+        parsed if method in (WORKDAY, PHENOM)
+        else [p for p in parsed if is_student_posting(p)]
+    )
     kept = [p for p in students if is_us(p)]
-    suppressed_not_student = len(parsed) - len(students)
+    suppressed_not_student = len(parsed) - len(students) + prefiltered_out
     suppressed_not_us = len(students) - len(kept)
 
     previous_text = state.read_snapshot(source_id, ext="tsv")
@@ -382,7 +503,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     # a README restructure: HTTP 200, no exception, and "no open roles" indistinguishable
     # from "we have gone blind". Self-calibrating against yesterday rather than a
     # configured floor, so there is no constant to rot.
-    if previous is not None and previous.rows and not parsed:
+    if previous is not None and previous.rows and not parsed and not prefiltered_out:
         return state.SourceResult(
             source_id=source_id,
             ok=False,
@@ -393,7 +514,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     text = snapshot.render_snapshot(current)
     extra = {
         "rows": len(current.rows),
-        "postings": len(parsed),
+        "postings": len(parsed) + prefiltered_out,
         "suppressed_not_student": suppressed_not_student,
         "suppressed_not_us": suppressed_not_us,
     }

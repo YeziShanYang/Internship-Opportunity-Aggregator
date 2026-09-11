@@ -40,6 +40,7 @@ CHECKERS: dict[str, tuple] = {
     "lever": (job_boards.check, WEB_CLIENT),
     "ashby": (job_boards.check, WEB_CLIENT),
     "workday": (job_boards.check, WEB_CLIENT),
+    "phenom": (job_boards.check, WEB_CLIENT),
     "page_text": (page_watch.check, WEB_CLIENT),
 }
 

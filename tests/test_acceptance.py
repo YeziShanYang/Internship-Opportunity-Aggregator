@@ -874,6 +874,66 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
             with self.subTest(location=keep):
                 self.assertFalse(job_boards.NON_US_LOCATION.search(keep), keep)
 
+    def test_14_9l_a_phenom_discovery_programme_survives_with_no_intern_in_its_title(self):
+        """The Jane Street trap in a second ATS. Susquehanna's Discovery Programs are
+        titled "Discovery Program: Quantitative Trading" -- no "intern" anywhere -- and
+        the student-ness lives in a `category` field that arrives as a *list*."""
+        payload = {"totalCount": 3, "jobs": [
+            {"data": {"title": "Discovery Program: Quantitative Trading",
+                      "category": ["Student Discovery Program"], "city": "New York",
+                      "country": "United States", "apply_url": "https://x.invalid/1",
+                      "description": "<p>graduate in the spring of 2029</p>",
+                      "qualifications": ""}},
+            {"data": {"title": "Quantitative Trader Internship: Summer 2027",
+                      "category": ["Interns + Co-ops"], "city": "Chicago",
+                      "country": "United States", "apply_url": "https://x.invalid/2",
+                      "description": "<p>x</p>", "qualifications": ""}},
+            {"data": {"title": "C++ Developer | Experienced Hire",
+                      "category": ["Experienced Professionals"], "city": "New York",
+                      "country": "United States", "apply_url": "https://x.invalid/3",
+                      "description": "<p>x</p>", "qualifications": ""}},
+        ]}
+        r = job_boards.check(
+            {"source_id": "sig", "method": "phenom",
+             "url": "https://careers.example.invalid/api/jobs", "program_names": ""},
+            FakeJSONClient(payload),
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertEqual(r.extra["rows"], 2, "both student rows must survive")
+        self.assertIn("Discovery Program: Quantitative Trading", r.snapshot_text)
+        self.assertNotIn("Experienced Hire", r.snapshot_text)
+
+    def test_14_9m_a_fetcher_side_filter_is_reported_not_swallowed(self):
+        """Workday and Phenom screen inside their fetcher, so the shared screen in
+        check() has nothing left to remove. That once made a 263-posting board report
+        "0 suppressed" in HEALTH -- a silent filter, which this project treats as a bug
+        in its own right."""
+        payload = {"totalCount": 2, "jobs": [
+            {"data": {"title": "SWE Intern", "category": ["Interns + Co-ops"],
+                      "city": "New York", "country": "United States",
+                      "apply_url": "https://x.invalid/1", "description": "<p>x</p>",
+                      "qualifications": ""}},
+            {"data": {"title": "Head of Compliance", "category": ["Experienced Professionals"],
+                      "city": "New York", "country": "United States",
+                      "apply_url": "https://x.invalid/2", "description": "<p>x</p>",
+                      "qualifications": ""}},
+        ]}
+        r = job_boards.check(
+            {"source_id": "sig2", "method": "phenom",
+             "url": "https://careers.example.invalid/api/jobs", "program_names": ""},
+            FakeJSONClient(payload),
+        )
+        self.assertEqual(r.extra["postings"], 2, "the pre-filter total must be reported")
+        self.assertEqual(r.extra["suppressed_not_student"], 1)
+
+    def test_14_9n_a_phenom_field_may_be_a_list_a_dict_or_a_string(self):
+        """Field types are per-field and undocumented; the first version of the fetcher
+        called .strip() on a list and failed the entire board."""
+        self.assertEqual(job_boards._phenom_field(["Interns + Co-ops"]), "Interns + Co-ops")
+        self.assertEqual(job_boards._phenom_field({"name": "New Graduates"}), "New Graduates")
+        self.assertEqual(job_boards._phenom_field("  Intern  "), "Intern")
+        self.assertEqual(job_boards._phenom_field(None), "")
+
 
 class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
     PAGE = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 40 + "</body></html>"
