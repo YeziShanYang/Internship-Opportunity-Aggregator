@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 import os
+import re
 
 import httpx
 
@@ -61,6 +62,22 @@ def _health_lines(results: list[state.SourceResult], sources: dict[str, dict[str
             lines.append(
                 f"· {result.source_id}: first run, recorded "
                 f"{result.extra.get('rows', 0)} rows as the baseline."
+            )
+    # Every filter reports what it removed. A filter that hides silently is how a
+    # source goes blind without anyone noticing, and Tier 2 applies two of them.
+    not_student = sum(r.extra.get("suppressed_not_student", 0) for r in results)
+    not_us = sum(r.extra.get("suppressed_not_us", 0) for r in results)
+    if not_student or not_us:
+        lines.append(
+            f"· job boards: {not_student} postings were not student roles and "
+            f"{not_us} were outside the US."
+        )
+    for result in results:
+        collapsed = result.extra.get("collapsed")
+        if collapsed:
+            lines.append(
+                f"⚠ {result.source_id}: {collapsed} rows changed at once and were "
+                "collapsed into one item — that reads as a board restructure."
             )
     return lines, escalated
 
@@ -112,13 +129,17 @@ def _judgment_line(judgment: Judgment, suppress_reason: bool = False) -> str:
     line = " ".join(bits)
     if change.url:
         line += f" → {change.url}"
-    return line
+    # The trailing marker is what makes "tick it and never see it again" work. It is an
+    # HTML comment, so GitHub renders nothing, and it survives the owner editing the
+    # line. See collect_applied.
+    return line + f" <!--k:{state.change_key(change.source_id, change.key)}-->"
 
 
 def render(
     judgments: list[Judgment],
     results: list[state.SourceResult],
     sources: dict[str, dict[str, str]],
+    suppressed_applied: int = 0,
     status_only: bool = False,
 ) -> tuple[str, str]:
     """Return (issue title, issue body).
@@ -158,13 +179,13 @@ def render(
         for line in escalated:
             body.append(f"- {line}")
         for judgment in act_now:
-            body.append(f"- {_judgment_line(judgment, suppress_reason)}")
+            body.append(f"- [ ] {_judgment_line(judgment, suppress_reason)}")
         body.append("")
 
     if worth_a_look:
         body.append(f"## ■ WORTH A LOOK ({len(worth_a_look)})")
         for judgment in worth_a_look:
-            body.append(f"- {_judgment_line(judgment, suppress_reason)}")
+            body.append(f"- [ ] {_judgment_line(judgment, suppress_reason)}")
         body.append("")
 
     if ruled_out:
@@ -198,6 +219,11 @@ def render(
     body.append("## ■ HEALTH")
     for line in health_lines:
         body.append(f"- {line}")
+    if suppressed_applied:
+        body.append(
+            f"- {suppressed_applied} item(s) you ticked off in an earlier digest were "
+            "hidden. Untick one in its original issue to bring it back."
+        )
     if ruled_out:
         # Surfaced here as well as in the collapsed block: the filter silently eating
         # real opportunities is the failure mode worth noticing, and an implausible
@@ -292,6 +318,52 @@ def delivered_issue_exists(date: str) -> bool | None:
         # The issues endpoint returns pull requests too; they are not digests.
         if isinstance(issue, dict) and "pull_request" not in issue
     )
+
+
+_TICKED = re.compile(r"^\s*[-*]\s*\[[xX]\].*?<!--k:([0-9a-f]{10})-->", re.MULTILINE)
+
+
+def collect_applied(limit: int = 14) -> dict[str, str]:
+    """Keys the owner has ticked off in recently delivered digests.
+
+    The digest is already the interface -- it arrives as an issue the owner reads, and
+    CLAUDE.md has always described it as doubling as an application tracker. Ticking a
+    checkbox edits the issue body, so the state is already stored on GitHub; this just
+    reads it back. No new tool, no file to edit, nothing to remember.
+
+    Returns {} rather than raising when GitHub cannot be asked, so an API problem loses
+    a suppression rather than the digest.
+    """
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
+    if not repo or not token:
+        return {}
+    try:
+        response = httpx.get(
+            f"{GITHUB_API}/repos/{repo}/issues",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "User-Agent": state.USER_AGENT,
+            },
+            params={"state": "all", "sort": "created", "direction": "desc", "per_page": limit},
+            timeout=state.HTTP_TIMEOUT_SECONDS,
+        )
+        if response.status_code >= 300:
+            return {}
+        issues = response.json()
+    except (httpx.HTTPError, ValueError):
+        return {}
+    if not isinstance(issues, list):
+        return {}
+    marked: dict[str, str] = {}
+    for issue in issues:
+        if not isinstance(issue, dict) or "pull_request" in issue:
+            continue
+        when = (issue.get("updated_at") or "")[:10]
+        for key in _TICKED.findall(issue.get("body") or ""):
+            marked.setdefault(key, when)
+    return marked
 
 
 def deliver(title: str, body: str) -> str:

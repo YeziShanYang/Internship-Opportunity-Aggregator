@@ -208,6 +208,23 @@ def main(argv: list[str] | None = None) -> int:
     }
     changes = [change for change in changes if change.program_name not in muted]
 
+    # Anything the owner ticked off in a delivered digest -- applied to, or not
+    # interested -- is dropped before classification, which also saves the model call.
+    # Newly ticked keys are merged in first so a tick takes effect the next morning.
+    applied = state.read_applied()
+    newly_ticked = digest.collect_applied()
+    if newly_ticked:
+        applied.update({k: v for k, v in newly_ticked.items() if k not in applied})
+        if not args.dry_run:
+            state.write_applied(applied)
+    before_applied = len(changes)
+    changes = [
+        change
+        for change in changes
+        if state.change_key(change.source_id, change.key) not in applied
+    ]
+    suppressed_applied = before_applied - len(changes)
+
     by_id = {source["source_id"]: source for source in sources}
     judgments = (
         [] if args.no_classify else classify.classify(changes, by_id)
@@ -241,7 +258,10 @@ def main(argv: list[str] | None = None) -> int:
         # the once-a-day lock.
         send, status_only = True, True
 
-    title, body = digest.render(judgments, results, by_id, status_only=status_only)
+    title, body = digest.render(
+        judgments, results, by_id, suppressed_applied=suppressed_applied,
+        status_only=status_only,
+    )
 
     print(f"{len(results)} sources checked, {len(changes)} changes, {len(judgments)} judged")
     for result in results:

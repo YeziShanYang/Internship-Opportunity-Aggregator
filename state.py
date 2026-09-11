@@ -20,6 +20,11 @@ PROGRAMS_CSV = DATA / "programs.csv"
 SOURCES_CSV = DATA / "sources.csv"
 SNAPSHOTS = DATA / "snapshots"
 PROPOSALS_LOG = DATA / "proposals.log"
+# Items the owner has ticked off in a delivered digest -- applied to, or not interested.
+# Suppressed from every later digest. Keyed on a hash of source_id + row key, so next
+# cycle's repost ("Summer 2028" rather than "Summer 2027") is a different key and
+# resurfaces on its own, which is the intended behaviour rather than an accident.
+APPLIED_TSV = DATA / "applied.tsv"
 # The date of the last digest actually delivered. The schedule fires several times
 # each morning so that a dropped cron tick is not a missed day (see daily.yml), and the
 # cadence is exactly one digest a day, so something has to stop ticks two and three from
@@ -137,6 +142,35 @@ def write_sources(rows: list[dict[str, str]]) -> None:
 def snapshot_path(source_id: str, ext: str = "txt") -> pathlib.Path:
     """Tier 1 stores canonical `.tsv` rows; Tier 3 will store `.txt` page text."""
     return SNAPSHOTS / f"{source_id}.{ext}"
+
+
+def change_key(source_id: str, key: str) -> str:
+    """Stable short id for one digest line, used by the tick-to-dismiss flow."""
+    return hashlib.sha1(f"{source_id}|{key}".encode()).hexdigest()[:10]
+
+
+def read_applied() -> dict[str, str]:
+    """{key: marked_at}. Empty when nothing has ever been ticked."""
+    if not APPLIED_TSV.exists():
+        return {}
+    applied: dict[str, str] = {}
+    for line in APPLIED_TSV.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        parts = line.split("\t")
+        if parts[0]:
+            applied[parts[0]] = parts[1] if len(parts) > 1 else ""
+    return applied
+
+
+def write_applied(applied: dict[str, str], titles: dict[str, str] | None = None) -> None:
+    titles = titles or {}
+    lines = ["# key\tmarked_at\ttitle"]
+    lines += [
+        f"{key}\t{marked}\t{titles.get(key, '')}" for key, marked in sorted(applied.items())
+    ]
+    DATA.mkdir(parents=True, exist_ok=True)
+    APPLIED_TSV.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def read_snapshot(source_id: str, ext: str = "txt") -> str | None:
