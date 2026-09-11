@@ -18,11 +18,13 @@ capped -- see should_send and delivered_issue_exists.
 """
 from __future__ import annotations
 
+import datetime
 import os
 
 import httpx
 
 import calendar_reminders
+import classify
 import state
 from classify import Judgment
 
@@ -61,6 +63,30 @@ def _health_lines(results: list[state.SourceResult], sources: dict[str, dict[str
                 f"{result.extra.get('rows', 0)} rows as the baseline."
             )
     return lines, escalated
+
+
+def _stale_profile_line() -> str | None:
+    """Nag when the owner profile has not been reviewed in a while.
+
+    Every relevance call in the digest is made against `classify.OWNER_PROFILE`. When
+    it drifts out of date nothing breaks visibly -- the digest still renders, the
+    judgments still look confident, they are just answering last year's question. The
+    CALENDAR block is the right home because it already carries recurring
+    human-action reminders, and this line costs nothing on the days it does not fire.
+    """
+    try:
+        reviewed = datetime.date.fromisoformat(classify.PROFILE_LAST_REVIEWED)
+    except ValueError:
+        return None
+    days = (datetime.date.fromisoformat(state.today_iso()) - reviewed).days
+    if days < classify.PROFILE_REVIEW_AFTER_DAYS:
+        return None
+    return (
+        f"Your interest profile was last reviewed {reviewed.isoformat()} "
+        f"({days // 30} months ago) - are quant and maths still the priority? Every "
+        "relevance call in this digest assumes so. Edit OWNER_PROFILE in classify.py "
+        "and bump PROFILE_LAST_REVIEWED."
+    )
 
 
 def _judgment_line(judgment: Judgment, suppress_reason: bool = False) -> str:
@@ -144,6 +170,12 @@ def render(
     if ruled_out:
         body.append(f"<details><summary>■ RULED OUT ({len(ruled_out)})</summary>")
         body.append("")
+        body.append(
+            "_Read and judged out of scope - usually a class-year gate on the posting, "
+            "or a role outside quant/maths/software. Expand to audit; a wrong call here "
+            "is the expensive kind, so the reasons are shown rather than hidden._"
+        )
+        body.append("")
         for judgment in ruled_out:
             body.append(
                 f"- **{judgment.change.key}** — {judgment.why or 'not relevant'}"
@@ -158,11 +190,22 @@ def render(
         body.append(f"- {reminder}")
     for reminder in calendar_reminders.ALWAYS:
         body.append(f"- {reminder}")
+    stale = _stale_profile_line()
+    if stale:
+        body.append(f"- {stale}")
     body.append("")
 
     body.append("## ■ HEALTH")
     for line in health_lines:
         body.append(f"- {line}")
+    if ruled_out:
+        # Surfaced here as well as in the collapsed block: the filter silently eating
+        # real opportunities is the failure mode worth noticing, and an implausible
+        # count is the cheapest signal that it is happening.
+        body.append(
+            f"- {len(ruled_out)} of {len(judgments)} changes were filtered out by the "
+            "classifier (see RULED OUT above)."
+        )
 
     return title, "\n".join(body)
 

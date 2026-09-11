@@ -99,10 +99,25 @@ def update_program_state(
             if result.changes:
                 program["last_changed"] = now
 
+    # Aggregate job boards must not drive the status of their own programs.csv row.
+    # `judgment.program_name` falls back to `change.program_name`, which for every
+    # Simplify row is the single aggregate program "SimplifyJobs Summer 2027
+    # Internships". Before postings were classified this path was unreachable for that
+    # source; now ~35 per-row judgments a day would each try to set the status of one
+    # row that represents the whole board, which is meaningless and would churn
+    # proposals.log. Per-program sources are unaffected.
+    noisy = {
+        source["source_id"]
+        for source in sources
+        if (source.get("signal") or "high").strip().lower() == "low"
+    }
+
     for judgment in judgments:
         if not (judgment.classified and judgment.relevant):
             continue
         if judgment.confidence == "low":
+            continue
+        if judgment.change.source_id in noisy:
             continue
         program = by_name.get(judgment.program_name)
         if program is None or judgment.new_status not in state.PROGRAM_STATUSES:

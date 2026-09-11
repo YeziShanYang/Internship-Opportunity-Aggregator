@@ -26,7 +26,7 @@ import check
 import classify
 import digest
 import state
-from sources import github_repos
+from sources import github_repos, postings
 
 REPO = "northwesternfintech/2027QuantInternships"
 
@@ -485,6 +485,208 @@ class NoiseRegressionTests(unittest.TestCase):
             closing_rows[0].value,
             "an OPEN -> CLOSING SOON transition is exactly what must be reported",
         )
+
+
+# --- 14.7 -----------------------------------------------------------------------
+class PostingFilterTests(unittest.TestCase):
+    """The change that made WORTH A LOOK readable: fetch the posting, then judge it.
+
+    A Simplify row on its own is a title and a location -- measured, 7 of 592 rows
+    mention any class-year word, and all 7 are incidental. These lock down that the
+    posting text reaches the model, that a failed fetch can never masquerade as a
+    relevance decision, and that ruled-out items stay visible.
+    """
+
+    SOURCE = {"source_id": "simplify-2027", "signal": "low", "program_names": "Board"}
+
+    def _change(self, key="ACME / Software Engineer Intern", url=None):
+        detail = f"Company=[ACME](https://simplify.jobs/c/ACME); Role={key}"
+        if url:
+            detail += f"; Application=[ ](https://ats.example.com/x) [ ]({url})"
+        return state.Change(
+            source_id="simplify-2027", kind="added", key=key, detail=detail
+        )
+
+    def test_14_7_low_signal_rows_now_reach_the_classifier(self):
+        """The old bypass is gone: a low-signal row is classified, not skipped.
+
+        Skipping them is what filled WORTH A LOOK with 20-35 unreadable items a day,
+        because an unclassified change defaults to relevant=True.
+        """
+        change = self._change()
+        to_classify, summarise_only = classify.triage(
+            [change], {"simplify-2027": self.SOURCE}
+        )
+        self.assertEqual(to_classify, [change], "low-signal rows must be classified now")
+        self.assertEqual(summarise_only, [])
+
+    def test_14_7b_posting_url_prefers_the_posting_over_the_company_page(self):
+        """/c/ is a company listing; only /p/ carries this role's requirements."""
+        url = "https://simplify.jobs/p/06a6fa65-37c0-461f-be1e-748f50cdf55c"
+        self.assertEqual(postings.posting_url(self._change(url=url)), url)
+        self.assertIsNone(postings.posting_url(self._change()))
+
+    def test_14_7c_posting_text_reaches_the_model(self):
+        rendered = classify._render_change(
+            self._change(), ("Requirements: rising junior standing required.", "")
+        )
+        self.assertIn("POSTING TEXT", rendered)
+        self.assertIn("rising junior", rendered)
+
+    def test_14_7d_a_failed_fetch_can_never_look_like_a_judgment(self):
+        """A network failure must not read as 'the posting states no requirements'.
+
+        If it did, the model would rule items out on the strength of a timeout.
+        """
+        rendered = classify._render_change(self._change(), ("", "ConnectError: boom"))
+        self.assertIn("UNAVAILABLE", rendered)
+        self.assertIn("ConnectError: boom", rendered)
+        self.assertRegex(rendered, r"[Dd]o not rule this out")
+
+    def test_14_7e_a_javascript_shell_is_a_failure_not_an_empty_posting(self):
+        """Workday returns HTTP 200 with no text; that is an error, not a blank page."""
+        self.assertLess(len(postings.extract_text("<html><body></body></html>")),
+                        postings.MIN_USEFUL_CHARS)
+
+    def test_14_7f_ruled_out_items_stay_visible_with_their_reasons(self):
+        """Filtering is only safe if a wrong call is auditable."""
+        judgment = classify.Judgment(
+            change=self._change(),
+            relevant=False,
+            classified=True,
+            confidence="high",
+            why="The posting requires third or fourth year standing.",
+        )
+        _, body = digest.render([judgment], [], {})
+        self.assertIn("RULED OUT", body)
+        self.assertIn("third or fourth year", body)
+        self.assertIn("filtered out by the classifier", body)
+
+    def test_14_7g2_eligible_is_not_the_same_as_urgent(self):
+        """ACT NOW is only useful while it stays short.
+
+        Classifying every source made every eligible job-board row "confidently
+        relevant", which promoted 22 generic internships into ACT NOW and emptied
+        WORTH A LOOK. Urgency now means rolling review or a first-year-targeted row.
+        """
+        def judge(**kw):
+            change = state.Change(source_id="simplify-2027", kind="added",
+                                  key="ACME / Software Engineer Intern", detail="x", **kw)
+            return classify.Judgment(change=change, relevant=True, classified=True,
+                                     confidence="high")
+
+        self.assertFalse(judge().urgent, "merely eligible is WORTH A LOOK, not ACT NOW")
+        self.assertTrue(judge(rolling=True).urgent, "rolling firms close when full")
+        self.assertTrue(judge(is_discovery_candidate=True).urgent,
+                        "first-year-targeted rows are the point of the tool")
+
+    def test_14_7g_a_stale_owner_profile_nags_in_the_calendar(self):
+        """A stale profile mis-sorts everything while still looking well-formed."""
+        saved = classify.PROFILE_LAST_REVIEWED
+        try:
+            classify.PROFILE_LAST_REVIEWED = "2019-01-01"
+            _, body = digest.render([], [], {})
+            self.assertIn("interest profile was last reviewed", body)
+            classify.PROFILE_LAST_REVIEWED = state.today_iso()
+            _, fresh = digest.render([], [], {})
+            self.assertNotIn("interest profile was last reviewed", fresh)
+        finally:
+            classify.PROFILE_LAST_REVIEWED = saved
+
+    def test_14_7h_noisy_boards_never_write_to_programs_csv(self):
+        """One aggregate programs.csv row must not be driven by 35 per-row judgments."""
+        programs = [{"name": "Board", "status": "OPEN", "last_checked": "",
+                     "last_changed": "", "snapshot_hash": "", "source_id": "simplify-2027"}]
+        judgment = classify.Judgment(
+            change=self._change(), relevant=True, classified=True,
+            confidence="high", program_name="Board", new_status="CLOSED",
+        )
+        check.update_program_state(programs, [self.SOURCE], [], [judgment])
+        self.assertEqual(programs[0]["status"], "OPEN",
+                         "a low-signal board row must not flip the program's status")
+
+
+# --- 14.8 -----------------------------------------------------------------------
+@unittest.skipUnless(
+    os.environ.get("AZURE_OPENAI_API_KEY"),
+    "needs AZURE_OPENAI_API_KEY (live model calls)",
+)
+class PostingJudgementTests(unittest.TestCase):
+    """Does the small model actually make the right call on real posting text?
+
+    gpt-5-mini is weaker than Sonnet, and rules 6 and 7 ask it to *rule things out* --
+    the expensive direction to get wrong. The posting text is seeded into the fetch
+    cache so these are deterministic about the input while still making a real model
+    call about the judgment.
+    """
+
+    SOURCE = {"source_id": "simplify-2027", "signal": "low", "program_names": "Board"}
+    URL = "https://simplify.jobs/p/00000000-0000-0000-0000-0000000000%02d"
+
+    def setUp(self):
+        self._saved = os.environ.get("CLASSIFIER_PROVIDER")
+        os.environ["CLASSIFIER_PROVIDER"] = "azure"
+        postings.CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        self._written = []
+
+    def tearDown(self):
+        for path in self._written:
+            path.unlink(missing_ok=True)
+        if self._saved is None:
+            os.environ.pop("CLASSIFIER_PROVIDER", None)
+        else:
+            os.environ["CLASSIFIER_PROVIDER"] = self._saved
+
+    def _judge(self, n, role, posting_text):
+        url = self.URL % n
+        path = postings._cache_path(url)
+        path.write_text(posting_text)
+        self._written.append(path)
+        change = state.Change(
+            source_id="simplify-2027", kind="added",
+            key=f"ACME / {role}",
+            detail=f"Company=ACME; Role={role}; Application=[ ]({url})",
+        )
+        judgments = classify.classify([change], {"simplify-2027": self.SOURCE})
+        self.assertEqual(len(judgments), 1)
+        return judgments[0]
+
+    def test_14_8_a_class_year_gate_rules_the_posting_out(self):
+        """Rule 6, the filter that does the most work: ~a third of postings gate."""
+        j = self._judge(1, "Software Engineer Intern", (
+            "Requirements: Currently be in the third or fourth year of a Bachelor's "
+            "degree in Computer Science. Expected graduation between December 2027 "
+            "and August 2028. Strong programming skills required."))
+        self.assertTrue(j.classified, j.error)
+        self.assertFalse(j.relevant, j.why)
+        self.assertRegex(j.why.lower(), r"third|fourth|year|graduat|2027|2028")
+
+    def test_14_8_b_no_gate_means_relevant_not_ruled_out(self):
+        """Absence of a gate must never be read as grounds to rule out (rule 6)."""
+        j = self._judge(2, "Software Engineer Intern", (
+            "Requirements: Currently enrolled in a Bachelor's or Master's degree "
+            "program in Engineering, Computer Science, or a related field in the "
+            "United States. Reliable transportation to the worksite."))
+        self.assertTrue(j.classified, j.error)
+        self.assertTrue(j.relevant, f"a first-year qualifies here: {j.why}")
+
+    def test_14_8_c_a_plainly_unrelated_role_is_ruled_out(self):
+        """Rule 7 -- but only for things that are plainly not the owner's field."""
+        j = self._judge(3, "IT Document Automation Developer Intern", (
+            "Requirements: Currently enrolled in a Bachelor's program. You will "
+            "maintain document templates, scanning workflows and records retention "
+            "schedules for the corporate records team."))
+        self.assertTrue(j.classified, j.error)
+        self.assertFalse(j.relevant, j.why)
+
+    def test_14_8_d_a_quant_role_survives_both_new_rules(self):
+        """The false negative that would actually cost money."""
+        j = self._judge(4, "Quantitative Trading Intern", (
+            "Requirements: Currently enrolled in a Bachelor's degree program in "
+            "Mathematics, Statistics, Computer Science or a related quantitative "
+            "field. All undergraduate years are encouraged to apply."))
+        self.assertTrue(j.classified, j.error)
+        self.assertTrue(j.relevant, f"must not rule out a quant role: {j.why}")
 
 
 if __name__ == "__main__":
