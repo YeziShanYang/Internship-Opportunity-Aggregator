@@ -157,8 +157,17 @@ def change_key(source_id: str, key: str) -> str:
     return hashlib.sha1(f"{source_id}|{key}".encode()).hexdigest()[:10]
 
 
+# A dismissal lasts under a year, so an annually reposted role always comes back in
+# time for the next cycle. Keying alone is not enough: 72% of job-board keys carry a
+# cycle marker ("Summer 2027") and change by themselves, but the other 28% do not --
+# Jane Street titles every student role plainly ("Quantitative Trader @ New York") and
+# puts the cycle in metadata, so those keys are identical year over year. Without an
+# expiry, ticking one of those off would hide the most important firm's roles forever.
+APPLIED_TTL_DAYS = 300
+
+
 def read_applied() -> dict[str, str]:
-    """{key: marked_at}. Empty when nothing has ever been ticked."""
+    """{key: marked_at}, excluding dismissals older than APPLIED_TTL_DAYS."""
     if not APPLIED_TSV.exists():
         return {}
     applied: dict[str, str] = {}
@@ -166,9 +175,21 @@ def read_applied() -> dict[str, str]:
         if not line.strip() or line.startswith("#"):
             continue
         parts = line.split("\t")
-        if parts[0]:
-            applied[parts[0]] = parts[1] if len(parts) > 1 else ""
+        if not parts[0]:
+            continue
+        marked = parts[1] if len(parts) > 1 else ""
+        if marked and _days_since(marked) > APPLIED_TTL_DAYS:
+            continue  # expired: let the next cycle's repost through
+        applied[parts[0]] = marked
     return applied
+
+
+def _days_since(iso_date: str) -> int:
+    try:
+        then = datetime.date.fromisoformat(iso_date[:10])
+    except ValueError:
+        return 0
+    return (datetime.date.fromisoformat(today_iso()) - then).days
 
 
 def write_applied(applied: dict[str, str], titles: dict[str, str] | None = None) -> None:
