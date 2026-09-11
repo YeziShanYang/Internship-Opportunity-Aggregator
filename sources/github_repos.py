@@ -24,25 +24,21 @@ from dataclasses import dataclass, field
 import httpx
 
 import state
+from sources.snapshot import (  # shared with job_boards and page_watch
+    DISCOVERY_PATTERN,
+    ROLLING_PATTERN,
+    ROWS_HEADER,
+    SECTIONS_HEADER,
+    Row,
+    Snapshot,
+    diff_snapshots,
+    parse_snapshot,
+    _URL,
+    render_snapshot,
+)
 
 GITHUB_API = "https://api.github.com"
 RAW_BASE = "https://raw.githubusercontent.com"
-
-# Spec section 5: a new row whose title looks like an underclassman program is a
-# candidate new program, not just a new posting.
-DISCOVERY_PATTERN = re.compile(
-    r"first.?year|freshman|sophomore|underclass|insight|discovery|invitational"
-    r"|immersion|explore|ignite|launch|winternship|pre.?intern",
-    re.IGNORECASE,
-)
-
-# Spec section 8 rule 4: these review on a rolling basis and close when full, so any
-# change on a row mentioning them is high priority regardless of stated deadline.
-ROLLING_PATTERN = re.compile(
-    r"jane\s*street|nvidia|d\.?\s*e\.?\s*shaw|deshaw|point\s*72|cubist",
-    re.IGNORECASE,
-)
-
 
 @dataclass(frozen=True)
 class RepoConfig:
@@ -119,44 +115,17 @@ class Table:
     rows: list[dict[str, str]] = field(default_factory=list)
 
 
-@dataclass
-class Row:
-    section: str
-    key: str
-    value: str
-    url: str = ""
-
-    @property
-    def identity(self) -> str:
-        """Diff key. Section-qualified: Cruz-Lopez and Simplify both list the same
-        company in more than one table, and an unqualified key would silently merge
-        them and hide one of the two."""
-        return f"{self.section} :: {self.key}"
-
-
-@dataclass
-class Snapshot:
-    """What we remember about a repo between runs.
-
-    Sections are tracked separately from rows because an empty table under a firm
-    heading is meaningful: it means "this firm has no open roles right now", which is
-    different from "this firm is not in the list". Without it, a firm posting its first
-    role would look like a brand-new section.
-    """
-
-    sections: list[str] = field(default_factory=list)
-    rows: list[Row] = field(default_factory=list)
-
-
-# --------------------------------------------------------------------------- text
-
 _IMG_MD = re.compile(r"!\[[^\]]*\]\([^)]*\)")
-_IMG_TAG = re.compile(r"(?is)<img\b[^>]*>")
-_ANCHOR = re.compile(r'(?is)<a\b[^>]*?href=["\']([^"\']+)["\'][^>]*>(.*?)</a>')
-_TAG = re.compile(r"(?s)<[^>]+>")
-_COMMENT = re.compile(r"(?s)<!--.*?-->")
-_TRACKING_PARAM = re.compile(r"[?&](utm_[a-z]+|ref)=[^&\s)]*")
 
+_IMG_TAG = re.compile(r"(?is)<img\b[^>]*>")
+
+_ANCHOR = re.compile(r'(?is)<a\b[^>]*?href=["\']([^"\']+)["\'][^>]*>(.*?)</a>')
+
+_TAG = re.compile(r"(?s)<[^>]+>")
+
+_COMMENT = re.compile(r"(?s)<!--.*?-->")
+
+_TRACKING_PARAM = re.compile(r"[?&](utm_[a-z]+|ref)=[^&\s)]*")
 
 def clean_cell(text: str) -> str:
     """Normalise one cell: drop badge images and tags, keep link targets and emoji.
@@ -275,9 +244,6 @@ def _first_present(headers: list[str], candidates: tuple[str, ...]) -> str | Non
     return None
 
 
-_URL = re.compile(r"https?://[^\s)\]]+")
-
-
 # Simplify writes a bare "↳" in the Company cell to mean "same company as the row
 # above". Taken literally it produces hundreds of rows keyed on "↳".
 _CARRY_FORWARD = ("↳", "->", "⤷")
@@ -348,113 +314,6 @@ def extract(text: str, config: RepoConfig) -> Snapshot:
                 )
             )
     return snapshot
-
-
-SECTIONS_HEADER = "# sections"
-ROWS_HEADER = "# rows"
-
-
-def render_snapshot(snapshot: Snapshot) -> str:
-    """Canonical, sorted text. This is what gets committed.
-
-    Sorting matters: it means a newly posted role is exactly one added line in
-    `git diff`, rather than a reflowed blob.
-    """
-    lines = [SECTIONS_HEADER]
-    lines += sorted(set(snapshot.sections))
-    lines.append(ROWS_HEADER)
-    lines += sorted({f"{row.section}\t{row.key}\t{row.value}" for row in snapshot.rows})
-    return "\n".join(lines) + "\n"
-
-
-def parse_snapshot(text: str) -> Snapshot:
-    snapshot = Snapshot()
-    block = ROWS_HEADER  # tolerate a legacy rows-only snapshot
-    for line in text.splitlines():
-        if not line.strip():
-            continue
-        if line in (SECTIONS_HEADER, ROWS_HEADER):
-            block = line
-            continue
-        if block == SECTIONS_HEADER:
-            snapshot.sections.append(line)
-            continue
-        parts = line.split("\t")
-        if len(parts) < 3:
-            continue
-        section, key, value = parts[0], parts[1], "\t".join(parts[2:])
-        urls = _URL.findall(value)
-        snapshot.rows.append(
-            Row(section=section, key=key, value=value, url=urls[0] if urls else "")
-        )
-    return snapshot
-
-
-def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[state.Change]:
-    """Row-level diff keyed on company + role (spec section 5)."""
-    old_by_key = {row.identity: row for row in old.rows}
-    new_by_key = {row.identity: row for row in new.rows}
-    changes: list[state.Change] = []
-
-    # A brand-new firm section is worth calling out in its own right (spec section 5).
-    for section in sorted(set(new.sections) - set(old.sections)):
-        if section:
-            changes.append(
-                state.Change(
-                    source_id=source_id,
-                    kind="added",
-                    key=f"new section: {section}",
-                    detail=f'A section that was not in the previous snapshot: "{section}".',
-                    is_discovery_candidate=True,
-                    rolling=bool(ROLLING_PATTERN.search(section)),
-                )
-            )
-
-    for key in sorted(new_by_key.keys() - old_by_key.keys()):
-        row = new_by_key[key]
-        changes.append(
-            state.Change(
-                source_id=source_id,
-                kind="added",
-                key=row.key,
-                detail=f"New row: {row.value}",
-                url=row.url,
-                is_discovery_candidate=bool(DISCOVERY_PATTERN.search(f"{row.key} {row.value}")),
-                rolling=bool(ROLLING_PATTERN.search(f"{row.key} {row.value}")),
-            )
-        )
-
-    for key in sorted(old_by_key.keys() - new_by_key.keys()):
-        row = old_by_key[key]
-        changes.append(
-            state.Change(
-                source_id=source_id,
-                kind="removed",
-                key=row.key,
-                detail=f"Row disappeared. It previously read: {row.value}",
-                url=row.url,
-                rolling=bool(ROLLING_PATTERN.search(f"{key} {row.value}")),
-            )
-        )
-
-    for key in sorted(old_by_key.keys() & new_by_key.keys()):
-        before, after = old_by_key[key].value, new_by_key[key].value
-        if before != after:
-            changes.append(
-                state.Change(
-                    source_id=source_id,
-                    kind="changed",
-                    key=new_by_key[key].key,
-                    detail=f"Was: {before}\nNow: {after}",
-                    url=new_by_key[key].url,
-                    is_discovery_candidate=bool(DISCOVERY_PATTERN.search(f"{key} {after}")),
-                    rolling=bool(ROLLING_PATTERN.search(f"{key} {after}")),
-                )
-            )
-    return changes
-
-
-# --------------------------------------------------------------------------- fetch
 
 
 def fetch_readme(client: httpx.Client, repo: str) -> tuple[str, str]:
