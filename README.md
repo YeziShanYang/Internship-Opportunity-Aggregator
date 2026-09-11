@@ -67,7 +67,7 @@ discover.py              the weekly pass that proposes new sources and never add
 classify.py              one Claude call per change; the class-year and identity gates
 digest.py                renders the digest, opens the Issue
 calendar_reminders.py    standing reminders for what cannot be automated
-build_xlsx.py            CSVs → out/programs.xlsx (4 sheets)
+build_xlsx.py            CSVs → out/programs.xlsx (yours) + out/tracked.xlsx (the tool's)
 seed_programs.py         one-time seed from the original spreadsheet
 data/programs.csv        CANONICAL program list — edit this, not the xlsx
 data/sources.csv         what to check, and how
@@ -75,7 +75,8 @@ data/manual.csv          what this tool CANNOT tell you about → "Manual Watch"
 data/priority.csv        ranked shortlist to watch yourself → "Priority" sheet
 data/snapshots/*.tsv     one canonical line per listing row, committed
 data/proposals.log       append-only: proposed edits the tool refused to make itself
-out/programs.xlsx        GENERATED — never hand-edit
+out/programs.xlsx        GENERATED — yours: only what you must check by hand
+out/tracked.xlsx         GENERATED — the tool's: all programs, sources, applied, discovered
 ```
 
 ### Why the snapshots are TSV, not the READMEs

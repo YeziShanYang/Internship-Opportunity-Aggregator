@@ -27,6 +27,7 @@ import classify
 import discover
 import digest
 import state
+import build_xlsx
 from sources import github_repos, job_boards, page_watch, postings, snapshot
 
 REPO = "northwesternfintech/2027QuantInternships"
@@ -1103,3 +1104,123 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class OwnerWorkbookTests(unittest.TestCase):
+    """out/programs.xlsx is the owner's file: only what he must chase himself.
+
+    Asked for directly -- it had become a dump of all 187 programmes, which is useless
+    for deciding what to go and check. Two classes of row are bloat there: things he
+    cannot apply to, and things a watched source already reports in the daily digest.
+    """
+
+    SOURCES = {
+        "janestreet-fttp": {
+            "source_id": "janestreet-fttp", "method": "page_text",
+            "url": "https://www.janestreet.com/join-jane-street/programs-and-events/fttp/",
+        },
+        "citadel-students": {
+            "source_id": "citadel-students", "method": "manual",
+            "url": "https://www.citadel.com/careers/students/",
+        },
+        "aqr-greenhouse": {
+            "source_id": "aqr-greenhouse", "method": "greenhouse", "url": "aqr",
+        },
+    }
+
+    def _program(self, **overrides):
+        row = {"name": "P", "category": "c", "website": "", "eligible": "YES",
+               "notes": "", "source_id": "", "applications_open": "", "target_years": ""}
+        row.update(overrides)
+        return row
+
+    def test_14_10a_a_shared_domain_is_not_coverage(self):
+        """The regression that nearly shipped. Matching on the registrable domain called
+        "Jane Street Puzzles (monthly)" covered because janestreet.com is watched -- but
+        the watcher points at the FTTP page. Folding the puzzles away would have hidden
+        them from the only file that was going to surface them."""
+        puzzles = self._program(
+            name="Jane Street Puzzles (monthly)",
+            website="https://www.janestreet.com/puzzles/current-puzzle/")
+        self.assertEqual(build_xlsx.covered_by(puzzles, self.SOURCES), "")
+
+    def test_14_10b_the_exact_watched_page_is_coverage(self):
+        fttp = self._program(
+            name="Jane Street FTTP",
+            website="https://www.janestreet.com/join-jane-street/programs-and-events/fttp/")
+        self.assertEqual(build_xlsx.covered_by(fttp, self.SOURCES), "janestreet-fttp")
+
+    def test_14_10c_a_manual_source_is_not_coverage(self):
+        """A manual row is precisely a thing the tool cannot watch, so it must leave the
+        programme on the hand-check list rather than removing it."""
+        discover_citadel = self._program(
+            name="Discover Citadel", source_id="citadel-students")
+        self.assertEqual(build_xlsx.covered_by(discover_citadel, self.SOURCES), "")
+
+    def test_14_10d_a_dangling_source_id_keeps_the_row_and_warns(self):
+        """A renamed source once left programs.csv pointing at a row that no longer
+        existed. A dangling reference must never silently delete a programme from the
+        owner's list."""
+        orphan = self._program(name="Optiver FutureFocus", source_id="gone-away")
+        keep, left_out, warnings = build_xlsx.partition([orphan], self.SOURCES)
+        self.assertEqual(len(keep), 1, "the row must stay on his list")
+        self.assertFalse(left_out)
+        self.assertTrue(any("gone-away" in w for w in warnings), warnings)
+
+    def test_14_10e_nothing_can_vanish_without_a_reason(self):
+        """Every filter reports what it removed. A programme must appear either on the
+        list or on the Left Out sheet, never neither."""
+        programs = [
+            self._program(name="applyable"),
+            self._program(name="ruled out", eligible="NO"),
+            self._program(name="dead", eligible="STALE"),
+            self._program(name="watched", source_id="aqr-greenhouse"),
+        ]
+        keep, left_out, _ = build_xlsx.partition(programs, self.SOURCES)
+        self.assertEqual(len(keep) + len(left_out), len(programs))
+        self.assertEqual([r["name"] for r in keep], ["applyable"])
+        reasons = {r["name"]: r["why"] for r in left_out}
+        self.assertIn("cannot apply", reasons["ruled out"])
+        self.assertIn("cannot apply", reasons["dead"])
+        self.assertIn("aqr-greenhouse", reasons["watched"])
+        for row in left_out:
+            self.assertTrue(row["why"], "every exclusion carries a stated reason")
+
+    def test_14_10f_actionable_rows_sort_first(self):
+        programs = [self._program(name="c", eligible="LATER"),
+                    self._program(name="a", eligible="YES"),
+                    self._program(name="b", eligible="CHECK")]
+        keep, _, _ = build_xlsx.partition(programs, self.SOURCES)
+        self.assertEqual([r["eligible"] for r in keep], ["YES", "CHECK", "LATER"])
+
+    def test_14_10g_both_workbooks_build_and_the_owner_file_excludes_ruled_out_rows(self):
+        from openpyxl import load_workbook
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            saved = (state.OUT_XLSX, state.OUT_TRACKED_XLSX)
+            state.OUT_XLSX = root / "programs.xlsx"
+            state.OUT_TRACKED_XLSX = root / "tracked.xlsx"
+            try:
+                paths = build_xlsx.build()
+                self.assertEqual(len(paths), 2)
+                for path in paths:
+                    self.assertTrue(path.exists(), path)
+                owner = load_workbook(state.OUT_XLSX)
+                self.assertEqual(owner.worksheets[0].title, "Check By Hand")
+                self.assertIn("Left Out", owner.sheetnames)
+                codes = {
+                    str(row[0]).strip().upper()
+                    for row in owner["Check By Hand"].iter_rows(min_row=2, values_only=True)
+                }
+                self.assertNotIn("NO", codes)
+                self.assertNotIn("STALE", codes)
+                tracked = load_workbook(state.OUT_TRACKED_XLSX)
+                self.assertEqual(
+                    tracked.sheetnames,
+                    ["All Programs", "Sources", "Applied", "Discovered"])
+                # the full list still exists somewhere -- it moved, it was not dropped
+                self.assertEqual(
+                    tracked["All Programs"].max_row - 1, len(state.read_programs()))
+            finally:
+                state.OUT_XLSX, state.OUT_TRACKED_XLSX = saved
+
