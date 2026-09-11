@@ -55,8 +55,11 @@ WORKDAY_PAGE = 20
 WORKDAY_MAX_PAGES = 40
 
 # Descriptions are one extra request each, so they are fetched only for postings that
-# already passed the filters. Capital Group's board is 152 jobs and 1 survivor.
-WORKDAY_MAX_DETAILS = 25
+# already passed the title filter. Capital Group's board is 152 jobs and 1 survivor.
+# The cap must not bind silently -- several boards hit an earlier value of 25 exactly,
+# which is the signature of a truncation rather than a coincidence -- so overflow is
+# counted and reported in HEALTH.
+WORKDAY_MAX_DETAILS = 80
 
 # Either signal is enough. See the module docstring for why neither alone suffices.
 #
@@ -210,11 +213,29 @@ def fetch_workday(client: httpx.Client, base: str) -> list[Posting]:
             break
         listed += batch
 
+    # A board too large to page through is worse than an absent one: it would look
+    # healthy while seeing only the first slice. Workday's searchText does not narrow
+    # usefully (NVIDIA: 2,000 jobs, 1,004 "matches" for "intern"), so the honest move
+    # is to refuse the board rather than half-read it.
+    if total and len(listed) < total:
+        raise RuntimeError(
+            f"board has {total} postings but only {len(listed)} could be paged "
+            f"(Workday caps pages at {WORKDAY_PAGE}); this source would be "
+            "silently partial, so it is reported as failing instead"
+        )
+
     # Filter on the title first; only then pay for a description.
-    interesting = [
+    matched = [
         job for job in listed
         if STUDENT_TITLE_WORKDAY.search(job.get("title") or "")
-    ][:WORKDAY_MAX_DETAILS]
+    ]
+    interesting = matched[:WORKDAY_MAX_DETAILS]
+    if len(matched) > WORKDAY_MAX_DETAILS:
+        raise RuntimeError(
+            f"{len(matched)} postings passed the title filter but only "
+            f"{WORKDAY_MAX_DETAILS} descriptions are fetched per run; raise "
+            "WORKDAY_MAX_DETAILS rather than letting this board go partial"
+        )
 
     out = []
     for job in interesting:
