@@ -170,7 +170,12 @@ def to_snapshot(kept: list[Posting]) -> snapshot.Snapshot:
     """
     snap = snapshot.Snapshot()
     seen: dict[str, int] = {}
-    for posting in kept:
+    # Sorted before the ordinals are handed out. Two postings with the same title and
+    # location need a "#2" to tell them apart, and assigning that in whatever order the
+    # API happened to return would let them swap suffixes between runs and churn a
+    # spurious pair of changes every morning. Measured: only 1 row of 188 collides
+    # today, so this is insurance rather than a fix.
+    for posting in sorted(kept, key=lambda p: (p.department, p.title, p.location, p.url)):
         section = posting.department.strip() or "(no department)"
         title = snapshot.fold(posting.title)
         key = f"{title} @ {posting.location}" if posting.location else title

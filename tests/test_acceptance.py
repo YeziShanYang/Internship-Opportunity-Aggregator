@@ -934,18 +934,26 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertIn(k27, state.read_applied())
         self.assertNotIn(k28, state.read_applied())
 
-    def test_14_9s2_a_dismissal_expires_so_next_cycle_always_returns(self):
-        """Keying alone is not enough to guarantee the annual repost comes back.
+    def test_14_9s2_a_dismissal_is_scoped_to_its_hiring_cycle(self):
+        """Next year's repost must return even when the title never says a year.
 
-        72% of job-board keys carry a cycle marker and change by themselves. The other
-        28% do not -- Jane Street titles every student role plainly and puts the cycle
-        in metadata -- so without an expiry, ticking one of those off would hide the
-        most important firm's roles permanently.
+        Measured on the live boards: 136 of 188 rows carry "Summer 2027" or similar
+        and would change key by themselves, but 52 do not -- Jane Street titles every
+        student role plainly and puts the season in metadata. Tagging the key with the
+        cycle covers both, with no expiry clock that could lapse mid-season.
         """
-        state.write_applied({"recent": "2026-09-01", "last_cycle": "2025-01-01"})
-        applied = state.read_applied()
-        self.assertIn("recent", applied)
-        self.assertNotIn("last_cycle", applied, "a year-old dismissal must lapse")
+        plain = "Quantitative Trader @ New York"
+        sept = state.change_key("js", plain, state.recruiting_cycle("2026-09-11"))
+        january = state.change_key("js", plain, state.recruiting_cycle("2027-01-15"))
+        next_july = state.change_key("js", plain, state.recruiting_cycle("2027-07-01"))
+        self.assertEqual(sept, january, "a dismissal must hold for the whole season")
+        self.assertNotEqual(sept, next_july, "the next season must be a new item")
+
+    def test_14_9s3_the_cycle_rolls_over_mid_year_not_in_january(self):
+        """Summer 2027 roles are advertised from about July 2026."""
+        self.assertEqual(state.recruiting_cycle("2026-09-11"), 2027)
+        self.assertEqual(state.recruiting_cycle("2027-06-30"), 2027)
+        self.assertEqual(state.recruiting_cycle("2027-07-01"), 2028)
 
     def test_14_9s_the_digest_marks_each_item_with_its_key(self):
         judgment = classify.Judgment(
