@@ -934,6 +934,19 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertIn(k27, state.read_applied())
         self.assertNotIn(k28, state.read_applied())
 
+    def test_14_9s2_a_dismissal_expires_so_next_cycle_always_returns(self):
+        """Keying alone is not enough to guarantee the annual repost comes back.
+
+        72% of job-board keys carry a cycle marker and change by themselves. The other
+        28% do not -- Jane Street titles every student role plainly and puts the cycle
+        in metadata -- so without an expiry, ticking one of those off would hide the
+        most important firm's roles permanently.
+        """
+        state.write_applied({"recent": "2026-09-01", "last_cycle": "2025-01-01"})
+        applied = state.read_applied()
+        self.assertIn("recent", applied)
+        self.assertNotIn("last_cycle", applied, "a year-old dismissal must lapse")
+
     def test_14_9s_the_digest_marks_each_item_with_its_key(self):
         judgment = classify.Judgment(
             change=state.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
