@@ -44,6 +44,13 @@ SHRINK_RATIO = 0.4
 # A nav change can move dozens of lines; the digest only needs enough to judge.
 MAX_DIFF_LINES = 12
 
+# No single diff line may be longer than this. Several watched sources are vendor JSON
+# feeds (Workable, Rippling, Teamtailor, Pinpoint) served as one unbroken line, and
+# Wolverine's is 147,741 characters. Emitting that verbatim would put a single line past
+# GitHub's 65,536-character issue-body limit and fail delivery outright -- turning a
+# one-byte upstream edit into a missed digest.
+MAX_DIFF_LINE_CHARS = 400
+
 _DROP = re.compile(r"(?is)<(script|style|noscript|svg|iframe|template)\b.*?</\1>")
 _HTML_COMMENT = re.compile(r"(?s)<!--.*?-->")
 _BLOCK_END = re.compile(
@@ -76,6 +83,11 @@ def normalise(raw_html: str) -> list[str]:
     text = _BLOCK_END.sub("\n", text)
     text = _TAG.sub(" ", text)
     text = postings.extract_text(text) if "<" in text else text
+    # Vendor JSON feeds (Workable, Rippling, Teamtailor, Pinpoint) arrive as one line, so
+    # a line differ can only ever say "the whole feed changed". Breaking on record
+    # boundaries makes a new posting show up as one added line instead.
+    if text.lstrip()[:1] in ("{", "["):
+        text = text.replace("},{", "},\n{").replace("}, {", "},\n{")
     for pattern, placeholder in _NOISE:
         text = pattern.sub(placeholder, text)
     lines = []
@@ -106,8 +118,14 @@ def diff_pages(
         return []
 
     blob = " ".join(added)
-    body = [f"+ {line}" for line in added[:MAX_DIFF_LINES]]
-    body += [f"- {line}" for line in removed[:MAX_DIFF_LINES]]
+
+    def clip(line: str) -> str:
+        return line if len(line) <= MAX_DIFF_LINE_CHARS else (
+            line[:MAX_DIFF_LINE_CHARS] + f" … [+{len(line) - MAX_DIFF_LINE_CHARS} chars]"
+        )
+
+    body = [f"+ {clip(line)}" for line in added[:MAX_DIFF_LINES]]
+    body += [f"- {clip(line)}" for line in removed[:MAX_DIFF_LINES]]
     if len(added) > MAX_DIFF_LINES or len(removed) > MAX_DIFF_LINES:
         body.append(f"... {len(added)} added and {len(removed)} removed lines in total.")
 

@@ -1018,6 +1018,25 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         self.assertFalse(third.changes[0].is_discovery_candidate,
                          "a closure must not be flagged as a discovery")
 
+    def test_14_9q_a_one_line_json_feed_diffs_per_record(self):
+        """Four watched sources are vendor JSON feeds served as a single line. A line
+        differ on one line can only ever say "the whole feed changed"."""
+        feed = '[{"title":"Quant Intern","id":1},{"title":"SWE Intern","id":2}]'
+        lines = page_watch.normalise(feed)
+        self.assertEqual(len(lines), 2, lines)
+
+    def test_14_9r_no_digest_line_can_exceed_the_cap(self):
+        """Wolverine's feed is 147,741 characters on one line. Emitted verbatim it would
+        push a single line past GitHub's 65,536-character issue-body limit and fail
+        delivery -- a one-byte upstream edit costing the whole digest."""
+        monster = "x" * 200_000
+        changes = page_watch.diff_pages(
+            "s", [], [monster], {"program_names": "P", "url": "u"})
+        self.assertTrue(changes)
+        longest = max(len(line) for line in changes[0].detail.splitlines())
+        self.assertLessEqual(longest, page_watch.MAX_DIFF_LINE_CHARS + 40, longest)
+        self.assertIn("chars]", changes[0].detail, "truncation must be visible, not silent")
+
 
 class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
     def test_14_9o_discovery_never_writes_sources_csv(self):
