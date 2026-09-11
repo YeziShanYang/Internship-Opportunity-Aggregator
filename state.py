@@ -18,6 +18,11 @@ ROOT = pathlib.Path(__file__).resolve().parent
 DATA = ROOT / "data"
 PROGRAMS_CSV = DATA / "programs.csv"
 SOURCES_CSV = DATA / "sources.csv"
+# The one method that is deliberately not fetched: these sources block automation or
+# have nothing to diff, and they reach the owner as calendar reminders instead. It lives
+# here rather than in check.py because build_xlsx.py needs it too -- a manual row must
+# not count as coverage when deciding what stays on the owner's hand-check list.
+UNWATCHED_METHOD = "manual"
 SNAPSHOTS = DATA / "snapshots"
 PROPOSALS_LOG = DATA / "proposals.log"
 # Items the owner has ticked off in a delivered digest -- applied to, or not interested.
@@ -40,7 +45,13 @@ LAST_DISCOVERY = DATA / "last_discovery.txt"
 # whatever commit the run checked out, so it can be stale. digest.delivered_issue_exists
 # holds the authoritative answer.
 LAST_DELIVERED = DATA / "last_delivered.txt"
+# Two workbooks, with a deliberate split of audience (asked for by the owner
+# 2026-09-11). programs.xlsx is *his* file: only the opportunities he has to chase
+# himself. Anything he cannot apply to, and anything the tracker already watches, is
+# bloat there and belongs in the other file. tracked.xlsx is the tool's own bookkeeping
+# -- the full programme list plus the source, applied and discovery tables.
 OUT_XLSX = ROOT / "out" / "programs.xlsx"
+OUT_TRACKED_XLSX = ROOT / "out" / "tracked.xlsx"
 
 # Spec section 11: identify ourselves, with a contact address.
 USER_AGENT = "opportunity-tracker/1.0 (+mailto:jasonshi@stanford.edu)"

@@ -44,10 +44,9 @@ CHECKERS: dict[str, tuple] = {
     "page_text": (page_watch.check, WEB_CLIENT),
 }
 
-# The one method that is deliberately not fetched: these sources block automation or
-# have nothing to diff, and they reach the owner as calendar reminders instead.
-# Anything else absent from CHECKERS is a broken row, not a source to skip.
-UNWATCHED = "manual"
+# Defined in state.py so build_xlsx.py can share it. Anything else absent from
+# CHECKERS is a broken row, not a source to skip.
+UNWATCHED = state.UNWATCHED_METHOD
 
 
 def run_sources(
