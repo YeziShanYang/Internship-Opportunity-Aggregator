@@ -140,6 +140,7 @@ def render(
     results: list[state.SourceResult],
     sources: dict[str, dict[str, str]],
     suppressed_applied: int = 0,
+    discovery_lines: list[str] | None = None,
     status_only: bool = False,
 ) -> tuple[str, str]:
     """Return (issue title, issue body).
@@ -203,6 +204,11 @@ def render(
             )
         body.append("")
         body.append("</details>")
+        body.append("")
+
+    if discovery_lines:
+        body.append("## ■ DISCOVERED")
+        body += discovery_lines
         body.append("")
 
     month, reminders = calendar_reminders.for_month()
