@@ -25,6 +25,14 @@ PROPOSALS_LOG = DATA / "proposals.log"
 # cycle's repost ("Summer 2028" rather than "Summer 2027") is a different key and
 # resurfaces on its own, which is the intended behaviour rather than an accident.
 APPLIED_TSV = DATA / "applied.tsv"
+# Sources the weekly discovery pass has proposed. Committed, because without it the
+# same candidates reappear every Monday and the section becomes noise. `status` is
+# hand-edited: `rejected` is a permanent tombstone, never re-proposed.
+DISCOVERED_CSV = DATA / "discovered.csv"
+DISCOVERED_COLUMNS = [
+    "first_proposed", "last_proposed", "kind", "key", "title", "url", "evidence", "status",
+]
+LAST_DISCOVERY = DATA / "last_discovery.txt"
 # The date of the last digest actually delivered. The schedule fires several times
 # each morning so that a dropped cron tick is not a missed day (see daily.yml), and the
 # cadence is exactly one digest a day, so something has to stop ticks two and three from
@@ -171,6 +179,23 @@ def write_applied(applied: dict[str, str], titles: dict[str, str] | None = None)
     ]
     DATA.mkdir(parents=True, exist_ok=True)
     APPLIED_TSV.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def read_discovered() -> list[dict[str, str]]:
+    return read_csv(DISCOVERED_CSV, DISCOVERED_COLUMNS)
+
+
+def write_discovered(rows: list[dict[str, str]]) -> None:
+    write_csv(DISCOVERED_CSV, DISCOVERED_COLUMNS, rows)
+
+
+def read_last_discovery() -> str:
+    return LAST_DISCOVERY.read_text(encoding="utf-8").strip() if LAST_DISCOVERY.exists() else ""
+
+
+def write_last_discovery(date: str | None = None) -> None:
+    DATA.mkdir(parents=True, exist_ok=True)
+    LAST_DISCOVERY.write_text((date or today_iso()) + "\n", encoding="utf-8")
 
 
 def read_snapshot(source_id: str, ext: str = "txt") -> str | None:

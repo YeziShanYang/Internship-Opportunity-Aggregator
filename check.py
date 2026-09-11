@@ -19,6 +19,7 @@ import time
 
 import classify
 import digest
+import discover
 import state
 from sources import github_repos, job_boards, page_watch, postings
 
@@ -177,6 +178,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--only", help="check a single source_id")
     parser.add_argument(
+        "--force-discovery",
+        action="store_true",
+        help="run the weekly source-discovery pass regardless of the day",
+    )
+    parser.add_argument(
         "--no-classify", action="store_true", help="skip the LLM step entirely"
     )
     parser.add_argument(
@@ -258,10 +264,32 @@ def main(argv: list[str] | None = None) -> int:
         # the once-a-day lock.
         send, status_only = True, True
 
+    # Discovery rides along in whichever run actually mails. The gate is "this run is
+    # delivering", not "this is the first tick": when a tick is dropped, a later one
+    # does the mailing, and the one-issue-per-date cap means discovery cannot open an
+    # issue of its own.
+    discovery_lines: list[str] = []
+    discovery_notes: list[str] = []
+    if send and not args.dry_run and (args.force_discovery or discover.due()):
+        try:
+            token = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
+            with github_repos.build_client(token) as gh, postings.build_client() as web:
+                candidates, discovery_notes = discover.run(gh, web, sources)
+            discover.record(candidates)
+            state.write_last_discovery()
+            if candidates:
+                discovery_lines = discover.lines(candidates)
+        except Exception as exc:  # the digest must never be lost because this broke
+            discovery_notes = [
+                f"the weekly discovery pass failed: {type(exc).__name__}: {exc}"
+            ]
+
     title, body = digest.render(
         judgments, results, by_id, suppressed_applied=suppressed_applied,
-        status_only=status_only,
+        discovery_lines=discovery_lines, status_only=status_only,
     )
+    for note in discovery_notes:
+        body += f"\n- ⚠ {note}"
 
     print(f"{len(results)} sources checked, {len(changes)} changes, {len(judgments)} judged")
     for result in results:
