@@ -37,17 +37,45 @@ import httpx
 import state
 from sources import postings, snapshot
 
-GREENHOUSE, LEVER, ASHBY = "greenhouse", "lever", "ashby"
+GREENHOUSE, LEVER, ASHBY, WORKDAY = "greenhouse", "lever", "ashby", "workday"
 
 ENDPOINTS = {
     GREENHOUSE: "https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true",
     LEVER: "https://api.lever.co/v0/postings/{slug}?mode=json",
     ASHBY: "https://api.ashbyhq.com/posting-api/job-board/{slug}",
+    # Workday's slug is the whole CXS base URL, because the tenant, the site and the
+    # wd1/wd3/wd5 shard all vary independently and guessing any of them is guesswork.
+    WORKDAY: "{slug}/jobs",
 }
 
+# Workday rejects a limit above 20 (50 and 100 return an empty list), and it keeps
+# serving rows past the end rather than stopping -- a naive "fetch until empty" loop
+# pulled 412 rows from a 152-job board, cycling the same titles. Always stop at `total`.
+WORKDAY_PAGE = 20
+WORKDAY_MAX_PAGES = 40
+
+# Descriptions are one extra request each, so they are fetched only for postings that
+# already passed the filters. Capital Group's board is 152 jobs and 1 survivor.
+WORKDAY_MAX_DETAILS = 25
+
 # Either signal is enough. See the module docstring for why neither alone suffices.
-STUDENT_TITLE = re.compile(r"intern", re.IGNORECASE)
-STUDENT_TYPE = re.compile(r"intern|co.?op", re.IGNORECASE)
+#
+# `(?!a)` is load-bearing. A bare "intern" matches "Internal Audit Analyst",
+# "Internal Sales Manager" and "International Fund Administration" -- no English word
+# starts "interna" except those -- harmless on the
+# quant boards, which have none, but Capital Group's Workday board alone has 28 such
+# titles and they would all be classified as student roles. The winternship alternative
+# is there because Virtu really does run one and the word buries "intern" mid-token,
+# so a plain word-boundary fix would drop a genuine programme.
+STUDENT_TITLE = re.compile(r"\bintern(?!al)|winternship", re.IGNORECASE)
+STUDENT_TYPE = re.compile(r"\bintern(?!al)|co.?op", re.IGNORECASE)
+
+# Workday's list response carries no employment type, so the title is all there is at
+# list time. A future year in the title is the signal that catches the campus programmes
+# whose names avoid the word entirely -- Capital Group's is "CAP Associate - US (2027)".
+STUDENT_TITLE_WORKDAY = re.compile(
+    r"\bintern(?!al)|winternship|co.?op|campus|\b20(2[6-9]|3\d)\b", re.IGNORECASE
+)
 
 # The owner is a US citizen, US-based (spec section 8 profile). Jane Street alone posts
 # the same internship in four cities. Matching is deliberately generous -- an
@@ -153,7 +181,72 @@ def parse_ashby(payload: dict) -> list[Posting]:
     return out
 
 
+def fetch_workday(client: httpx.Client, base: str) -> list[Posting]:
+    """List a Workday board, then fetch descriptions for the survivors only.
+
+    Workday is why "the firm has no public API" was wrong for so many employers. A
+    plain fetch of a Workday posting returns zero characters of text because the page
+    renders entirely in JavaScript, so it looked unreachable. The CXS endpoint behind
+    it returns clean JSON: measured, 84 of the 96 Workday tenant/site pairs already
+    linked from our own snapshots answer it.
+    """
+    listed: list[dict] = []
+    total = None
+    for page in range(WORKDAY_MAX_PAGES):
+        offset = page * WORKDAY_PAGE
+        if total is not None and offset >= total:
+            break
+        response = client.post(
+            f"{base}/jobs",
+            json={"appliedFacets": {}, "limit": WORKDAY_PAGE, "offset": offset, "searchText": ""},
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if total is None:
+            total = payload.get("total") or 0
+        batch = payload.get("jobPostings") or []
+        if not batch:
+            break
+        listed += batch
+
+    # Filter on the title first; only then pay for a description.
+    interesting = [
+        job for job in listed
+        if STUDENT_TITLE_WORKDAY.search(job.get("title") or "")
+    ][:WORKDAY_MAX_DETAILS]
+
+    out = []
+    for job in interesting:
+        path = job.get("externalPath") or ""
+        text = ""
+        employment_type = ""
+        if path:
+            try:
+                detail = client.get(f"{base}{path}")
+                if detail.status_code < 300:
+                    info = detail.json().get("jobPostingInfo") or {}
+                    text = _clean(info.get("jobDescription") or "")
+                    employment_type = info.get("timeType") or ""
+            except Exception:
+                pass  # a missing description is not a failed board
+        out.append(
+            Posting(
+                title=(job.get("title") or "").strip(),
+                location=(job.get("locationsText") or "").strip(),
+                department="(no department)",
+                employment_type=employment_type,
+                url=f"{base.split('/wday/')[0]}{path}",
+                text=text,
+            )
+        )
+    return out
+
+
 PARSERS = {GREENHOUSE: parse_greenhouse, LEVER: parse_lever, ASHBY: parse_ashby}
+# Workday needs POST + pagination + a second request per survivor, so it does not fit
+# the parse-one-payload shape the other three share.
+FETCHERS = {WORKDAY: fetch_workday}
 
 
 def to_snapshot(kept: list[Posting]) -> snapshot.Snapshot:
@@ -199,7 +292,8 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     method = (source.get("method") or "").strip()
     slug = (source.get("url") or "").strip()
     parser = PARSERS.get(method)
-    if parser is None or not slug:
+    fetcher = FETCHERS.get(method)
+    if (parser is None and fetcher is None) or not slug:
         return state.SourceResult(
             source_id=source_id,
             ok=False,
@@ -207,15 +301,18 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
         )
 
     try:
-        response = client.get(ENDPOINTS[method].format(slug=slug))
-        response.raise_for_status()
-        parsed = parser(response.json())
+        if fetcher is not None:
+            parsed = fetcher(client, slug.rstrip("/"))
+        else:
+            response = client.get(ENDPOINTS[method].format(slug=slug))
+            response.raise_for_status()
+            parsed = parser(response.json())
     except Exception as exc:
         return state.SourceResult(
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}"
         )
 
-    students = [p for p in parsed if is_student_posting(p)]
+    students = parsed if method == WORKDAY else [p for p in parsed if is_student_posting(p)]
     kept = [p for p in students if is_us(p)]
     suppressed_not_student = len(parsed) - len(students)
     suppressed_not_us = len(students) - len(kept)
