@@ -58,9 +58,13 @@ jobs:
           # Fine-grained, read-only, public repos. Lifts the GitHub API limit from 60
           # requests/hour to 5,000.
           GH_PAT: ${{ secrets.GH_PAT }}
-          # Optional. Without it the run still works; changes are surfaced unclassified
-          # rather than dropped.
+          # Both optional, and Anthropic wins when both are set. Without either, the
+          # run still works; changes are surfaced unclassified rather than dropped.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # gpt-5-mini on a Microsoft Foundry resource, funded by Azure for Students
+          # credit. Claude is unavailable there: Azure grants zero Claude deployment
+          # quota to student subscriptions because it is Marketplace-billed.
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python check.py
 
