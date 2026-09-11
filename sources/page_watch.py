@@ -26,7 +26,16 @@ import state
 from sources import postings, snapshot
 
 # Below this a response is a JavaScript shell or a block page, not a short page.
-MIN_ABSOLUTE_CHARS = 200
+# Calibrated against measurements, not guessed: the thinnest real page in the watchlist
+# is hedgewestsf at 837 characters, while SIG's careers page yields 221 from 402KB of
+# HTML. An earlier value of 200 let SIG through.
+MIN_ABSOLUTE_CHARS = 500
+
+# The stronger signal, because it does not care how big the page is. A shell is mostly
+# markup: SIG measures 0.0005 text-to-HTML, while the thinnest genuine page in the
+# watchlist (imc-launchpad-us, 2,472 chars from 678KB) measures 0.0036 -- seven times
+# higher. Everything else measured between 0.01 and 0.31.
+MIN_TEXT_HTML_RATIO = 0.0015
 
 # Losing this much of a page is a redesign, a block, or a partial render. Self
 # calibrating against the last good fetch, so there is no per-source constant to rot.
@@ -158,6 +167,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     lines = normalise(response.text)
     text = "\n".join(lines)
     previous_text = state.read_snapshot(source_id, ext="txt")
+    ratio = len(text) / max(len(response.text), 1)
 
     if len(text) < MIN_ABSOLUTE_CHARS:
         return state.SourceResult(
@@ -167,6 +177,17 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             error=(
                 f"page returned only {len(text)} characters of text "
                 "(renders in JavaScript, or was blocked)"
+            ),
+        )
+    if ratio < MIN_TEXT_HTML_RATIO:
+        return state.SourceResult(
+            source_id=source_id,
+            ok=False,
+            content_length=len(text),
+            error=(
+                f"page yielded {len(text)} characters of text from "
+                f"{len(response.text)} of HTML (ratio {ratio:.4f}) - this is a "
+                "JavaScript shell, not a page with little on it"
             ),
         )
     if previous_text is not None and len(text) < SHRINK_RATIO * len(previous_text):
@@ -180,7 +201,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             ),
         )
 
-    extra = {"rows": len(lines), "chars": len(text)}
+    extra = {"rows": len(lines), "chars": len(text), "ratio": round(ratio, 4)}
     if previous_text is None:
         return state.SourceResult(
             source_id=source_id,

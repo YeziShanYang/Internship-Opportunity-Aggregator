@@ -445,13 +445,19 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
     # One batch fetch for the whole run rather than a serial fetch per change: ~35
     # postings resolve in well under a second warm, and the module caps its own total
     # wall clock so a hung host cannot stall the daily job.
-    fetched = postings.fetch_for_changes(to_classify)
+    #
+    # Tier 2 and Tier 3 already carry their text: an ATS returns the description in the
+    # same response that lists the job, and a page diff *is* the text. Only ask
+    # `postings` for the ones that arrive bare, which in practice means Simplify rows.
+    fetched = postings.fetch_for_changes([c for c in to_classify if not c.posting_text])
 
     def judge(change: state.Change) -> Judgment:
-        url = postings.posting_url(change)
-        return classify_one(
-            provider, client, deployment, change, fetched.get(url) if url else None
-        )
+        if change.posting_text:
+            posting = (change.posting_text, "")
+        else:
+            url = postings.posting_url(change)
+            posting = fetched.get(url) if url else None
+        return classify_one(provider, client, deployment, change, posting)
 
     # Concurrent because the loop got long. Classifying every source instead of only
     # the high-signal ones took a run from a handful of calls to ~35 on a normal day
