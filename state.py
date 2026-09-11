@@ -152,22 +152,32 @@ def snapshot_path(source_id: str, ext: str = "txt") -> pathlib.Path:
     return SNAPSHOTS / f"{source_id}.{ext}"
 
 
-def change_key(source_id: str, key: str) -> str:
-    """Stable short id for one digest line, used by the tick-to-dismiss flow."""
-    return hashlib.sha1(f"{source_id}|{key}".encode()).hexdigest()[:10]
+def change_key(source_id: str, key: str, cycle: int | None = None) -> str:
+    """Short id for one digest line in one hiring cycle, for tick-to-dismiss.
+
+    The cycle is part of the hash on purpose, so a dismissal is scoped to the season it
+    was made in and next year's repost is simply a different item. Relying on the title
+    to carry the year does not work: measured across the live boards, 136 of 188 rows
+    say "Summer 2027" somewhere and 52 do not -- Jane Street titles every student role
+    plainly and records the season in metadata. Tagging the key means those come back
+    too, without an expiry clock that would also lapse mid-season.
+    """
+    cycle = recruiting_cycle() if cycle is None else cycle
+    return hashlib.sha1(f"{source_id}|{key}|{cycle}".encode()).hexdigest()[:10]
 
 
-# A dismissal lasts under a year, so an annually reposted role always comes back in
-# time for the next cycle. Keying alone is not enough: 72% of job-board keys carry a
-# cycle marker ("Summer 2027") and change by themselves, but the other 28% do not --
-# Jane Street titles every student role plainly ("Quantitative Trader @ New York") and
-# puts the cycle in metadata, so those keys are identical year over year. Without an
-# expiry, ticking one of those off would hide the most important firm's roles forever.
-APPLIED_TTL_DAYS = 300
+def recruiting_cycle(date: str | None = None) -> int:
+    """Which hiring season a date belongs to.
+
+    Summer 2027 internships are advertised from roughly July 2026, so the cycle rolls
+    over mid-year rather than in January: September 2026 is part of the 2027 cycle.
+    """
+    day = datetime.date.fromisoformat(date or today_iso())
+    return day.year + 1 if day.month >= 7 else day.year
 
 
 def read_applied() -> dict[str, str]:
-    """{key: marked_at}, excluding dismissals older than APPLIED_TTL_DAYS."""
+    """{key: marked_at}. Empty when nothing has ever been ticked."""
     if not APPLIED_TSV.exists():
         return {}
     applied: dict[str, str] = {}
@@ -177,19 +187,8 @@ def read_applied() -> dict[str, str]:
         parts = line.split("\t")
         if not parts[0]:
             continue
-        marked = parts[1] if len(parts) > 1 else ""
-        if marked and _days_since(marked) > APPLIED_TTL_DAYS:
-            continue  # expired: let the next cycle's repost through
-        applied[parts[0]] = marked
+        applied[parts[0]] = parts[1] if len(parts) > 1 else ""
     return applied
-
-
-def _days_since(iso_date: str) -> int:
-    try:
-        then = datetime.date.fromisoformat(iso_date[:10])
-    except ValueError:
-        return 0
-    return (datetime.date.fromisoformat(today_iso()) - then).days
 
 
 def write_applied(applied: dict[str, str], titles: dict[str, str] | None = None) -> None:
