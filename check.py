@@ -20,9 +20,31 @@ import time
 import classify
 import digest
 import state
-from sources import github_repos
+from sources import github_repos, job_boards, page_watch, postings
 
-TIER1_METHODS = {"github_readme"}
+# Which module handles each `method` in sources.csv, and which HTTP client it gets.
+#
+# Two clients, not one, and that is a credential boundary rather than a style choice.
+# `github_repos.build_client` puts `Authorization: Bearer <GH_PAT>` on every request it
+# makes. While only GitHub was contacted that was harmless; the moment a job board or a
+# careers page shares the client, the PAT is sent to boards-api.greenhouse.io,
+# api.lever.co, api.ashbyhq.com and every firm's marketing site. The web client carries
+# the honest User-Agent and no credentials at all.
+GITHUB_CLIENT = "github"
+WEB_CLIENT = "web"
+
+CHECKERS: dict[str, tuple] = {
+    "github_readme": (github_repos.check, GITHUB_CLIENT),
+    "greenhouse": (job_boards.check, WEB_CLIENT),
+    "lever": (job_boards.check, WEB_CLIENT),
+    "ashby": (job_boards.check, WEB_CLIENT),
+    "page_text": (page_watch.check, WEB_CLIENT),
+}
+
+# The one method that is deliberately not fetched: these sources block automation or
+# have nothing to diff, and they reach the owner as calendar reminders instead.
+# Anything else absent from CHECKERS is a broken row, not a source to skip.
+UNWATCHED = "manual"
 
 
 def run_sources(
@@ -36,16 +58,31 @@ def run_sources(
             "(60 requests/hour instead of 5,000)",
             file=sys.stderr,
         )
-    with github_repos.build_client(token) as client:
+    with github_repos.build_client(token) as github_client, postings.build_client() as web_client:
+        clients = {GITHUB_CLIENT: github_client, WEB_CLIENT: web_client}
         for source in sources:
             source_id = source["source_id"]
             if only and source_id != only:
                 continue
-            if source["method"] not in TIER1_METHODS:
-                continue  # Tiers 2 and 3 are not built yet
-            if (source.get("method") or "") == "manual":
+            method = (source.get("method") or "").strip()
+            if method == UNWATCHED:
                 continue
-            results.append(github_repos.check(source, client))
+            handler = CHECKERS.get(method)
+            if handler is None:
+                # Spec 10.1. This used to be a bare `continue`, which meant a typo in
+                # sources.csv produced no SourceResult at all: no health line, no
+                # failure count, and a silently unwatched source indistinguishable
+                # from a quiet one. A configuration error has to be visible.
+                results.append(
+                    state.SourceResult(
+                        source_id=source_id,
+                        ok=False,
+                        error=f"sources.csv sets method={method!r}, which no module handles",
+                    )
+                )
+                continue
+            check_fn, client_name = handler
+            results.append(check_fn(source, clients[client_name]))
             time.sleep(state.REQUEST_DELAY_SECONDS)  # spec section 11: be a good citizen
     return results
 
@@ -224,7 +261,9 @@ def main(argv: list[str] | None = None) -> int:
 
     for result in results:
         if result.ok and result.snapshot_text is not None:
-            state.write_snapshot(result.source_id, result.snapshot_text, ext="tsv")
+            state.write_snapshot(
+                result.source_id, result.snapshot_text, ext=result.snapshot_ext
+            )
     state.write_sources(sources)
     state.write_programs(programs)
 
