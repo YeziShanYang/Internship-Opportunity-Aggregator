@@ -934,6 +934,36 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(job_boards._phenom_field("  Intern  "), "Intern")
         self.assertEqual(job_boards._phenom_field(None), "")
 
+    def test_14_9o_aqr_style_summer_analyst_titles_are_student_roles(self):
+        """Measured gap, 2026-09-11: "intern" alone found 140 US student rows across the
+        ATS boards and missed 60. AQR was invisible entirely -- all 54 of its postings
+        have an empty employment_type and its whole 2027 programme is titled "2027
+        Engineering Summer Analyst". Third variant of the Jane Street trap."""
+        for title in ("2027 Engineering Summer Analyst", "2027 Research Summer Analyst",
+                      "Campus Full Time 2027 - Quantitative Trader",
+                      "Graduate Trader Program Chicago 2027",
+                      "Software Engineer - University Hire 2027",
+                      "Quantitative Trader/Researcher - 2027",
+                      "2027 Cubist Quant Academy - Developers"):
+            with self.subTest(title=title):
+                self.assertTrue(
+                    job_boards.is_student_posting(
+                        job_boards.Posting(title, "New York", "x", "", "u", "")),
+                    title)
+
+    def test_14_9p_a_campus_recruiter_is_not_a_student_role(self):
+        """Jobs *about* early-career hiring match the widened screen and are full-time
+        staff roles. Jane Street posts three of them."""
+        for title in ("Campus Recruiter, Technology",
+                      "Campus Relations & Events Associate",
+                      "Campus Recruiting Coordinator",
+                      "Quantitative Campus Recruiter"):
+            with self.subTest(title=title):
+                self.assertFalse(
+                    job_boards.is_student_posting(
+                        job_boards.Posting(title, "New York", "x", "", "u", "")),
+                    title)
+
 
 class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
     PAGE = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 40 + "</body></html>"

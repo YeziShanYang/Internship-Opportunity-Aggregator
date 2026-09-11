@@ -76,8 +76,30 @@ WORKDAY_MAX_DETAILS = 80
 # "International Equity Fund Analyst" and every "Internationa..." title through. The
 # winternship alternative is there because Virtu really does run one and the word
 # buries "intern" mid-token, so a plain word-boundary fix would drop a real programme.
-STUDENT_TITLE = re.compile(r"\bintern(?!a)|winternship", re.IGNORECASE)
+# Measured 2026-09-11 against every Greenhouse/Lever/Ashby board on the watchlist: the
+# word "intern" alone found 140 US student rows and missed 60 more. AQR was invisible
+# entirely -- all 54 of its postings carry an empty employment_type and its whole 2027
+# programme is titled "2027 Engineering Summer Analyst", "2027 Research Summer Analyst"
+# and so on. This is the Jane Street trap in a third form, so the screen now covers the
+# vocabularies these firms actually use: Summer/Winter Analyst, Campus, Academy,
+# Graduate Programme, University Hire, and a cycle year in the title.
+STUDENT_TITLE = re.compile(
+    r"\bintern(?!a)|winternship|co.?op"
+    r"|\b(summer|winter|spring|fall)\s+(analyst|associate|intern)"
+    r"|\bcampus\b|\bacademy\b|university hire|new grad"
+    r"|graduate (programme|program|scheme|developer|trader|researcher|engineer)"
+    r"|\b20(2[6-9]|3\d)\b",
+    re.IGNORECASE,
+)
 STUDENT_TYPE = re.compile(r"\bintern(?!a)|co.?op", re.IGNORECASE)
+
+# Jobs *about* early-career hiring are not early-career jobs. "Campus Recruiter",
+# "Campus Relations & Events Associate" and "Campus Recruiting Coordinator" all match
+# the widened screen above and are all full-time staff roles. Checked before the
+# positive screen so it cannot be out-voted by a year in the title.
+NOT_A_STUDENT_ROLE = re.compile(
+    r"recruit|talent acquisition|campus relations", re.IGNORECASE
+)
 
 # Workday's list response carries no employment type, so the title is all there is at
 # list time. A future year in the title is the signal that catches the campus programmes
@@ -164,6 +186,8 @@ class Posting:
 
 
 def is_student_posting(posting: Posting) -> bool:
+    if NOT_A_STUDENT_ROLE.search(posting.title):
+        return False
     return bool(
         STUDENT_TITLE.search(posting.title)
         or STUDENT_TYPE.search(posting.employment_type or "")
@@ -289,6 +313,7 @@ def fetch_workday(client: httpx.Client, base: str) -> tuple[list[Posting], int]:
     matched = [
         job for job in listed
         if STUDENT_TITLE_WORKDAY.search(job.get("title") or "")
+        and not NOT_A_STUDENT_ROLE.search(job.get("title") or "")
         and not NON_US_LOCATION.search(job.get("locationsText") or "")
     ]
     interesting = matched[:WORKDAY_MAX_DETAILS]
@@ -392,6 +417,8 @@ def fetch_phenom(client: httpx.Client, endpoint: str) -> tuple[list[Posting], in
         data = job.get("data") or {}
         category = _phenom_field(data.get("category"))
         if not PHENOM_STUDENT_CATEGORY.search(category):
+            continue
+        if NOT_A_STUDENT_ROLE.search(_phenom_field(data.get("title"))):
             continue
         city = _phenom_field(data.get("city"))
         country = _phenom_field(data.get("country"))
