@@ -33,11 +33,13 @@ Three deliberate safety properties:
 """
 from __future__ import annotations
 
+import concurrent.futures
 import json
 import os
 from dataclasses import dataclass, field
 
 import state
+from sources import postings
 
 MODEL = "claude-opus-5"
 
@@ -49,16 +51,31 @@ AZURE_DEFAULT_ENDPOINT = "https://opptracker-ai-jshi.openai.azure.com/"
 AZURE_DEFAULT_API_VERSION = "2024-12-01-preview"
 
 # Bounds the daily bill. Any overflow still reaches the digest, just unclassified.
-MAX_CLASSIFICATIONS_PER_RUN = 60
+# Raised from 60 when the backend moved to gpt-5-mini and postings started being
+# fetched: a classification costs roughly $0.0015 including ~6K tokens of posting text,
+# so even the worst day observed (162 changes) is about $0.25.
+MAX_CLASSIFICATIONS_PER_RUN = 250
 
-# Spec section 8, given to the model verbatim.
+# The work is network-bound, so a modest pool collapses the wall clock without
+# troubling the deployment's 500K tokens/minute quota.
+MAX_CONCURRENT_CLASSIFICATIONS = 6
+
+# The owner's interests are perishable input, not a constant. A stale profile does not
+# fail loudly -- it quietly mis-sorts every item in every digest while the output still
+# looks well-formed. Bump this date by hand whenever OWNER_PROFILE changes; digest.py
+# reads it and nags in the CALENDAR block once it goes stale.
+PROFILE_LAST_REVIEWED = "2026-09-11"
+PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
+
 OWNER_PROFILE = (
     "First-year undergraduate at Stanford, class of 2030, studying math and/or CS. "
     "Does not meet the eligibility criteria for identity-restricted programmes "
     "-- those reserved for women, transgender or gender-expansive students, "
     "underrepresented racial minorities, or LGBTQIA+ students -- nor for \"barriers "
     "to access and opportunity\" criteria. US citizen, US-based. "
-    "Regional St. Louis firms are viable summer options."
+    "Regional St. Louis firms are viable summer options. "
+    "Interests, in order: quantitative finance and mathematics first, software "
+    "engineering second. General finance roles are adjacent and acceptable."
 )
 
 SYSTEM_PROMPT = f"""You judge whether a change on an opportunity-tracking source matters to one specific person.
@@ -85,6 +102,26 @@ Rules, in priority order:
    October. Any change on one of those is high priority regardless of stated deadline.
 5. Never assert a new value for the owner's hand-maintained `eligible` column. If the
    change implies one, put it in `eligible_proposal` as a suggestion with reasoning.
+
+6. Class-year gates stated on the posting are decisive. When the POSTING TEXT below
+   states a requirement this person cannot meet -- "rising junior", "rising senior",
+   "penultimate year", "third or fourth year", "junior or senior standing", a Master's
+   or PhD program, or a graduation window in 2027 or 2028 -- set relevant: false and
+   quote the exact phrase in `why`. Measured: about a third of these postings carry
+   such a gate, so this is the filter that does the most work.
+   Absence of a gate is NOT a reason to rule out. "Currently enrolled in a Bachelor's
+   degree program" includes a first-year: that is relevant: true.
+7. Rule out roles that are clearly outside this person's field. In scope: software
+   engineering, quantitative research, trading, mathematics, data/ML, and
+   finance-adjacent work. Out of scope, as examples: public relations, human
+   resources, marketing, recruiting, change management, IT document automation, and
+   general business operations. Only rule out what is plainly unrelated -- when a role
+   is technical at all, or you are unsure, keep it. Erring toward applying is correct;
+   this person can and does apply broadly.
+
+If the POSTING TEXT is missing or a fetch error is noted, you are judging on a job
+title alone. Say so in `why`, use confidence "low", and do NOT rule the item out on
+class-year grounds -- you have not seen the requirements.
 
 `why` must be one sentence and must name the specific reason -- the class year, the
 identity gate, the deadline -- not a generic statement of interest."""
@@ -139,33 +176,50 @@ class Judgment:
 
     @property
     def urgent(self) -> bool:
-        """Goes in ACT NOW rather than WORTH A LOOK."""
+        """Goes in ACT NOW rather than WORTH A LOOK.
+
+        ACT NOW is only useful while it stays short. This used to be "relevant and
+        confidently classified", which worked while only high-signal sources were
+        classified at all. Once every source was classified that rule promoted every
+        generic-but-eligible job-board row -- a measured run put 22 of them in ACT NOW
+        and left WORTH A LOOK empty, burying the two or three items that actually
+        needed same-day attention.
+
+        So urgency now means one of two specific things: a firm that reviews on a
+        rolling basis and closes when full, or a row that reads as aimed at
+        first-years. Merely being eligible for something is WORTH A LOOK, not ACT NOW.
+        (Failing sources are escalated into the same block separately, by digest.py.)
+        """
         if not self.relevant:
             return False
-        if self.change.rolling:  # spec section 8 rule 4
+        if self.change.rolling:  # closes when full; time-critical regardless of stage
             return True
+        if not self.change.is_discovery_candidate:
+            return False
         return self.classified and self.confidence in ("medium", "high")
 
 
 def triage(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> tuple[list[state.Change], list[state.Change]]:
     """Split changes into (classify, summarise-only).
 
-    Spec section 5 calls Simplify low signal: 1169 untagged roles, most of them junior
-    SWE postings. Spending a model call on each new one would cost money to produce
-    noise, so low-signal sources are classified only when the row matches the
-    underclassman discovery regex or a rolling-review firm. High-signal sources are
-    always classified, per rule 3.
+    Everything is classified now. This used to bypass low-signal sources -- Simplify's
+    ~600 untagged roles -- because an Opus call per row cost real money to produce
+    noise. Two things changed. The backend is gpt-5-mini, so a row costs ~$0.0015
+    instead of ~$0.025; and `sources.postings` now fetches the actual posting, so there
+    is finally something worth judging. A Simplify row on its own is a title and a
+    location: measured, 7 of 592 rows mention any class-year word, and all 7 are
+    incidental matches on "Graduate Researcher". The bypass was skipping rows that
+    could not have been judged anyway.
+
+    Skipping them was also what filled WORTH A LOOK with 20-35 unreadable items a day,
+    since an unclassified change defaults to `relevant=True`.
+
+    The `signal` column stays in sources.csv: it no longer gates classification, but it
+    still marks which sources are noisy, and the overflow sort below prefers rolling
+    and discovery rows when a day exceeds the cap.
     """
-    to_classify: list[state.Change] = []
+    to_classify: list[state.Change] = list(changes)
     summarise_only: list[state.Change] = []
-    for change in changes:
-        source = sources.get(change.source_id, {})
-        low_signal = (source.get("signal") or "high").strip().lower() == "low"
-        interesting = change.is_discovery_candidate or change.rolling
-        if low_signal and not interesting:
-            summarise_only.append(change)
-        else:
-            to_classify.append(change)
 
     if len(to_classify) > MAX_CLASSIFICATIONS_PER_RUN:
         # Keep the most interesting ones; the rest still get reported, unclassified.
@@ -175,7 +229,14 @@ def triage(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> t
     return to_classify, summarise_only
 
 
-def _render_change(change: state.Change) -> str:
+def _render_change(change: state.Change, posting: tuple[str, str] | None = None) -> str:
+    """Render one change for the model. `posting` is the (text, error) from a fetch.
+
+    The distinction between "no posting text" and "the fetch failed" is load-bearing:
+    rule 6 tells the model not to rule anything out on class-year grounds when it has
+    not seen the requirements, so the failure has to be stated rather than left as a
+    silent absence.
+    """
     lines = [
         f"Source: {change.source_id}",
         f"Change type: {change.kind}",
@@ -189,6 +250,17 @@ def _render_change(change: state.Change) -> str:
         lines.append("NOTE: mentions a firm that reviews on a rolling basis.")
     lines.append("")
     lines.append(change.detail[:4000])
+
+    text, error = posting if posting else ("", "")
+    if text:
+        lines.append("")
+        lines.append("--- POSTING TEXT (fetched from the live listing) ---")
+        lines.append(text[:postings.MAX_TEXT_CHARS])
+    elif error:
+        lines.append("")
+        lines.append(f"--- POSTING TEXT UNAVAILABLE: {error} ---")
+        lines.append("Judge on the row above alone. Do not rule this out on class-year")
+        lines.append("grounds; you have not seen the requirements.")
     return "\n".join(lines)
 
 
@@ -257,7 +329,7 @@ def _judgment_from_text(change: state.Change, text: str) -> Judgment:
     )
 
 
-def _classify_anthropic(client, model: str, change: state.Change) -> Judgment:
+def _classify_anthropic(client, model: str, change: state.Change, posting=None) -> Judgment:
     try:
         response = client.messages.create(
             model=model,
@@ -271,7 +343,7 @@ def _classify_anthropic(client, model: str, change: state.Change) -> Judgment:
                 "effort": "low",
                 "format": {"type": "json_schema", "schema": RESULT_SCHEMA},
             },
-            messages=[{"role": "user", "content": _render_change(change)}],
+            messages=[{"role": "user", "content": _render_change(change, posting)}],
         )
     except Exception as exc:
         return Judgment(change=change, error=f"{type(exc).__name__}: {exc}")
@@ -286,7 +358,7 @@ def _classify_anthropic(client, model: str, change: state.Change) -> Judgment:
     return _judgment_from_text(change, text)
 
 
-def _classify_azure(client, deployment: str, change: state.Change) -> Judgment:
+def _classify_azure(client, deployment: str, change: state.Change, posting=None) -> Judgment:
     try:
         response = client.chat.completions.create(
             model=deployment,
@@ -305,7 +377,7 @@ def _classify_azure(client, deployment: str, change: state.Change) -> Judgment:
             },
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _render_change(change)},
+                {"role": "user", "content": _render_change(change, posting)},
             ],
         )
     except Exception as exc:
@@ -325,11 +397,13 @@ def _classify_azure(client, deployment: str, change: state.Change) -> Judgment:
     return _judgment_from_text(change, choice.message.content or "")
 
 
-def classify_one(provider: str, client, deployment: str, change: state.Change) -> Judgment:
+def classify_one(
+    provider: str, client, deployment: str, change: state.Change, posting=None
+) -> Judgment:
     """Dispatch one change to whichever backend is configured."""
     if provider == ANTHROPIC:
-        return _classify_anthropic(client, deployment, change)
-    return _classify_azure(client, deployment, change)
+        return _classify_anthropic(client, deployment, change, posting)
+    return _classify_azure(client, deployment, change, posting)
 
 
 def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> list[Judgment]:
@@ -368,8 +442,30 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
             )
         return judgments
 
-    for change in to_classify:
-        judgment = classify_one(provider, client, deployment, change)
+    # One batch fetch for the whole run rather than a serial fetch per change: ~35
+    # postings resolve in well under a second warm, and the module caps its own total
+    # wall clock so a hung host cannot stall the daily job.
+    fetched = postings.fetch_for_changes(to_classify)
+
+    def judge(change: state.Change) -> Judgment:
+        url = postings.posting_url(change)
+        return classify_one(
+            provider, client, deployment, change, fetched.get(url) if url else None
+        )
+
+    # Concurrent because the loop got long. Classifying every source instead of only
+    # the high-signal ones took a run from a handful of calls to ~35 on a normal day
+    # and 162 on the worst observed; serially at ~3s each that is minutes of runner
+    # time for work that is almost entirely waiting on the network.
+    #
+    # `pool.map` yields results in input order, which matters: proposals.log is an
+    # audit trail and must not reorder run to run. Writes happen below, on one thread,
+    # after every judgment is in -- `state.append_proposal` appends to a file and is
+    # not safe to call from the pool.
+    with concurrent.futures.ThreadPoolExecutor(MAX_CONCURRENT_CLASSIFICATIONS) as pool:
+        judged = list(pool.map(judge, to_classify))
+
+    for change, judgment in zip(to_classify, judged):
         if judgment.eligible_proposal:
             state.append_proposal(
                 f"{change.source_id}\t{change.key}\tproposed eligible="

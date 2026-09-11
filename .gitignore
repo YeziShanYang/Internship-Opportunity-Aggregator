@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Fetched job-posting text. Derived data, not state: re-fetchable, and committing
+# ~35 pages a day would bury the CSV history that git log exists to answer.
+data/postings_cache/
