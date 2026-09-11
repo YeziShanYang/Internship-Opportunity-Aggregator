@@ -185,6 +185,11 @@ class Change:
     program_name: str = ""  # filled from sources.csv program_names
     is_discovery_candidate: bool = False
     rolling: bool = False
+    # Some sources hand back the full posting body in the same response that lists it
+    # -- Greenhouse `content=true`, Lever and Ashby `descriptionPlain`. Carrying it
+    # here lets the classifier judge real requirements without a second HTTP request,
+    # and without `postings` having to guess a URL it cannot always construct.
+    posting_text: str = ""
 
 
 @dataclass
@@ -203,4 +208,6 @@ class SourceResult:
     content_length: int = 0
     snapshot_text: str | None = None  # new snapshot to persist, if the check succeeded
     baseline: bool = False  # first ever sight of this source: record, do not report
+    # Tier 1 and 2 store a canonical TSV; Tier 3 stores normalised page text.
+    snapshot_ext: str = "tsv"
     extra: dict[str, Any] = field(default_factory=dict)
