@@ -8,9 +8,10 @@ Runs on GitHub Actions, so it does not care whether your laptop is awake. State 
 this repo as CSVs, which makes **git the database**: `git log` answers "which page
 changed on which morning" forever, for free.
 
-**Status: Phases 1 and 2 shipped.** 71 sources — five GitHub repo trackers, 43 ATS
-boards (Greenhouse/Workday/Ashby/Lever), 19 watched pages and four `manual` rows — with
-Issue delivery, one digest a day, a weekly source-discovery pass, and tick-to-dismiss.
+**Status: Phases 1 and 2 shipped.** 120 sources — five GitHub repo trackers, 60 ATS
+boards (Greenhouse/Workday/Ashby/Lever/Phenom), 52 watched pages and three `manual`
+rows — with Issue delivery, one digest a day, a weekly source-discovery pass, and
+tick-to-dismiss.
 
 Sources divide by *intake path*, not by tier: aggregator lists that someone else
 curates, and named employers. For a named employer the watcher points either at the
@@ -59,7 +60,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 check.py                 orchestrates: check → classify → render → deliver → save state
 sources/snapshot.py      the canonical row/diff shape every source type shares
 sources/github_repos.py  repo READMEs, diffed at the row level
-sources/job_boards.py    Greenhouse/Workday/Ashby/Lever JSON -> the same canonical rows
+sources/job_boards.py    Greenhouse/Workday/Ashby/Lever/Phenom JSON -> canonical rows
 sources/page_watch.py    fetch a page, normalise to lines, diff; two floors, no browser
 sources/postings.py      fetch the real posting behind a board row, for the classifier
 discover.py              the weekly pass that proposes new sources and never adds one
