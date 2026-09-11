@@ -18,7 +18,86 @@ ask what to do with it.
 If the page is paywalled, JS-only, or returns nothing useful, say so plainly and ask the
 user to paste the text. Do not guess at contents you could not read.
 
-## 2. Extract every opportunity
+## 2. Resolve every link to something that will still exist next year
+
+**A link to one job posting is almost never the right thing to watch.** The requisition
+closes when the role is filled, the URL 404s, and next year the same programme reappears
+at a different URL. A source pointed at it looks healthy right up to the moment it goes
+permanently blind.
+
+So before probing anything, turn the link you were given into a **durable watch target**.
+There are only three kinds, in order of preference:
+
+| Kind | When | Where it goes |
+|---|---|---|
+| **Programme page** | the employer has a page for this specific programme, with the apply button on it | `page_text`, tier 3, `signal: high` |
+| **Whole job board** | the employer posts everything through one ATS | the matching ATS method, tier 2, `signal: low`, `program_names` empty |
+| **Aggregator** | it is somebody else's curated list, not an employer | `github_readme` if it is a repo README |
+
+Prefer the programme page when one exists: it carries the rolling-deadline language and
+the apply button, and it survives the requisition closing. Jane Street is the worked
+example — their Greenhouse board has no FTTP listing at all, so the board alone would
+never tell you FTTP had opened. Watch both when both exist; they answer different
+questions.
+
+### Finding the board behind a posting URL
+
+Read the host. The fingerprint tells you the ATS and the slug is in the path:
+
+| Posting URL contains | Method | `url` column holds |
+|---|---|---|
+| `job-boards.greenhouse.io/<slug>/...` or `?gh_jid=` | `greenhouse` | the slug, e.g. `janestreet` |
+| `jobs.lever.co/<slug>/...` | `lever` | the slug |
+| `jobs.ashbyhq.com/<slug>/...` (case-sensitive) | `ashby` | the slug |
+| `<tenant>.wdN.myworkdayjobs.com/en-US/<site>/job/...` | `workday` | the full CXS base URL (below) |
+
+**Workday needs care and is worth the trouble** — it is the most common ATS among large
+employers and a plain fetch of any Workday page returns *zero* characters of text,
+which is why it looks unwatchable. The JSON API behind it works fine. From
+`https://capgroup.wd1.myworkdayjobs.com/en-US/capitalgroupcareers/job/Los-Angeles/CAP-Associate---US--2027-_JR7194-1`
+take the tenant (`capgroup`), the shard (`wd1`) and the site (`capitalgroupcareers`) and
+build:
+
+```
+https://capgroup.wd1.myworkdayjobs.com/wday/cxs/capgroup/capitalgroupcareers
+```
+
+Confirm it before adding — the shard in the posting URL is not always the one the API
+answers on, so try `wd1`, `wd3`, `wd5`, `wd2`:
+
+```bash
+curl -s -X POST "https://<tenant>.<shard>.myworkdayjobs.com/wday/cxs/<tenant>/<site>/jobs" \
+  -H 'Content-Type: application/json' \
+  -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' | head -c 400
+```
+
+A `total` and a `jobPostings` array means it works. Two boards will refuse and should be
+left out rather than added half-working: one with more postings than can be paged 20 at a
+time (~800 max), and one where nearly every title passes the student filter, which would
+mean hundreds of description fetches a day. `job_boards.check` raises on both instead of
+reading them partially.
+
+### If the employer has no public board
+
+Then the durable target is their careers or students page as `page_text`. Probe it (§3):
+if it yields real text, watch it. If it is a JavaScript shell, it goes to `manual` — do
+not point a source at the posting URL as a consolation prize, because that is the failure
+this whole section exists to prevent.
+
+### Confirm the placement afterwards
+
+```bash
+.venv/bin/python -c "
+import csv,re
+for r in csv.DictReader(open('data/sources.csv')):
+    if re.search(r'/job/|jobid|requisition|_JR\\d|\\?q=JR', r['url'], re.I):
+        print('POSTING-SPECIFIC, will die:', r['source_id'], r['url'])
+"
+```
+
+That should print nothing.
+
+## 3. Extract every opportunity
 
 Read the whole article, not just the headings. A "10 internships for freshmen" listicle
 has ten opportunities; a single program page has one. Aggregator pages linking out to
@@ -29,7 +108,7 @@ which class years it targets, and any eligibility language quoted from the page.
 
 **Ignore nothing because it looks marginal** — the owner filters, you collect.
 
-## 3. Probe each opportunity's own URL
+## 4. Probe each opportunity's own URL
 
 ```bash
 .venv/bin/python add_opportunity.py --probe "https://the-opportunity-url"
@@ -41,15 +120,16 @@ placement — do not assume a page is watchable:
 
 | Probe says | Placement |
 |---|---|
+| the employer has an ATS board (§2) | `source` block, **tier 2**, `method: greenhouse` / `lever` / `ashby` / `workday`, `signal: "low"`, `program_names` empty — one board is not one tracked programme, and an empty `program_names` is what stops a 200-job board driving one row's status |
 | `render_js=false`, plenty of text | `source` block, tier 3, `render_js: false` |
 | `render_js=true` (under ~200 chars) | `source` block with `render_js: true`, **and** a `manual` block with `coverage: "Planned - phase 3"` |
-| Under ~50 chars, or a 2-URL sitemap | `manual` only — there is nothing to diff |
+| Under ~500 chars, or a text-to-HTML ratio under 0.0015 | `manual` only — there is nothing to diff |
 | `MANUAL - blocked` (401/403) or robots disallows | `manual` only, `coverage: "Never - blocked"`. **Never** work around a block |
 | Announced on Instagram/listserv before the site changes | `manual`, `coverage: "Never - announced off-web"` |
 
 Serialise probes with a beat between them. Be a good citizen (spec section 11).
 
-## 4. Set eligibility conservatively
+## 5. Set eligibility conservatively
 
 The owner is a Stanford first-year, class of 2030, math/CS, a US citizen based in the US
 — and **not** eligible for identity- or hardship-targeted programs.
@@ -63,7 +143,7 @@ The owner is a Stanford first-year, class of 2030, math/CS, a US citizen based i
 - Put the eligibility language you actually read into `notes`, quoted. "Grad window Dec
   2027-Jun 2029" is useful; "seems relevant" is not.
 
-## 5. Check what is already tracked before adding
+## 6. Check what is already tracked before adding
 
 `data/programs.csv` already holds ~150 hand-researched rows. The script dedupes on exact
 name, but **near-miss names slip through** — "MIT Pokerbots" vs "Pokerbots (MIT)" would
@@ -85,7 +165,7 @@ This has already mattered: an article-style addition of MIT Pokerbots would have
 overwritten a researched `NO` (the competition server needs a teammate with MIT
 certificates) with a hopeful `CHECK`.
 
-## 6. Add them
+## 7. Add them
 
 Build a JSON array and dry-run it first:
 
@@ -124,7 +204,7 @@ probability for a first-year; a padded Priority sheet is a useless one.
 .venv/bin/python build_xlsx.py
 ```
 
-## 7. Commit and report
+## 8. Commit and report
 
 ```bash
 git diff --stat && git add -A && git commit -F /tmp/msg.txt && git push
