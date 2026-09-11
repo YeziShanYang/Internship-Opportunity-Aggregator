@@ -8,9 +8,9 @@ Runs on GitHub Actions, so it does not care whether your laptop is awake. State 
 this repo as CSVs, which makes **git the database**: `git log` answers "which page
 changed on which morning" forever, for free.
 
-**Status: Phase 1 shipped.** Tier 1 (five GitHub repo trackers) is live, with Issue
-delivery, the health block and the change-only cadence. Tiers 2 and 3 are not built —
-see [What is not built yet](#what-is-not-built-yet).
+**Status: Phases 1 and 2 shipped.** 47 sources across three tiers — five GitHub repo
+trackers, 28 ATS boards (Greenhouse/Lever/Ashby) and 14 page watchers — with Issue
+delivery, one digest a day, a weekly source-discovery pass, and tick-to-dismiss.
 
 ---
 
@@ -261,16 +261,18 @@ Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHu
 
 ## What is not built yet
 
-- **Phase 2** — resolve the 47 NUFT firms to their ATS and wire the Greenhouse / Lever /
-  Ashby JSON endpoints, plus the Kaggle API. The endpoints work (Greenhouse `akunacapital`
-  returns 35 jobs, `jumptrading` 109, `imc` 175; Ashby `ramp` 142), but slug resolution is
-  genuinely manual per firm — guessing fails often, and Optiver, DRW, Citadel and Five
-  Rings are not on Lever at all.
-- **Phase 3** — the ~45 page watchers. Playwright runs in the Actions job for the ~10
-  JS-shell pages; note that changedetection.io, which the spec suggests, is a *persistent
-  service* and cannot run inside an ephemeral Actions job. Budget ~3–6 min per run
-  (~150 of your 2,000 free private-repo minutes/month), not the spec's "~30 seconds".
-- **Phase 4** — classifier tuning.
+- **Playwright for JS-shell pages.** Ten Tier 3 pages were measured returning real text
+  to a plain GET, so no browser ships. SIG's careers page is a shell (402KB of HTML,
+  221 characters of text) and is `method=manual` as a result. Adding a browser would
+  reach it and a handful like it, at ~3–6 min per run.
+- **The rest of the spec's ~45 watch URLs.** Several are stale — Berkeley 404s, D. E.
+  Shaw's `/fellowships` path is gone, DRW's URL 308-redirects — so extending the list
+  is URL archaeology before it is code.
+- **Cross-source dedupe.** Eight of ten Greenhouse boards are firms the NUFT repo also
+  lists, so the same opportunity can arrive twice under two names. Left alone on
+  purpose: the two are not really duplicates, since Tier 2 carries the full title,
+  location and description while NUFT carries a role code, and tick-to-dismiss handles
+  any genuine double-sighting.
+- **Classifier tuning** — the spec's Phase 4.
 
-Tiers 1 and 2 should work unchanged for years. Tier 3 is where the effort goes, and it is
-only worth doing cheaply.
+Tiers 1 and 2 should work unchanged for years. Tier 3 is the fragile one.

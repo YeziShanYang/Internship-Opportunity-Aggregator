@@ -270,13 +270,16 @@ def main(argv: list[str] | None = None) -> int:
     # issue of its own.
     discovery_lines: list[str] = []
     discovery_notes: list[str] = []
-    if send and not args.dry_run and (args.force_discovery or discover.due()):
+    # --force-discovery works under --dry-run too, so the section can be eyeballed
+    # before it ever mails; the writes below are what --dry-run actually suppresses.
+    if (send and not args.dry_run and discover.due()) or args.force_discovery:
         try:
             token = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
             with github_repos.build_client(token) as gh, postings.build_client() as web:
                 candidates, discovery_notes = discover.run(gh, web, sources)
-            discover.record(candidates)
-            state.write_last_discovery()
+            if not args.dry_run:
+                discover.record(candidates)
+                state.write_last_discovery()
             if candidates:
                 discovery_lines = discover.lines(candidates)
         except Exception as exc:  # the digest must never be lost because this broke
