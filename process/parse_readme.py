@@ -23,7 +23,7 @@ import re
 from dataclasses import dataclass, field
 
 from core import models
-from process.snapshot import (  # shared with job_boards and page_watch
+from process.snapshot import (  # shared with parse_ats and parse_page
     DISCOVERY_PATTERN,
     ROLLING_PATTERN,
     ROWS_HEADER,
@@ -33,6 +33,7 @@ from process.snapshot import (  # shared with job_boards and page_watch
     diff_snapshots,
     parse_snapshot,
     _URL,
+    _recover_posting_url,
     render_snapshot,
 )
 
@@ -382,6 +383,10 @@ def extract_reported(
                     key=key,
                     value=value,
                     url=urls[0] if urls else "",
+                    # Assigned here, where the parsed cells are in hand. `url` is
+                    # whichever link came first, which on a Simplify row is the company
+                    # page rather than the posting.
+                    posting_url=_recover_posting_url(value),
                 )
             )
     return snapshot, [

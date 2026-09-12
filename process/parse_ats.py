@@ -29,8 +29,8 @@ import re
 
 from core import clock, models
 from gather import ats
+from core import text as coretext
 from process import snapshot
-from sources import postings
 
 # Either signal is enough. See the module docstring for why neither alone suffices.
 #
@@ -195,7 +195,7 @@ def wants_workday_detail(job: dict) -> bool:
 
 
 def _clean(raw: str) -> str:
-    return postings.extract_text(html.unescape(raw or ""))[: postings.MAX_TEXT_CHARS]
+    return coretext.extract_text(html.unescape(raw or ""))[: coretext.MAX_TEXT_CHARS]
 
 
 def parse_greenhouse(payload: dict) -> list[models.Posting]:
@@ -416,7 +416,10 @@ def to_snapshot(
             for label, text in (("Type", posting.employment_type), ("URL", posting.url))
             if text
         )
-        row = snapshot.Row(section=section, key=key, value=value, url=posting.url)
+        # An ATS row's own url is the posting page, so the two agree here. They
+        # differ only on the aggregator READMEs, which carry two links per cell.
+        row = snapshot.Row(section=section, key=key, value=value,
+                           url=posting.url, posting_url=posting.url)
         snap.sections.append(section)
         snap.rows.append(row)
         by_identity[row.identity] = posting

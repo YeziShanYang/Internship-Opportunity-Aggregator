@@ -33,6 +33,7 @@ import httpx
 
 import calendar_reminders
 import classify
+from enrich import bodies as enrich_bodies
 from core import clock, models, paths
 from classify import Judgment
 
@@ -320,6 +321,7 @@ def render(
     suppressed_muted: int = 0,
     discovery_lines: list[str] | None = None,
     status_only: bool = False,
+    enriched: dict[str, enrich_bodies.PostingBody] | None = None,
 ) -> tuple[str, str]:
     """Return (issue title, issue body).
 
@@ -412,6 +414,11 @@ def render(
     # page a day later is a cost nobody notices drifting upward.
     # Before the spend line, because it explains part of it: a change the screen
     # settled is a model call that did not happen.
+    # Before the screen line, because it comes first in the pipeline and because a
+    # posting that could not be read is the reason a screen had no opinion about it.
+    enrich_line = enrich_bodies.health_line(enriched or {})
+    if enrich_line:
+        body.append(f"- {enrich_line}")
     screened = classify.screen_line()
     if screened:
         body.append(f"- {screened}")

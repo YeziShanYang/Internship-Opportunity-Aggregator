@@ -27,6 +27,14 @@ class Change:
     # core.clock.change_id for why this is not the same thing as change_key.
     change_id: str = ""
     url: str = ""
+    # The *fetchable posting page*, as distinct from `url`. On an aggregator row those
+    # are different links and `url` is the wrong one: a Simplify row carries both the
+    # employer's ATS (a JavaScript shell that returns zero characters) and
+    # simplify.jobs/p/<uuid> (13K-34K characters of real requirements), and `url` is
+    # whichever came first in the cell -- usually the company page. Recorded by the
+    # producer that had the parsed cells in hand rather than recovered downstream with
+    # a second regex, which is what it was until now.
+    posting_url: str = ""
     program_name: str = ""  # filled from sources.csv program_names
     is_discovery_candidate: bool = False
     rolling: bool = False

@@ -310,3 +310,76 @@ class RawBodyReplayTests(unittest.TestCase):
         raw = b"\xff\xfe<html>not utf-8</html>"
         artifacts.write_body("s", raw)
         self.assertEqual(artifacts.read_body("s"), raw)
+
+
+class EnrichStageTests(unittest.TestCase):
+    """The second network stage, and the one thing it must never do: turn a fetch
+    failure into a relevance decision."""
+
+    def _change(self, **kwargs) -> models.Change:
+        base = dict(source_id="s", kind="added", key="SWE Intern", detail="d",
+                    change_id="abc123")
+        base.update(kwargs)
+        return models.Change(**base)
+
+    def test_a_body_table_is_keyed_on_change_id_not_url(self):
+        """An inline ATS body has no URL to key on, and two changed rows can share one
+        posting link -- a URL-keyed table can hold neither case."""
+        from enrich import bodies
+        table = bodies.collect([
+            self._change(change_id="one", posting_text="A"),
+            self._change(change_id="two", posting_text="B"),
+        ])
+        self.assertEqual(sorted(table), ["one", "two"])
+        self.assertEqual(table["one"].text, "A")
+
+    def test_every_change_gets_an_entry_even_with_nothing_to_fetch(self):
+        """So "missing from the table" stops being ambiguous between "nothing to get"
+        and "enrich never ran"."""
+        from enrich import bodies
+        table = bodies.collect([self._change()])
+        self.assertEqual(table["abc123"].origin, bodies.ABSENT)
+
+    def test_a_failed_fetch_stays_an_error_and_never_becomes_empty_text(self):
+        """The whole reason PostingBody carries `origin` and `error`. Returning a
+        failed fetch as empty text would let the classifier read "no stated
+        requirements" and rule the posting out on a network problem."""
+        from enrich import bodies
+        body = bodies.PostingBody(
+            change_id="abc123", error="ConnectError: nope", origin=bodies.FETCHED)
+        self.assertEqual(
+            bodies.for_change({"abc123": body}, self._change()),
+            ("", "ConnectError: nope"))
+        self.assertFalse(body.usable)
+
+    def test_an_inline_body_survives_a_caller_that_skipped_enrich(self):
+        """The text belongs to the Change -- an ATS returns it in the same response
+        that lists the job. A classify call with no bodies table must not lose it, or a
+        screen rule-out silently becomes a "no opinion" plus a wasted model call. This
+        regressed once while enrich was being extracted, and the suite caught it."""
+        from enrich import bodies
+        change = self._change(posting_text="Rising junior required.")
+        self.assertEqual(
+            bodies.for_change({}, change), ("Rising junior required.", ""))
+
+    def test_the_typed_posting_url_is_used_without_reparsing_the_detail(self):
+        from enrich import bodies
+        url = "https://simplify.jobs/p/00000000-0000-0000-0000-000000000001"
+        self.assertEqual(bodies.needs_fetch(self._change(posting_url=url)), url)
+
+    def test_the_stage_reports_what_it_managed(self):
+        from enrich import bodies
+        table = {
+            "a": bodies.PostingBody("a", text="x", origin=bodies.FETCHED),
+            "b": bodies.PostingBody("b", error="boom", origin=bodies.FETCHED),
+            "c": bodies.PostingBody("c", text="y", origin=bodies.INLINE),
+        }
+        line = bodies.health_line(table)
+        self.assertIn("1 of 2 bodies fetched for 3 changed row(s)", line)
+        self.assertIn("could not be read", line)
+
+    def test_nothing_fetched_means_no_health_line(self):
+        """An inline-only run has nothing to report and must not print a zero."""
+        from enrich import bodies
+        self.assertIsNone(bodies.health_line(
+            {"a": bodies.PostingBody("a", text="x", origin=bodies.INLINE)}))

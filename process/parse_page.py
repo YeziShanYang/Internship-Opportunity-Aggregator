@@ -27,8 +27,8 @@ import re
 from core import clock, models
 from gather import page
 from process import redirect
+from core import text as coretext
 from process import snapshot
-from sources import postings
 
 # Below this a response is a JavaScript shell or a block page, not a short page.
 # Calibrated against measurements, not guessed: the thinnest real page in the watchlist
@@ -87,7 +87,7 @@ def normalise(raw_html: str) -> list[str]:
     text = _HTML_COMMENT.sub(" ", text)
     text = _BLOCK_END.sub("\n", text)
     text = _TAG.sub(" ", text)
-    text = postings.extract_text(text) if "<" in text else text
+    text = coretext.extract_text(text) if "<" in text else text
     # Vendor JSON feeds (Workable, Rippling, Teamtailor, Pinpoint) arrive as one line, so
     # a line differ can only ever say "the whole feed changed". Breaking on record
     # boundaries makes a new posting show up as one added line instead.
@@ -151,7 +151,7 @@ def diff_pages(
             # a discovery, and flagging it would push a closure into ACT NOW.
             is_discovery_candidate=bool(snapshot.DISCOVERY_PATTERN.search(blob)),
             rolling=bool(snapshot.ROLLING_PATTERN.search(blob)),
-            posting_text=blob[: postings.MAX_TEXT_CHARS],
+            posting_text=blob[: coretext.MAX_TEXT_CHARS],
         )
     ]
 

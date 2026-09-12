@@ -1,13 +1,7 @@
-"""Fetch a repo's README, and build the client that carries the GitHub credential.
+"""Fetch a repo's README: the repo metadata for its default branch, then the raw file.
 
-Two clients exist in this tool, not one, and that is a credential boundary rather than
-a style choice. `build_client` puts `Authorization: Bearer <GH_PAT>` on every request it
-makes. While only GitHub was contacted that was harmless; the moment a job board or a
-careers page shares the client, the PAT is sent to boards-api.greenhouse.io,
-api.lever.co, api.ashbyhq.com and every firm's marketing site. The web client
-(`sources.postings.build_client`) carries the honest User-Agent and no credentials.
-
-Network only. Parsing the tables is `process.parse_readme`'s job.
+Network only. Parsing the tables is `process.parse_readme`'s job, and the client that
+carries the GitHub credential is `gather.clients`' -- see there for why there are two.
 """
 from __future__ import annotations
 
@@ -30,15 +24,6 @@ class ReadmeFetch:
     attempt: models.FetchAttempt
     text: str = ""
     branch: str = ""
-
-
-def build_client(token: str | None) -> httpx.Client:
-    headers = {"User-Agent": paths.USER_AGENT, "Accept": "application/vnd.github+json"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    return httpx.Client(
-        headers=headers, timeout=paths.HTTP_TIMEOUT_SECONDS, follow_redirects=True
-    )
 
 
 def fetch_readme(client: httpx.Client, repo: str) -> tuple[str, str]:
