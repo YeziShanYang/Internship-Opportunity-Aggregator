@@ -215,15 +215,11 @@ def main(argv: list[str] | None = None) -> int:
     }
     changes = [change for change in changes if change.program_name not in muted]
 
-    # Anything the owner ticked off in a delivered digest -- applied to, or not
-    # interested -- is dropped before classification, which also saves the model call.
-    # Newly ticked keys are merged in first so a tick takes effect the next morning.
+    # Anything muted in data/applied.tsv -- applied to, or not interested -- is dropped
+    # before classification, which also saves the model call. This used to be populated
+    # by ticking a checkbox in a delivered digest; the digest is a table now and a table
+    # cell cannot hold a working checkbox, so the file is hand-edited.
     applied = state.read_applied()
-    newly_ticked = digest.collect_applied()
-    if newly_ticked:
-        applied.update({k: v for k, v in newly_ticked.items() if k not in applied})
-        if not args.dry_run:
-            state.write_applied(applied)
     before_applied = len(changes)
     changes = [
         change
