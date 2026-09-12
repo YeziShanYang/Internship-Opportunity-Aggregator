@@ -6,3 +6,8 @@ __pycache__/
 # Fetched job-posting text. Derived data, not state: re-fetchable, and committing
 # ~35 pages a day would bury the CSV history that git log exists to answer.
 data/postings_cache/
+
+# Stage artifacts. Derived, re-fetchable data: ~157 fetched page bodies a day plus
+# the JSON handoff between stages. Committing it would bury the CSV history that git
+# log exists to answer, exactly as postings_cache would.
+.run/
