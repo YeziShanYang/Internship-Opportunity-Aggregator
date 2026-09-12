@@ -19,6 +19,7 @@ import os
 import pathlib
 import re
 import sys
+import time
 import tempfile
 import unittest
 
@@ -1980,3 +1981,151 @@ class EightfoldTests(_IsolatedState, unittest.TestCase):
         r = job_boards.check(self.SRC, Broken())
         self.assertFalse(r.ok)
         self.assertIn("rate limited", r.error)
+
+
+class AtsProbeTests(_IsolatedState, unittest.TestCase):
+    """The probe that finds the real board behind a watched careers page.
+
+    Validated against the live watchlist: from an empty knowledge base it
+    rediscovers 11 of the 11 boards the 2026-09-12 hand audit found. These tests pin
+    the shapes that made that possible, and the false positives that made the
+    documented technique untrustworthy.
+    """
+
+    def setUp(self):
+        super().setUp()
+        # The probe sleeps REQUEST_DELAY_SECONDS between fetches to be polite to real
+        # hosts. Against fakes that is 12 seconds of the suite doing nothing, and a
+        # slow suite is a suite that stops being run.
+        original = state.REQUEST_DELAY_SECONDS
+        state.REQUEST_DELAY_SECONDS = 0.0
+        self.addCleanup(setattr, state, "REQUEST_DELAY_SECONDS", original)
+
+    class Pages:
+        """Serves a fixed body per URL, and 404s anything else."""
+
+        def __init__(self, bodies):
+            self.bodies = bodies
+            self.fetched = []
+
+        def get(self, url, *args, **kwargs):
+            self.fetched.append(url)
+            if url in self.bodies:
+                return FakeResponse(text=self.bodies[url], status=200, url=url)
+            return FakeResponse(text="", status=404, url=url)
+
+    PAGE = "https://firm.test/careers/"
+
+    def _src(self, url=None, source_id="firm-careers", method="page_text"):
+        return [{"source_id": source_id, "method": method, "url": url or self.PAGE,
+                 "program_names": "", "signal": "low"}]
+
+    def _mine(self, bodies, known=frozenset(), sources=None):
+        client = self.Pages(bodies)
+        found, notes = discover.mine_pages(
+            sources or self._src(), client, set(known), deadline=time.monotonic() + 60
+        )
+        return found, notes, client
+
+    # --- the false positives that made the documented technique untrustworthy -----
+
+    def test_the_word_leverage_is_not_a_lever_board(self):
+        """Measured: CLAUDE.md's bare-keyword grep produced 10 false positives out of
+        24 hits across the 65 watched pages, nine of them on "leverage" alone."""
+        found, _, _ = self._mine({self.PAGE: "<p>We leverage leveraged Leverage.</p>"})
+        self.assertEqual(found, [])
+
+    def test_an_hr_workday_disclosure_is_not_a_job_board(self):
+        """brevanhoward-students matched only on "our HR Workday system"."""
+        found, notes, _ = self._mine({self.PAGE: "<p>Data is held in our HR Workday system.</p>"})
+        self.assertEqual(found, [])
+        self.assertEqual(notes, [], "a prose mention must not raise a vendor note either")
+
+    # --- the shapes that had to work -------------------------------------------
+
+    def test_a_plain_board_link(self):
+        found, _, _ = self._mine(
+            {self.PAGE: '<a href="https://boards.greenhouse.io/acmecapital">Jobs</a>'}
+        )
+        self.assertEqual([c.key for c in found], ["greenhouse:acmecapital"])
+
+    def test_a_greenhouse_embed_script(self):
+        """Verition's and Eclipse's slugs appear only in a grnhse_app embed."""
+        found, _, _ = self._mine(
+            {self.PAGE: '<script src="https://x/grnhse_app.js?for=veritiongroupllc"></script>'}
+        )
+        self.assertEqual([c.key for c in found], ["greenhouse:veritiongroupllc"])
+
+    def test_the_api_host(self):
+        """Graham's slug appears nowhere but a boards-api URL, and "boards-api" is
+        not "boards"."""
+        found, _, _ = self._mine({
+            self.PAGE: 'fetch("https://boards-api.greenhouse.io/v1/boards/'
+                       'grahamcapitalmanagement/jobs?content=true")'
+        })
+        self.assertEqual([c.key for c in found], ["greenhouse:grahamcapitalmanagement"])
+
+    def test_it_follows_one_hop_to_an_all_jobs_page(self):
+        """The owner's actual description: "click a couple more buttons". Probing only
+        the watched page found 8 of 11; this is what recovered the other three."""
+        found, _, client = self._mine({
+            self.PAGE: '<a href="/all-jobs/">See all jobs</a>',
+            "https://firm.test/all-jobs/": '<a href="https://jobs.ashbyhq.com/deepfirm">Apply</a>',
+        })
+        self.assertEqual([c.key for c in found], ["ashby:deepfirm"])
+        self.assertIn("https://firm.test/all-jobs/", client.fetched)
+
+    def test_it_does_not_follow_offsite_links(self):
+        """Following off-site links turns a probe of our own watchlist into a crawler."""
+        found, _, client = self._mine({
+            self.PAGE: '<a href="https://elsewhere.test/open-positions">Jobs</a>',
+            "https://elsewhere.test/open-positions": '<a href="https://jobs.lever.co/nope">x</a>',
+        })
+        self.assertEqual(found, [])
+        self.assertNotIn("https://elsewhere.test/open-positions", client.fetched)
+
+    def test_the_hop_budget_is_bounded(self):
+        links = "".join(f'<a href="/open-positions-{i}">j</a>' for i in range(20))
+        _, _, client = self._mine({self.PAGE: links})
+        self.assertLessEqual(len(client.fetched), 1 + discover.MAX_HOPS_PER_PAGE)
+
+    # --- hygiene ----------------------------------------------------------------
+
+    def test_url_furniture_is_never_proposed_as_a_board(self):
+        """Without this, every Greenhouse-embedding page proposes a board called
+        "embed"."""
+        found, _, _ = self._mine(
+            {self.PAGE: '<script src="https://boards.greenhouse.io/embed/job_board/js?for=realslug">'}
+        )
+        self.assertEqual([c.key for c in found], ["greenhouse:realslug"])
+
+    def test_a_board_already_watched_is_not_proposed_again(self):
+        found, _, _ = self._mine(
+            {self.PAGE: '<a href="https://boards.greenhouse.io/acmecapital">x</a>'},
+            known={"greenhouse:acmecapital"},
+        )
+        self.assertEqual(found, [])
+
+    def test_an_unsupported_vendor_is_reported_not_proposed(self):
+        """Finding one still means the firm HAS a real board and the page_text row is
+        pointed at the wrong thing -- but we cannot watch it yet, so it goes to a
+        human instead of into a proposal."""
+        found, notes, _ = self._mine(
+            {self.PAGE: '<script src="https://cdn.phenompeople.com/x.js"></script>'}
+        )
+        self.assertEqual(found, [])
+        self.assertEqual(len(notes), 1)
+        self.assertIn("phenom fingerprint", notes[0])
+
+    def test_only_page_text_sources_are_probed(self):
+        _, _, client = self._mine(
+            {self.PAGE: "x"}, sources=self._src(method="greenhouse")
+        )
+        self.assertEqual(client.fetched, [], "an ATS row is already pointed at its board")
+
+    def test_an_unreadable_page_is_silent(self):
+        """page_watch already shouts about a page it cannot read; the probe adding a
+        second alarm would be noise."""
+        found, notes, _ = self._mine({})
+        self.assertEqual(found, [])
+        self.assertEqual(notes, [])
