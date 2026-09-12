@@ -33,7 +33,7 @@ import digest
 from core import clock, models, paths
 from gather import breaker
 from persist import store
-from process import redirect
+from process import redirect, suppress
 import build_xlsx
 from sources import github_repos, job_boards, page_watch, postings, snapshot
 
@@ -1901,25 +1901,26 @@ class MutedProgramTests(_IsolatedState, unittest.TestCase):
     """
 
     def _run(self, program_name, muted_names):
-        result = models.SourceResult(
-            source_id="s", ok=True,
-            changes=[models.Change(source_id="s", kind="added", key="Row",
-                                  detail="x", program_name=program_name)],
-        )
+        """Through the real filter, not a copy of it.
+
+        This used to reimplement `_all_muted` inline, which meant it was asserting
+        against a second copy of the logic -- so the bug it documents (comparing the
+        whole "|"-separated field against one name) could have come back in the shipped
+        path while these five tests stayed green.
+        """
         programs = [
             {"name": n, "muted": "true", "status": "unknown", "last_checked": "",
              "last_changed": "", "snapshot_hash": ""}
             for n in muted_names
         ]
-        muted = {p["name"] for p in programs if p["muted"] == "true"}
-        changes = [c for r in [result] for c in r.changes]
-
-        def all_muted(change):
-            names = [n.strip() for n in (change.program_name or "").split("|") if n.strip()]
-            return bool(names) and all(name in muted for name in names)
-
-        kept = [c for c in changes if not all_muted(c)]
-        return len(changes) - len(kept)
+        changes = [models.Change(source_id="s", kind="added", key="Row",
+                                 detail="x", program_name=program_name)]
+        kept, reports = suppress.suppress(
+            changes, muted=suppress.muted_programmes(programs), applied={})
+        removed = suppress.removed_by(reports, suppress.MUTED)
+        self.assertEqual(removed, len(changes) - len(kept),
+                         "the filter's own report must match what it actually dropped")
+        return removed
 
     def test_a_single_muted_programme_is_muted(self):
         self.assertEqual(self._run("Jane Street FTTP", ["Jane Street FTTP"]), 1)
