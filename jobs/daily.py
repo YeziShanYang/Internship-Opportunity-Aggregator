@@ -21,8 +21,8 @@ import argparse
 import sys
 
 import classify
-import digest
 import discover
+from deliver import digest, health, issue
 from core import clock, models, paths
 from enrich import bodies as enrich_bodies
 from gather import clients, collect
@@ -171,22 +171,20 @@ def _suppress(
 
 
 def _write_change_set(
-    results: list[models.SourceResult],
+    metrics: list[models.SourceMetrics],
     changes: list[models.Change],
     filters: list[models.FilterReport],
 ) -> None:
     """Written whether or not this is a dry run. `.run/` is derived scratch rather than
     the database, and a dry run is exactly when someone wants to read it. Written after
     suppression, because a muted change is not a change this run is acting on -- but
-    the count of them is, which is what the FilterReports carry."""
+    the count of them is, which is what the FilterReports carry.
+
+    `filters` is every report from every filter site -- per-source and run-wide in one
+    list, because "did every filter report what it removed?" has to be answerable in
+    one place."""
     artifacts.write(artifacts.CHANGES, "changes", models.ChangeSet(
-        changes=changes,
-        metrics=[models.SourceMetrics.of(result) for result in results],
-        # Both kinds together: the per-source screens each checker applied, and the two
-        # run-wide mute filters. One list, because "did every filter report?" has to be
-        # answerable in one place.
-        filters=[report for result in results for report in result.filters] + filters,
-    ))
+        changes=changes, metrics=metrics, filters=filters))
 
 
 def run(args: argparse.Namespace) -> int:
@@ -214,7 +212,7 @@ def run(args: argparse.Namespace) -> int:
     changes, filters = _suppress(results, programs)
     suppressed_muted = suppress.removed_by(filters, suppress.MUTED)
     suppressed_applied = suppress.removed_by(filters, suppress.APPLIED)
-    _write_change_set(results, changes, filters)
+    metrics = [models.SourceMetrics.of(result) for result in results]
 
     by_id = {source["source_id"]: source for source in sources}
 
@@ -223,11 +221,16 @@ def run(args: argparse.Namespace) -> int:
     bodies = _enrich(changes, args)
     verdicts = _screen(changes, bodies)
     filters.append(screen.report(changes, verdicts))
-    judgments = (
-        [] if args.no_classify
+    # One combined list, built once and used for both the artifact and the digest, so
+    # a rebuild from `.run/` renders exactly what this run rendered.
+    filters = [report for m in metrics for report in m.filters] + filters
+    _write_change_set(metrics, changes, filters)
+    judged = (
+        models.JudgedSet() if args.no_classify
         else classify.classify(changes, by_id, bodies, verdicts)
     )
-    artifacts.write(artifacts.JUDGED, "judged", judgments)
+    judgments = judged.judgments
+    artifacts.write(artifacts.JUDGED, "judged", judged)
 
     update_source_state(sources, results)
     update_program_state(programs, sources, results, judgments)
@@ -239,18 +242,18 @@ def run(args: argparse.Namespace) -> int:
     # Ask GitHub first and treat the local marker as the fallback, not the other way
     # round: the marker comes from whatever commit this run checked out, and late ticks
     # do not necessarily dispatch in cron order, so it can be stale. See
-    # digest.delivered_issue_exists. Either source saying "delivered" is enough --
+    # deliver.issue.already_sent. Either source saying "delivered" is enough --
     # a stale marker cannot cause a duplicate, only a redundant suppression, and the
     # marker is only ever stale in the direction of a delivery this run did not see.
     today = clock.today_iso()
     marker_delivered = store.read_last_delivered() == today
-    issue_delivered = digest.delivered_issue_exists(today)
+    issue_delivered = issue.already_sent(today)
     delivered_today = (
         marker_delivered if issue_delivered is None else (issue_delivered or marker_delivered)
     )
 
-    send, status_only = digest.should_send(
-        judgments, results, already_delivered_today=delivered_today
+    send, status_only = issue.should_send(
+        judgments, metrics, already_delivered_today=delivered_today
     )
     if args.force_health:
         # A deliberate manual override: render the quiet-day shape on demand and ignore
@@ -281,10 +284,10 @@ def run(args: argparse.Namespace) -> int:
             ]
 
     title, body = digest.render(
-        judgments, results, by_id, suppressed_applied=suppressed_applied,
+        judgments, metrics, by_id, suppressed_applied=suppressed_applied,
         suppressed_muted=suppressed_muted,
         discovery_lines=discovery_lines, status_only=status_only,
-        enriched=bodies, filters=filters,
+        enriched=bodies, filters=filters, usage=judged.usage,
     )
     for note in discovery_notes:
         body += f"\n- ⚠ {note}"
@@ -320,7 +323,7 @@ def run(args: argparse.Namespace) -> int:
     store.write_programs(programs)
 
     if send:
-        print(digest.deliver(title, body))
+        print(issue.deliver(title, body))
         store.write_last_delivered()
     else:
         print(
@@ -364,7 +367,10 @@ def process_only(args: argparse.Namespace) -> int:
         return 2
     results = build.build(sources, build.load_attempts())
     changes, filters = _suppress(results, programs)
-    _write_change_set(results, changes, filters)
+    metrics = [models.SourceMetrics.of(result) for result in results]
+    _write_change_set(
+        metrics, changes,
+        [report for m in metrics for report in m.filters] + filters)
     print(f"{len(results)} sources processed, {len(changes)} changes")
     print(f"wrote {artifacts.path(artifacts.CHANGES)}")
     return 0
@@ -387,8 +393,51 @@ def screen_only(args: argparse.Namespace) -> int:
     bodies = artifacts.read(
         artifacts.ENRICHED, "enriched", dict[str, enrich_bodies.PostingBody])
     verdicts = _screen(change_set.changes, bodies)
-    print(digest.filter_lines([screen.report(change_set.changes, verdicts)])[0]
+    print(health.filter_lines([screen.report(change_set.changes, verdicts)])[0]
           if verdicts else
           f"0 of {len(change_set.changes)} change(s) matched a rule-out phrase")
     print(f"wrote {artifacts.path(artifacts.SCREENED)}")
+    return 0
+
+
+def _read_run() -> tuple[models.ChangeSet, dict, models.JudgedSet]:
+    """Every artifact the renderer needs, or a loud error naming the missing stage."""
+    return (
+        artifacts.read(artifacts.CHANGES, "changes", models.ChangeSet),
+        artifacts.read(
+            artifacts.ENRICHED, "enriched", dict[str, enrich_bodies.PostingBody]),
+        artifacts.read(artifacts.JUDGED, "judged", models.JudgedSet),
+    )
+
+
+def render_only(args: argparse.Namespace) -> int:
+    """`run.py render`: rebuild the digest from `.run/`. No network, no model.
+
+    The point of the stage split, made concrete. This composes the exact bytes that
+    would be posted from artifacts alone -- which is why HEALTH reads SourceMetrics
+    rather than live results, and why the screen tally and the spend are values on the
+    artifacts rather than module globals.
+
+    One thing it cannot reproduce: the DISCOVERED section. The weekly pass is a
+    separate job with its own network budget and it rides along in whichever run
+    actually mails, so it is not in any artifact. Said here rather than left as a
+    surprising absence.
+    """
+    change_set, bodies, judged = _read_run()
+    sources = {s["source_id"]: s for s in store.read_sources()}
+    _, status_only = issue.should_send(
+        judged.judgments, change_set.metrics, already_delivered_today=False)
+    if args.force_health:
+        status_only = True
+    title, body = digest.render(
+        judged.judgments, change_set.metrics, sources,
+        suppressed_applied=suppress.removed_by(change_set.filters, suppress.APPLIED),
+        suppressed_muted=suppress.removed_by(change_set.filters, suppress.MUTED),
+        status_only=status_only, enriched=bodies,
+        filters=change_set.filters, usage=judged.usage,
+    )
+    artifacts.write_text(artifacts.DIGEST, body)
+    artifacts.write_text(artifacts.DIGEST_TITLE, title + "\n")
+    print(title)
+    print(f"wrote {artifacts.path(artifacts.DIGEST)}")
     return 0

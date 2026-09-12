@@ -136,6 +136,12 @@ class SourceMetrics:
     snapshot_ext: str = "tsv"
     change_count: int = 0
     extra: dict[str, Any] = field(default_factory=dict)
+    # The reporting facts, carried rather than dropped: `deliver` renders the HEALTH
+    # block from this projection, so anything HEALTH is obliged to print has to survive
+    # the stage boundary. Omitting either of these is how a filter or a board
+    # restructure would go unmentioned in a digest rendered from the artifact.
+    filters: list[FilterReport] = field(default_factory=list)
+    collapsed: BoardCollapse | None = None
 
     @classmethod
     def of(cls, result: SourceResult) -> SourceMetrics:
@@ -149,6 +155,8 @@ class SourceMetrics:
             snapshot_ext=result.snapshot_ext,
             change_count=len(result.changes),
             extra=dict(result.extra),
+            filters=list(result.filters),
+            collapsed=result.collapsed,
         )
 
 
@@ -219,3 +227,133 @@ class Posting:
     employment_type: str
     url: str
     text: str  # description; goes to the classifier, never into the snapshot
+
+
+# List prices per million tokens, (input, output), as published 2026-09-12. Only models
+# whose pricing has actually been checked appear here: an unpriced model reports its
+# token counts and says so, rather than inventing a dollar figure.
+PRICES_PER_MTOK = {
+    "gpt-5-mini": (0.25, 2.00),
+}
+
+
+@dataclass
+class Usage:
+    """What the run actually spent, accumulated across the thread pool.
+
+    This exists because the only way to answer "why did yesterday cost 34 cents" used
+    to be to reconstruct the prompts from git and solve backwards from the Azure
+    portal. That reconstruction established that 81% of the spend was reasoning tokens
+    -- a fact nothing in the digest would have surfaced on its own, which is exactly why
+    the cost drifted unnoticed. A cost that only appears on a billing page a day later
+    is a cost nobody notices rising.
+    """
+
+    provider: str = ""
+    model: str = ""
+    effort: str = ""
+    calls: int = 0
+    input_tokens: int = 0
+    cached_input_tokens: int = 0
+    output_tokens: int = 0
+    reasoning_tokens: int = 0
+    unreported: int = 0  # calls whose response carried no usage block
+
+    def estimated_usd(self) -> float | None:
+        """None means this model's pricing has not been checked, not that it is free."""
+        rates = PRICES_PER_MTOK.get(self.model)
+        if rates is None:
+            return None
+        rate_in, rate_out = rates
+        # Cached input bills at a tenth of list on both providers.
+        billed_in = (
+            (self.input_tokens - self.cached_input_tokens)
+            + self.cached_input_tokens * 0.1
+        )
+        return (billed_in * rate_in + self.output_tokens * rate_out) / 1_000_000
+
+
+# How a Judgment came to exist. Five call sites used to produce five slightly different
+# shapes of the same dataclass, with `classified` set by hand at each one -- so "was
+# this judged?" was a field someone had to remember to set rather than a consequence of
+# how the judgment was made.
+MODEL = "model"
+SCREENED = "screened"
+UNCLASSIFIED = "unclassified"
+ERROR = "error"
+OVER_BUDGET = "over_budget"
+
+#: The outcomes that represent a real verdict on the item.
+DECIDED = (MODEL, SCREENED)
+
+
+@dataclass
+class Judgment:
+    """A classified change, and how it came to be classified."""
+
+    change: Change
+    outcome: str = UNCLASSIFIED
+    relevant: bool = True
+    program_name: str = ""
+    new_status: str = "unknown"
+    why: str = ""
+    confidence: str = "low"
+    suggested_action: str = ""
+    eligible_proposal: str = ""
+    error: str = ""
+    # Set when the deterministic screen settled this instead of the model. Carried so
+    # RULED OUT can say which rule fired, and so a digest can be read back later to
+    # tell which rule set produced it.
+    screen_rule: str = ""
+    screen_version: int = 0
+
+    @property
+    def classified(self) -> bool:
+        """Derived, not stored. A judgment is classified when something actually
+        decided it -- the model, or a quoted phrase. Everything else reached the digest
+        unjudged, which the reader is told about rather than left to infer."""
+        return self.outcome in DECIDED
+
+    @classmethod
+    def from_model(cls, change: Change, **payload) -> Judgment:
+        return cls(change=change, outcome=MODEL, **payload)
+
+    @classmethod
+    def from_screen(
+        cls, change: Change, *, why: str, rule: str, version: int
+    ) -> Judgment:
+        """A quoted phrase is a real judgment, with high confidence: the employer wrote
+        the sentence that rules the item out."""
+        return cls(
+            change=change, outcome=SCREENED, program_name=change.program_name,
+            relevant=False, confidence="high", why=why,
+            screen_rule=rule, screen_version=version)
+
+    @classmethod
+    def unjudged(cls, change: Change, why: str) -> Judgment:
+        """Surfaced without a verdict. `relevant` stays True on purpose -- spec 8 rule
+        3: a false negative costs a real opportunity, a false positive costs a glance."""
+        return cls(change=change, outcome=UNCLASSIFIED,
+                   program_name=change.program_name, why=why)
+
+    @classmethod
+    def failed(cls, change: Change, error: str) -> Judgment:
+        """A provider failure is never silently swallowed. The digest reports it rather
+        than showing the change as benignly unclassified (spec 10.1)."""
+        return cls(change=change, outcome=ERROR,
+                   program_name=change.program_name, error=error)
+
+    @classmethod
+    def over_budget(cls, change: Change, cap: int) -> Judgment:
+        return cls(
+            change=change, outcome=OVER_BUDGET, program_name=change.program_name,
+            why=f"Not classified: this run exceeded its cap of {cap} classifications, "
+                "so this row is surfaced unjudged rather than dropped.")
+
+
+@dataclass
+class JudgedSet:
+    """The `.run/judged.json` payload: the verdicts, and what they cost."""
+
+    judgments: list[Judgment] = field(default_factory=list)
+    usage: Usage = field(default_factory=Usage)
