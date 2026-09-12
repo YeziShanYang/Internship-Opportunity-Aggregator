@@ -33,7 +33,7 @@ their shape but to port specific mechanisms and decline others.
 | # | Thing | Them | Us |
 |---|---|---|---|
 | 1 | **Classification cost** | zero model calls; `requirements.txt` is httpx, requests, supabase | $0.34/day measured, up to $388/yr at our own cap |
-| 2 | **Coverage** | 4,803 endpoints / 4,550 employers, grown automatically | 144 sources, grown by hand |
+| 2 | **Coverage** | 4,803 endpoints / 4,550 employers, grown automatically | 157 sources, grown by hand |
 | 3 | **Truncation safety** | every fetch carries `complete`; a partial snapshot may never close a role | `diff_snapshots` reports mass removals from a truncated read |
 | 4 | **Malformed vs empty** | `clean_listing` returns None, never `[]`, for junk payloads | no JSON equivalent of our `MIN_TEXT_HTML_RATIO` |
 | 5 | **Failure backoff** | circuit breaker, 6h→72h, self-healing, state in git | we escalate at 3 failures and keep hammering forever |
@@ -88,7 +88,7 @@ their shape but to port specific mechanisms and decline others.
   with jitter, `Retry-After` honouring, and per-host **and** per-provider
   concurrency caps.
 - I would **not** port their async rewrite. Our `ThreadPoolExecutor` is fine at
-  144 sources and async would touch every module. Revisit only if Phase 5 pushes
+  157 sources and async would touch every module. Revisit only if Phase 5 pushes
   us past ~1,000 endpoints.
 
 *Effort: ~1 day. Risk: low. Payoff: correctness under rate limits, and we stop
