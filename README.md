@@ -45,29 +45,104 @@ After that it is unattended.
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
 
-.venv/bin/python check.py --dry-run     # fetch everything, print the digest, change nothing
-.venv/bin/python check.py --only nuft-2027 --dry-run
-.venv/bin/python build_xlsx.py          # regenerate out/programs.xlsx
+.venv/bin/python run.py all --dry-run    # fetch everything, print the digest, change nothing
+.venv/bin/python run.py all --only nuft-2027 --dry-run
+.venv/bin/python build_xlsx.py           # regenerate out/programs.xlsx
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
 `--dry-run` opens no Issue and writes no state. Use it freely.
 
+### One stage at a time
+
+`run.py all` runs every stage in one process, which is what the Actions job does. Each
+stage is also runnable on its own, reading the previous stage's artifact out of `.run/`
+instead of recomputing it:
+
+```bash
+.venv/bin/python run.py gather     # fetch all 153 sources into .run/raw/. The only slow one
+.venv/bin/python run.py process    # parse and diff .run/raw/. No network at all
+.venv/bin/python run.py enrich     # fetch the posting behind each changed row
+.venv/bin/python run.py screen     # rule out what a quoted phrase settles. No model
+.venv/bin/python run.py classify   # the model calls, and only the model calls
+.venv/bin/python run.py render     # rebuild the digest. No network, no model
+.venv/bin/python run.py deliver    # post it, subject to the one-a-day cap
+```
+
+This is for the mornings when a digest looks wrong and the question is *which stage
+produced it*. `run.py render` rebuilds the exact bytes that would be posted from
+`.run/` alone, and `run.py process` can be re-run over one `gather` as many times as
+you like — it makes no requests and produces byte-identical output.
+
+`.run/` is gitignored: it is ~43MB of fetched bodies plus the JSON handoff, all
+re-fetchable, and committing it would bury the CSV history that `git log` exists to
+answer.
+
 ## How it works
 
+Eight stages, in a fixed order, each allowed to import only the ones below it. The
+rule is checked mechanically by `tests/test_layering.py`, which walks every module's
+AST — a rule that lives only in a document is how the previous shape of this code ended
+up with one function doing fourteen things including a disk read and a markdown render.
+
 ```
-check.py                 orchestrates: check → classify → render → deliver → save state
-sources/snapshot.py      the canonical row/diff shape every source type shares
-sources/github_repos.py  repo READMEs, diffed at the row level
-sources/job_boards.py    Greenhouse/Workday/Ashby/Lever/Phenom JSON -> canonical rows
-sources/page_watch.py    fetch a page, normalise to lines, diff; two floors, no browser
-sources/postings.py      fetch the real posting behind a board row, for the classifier
-discover.py              the weekly pass that proposes new sources and never adds one
-classify.py              one Claude call per change; the class-year and identity gates
-digest.py                renders the digest, opens the Issue
+run.py                   CLI: gather | process | enrich | screen | classify | render
+                              | deliver | all
+
+core/       (level 0)    shapes and constants. No I/O of any kind
+  models.py              Change, SourceResult, Judgment, Usage, the artifact payloads
+  paths.py               every path, the User-Agent, timeouts, column lists
+  clock.py               time, hashing, change_id (the join key) and change_key (mute)
+  profile.py             OWNER_PROFILE — perishable input, with its review date
+  codec.py               the ~70-line JSON codec for the stage artifacts
+  text.py                HTML → readable text, and the classifier's text budget
+
+persist/    (level 1)    ALL storage, read AND write. Below gather, not last
+  store.py               every read_*/write_* of the canonical CSVs and snapshots
+  artifacts.py           .run/* — the stage handoff
+  cache.py               the fetched-posting cache
+
+gather/     (level 2)    network I/O for sources, and whether to fetch at all
+  collect.py             the stage: fetch every source, write the bodies
+  clients.py             the two HTTP clients. Two, because it is a credential boundary
+  breaker.py             the circuit breaker — fetch policy, so it lives here
+  github_readme.py       fetch a README
+  ats.py                 fetch an ATS feed (greenhouse/lever/ashby/workday/phenom/eightfold)
+  page.py                fetch a page, recording the FINAL url
+
+process/    (level 3)    pure transformation. No network, no model, no writes
+  build.py               the stage: read .run/raw/, assess every source
+  snapshot.py            Row/Snapshot/diff — the shape every source type shares
+  parse_readme.py        repo READMEs, diffed at the row level
+  parse_ats.py           ATS JSON → canonical rows, and the student/US screens
+  parse_page.py          normalise a page to lines and diff; two floors, no browser
+  redirect.py            where a fetch landed is part of whether it succeeded
+  suppress.py            the muted and applied.tsv filters
+
+enrich/     (level 4)    the SECOND network stage, named rather than hidden
+  bodies.py              fetch the posting behind each CHANGED row. O(changes)
+  postings.py            the fetcher and its content floor
+
+screen/     (level 5)    deterministic verdicts only. May rule OUT, never IN
+  rules.py               the phrase patterns, and the guards that stop false positives
+  verdicts.py            the loop, and the FilterReport it owes HEALTH
+
+classify.py (level 6)    one model call per change the screen had no opinion on
+
+deliver/    (level 7)    every string the owner reads is composed here
+  digest.py              the one-table body
+  health.py              the HEALTH block: sources, filters, spend
+  urgency.py             ACT NOW vs WORTH A LOOK
+  issue.py               the cadence decision and the Issue POST
+
+jobs/                    compose stages into something runnable. Not stages themselves
+  daily.py               the morning digest
+  discovery.py           the Monday pass that proposes new sources and never adds one
+
 calendar_reminders.py    standing reminders for what cannot be automated
 build_xlsx.py            CSVs → out/programs.xlsx (yours) + out/tracked.xlsx (the tool's)
 seed_programs.py         one-time seed from the original spreadsheet
+add_opportunity.py       helper behind the /add-opportunity skill
 data/programs.csv        CANONICAL program list — edit this, not the xlsx
 data/sources.csv         what to check, and how
 data/manual.csv          what this tool CANNOT tell you about → "Manual Watch" sheet
@@ -77,6 +152,15 @@ data/proposals.log       append-only: proposed edits the tool refused to make it
 out/programs.xlsx        GENERATED — yours: only what you must check by hand
 out/tracked.xlsx         GENERATED — the tool's: all programs, sources, applied, discovered
 ```
+
+### Why two network stages and not one
+
+"Gather everything up front" is not achievable here, and pretending otherwise would be
+the dishonest kind of tidy. Which postings to fetch is only knowable *after* diffing:
+bodies are fetched for the handful of rows that moved, not for the ~4,000 sitting on the
+boards. So there are exactly two source-network stages — `gather` and `enrich` — and the
+pipeline says so out loud rather than hiding the second one inside the classifier, which
+is where it used to be.
 
 ### Why the snapshots are TSV, not the READMEs
 
