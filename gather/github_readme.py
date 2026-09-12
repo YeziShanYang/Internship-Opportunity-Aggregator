@@ -81,7 +81,10 @@ def fetch(source: dict[str, str], client: httpx.Client) -> ReadmeFetch:
         attempt=attempt(
             ok=True, status=200, size=len(text),
             final_url=f"{RAW_BASE}/{repo}/{branch}/README.md",
-            sha256=hashlib.sha256(text.encode("utf-8", "replace")).hexdigest()),
+            sha256=hashlib.sha256(text.encode("utf-8", "replace")).hexdigest(),
+            # The branch is not recoverable from the README bytes, and it is in the
+            # failure message when a parse floor fires ("from N bytes on branch dev").
+            meta={"branch": branch}),
         text=text,
         branch=branch,
     )

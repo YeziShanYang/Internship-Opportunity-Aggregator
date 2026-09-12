@@ -183,6 +183,15 @@ class FetchAttempt:
     sha256: str = ""
     elapsed_ms: int = 0
     requests: int = 1
+    # True when the circuit breaker skipped the fetch. A distinct fact from a failure:
+    # nothing was learned, so no counter may move, or a quarantine would extend itself
+    # for not having been looked at.
+    quarantined: bool = False
+    # The few per-method facts that are not the body and are not guessable from it: the
+    # README's default branch, and how many rows a paged board reported. Strings, so the
+    # artifact stays readable and the codec stays trivial; parsed back by the one
+    # assessor that wrote them.
+    meta: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
