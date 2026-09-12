@@ -313,6 +313,11 @@ def render(
     body.append("## ■ HEALTH")
     for line in health_lines:
         body.append(f"- {line}")
+    # What the run cost, in the run's own report. A cost that only appears on a billing
+    # page a day later is a cost nobody notices drifting upward.
+    spend = classify.usage_line()
+    if spend:
+        body.append(f"- {spend}")
     if suppressed_applied:
         body.append(
             f"- {suppressed_applied} item(s) are muted in data/applied.tsv and were "
