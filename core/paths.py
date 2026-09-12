@@ -48,6 +48,13 @@ LAST_DISCOVERY = DATA / "last_discovery.txt"
 # whatever commit the run checked out, so it can be stale. deliver.issue.already_sent
 # holds the authoritative answer.
 LAST_DELIVERED = DATA / "last_delivered.txt"
+# Fetched job-posting text. Derived data, not state: re-fetchable, and committing ~35
+# pages a day would bury the CSV history that git log exists to answer. It lived as an
+# import-bound `postings.CACHE_DIR` for a long time, which is why the test suite used to
+# write into the real one; resolving it here means it is redirected like every other
+# path rather than needing its own special case.
+POSTINGS_CACHE = DATA / "postings_cache"
+
 # Derived stage artifacts. Gitignored, following the precedent set by
 # data/postings_cache/: re-fetchable data that would otherwise bury the CSV history that
 # `git log` exists to answer.

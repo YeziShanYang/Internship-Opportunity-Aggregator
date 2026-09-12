@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import time
+from typing import Callable
 
 from core import models, paths
 from gather import ats, breaker, clients, github_readme, page
@@ -67,7 +68,9 @@ def _encode_body(method: str, fetched) -> bytes:
 
 
 def fetch_one(
-    source: dict[str, str], by_name: dict
+    source: dict[str, str],
+    by_name: dict,
+    wants_detail: Callable[[dict], bool],
 ) -> tuple[models.FetchAttempt, bytes]:
     """Fetch one source and return (attempt, body). Never raises."""
     source_id = source["source_id"]
@@ -79,11 +82,7 @@ def fetch_one(
     elif method == "github_readme":
         fetched = github_readme.fetch(source, client)
     else:
-        # Imported lazily so `gather` never imports `process` at module scope; the plan
-        # predicate is data flowing downhill, not a dependency going uphill.
-        from process.parse_ats import wants_workday_detail
-
-        fetched = ats.fetch(source, client, wants_detail=wants_workday_detail)
+        fetched = ats.fetch(source, client, wants_detail=wants_detail)
 
     attempt = fetched.attempt
     if attempt.source_id != source_id:
@@ -91,12 +90,23 @@ def fetch_one(
     return attempt, (_encode_body(method, fetched) if attempt.ok else b"")
 
 
-def collect(sources: list[dict[str, str]], only: str | None) -> list[models.FetchAttempt]:
+def collect(
+    sources: list[dict[str, str]],
+    only: str | None,
+    *,
+    wants_detail: Callable[[dict], bool],
+) -> list[models.FetchAttempt]:
     """Fetch every watched source, writing each body to `.run/raw/{source_id}.body`.
 
     Returns one FetchAttempt per source that was considered -- including the quarantined
     ones and the misconfigured ones, because a source that produced no record is a
     source nobody will notice has gone blind.
+
+    `wants_detail` decides which Workday listings are worth a second request for their
+    description. It is a parameter rather than an import because deciding what to keep
+    belongs to `process`, and a stage may only import at or below its own level -- a
+    lazy function-local import would have satisfied the letter of that and not the
+    point of it.
     """
     attempts: list[models.FetchAttempt] = []
     with clients.build_github_client(clients.github_token()) as github, \
@@ -126,7 +136,7 @@ def collect(sources: list[dict[str, str]], only: str | None) -> list[models.Fetc
                         source_id=source_id, ok=False, quarantined=True, error=why))
                     continue
 
-            attempt, body = fetch_one(source, by_name)
+            attempt, body = fetch_one(source, by_name, wants_detail)
             if attempt.ok:
                 artifacts.write_body(source_id, body)
             attempts.append(attempt)

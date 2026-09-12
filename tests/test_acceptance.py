@@ -26,12 +26,13 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import classify
-import discover
 import screen
-from deliver import digest, health, issue, urgency
+from deliver import digest, health, issue
+from deliver import urgency
+from jobs import discovery as discover
 from core import clock, models, paths, profile, text as coretext
 from gather import breaker
-from persist import store
+from persist import cache, store
 from jobs import daily
 from process import redirect, suppress
 import build_xlsx
@@ -203,11 +204,13 @@ class _IsolatedState:
     #: of `core.paths` at call time. A `from core.paths import SNAPSHOTS` anywhere
     #: downstream would bind a stale copy and silently send the write back into the
     #: database -- which is exactly the hazard that made hardening this file step 0 of
-    #: the refactor rather than a later tidy-up.
+    #: the refactor rather than a later tidy-up. `postings.CACHE_DIR` was the one
+    #: genuinely import-bound path and needed a special case here; it is
+    #: `paths.POSTINGS_CACHE` now, redirected like the rest.
     STATE_PATHS = (
         "DATA", "SNAPSHOTS", "PROPOSALS_LOG", "LAST_DELIVERED", "APPLIED_TSV",
         "DISCOVERED_CSV", "LAST_DISCOVERY", "PROGRAMS_CSV", "SOURCES_CSV",
-        "OUT_XLSX", "OUT_TRACKED_XLSX", "RUN_DIR",
+        "OUT_XLSX", "OUT_TRACKED_XLSX", "RUN_DIR", "POSTINGS_CACHE",
     )
 
     def setUp(self):
@@ -227,7 +230,6 @@ class _IsolatedState:
         root = pathlib.Path(tmp.name)
         for name in self.STATE_PATHS:
             self.addCleanup(setattr, paths, name, getattr(paths, name))
-        self.addCleanup(setattr, postings, "CACHE_DIR", postings.CACHE_DIR)
 
         paths.DATA = root
         paths.SNAPSHOTS = root / "snapshots"
@@ -240,7 +242,7 @@ class _IsolatedState:
         paths.SOURCES_CSV = root / "sources.csv"
         paths.OUT_XLSX = root / "out" / "programs.xlsx"
         paths.OUT_TRACKED_XLSX = root / "out" / "tracked.xlsx"
-        postings.CACHE_DIR = root / "postings_cache"
+        paths.POSTINGS_CACHE = root / "postings_cache"
         paths.RUN_DIR = root / ".run"
         paths.SNAPSHOTS.mkdir()
         return root
@@ -814,7 +816,7 @@ class PostingJudgementTests(_IsolatedState, unittest.TestCase):
         super().setUp()
         self._saved = os.environ.get("CLASSIFIER_PROVIDER")
         os.environ["CLASSIFIER_PROVIDER"] = "azure"
-        postings.CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        paths.POSTINGS_CACHE.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self):
         if self._saved is None:
@@ -824,7 +826,7 @@ class PostingJudgementTests(_IsolatedState, unittest.TestCase):
 
     def _judge(self, n, role, posting_text):
         url = self.URL % n
-        path = postings._cache_path(url)
+        path = cache.posting_path(url)
         path.write_text(posting_text)
         change = models.Change(
             source_id="simplify-2027", kind="added",

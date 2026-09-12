@@ -6,6 +6,8 @@
     run.py enrich                 fetch the posting behind each changed row
     run.py screen                 rule out what a quoted phrase settles. No model
     run.py render                 rebuild the digest from .run/. No network, no model
+    run.py classify               the model calls, and only the model calls
+    run.py deliver                post the rendered digest, subject to the daily cap
 
 The point of the verbs is not that anyone runs them one at a time every morning --
 `run.py all` does the whole thing in one process, so the Actions workflow keeps its
@@ -15,36 +17,18 @@ disk in `.run/`, instead of requiring the prompts to be reconstructed from the s
 commits. That reconstruction has been done once, to work out why 2026-09-12 cost 34
 cents, and it should never have needed doing.
 
-Stages are being split out one at a time (see REFACTOR-PLAN.md). A verb whose stage is
-still bundled inside `check.check`/`classify.classify` says so, and names the step that
-separates it, rather than silently doing nothing -- an empty stage that exits 0 is the
-same failure shape as a source that goes quiet instead of failing.
+Every stage is separately runnable, and each one reads the previous stage's artifact
+rather than recomputing it. `run.py gather` then `run.py process` twice produces
+byte-identical output with no second fetch; `run.py all` then `run.py render` produces
+the byte-identical digest with no network at all.
 """
 from __future__ import annotations
 
 import argparse
 import sys
 
-from core import paths
-
 # Stages in pipeline order. `all` is not a stage; it is the composition of them.
 STAGES = ("gather", "process", "enrich", "screen", "classify", "render", "deliver")
-
-# Which migration step makes each verb independently runnable. Printed rather than
-# kept in a comment, so someone hitting the wall is told where to look.
-SPLIT_BY_STEP = {"classify": "Step 7", "deliver": "Step 9"}
-
-
-def _not_yet_split(verb: str, step: str) -> int:
-    print(
-        f"`{verb}` is not separately runnable yet: it is still bundled inside the "
-        f"per-source check.\n"
-        f"{step} of REFACTOR-PLAN.md splits it. Use `run.py all` meanwhile -- it runs "
-        f"every stage in order and writes the same artifacts to {paths.RUN_DIR.name}/.",
-        file=sys.stderr,
-    )
-    return 2
-
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
@@ -88,7 +72,11 @@ def main(argv: list[str] | None = None) -> int:
         return daily.screen_only(args)
     if args.verb == "render":
         return daily.render_only(args)
-    return _not_yet_split(args.verb, SPLIT_BY_STEP[args.verb])
+    if args.verb == "classify":
+        return daily.classify_only(args)
+    if args.verb == "deliver":
+        return daily.deliver_only(args)
+    raise AssertionError(f"unreachable: no handler for {args.verb!r}")
 
 
 if __name__ == "__main__":

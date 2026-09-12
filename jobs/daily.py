@@ -21,13 +21,13 @@ import argparse
 import sys
 
 import classify
-import discover
 from deliver import digest, health, issue
+from jobs import discovery as discover
 from core import clock, models, paths
 from enrich import bodies as enrich_bodies
 from gather import clients, collect
 from persist import artifacts, store
-from process import build, suppress
+from process import build, parse_ats, suppress
 import screen
 
 
@@ -45,7 +45,7 @@ def run_sources(
     sources: list[dict[str, str]], only: str | None
 ) -> list[models.SourceResult]:
     """Gather, then process. Two stages, one call, for the callers that want both."""
-    return build.build(sources, collect.collect(sources, only))
+    return build.build(sources, _collect(sources, only))
 
 
 def update_source_state(
@@ -133,6 +133,35 @@ def update_program_state(
             )
             program["status"] = judgment.new_status
             program["last_changed"] = now
+
+
+def _collect(
+    sources: list[dict[str, str]], only: str | None
+) -> list[models.FetchAttempt]:
+    """Run the gather stage, supplying the one decision it cannot make itself.
+
+    Which Workday descriptions are worth a second request is a filtering judgment, so
+    it belongs to `process`; `gather` may not import that layer. The job is the only
+    place that knows about both, so the job hands the predicate over.
+    """
+    return collect.collect(
+        sources, only, wants_detail=parse_ats.wants_workday_detail)
+
+
+def _already_delivered(today: str) -> bool:
+    """Has today's digest already gone out?
+
+    Ask GitHub first and treat the local marker as the fallback, not the other way
+    round: the marker comes from whatever commit this run checked out, and late ticks
+    do not necessarily dispatch in cron order, so it can be stale. Either source saying
+    "delivered" is enough -- a stale marker cannot cause a duplicate, only a redundant
+    suppression, and it is only ever stale in the direction of a delivery this run did
+    not see. `already_sent` returns None rather than False when GitHub cannot be asked,
+    so "I could not check" is never read as "not yet delivered".
+    """
+    marker = store.read_last_delivered() == today
+    asked = issue.already_sent(today)
+    return marker if asked is None else (asked or marker)
 
 
 def _enrich(
@@ -246,11 +275,7 @@ def run(args: argparse.Namespace) -> int:
     # a stale marker cannot cause a duplicate, only a redundant suppression, and the
     # marker is only ever stale in the direction of a delivery this run did not see.
     today = clock.today_iso()
-    marker_delivered = store.read_last_delivered() == today
-    issue_delivered = issue.already_sent(today)
-    delivered_today = (
-        marker_delivered if issue_delivered is None else (issue_delivered or marker_delivered)
-    )
+    delivered_today = _already_delivered(today)
 
     send, status_only = issue.should_send(
         judgments, metrics, already_delivered_today=delivered_today
@@ -340,7 +365,7 @@ def gather_only(args: argparse.Namespace) -> int:
         print("data/sources.csv is empty or missing", file=sys.stderr)
         return 2
     artifacts.reset()
-    attempts = collect.collect(sources, args.only)
+    attempts = _collect(sources, args.only)
     if not attempts:
         print("no sources matched; nothing to do", file=sys.stderr)
         return 2
@@ -440,4 +465,57 @@ def render_only(args: argparse.Namespace) -> int:
     artifacts.write_text(artifacts.DIGEST_TITLE, title + "\n")
     print(title)
     print(f"wrote {artifacts.path(artifacts.DIGEST)}")
+    return 0
+
+
+def classify_only(args: argparse.Namespace) -> int:
+    """`run.py classify`: the model calls, and only the model calls.
+
+    Reads what `enrich` fetched and what `screen` settled, so the changes a quoted
+    phrase already decided cost nothing here. Running this twice makes no source
+    requests at all -- the artifact boundary is what makes that true, and it is the
+    check the plan asks for.
+    """
+    change_set = artifacts.read(artifacts.CHANGES, "changes", models.ChangeSet)
+    bodies = artifacts.read(
+        artifacts.ENRICHED, "enriched", dict[str, enrich_bodies.PostingBody])
+    verdicts = artifacts.read(
+        artifacts.SCREENED, "screened", dict[str, screen.Verdict])
+    by_id = {s["source_id"]: s for s in store.read_sources()}
+    judged = classify.classify(change_set.changes, by_id, bodies, verdicts)
+    artifacts.write(artifacts.JUDGED, "judged", judged)
+    spend = health.usage_line(judged.usage)
+    print(f"{len(judged.judgments)} judged" + (f"; {spend}" if spend else ""))
+    print(f"wrote {artifacts.path(artifacts.JUDGED)}")
+    return 0
+
+
+def deliver_only(args: argparse.Namespace) -> int:
+    """`run.py deliver`: post `.run/digest.md`, subject to the one-a-day cap.
+
+    The cap is applied here and not only in `all`, because this verb is exactly the
+    thing that would otherwise mail a second issue for a date -- run by hand after a
+    morning that already delivered. It asks GitHub first and treats the local marker as
+    the fallback, for the same reason `all` does: late ticks do not dispatch in cron
+    order, so a checked-out marker can be stale.
+    """
+    if not artifacts.exists(artifacts.DIGEST):
+        print("no rendered digest; run `run.py render` first", file=sys.stderr)
+        return 2
+    body = artifacts.read_text(artifacts.DIGEST)
+    title = artifacts.read_text(artifacts.DIGEST_TITLE).strip()
+
+    today = clock.today_iso()
+    if _already_delivered(today):
+        print(
+            f"a digest was already delivered on {today}: the cadence is exactly one "
+            "digest a day (spec section 9), and a retry has nothing to add that the "
+            "morning's issue did not already carry"
+        )
+        return 0
+    if args.dry_run:
+        print(f"--- would send ---\nTITLE: {title}\n\n{body}")
+        return 0
+    print(issue.deliver(title, body))
+    store.write_last_delivered()
     return 0

@@ -30,7 +30,6 @@ Three findings that shape this module:
 from __future__ import annotations
 
 import concurrent.futures
-import hashlib
 import re
 import time
 
@@ -38,13 +37,12 @@ import httpx
 
 from core import paths, text as coretext
 from gather import clients
+from persist import cache
 
 # Rows put the ATS link and the Simplify link in the same `Application=` field, ATS
 # first. Only the second one is fetchable, so match it specifically rather than taking
 # the first URL in the row.
 POSTING_URL = re.compile(r"https://simplify\.jobs/p/[0-9a-fA-F-]+")
-
-CACHE_DIR = paths.DATA / "postings_cache"
 
 # Below this, the response is a JavaScript shell rather than a posting. The real pages
 # measured 13K-34K characters; the Workday shells measured 0.
@@ -81,10 +79,6 @@ def recover_posting_url(*haystacks: str) -> str:
     return ""
 
 
-def _cache_path(url: str):
-    return CACHE_DIR / f"{hashlib.sha1(url.encode()).hexdigest()}.txt"
-
-
 extract_text = coretext.extract_text
 
 
@@ -96,12 +90,9 @@ def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
     could rule the posting out -- inventing a relevance decision from a network
     problem.
     """
-    cached = _cache_path(url)
-    if cached.exists():
-        try:
-            return cached.read_text(), ""
-        except OSError:
-            pass  # fall through and refetch
+    cached = cache.read_posting(url)
+    if cached is not None:
+        return cached, ""
 
     try:
         response = client.get(url)
@@ -116,12 +107,7 @@ def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
             "(renders in JavaScript, or was blocked)"
         )
 
-    try:
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        cached.write_text(text)
-    except OSError:
-        pass  # the cache is an optimisation; failing to write it is not an error
-
+    cache.write_posting(url, text)
     return text, ""
 
 
