@@ -1,0 +1,51 @@
+Opportunity digest — 2026-09-12 (source failing)
+
+Opportunity digest — 2026-09-12
+
+> Note: Not classified: no classifier credentials are configured (neither ANTHROPIC_API_KEY nor AZURE_OPENAI_API_KEY), so this is surfaced unjudged rather than dropped.
+
+## ■ OPPORTUNITIES (8)
+
+| Urgency | Company | Position | Notes |
+|---|---|---|---|
+| **ACT NOW** | aqr-internship-program | SOURCE BLIND — 4 failures running | not quiet, blind. Last success never. redirected to what looks like an error page… |
+| **ACT NOW** | crabel-careers | SOURCE BLIND — 5 failures running | not quiet, blind. Last success never. quarantined for 24h after 5 consecutive failures, retry… |
+| **ACT NOW** | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | ROLLING — closes when full; Jane Street reviews on a rolling basis and this is a trading seat… |
+| **ACT NOW** | InfiniteQuant | [Quantitative Trader @ NYC](https://simplify.jobs/p/abc) | Explicitly open to first- and second-year undergraduates, which is an unusually good match |
+| Worth a look | Optiver FutureFocus | [page updated (3 added, 1 removed)](https://optiver.com/working-at-optiver/career-opportunities/?level=student) | The page added a 2027 FutureFocus date |
+| Worth a look | Millennium Campus | [2027 Quantitative Researcher Intern \| Austin](https://campusjobs.mlp.com/1) | Campus board row with no class-year gate stated, so a first-year is eligible on the face of it… |
+| Worth a look | Millennium Campus | 2027 Applied AI Engineer Intern, New York | Row disappeared from the board; low confidence, kept deliberately |
+| Worth a look | Millennium Campus | 2027 Data Engineer Intern, Miami | unverified — open the page |
+
+<details><summary>■ RULED OUT (1)</summary>
+
+_Read and judged out of scope - usually a class-year gate on the posting, or a role outside quant/maths/software. Expand to audit; a wrong call here is the expensive kind, so the reasons are shown rather than hidden._
+
+- **Senior Platform Engineer @ Remote** — Posting requires junior standing or above; this owner is a rising sophomore for Summer 2027: "rising junior"
+
+</details>
+
+## ■ DISCOVERED
+_Proposals only — nothing has been added._
+
+- **greenhouse** `drweng` — linked from simplify-2027.tsv → https://boards-api.greenhouse.io/v1/boards/drweng/jobs?content=true
+
+## ■ CALENDAR (September)
+- A dated reminder for this month.
+- A standing reminder that fires every month.
+- Your interest profile was last reviewed 2025-01-01 (20 months ago) - are quant and maths still the priority? Every relevance call in this digest assumes so. Edit OWNER_PROFILE in classify.py and bump PROFILE_LAST_REVIEWED.
+
+## ■ HEALTH
+- 6 sources checked · 4 healthy · 2 FAILING
+- ⚠ 1 source(s) were not fetched at all — the circuit breaker has them quarantined: crabel-careers
+- ⚠ aqr-internship-program: 4 consecutive failures, last success never. redirected to what looks like an error page: https://www.aqr.com/About-Us/Our-Internship-Program -> https://www.aqr.com/404.
+- ⚠ crabel-careers: 5 consecutive failures, last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting
+- · millennium-eightfold: first run, recorded 17 rows as the baseline.
+- · job boards: 3900 postings were not student roles and 397 were outside the US.
+- ⚠ optiver-students: redirected to a different path: https://optiver.com/a -> https://www.optiver.com/b. The fetch succeeded, but this row is no longer watching the page it was configured for.
+- ⚠ simplify-2027: 41 rows changed at once and were collapsed into one item — that reads as a board restructure.
+- screen v1: 1 of 7 changes ruled out on a quoted phrase, with no model call (advanced-standing 1). They are listed in RULED OUT with the phrase that did it.
+- classifier: 6 calls · 42,000 in · 12,000 cached · 9,000 out · 7,300 of it reasoning · ~$0.0258 est. (gpt-5-mini, effort=minimal)
+- 2 item(s) are muted in data/applied.tsv and were hidden. Delete the line to bring one back.
+- 3 item(s) were hidden because every programme their source informs is muted=true in data/programs.csv.
+- 1 of 7 changes were filtered out by the classifier (see RULED OUT above).
