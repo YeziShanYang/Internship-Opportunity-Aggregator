@@ -53,10 +53,14 @@ BASE_README = """# Summer 2027 Quant Internships
 
 
 class FakeResponse:
-    def __init__(self, text="", payload=None, status=200):
+    def __init__(self, text="", payload=None, status=200, url=""):
         self.text = text
         self._payload = payload or {}
         self.status_code = status
+        # httpx sets `.url` to the FINAL url after following redirects, and page_watch
+        # compares it against the configured one. A fake without it would let a
+        # redirect bug pass the suite.
+        self.url = url
 
     def json(self):
         return self._payload
@@ -738,11 +742,15 @@ class FakeJSONClient:
 
 
 class FakeHTMLClient:
-    def __init__(self, html, status=200):
+    def __init__(self, html, status=200, final_url=None):
         self.html, self.status = html, status
+        # None = no redirect: the response reports the url that was asked for.
+        self.final_url = final_url
 
     def get(self, url, *args, **kwargs):
-        return FakeResponse(text=self.html, status=self.status)
+        return FakeResponse(
+            text=self.html, status=self.status, url=self.final_url or url
+        )
 
 
 def _gh(title, location="New York, United States", employment_type=None, content="<p>x</p>"):
@@ -1734,3 +1742,155 @@ class AggregatorRowRenderingTests(unittest.TestCase):
         row = self._row("Software Engineer / Backend Intern @ NYC", program="Jane Street")
         self.assertIn("| Jane Street |", row)
         self.assertIn("Software Engineer / Backend Intern", row)
+
+
+class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
+    """Where we landed is part of whether the fetch succeeded.
+
+    Both HTTP clients are built with `follow_redirects=True` and, until this, nothing
+    in the codebase read `response.url`. So a page that had been retired could 302 to a
+    friendly error page, return HTTP 200, and clear both content floors on the error
+    page's own prose. Measured 2026-09-12, two sources were doing exactly that:
+    `aqr-internship-program` had been reporting success from `aqr.com/404` (4,683 chars
+    at ratio 0.0929), and `twosigma-campus` had silently moved from the students page
+    to the generic careers page.
+
+    Calibration matters as much as detection. Of the 65 watched pages, 5 end up at a
+    different URL and 2 of those differ only cosmetically, so a naive check would have
+    been 40% noise.
+    """
+
+    PAGE = "<html><body>" + ("<p>Real careers content here for the floors.</p>" * 40) + "</body></html>"
+
+    def _src(self, url, **kw):
+        base = {"source_id": "p", "url": url, "render_js": "false",
+                "selector": "", "program_names": "Test Page"}
+        base.update(kw)
+        return base
+
+    def test_the_aqr_case_a_redirect_to_404_is_a_failure(self):
+        r = page_watch.check(
+            self._src("https://www.aqr.com/About-Us/Our-Internship-Program"),
+            FakeHTMLClient(self.PAGE, final_url="https://www.aqr.com/404"),
+        )
+        self.assertFalse(r.ok, "an error page must not read as success")
+        self.assertIn("error page", r.error)
+        self.assertIn("aqr.com/404", r.error)
+
+    def test_the_two_sigma_case_a_path_change_warns_but_does_not_fail(self):
+        """The fetch worked and the text is real -- calling it a failed fetch would be
+        a lie. But the row is no longer watching what its program_names claims."""
+        r = page_watch.check(
+            self._src("https://www.twosigma.com/careers/students/"),
+            FakeHTMLClient(self.PAGE, final_url="https://www.twosigma.com/careers/"),
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertIn("redirected to a different path", r.extra["redirected"])
+
+    def test_a_warned_redirect_reaches_HEALTH_every_morning(self):
+        r = page_watch.check(
+            self._src("https://www.twosigma.com/careers/students/", source_id="twosigma-campus"),
+            FakeHTMLClient(self.PAGE, final_url="https://www.twosigma.com/careers/"),
+        )
+        _, body = digest.render([], [r], {"twosigma-campus": {"source_id": "twosigma-campus"}})
+        self.assertIn("twosigma-campus", body)
+        self.assertIn("no longer watching the page it was configured for", body)
+
+    def test_a_www_only_difference_is_silent(self):
+        """osqf.org -> www.osqf.org. Real, and worth nothing."""
+        r = page_watch.check(
+            self._src("https://osqf.org/"),
+            FakeHTMLClient(self.PAGE, final_url="https://www.osqf.org/"),
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertNotIn("redirected", r.extra)
+
+    def test_a_trailing_slash_difference_is_silent(self):
+        """www.tower-research.com/open-positions/ -> tower-research.com/open-positions/"""
+        r = page_watch.check(
+            self._src("https://www.tower-research.com/open-positions/"),
+            FakeHTMLClient(self.PAGE, final_url="https://tower-research.com/open-positions"),
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertNotIn("redirected", r.extra)
+
+    def test_no_redirect_at_all_is_silent(self):
+        r = page_watch.check(
+            self._src("https://example.invalid/careers"), FakeHTMLClient(self.PAGE)
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertNotIn("redirected", r.extra)
+
+    def test_the_verdict_helper_recognises_several_error_page_shapes(self):
+        for final in ("https://x.test/404", "https://x.test/not-found",
+                      "https://x.test/page-not-found/", "https://x.test/error"):
+            sev, _ = state.redirect_verdict("https://x.test/careers", final)
+            self.assertEqual(sev, "fail", final)
+
+    def test_a_query_only_change_does_not_warn(self):
+        """optiver-students keeps its ?level=student through the redirect; the path is
+        what identifies the page."""
+        sev, _ = state.redirect_verdict(
+            "https://optiver.com/careers/?level=student",
+            "https://optiver.com/careers?level=student&utm=x",
+        )
+        self.assertEqual(sev, "")
+
+
+class MutedProgramTests(_IsolatedState, unittest.TestCase):
+    """The muted column has to actually mute, and has to say that it did.
+
+    It did neither until 2026-09-12. `program_names` in sources.csv is "|"-separated
+    and the filter compared the whole field against a single programme name, so muting
+    had no effect on any source covering more than one programme. And the filter
+    reported through nothing at all, which is how it went unnoticed that it was not
+    filtering -- the two halves of the same failure.
+    """
+
+    def _run(self, program_name, muted_names):
+        result = state.SourceResult(
+            source_id="s", ok=True,
+            changes=[state.Change(source_id="s", kind="added", key="Row",
+                                  detail="x", program_name=program_name)],
+        )
+        programs = [
+            {"name": n, "muted": "true", "status": "unknown", "last_checked": "",
+             "last_changed": "", "snapshot_hash": ""}
+            for n in muted_names
+        ]
+        muted = {p["name"] for p in programs if p["muted"] == "true"}
+        changes = [c for r in [result] for c in r.changes]
+
+        def all_muted(change):
+            names = [n.strip() for n in (change.program_name or "").split("|") if n.strip()]
+            return bool(names) and all(name in muted for name in names)
+
+        kept = [c for c in changes if not all_muted(c)]
+        return len(changes) - len(kept)
+
+    def test_a_single_muted_programme_is_muted(self):
+        self.assertEqual(self._run("Jane Street FTTP", ["Jane Street FTTP"]), 1)
+
+    def test_a_multi_programme_source_is_muted_when_all_are_muted(self):
+        """The case that silently never worked."""
+        self.assertEqual(
+            self._run("Jane Street FTTP|Jane Street INSIGHT",
+                      ["Jane Street FTTP", "Jane Street INSIGHT"]),
+            1,
+        )
+
+    def test_muting_one_programme_does_not_silence_the_others_on_that_row(self):
+        """Muting INSIGHT must not also silence FTTP news arriving on the same row."""
+        self.assertEqual(
+            self._run("Jane Street FTTP|Jane Street INSIGHT", ["Jane Street INSIGHT"]),
+            0,
+        )
+
+    def test_a_source_with_no_programme_is_never_muted(self):
+        """An empty program_names is a whole job board, not a muted programme."""
+        self.assertEqual(self._run("", ["Jane Street FTTP"]), 0)
+
+    def test_the_muted_count_reaches_HEALTH(self):
+        _, body = digest.render([], [], {}, suppressed_muted=3)
+        self.assertIn("3 item(s) were hidden", body)
+        self.assertIn("muted=true", body)

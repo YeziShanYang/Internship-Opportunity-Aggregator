@@ -182,6 +182,17 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}"
         )
 
+    # Where did we actually land? The client follows redirects, so until now a page
+    # that had been retired could 302 to a friendly error page, return HTTP 200, and
+    # clear both content floors on the error page's own prose. Nothing in this codebase
+    # read `response.url`, so it reported success indefinitely.
+    severity, redirect_note = state.redirect_verdict(source["url"], str(response.url))
+    if severity == "fail":
+        return state.SourceResult(
+            source_id=source_id, ok=False, error=redirect_note,
+            content_length=len(response.text),
+        )
+
     lines = normalise(response.text)
     text = "\n".join(lines)
     previous_text = state.read_snapshot(source_id, ext="txt")
@@ -197,6 +208,9 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
                 "(renders in JavaScript, or was blocked)"
             ),
         )
+    # A "warn" redirect is not a failed fetch -- the page loads and the text is real --
+    # but the row is no longer watching what it was configured for, so it rides along
+    # in extra and HEALTH says so every morning until the url is corrected.
     if ratio < MIN_TEXT_HTML_RATIO:
         return state.SourceResult(
             source_id=source_id,
@@ -220,6 +234,8 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
         )
 
     extra = {"rows": len(lines), "chars": len(text), "ratio": round(ratio, 4)}
+    if redirect_note:
+        extra["redirected"] = redirect_note
     if previous_text is None:
         return state.SourceResult(
             source_id=source_id,
