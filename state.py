@@ -61,6 +61,65 @@ HTTP_TIMEOUT_SECONDS = 30.0
 # Spec section 10.1: a source this broken is an emergency, not a footnote.
 FAILURE_ESCALATION_THRESHOLD = 3
 
+# Circuit breaker. A source that keeps failing is refetched on an exponential backoff
+# rather than on every tick, borrowed from zshah101's health.py. Measured 2026-09-12:
+# nine sources sit at exactly three consecutive failures with `last_success` empty --
+# they have never worked once -- and each was being fetched three times a morning
+# forever. Boards do come back (rate-limit storms, a page that was mid-deploy), so the
+# window is capped rather than permanent and one success resets everything.
+#
+# The breaker changes *fetch* policy only. It must never change *reporting* policy: a
+# quarantined source still appears in HEALTH and still escalates, because "we have
+# stopped looking" is the most important version of "this source is blind, not quiet"
+# (spec 10.1). Quarantining a source silently would be the exact failure this project
+# has been bitten by twice.
+QUARANTINE_AFTER_FAILURES = 3
+QUARANTINE_HOURS = (6, 12, 24, 48)
+QUARANTINE_CAP_HOURS = 72
+
+
+def quarantine_hours(consecutive_failures: int) -> int:
+    """How long to wait before retrying a source that has failed this many times."""
+    step = consecutive_failures - QUARANTINE_AFTER_FAILURES
+    if step < 0:
+        return 0
+    if step < len(QUARANTINE_HOURS):
+        return QUARANTINE_HOURS[step]
+    return QUARANTINE_CAP_HOURS
+
+
+def quarantine_state(source: dict[str, str], now: datetime.datetime | None = None):
+    """Return (skip_this_run, human explanation).
+
+    Returns `(False, "")` for a healthy source, for one below the threshold, and for
+    one whose window has expired -- an expired window is exactly how a recovered board
+    gets retried without anyone intervening.
+    """
+    failures = int(source.get("consecutive_failures") or 0)
+    hours = quarantine_hours(failures)
+    if not hours:
+        return False, ""
+    last_attempt = (source.get("last_attempt") or "").strip()
+    if not last_attempt:
+        # No record of an attempt, so nothing says the window has started. Try it.
+        return False, ""
+    try:
+        started = datetime.datetime.fromisoformat(last_attempt)
+    except ValueError:
+        return False, ""
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=datetime.timezone.utc)
+    now = now or datetime.datetime.now(datetime.timezone.utc)
+    until = started + datetime.timedelta(hours=hours)
+    if now >= until:
+        return False, ""
+    never = not (source.get("last_success") or "").strip()
+    return True, (
+        f"quarantined for {hours}h after {failures} consecutive failures, retry after "
+        f"{until.isoformat(timespec='minutes')}"
+        + (" — it has never succeeded, so check the URL rather than waiting" if never else "")
+    )
+
 # Seeded from quant_math_cs_programs_freshman.xlsx, plus the tracking columns in
 # spec section 4. Order is fixed; do not reorder without rewriting the whole file.
 PROGRAM_COLUMNS = [
@@ -90,6 +149,10 @@ SOURCE_COLUMNS = [
     "render_js",
     "last_success",
     "consecutive_failures",
+    # When we last actually tried. Distinct from last_success because the circuit
+    # breaker needs to know when the backoff window started, and a quarantined run
+    # is not an attempt.
+    "last_attempt",
     # high | low. Low-signal sources are only classified when a row matches the
     # underclassman or rolling-firm filters; see classify.triage.
     "signal",
@@ -301,3 +364,6 @@ class SourceResult:
     # Tier 1 and 2 store a canonical TSV; Tier 3 stores normalised page text.
     snapshot_ext: str = "tsv"
     extra: dict[str, Any] = field(default_factory=dict)
+    # True when the circuit breaker skipped the fetch. Neither a success nor a new
+    # failure: the counters must not move, or a quarantine would inflate itself.
+    quarantined: bool = False

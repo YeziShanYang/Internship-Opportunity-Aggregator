@@ -58,6 +58,16 @@ def _health_lines(
         else f"{len(results)} sources checked · {len(healthy)} healthy"
     ]
     escalated: list[tuple[str, str, str]] = []
+    quarantined = [r for r in failing if r.quarantined]
+    if quarantined:
+        # Reported as its own fact. "We have stopped looking at this source" is a
+        # different and more serious statement than "this fetch failed", and it is the
+        # one a reader is most likely to assume did not happen.
+        lines.append(
+            f"⚠ {len(quarantined)} source(s) were not fetched at all — the circuit "
+            f"breaker has them quarantined: "
+            + ", ".join(sorted(r.source_id for r in quarantined))
+        )
     for result in failing:
         source = sources.get(result.source_id, {})
         count = int(source.get("consecutive_failures") or 0)
