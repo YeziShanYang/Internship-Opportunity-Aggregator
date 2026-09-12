@@ -1,0 +1,102 @@
+MIT Pokerbots 2026
+Pokerbots
+What is Pokerbots?
+6.9630, or MIT Pokerbots, is a computerized poker tournament. Teams have one month to program a completely autonomous pokerbot which competes against other bots in a unique poker variant.
+Competitors must learn and apply concepts in mathematics, computer science, and economics not normally developed together in academic settings in order to conquer their opponents and emerge victorious.
+This year's competition features over $50,000 in prizes and attention from the most prestigious quantitative trading and technology firms. This IAP, channel your programming ability and strategic quantitative thinking skills to become the reigning Pokerbots champion!
+FAQ
+Why Poker?
+As a game of incomplete information and uncertainty, poker is a prime application of the game theory concepts and decision making skills essential to trading. While traders make risk decisions based on the limited information they get from the markets, poker players make decisions based on hidden information as well, taking into account factors such as expected value and probability distributions.
+I thought this was a programming competition? What language is it in?
+It is! To build a working pokerbot only requires both critical thinking ability and an eagerness to learn. However, an understanding of machine learning, algorithms, and data science can go a long way towards creating an advanced pokerbot. Competitiors can code in their choice of Python, Java, or C++.
+Machine learning? Algorithms? Exactly how much coding experience is necessary?
+We welcome students with all levels of programming experience. Nevertheless, some previous coding experience would certainly be helpful. Although not necessary, we recommend you have at least one team member with some programming experience.
+What form of poker will it be?
+We are keeping the game and tournament structure secret. You will hear all about it during the challenge unveiling in early January 2026.
+How many members can make up a team?
+Teams may be composed of 1-4 students.
+How do I receive course credit?
+You will need to submit functioning pokerbots for various checkpoints throughout the course, as well as a short strategy report at the end of IAP.
+Do I have to be an MIT student to participate?
+For our course and tournament in January, you must be able to register for MIT IAP classes. If you are cross-registering, bring your papers in on the first day of class for us to sign. At least one member of your team must have MIT certificates to access our competition server.
+How do I register?
+Here !
+Do I have to be on campus?
+Nope! Our lectures are recorded on Zoom and posted online. In addition, all submissions can be done online and we have virtual office hours and Piazza
+How much time will it take to make a pokerbot?
+Creating a functioning pokerbot takes no time at all. However, creating a competitive and strategic pokerbot will require more effort and experimentation. Ultimately, the more you put into your pokerbot, the more value you will receive from the class!
+Are listeners allowed to compete?
+Yes! Students taking the class on listener status are allowed to compete and win prizes just like any other student taking the class for credit.
+2026 Sponsors
+Interested in sponsoring? Send us an email at pokerbots-sponsor@mit.edu .
+Meet the team!
+Sri Saraf '26
+Co-President
+Bobby Costin '28
+Co-President
+Sejal Rathi '26
+Vice President
+Jacob Jobraeel '27
+Innovation Chair
+Jacob David '26
+Head Instructor
+Sam Zhou '27
+Tech Lead
+Paco Gomez '26
+Engine Lead
+Steve Zhang '28
+Server Lead
+Landon Sims '29
+Engine Developler
+Reese Long '29
+Server Developler
+Alan Duan '29
+Treasurer
+Michelle Gao '29
+Sponsorship Director
+Alumni
+Alexander Zhang '26
+Co-President (2025)
+Gaurab Das '25
+Vice President (2025)
+Dylan Dong '24
+Vice President (2024)
+Matt McManus '23
+Co-President (2023)
+Sophie Yang '24
+Co-President (2023)
+Gabriel Arruda '24
+Teaching Assistant (2023)
+Max Tan '25
+Vice President (2023)
+Haijia Wang '23
+Instructor (2022)
+Andy Zhu '23
+President (2022)
+Shreyas Srinivasan '22
+President (2019, 2020, 2021)
+Stephen Otremba '21
+Head Instructor (2020, 2021)
+Gabriel Ramirez '21
+Tech Lead (2020, 2021)
+Nilai Sarda '20
+Instructor (2019, 2020)
+David Amirault '20
+Head Instructor (2019, 2020)
+Joe Zurier '19
+Instructor (2019)
+Larry Zhang '18
+Marketing (2019)
+Jack Serrino '18
+President (2019)
+Kevin Wen '16
+President (2015, 2016)
+Justin Martinez '16
+Co-organizer &amp; Lead Developer (2015)
+Kevin Pang '11
+Founder (2011, 2012)
+Question? Comments? Concerns? We'd love to hear from you.
+You can reach the Pokerbots Team at pokerbots@mit.edu .
+&copy; MIT Pokerbots 2025
+Accessibility
+Back to top

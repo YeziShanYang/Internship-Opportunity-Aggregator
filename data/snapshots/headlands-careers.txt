@@ -1,0 +1,389 @@
+Careers | Headlands Technologies LLC
+Your browser is not supported!
+Please try one of these browsers:
+Chrome, Firefox, IE9+
+About
+Careers
+Blog
+Contact
+TERMS AND CONDITIONS
+PRIVACY POLICY
+FRAUD AND IMPERSONATION WARNINGS
+Careers
+We are currently hiring for a variety of roles, including experienced and entry-level software developers and quantitative researchers.
+Select a location to view open positions
+Amsterdam
+Chicago
+London
+New York
+Software Developer (C++)
+Scope
+As a software developer at Headlands Tech you will design, engineer and implement the Firm&#39;s trading software in the C++ programming language. You will work in close collaboration with the research, systems, and operations teams to architect, implement and analyze new automated electronic trading algorithms. You will play a key role in designing and constructing the Firm&#39;s software infrastructure to support new and existing lines of business. In addition, you will expand the Firm&#39;s proprietary research platform to improve performance and support new exchanges, products and functionality.
+Qualifications
+Preferred degree in any computing related area (e.g., computer science, computer engineering, etc.)
+In lieu of this, extensive professional software development experience
+Well-versed in the fundamentals of software engineering
+Genuine interest in solving technical problems, along with a strong ability to implement solutions
+Low ego, able to work both in a collaborative team setting and autonomously
+Committed to designing and implementing fully automated, scalable, and maintainable solutions with extensive testing
+Superior ability to write in C++, or experience with other statically-typed imperative programming language
+Comfortable operating at various different levels of abstraction, from individual machines to large scale distributed systems
+Strong knowledge of the details of computing all throughout the technical stack
+Knowledge of Linux a plus
+Experience in the trading industry preferred but not mandatory
+Day to Day
+This isn&#39;t an exhaustive list but represents a selection of the types of tasks that software developers at Headlands Tech take on while developing and maintaining a large scale 24-hour automated trading system.
+Build, maintain, and improve exchange connectivity
+Leverage existing infrastructure, extending functionality where necessary
+Build a deep understanding of exchange behavior to integrate into our existing trading system
+Maintain and extend core research infrastructure
+Design, implement, and maintain distributed storage systems with various different performance and reliability requirements
+Address performance limitations within our own software, open source libraries and applications, Linux, etc.
+Investigate new technologies to improve stability, scalability, and performance
+Implement new trading strategies in collaboration with research and operations teams
+Extend strategy framework to enable new behaviors and improve existing ones
+Investigate signal issues for trading system
+Reconcile differences between trading strategies performance in simulation versus production
+Investigate production trading issues in collaboration with operations, systems, and research teams
+Optimize the performance of the live trading system
+Measure latency and throughput through microbenchmarks, profiling, tracing, etc.
+Optimize existing code using lock free data structures, compiler intrinsics, etc.
+Develop new algorithms to address performance limitations at a higher abstraction layer
+Rearchitect components of the trading system to eliminate bottlenecks
+Fundamental network programming
+Implement low level networking protocols
+Investigate network captures to understand latency and behavior of both exchange and internal communication
+Ensure the continued stability and reliability of the trading system
+Build monitoring systems for trading strategies and all other pieces of our infrastructure
+Conduct code reviews of other developers, researchers and operations team members
+Benefits &amp; Compensation &mdash; Amsterdam
+Group Medical Insurance through CZ with a monthly stipend
+Short-Term Disability, Long-Term Disability, and Accident Insurance coverage provided
+Annual comprehensive physical examination and on-site annual influenza shots
+PTO, paid holidays, and parental leave for eligible full-time employees
+Defined Contribution Pension Scheme with employer contribution and Surviving Dependents Contribution Scheme
+Optional Dutch language classes
+Optional employer-provided tax preparation
+Free on-site catered meals, stocked kitchen, daily meal delivery stipends, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; Chicago
+Base Salary Range: $200k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; London
+Employer paid Private Medical Insurance through AXA (Moratorium plan)
+Employer paid Dental Insurance through BUPA
+Employer paid Critical Accident, Critical Illness, and Group Income Protection Insurance
+PTO, paid holidays, and parental leave for eligible full-time employees
+Salary Sacrifice Pension Plan with 5% employer contribution and auto-enrolment upon hire
+Daily meal delivery stipends, stocked kitchen, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; New York
+Base Salary Range: $200k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+We are proud to be an equal opportunity workplace and to provide employees with a work environment free of discrimination and harassment. All employment decisions at Headlands Tech are based on business needs, job requirements and individual qualifications, without regard to race, color, religion or belief, national origin, sex, sexual orientation, gender identity/expression, age, status as a protected veteran, status as an individual with a disability, or any other applicable legally protected characteristics. Headlands Tech will not tolerate discrimination or harassment based on any of these characteristics.
+Apply Now
+Software Developer (Java)
+Scope
+As a Java software developer at Headlands Tech, you will work in close collaboration with the research, systems, and operations teams to design, engineer, implement, and maintain the Firm&#39;s software written in Java programming language. You will play a key role in designing and constructing the Firm&#39;s software infrastructure to support new and existing lines of business. You will expand the Firm&#39;s proprietary research platform to improve performance and support new exchanges, products and functionality.
+Qualifications
+Preferred degree in any computing related area (e.g., computer science, computer engineering, etc.)
+In lieu of this, extensive professional software development experience
+Well-versed in the fundamentals of software engineering
+Genuine interest in solving technical problems, along with a strong ability to implement solutions
+Low ego, able to work both in a collaborative team setting and autonomously
+Committed to designing and implementing fully automated, scalable, and maintainable solutions with extensive testing
+Comfortable operating at various levels of abstraction, from individual machines to large scale distributed systems
+Strong knowledge of the details of computing all throughout the technical stack
+Superior ability to write, refactor, and debug programs in Java
+Good knowledge of networking and storage systems
+Experience or knowledge of C++ is a plus
+Knowledge of Linux is a plus
+Experience in the trading industry is a plus
+Day to Day
+This isn&#39;t an exhaustive list but represents a selection of the types of tasks that software developers at Headlands Tech take on while developing and maintaining a large scale 24-hour automated trading system and research framework.
+Maintain and extend core research infrastructure
+Design, implement, and maintain distributed storage systems with various performance and reliability requirements
+Address performance limitations within our own software, open-source libraries and applications, Linux, etc.
+Investigate new technologies to improve stability, scalability, and performance of a distributed computing farm
+Develop and improve monitoring and proactive detection capabilities
+Perform basic data analysis to support decision making and better plan for future growth
+Improve networking communication between different components of the system to achieve optimal latency and throughput
+Communicate with stakeholders across teams to understand needs and define application specifications
+Conduct code reviews of other developers, researchers and operations team members
+Participate in the recruitment process by conducting interviews and providing candidate evaluations
+Benefits &amp; Compensation &mdash; Amsterdam
+Group Medical Insurance through CZ with a monthly stipend
+Short-Term Disability, Long-Term Disability, and Accident Insurance coverage provided
+Annual comprehensive physical examination and on-site annual influenza shots
+PTO, paid holidays, and parental leave for eligible full-time employees
+Defined Contribution Pension Scheme with employer contribution and Surviving Dependents Contribution Scheme
+Optional Dutch language classes
+Optional employer-provided tax preparation
+Free on-site catered meals, stocked kitchen, daily meal delivery stipends, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; Chicago
+Base Salary Range: $175k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; London
+Employer paid Private Medical Insurance through AXA (Moratorium plan)
+Employer paid Dental Insurance through BUPA
+Employer paid Critical Accident, Critical Illness, and Group Income Protection Insurance
+PTO, paid holidays, and parental leave for eligible full-time employees
+Salary Sacrifice Pension Plan with 5% employer contribution and auto-enrolment upon hire
+Daily meal delivery stipends, stocked kitchen, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+We are proud to be an equal opportunity workplace and to provide employees with a work environment free of discrimination and harassment. All employment decisions at Headlands Tech are based on business needs, job requirements and individual qualifications, without regard to race, color, religion or belief, national origin, sex, sexual orientation, gender identity/expression, age, status as a protected veteran, status as an individual with a disability, or any other applicable legally protected characteristics. Headlands Tech will not tolerate discrimination or harassment based on any of these characteristics.
+Apply Now
+FPGA Engineer
+Scope
+As an FPGA Engineer at Headlands Tech, you will be responsible for digital circuit design and verification, developing in-house intellectual property, and scaling designs globally. You will work with cutting-edge hardware technologies to support the Firm&#39;s automated trading infrastructure.
+Qualifications
+Professional experience with FPGA/ASIC design and verification
+Experience developing reusable IPs and scaling designs to multiple target platforms
+Solid understanding of digital design principles
+Strong working knowledge of either SystemVerilog/Verilog/VHDL
+In-depth knowledge of common EDA tools
+Knowledge of C++ required
+Familiarity with common scripting languages TCL/Python/Bash
+University degree in EE, CS, CE or related technical field
+Experience with high-speed transceivers, networking protocols, and packet processing is preferred
+Day to Day
+Design and verify RTL implementations for trading systems
+Develop reusable IP components that can be deployed across multiple platforms
+Integrate hardware designs with wider technology stack
+Script automation tasks and workflow improvements
+Collaborate with software, research, and systems teams
+Benefits &amp; Compensation &mdash; Amsterdam
+Group Medical Insurance through CZ with a monthly stipend
+Short-Term Disability, Long-Term Disability, and Accident Insurance coverage provided
+Annual comprehensive physical examination and on-site annual influenza shots
+PTO, paid holidays, and parental leave for eligible full-time employees
+Defined Contribution Pension Scheme with employer contribution and Surviving Dependents Contribution Scheme
+Optional Dutch language classes
+Optional employer-provided tax preparation
+Free on-site catered meals, stocked kitchen, daily meal delivery stipends, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; Chicago
+Base Salary Range: $225k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; London
+Employer paid Private Medical Insurance through AXA (Moratorium plan)
+Employer paid Dental Insurance through BUPA
+Employer paid Critical Accident, Critical Illness, and Group Income Protection Insurance
+PTO, paid holidays, and parental leave for eligible full-time employees
+Salary Sacrifice Pension Plan with 5% employer contribution and auto-enrolment upon hire
+Daily meal delivery stipends, stocked kitchen, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; New York
+Base Salary Range: $225k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+We are proud to be an equal opportunity workplace and to provide employees with a work environment free of discrimination and harassment. All employment decisions at Headlands Tech are based on business needs, job requirements and individual qualifications, without regard to race, color, religion or belief, national origin, sex, sexual orientation, gender identity/expression, age, status as a protected veteran, status as an individual with a disability, or any other applicable legally protected characteristics. Headlands Tech will not tolerate discrimination or harassment based on any of these characteristics.
+Apply Now
+Quantitative Researcher
+Scope
+As a Quantitative Researcher at Headlands Tech, you&#39;ll join a team of researchers responsible for the firm&#39;s portfolio of automated electronic trading strategies. You&#39;ll research and develop predictive signals and trading models, iterating to drive measurable improvements in strategy PnL. Working closely with colleagues, you&#39;ll own ideas from hypothesis through production and be responsible for the results they generate.
+Qualifications
+Low ego; effective both collaboratively and autonomously
+Highly motivated and ambitious, with a focus on results
+Experience or demonstrable interest in systematic trading
+A track record of applying statistics and machine learning to noisy real-world data
+Solid software development skills, with practical experience in Java, C++, or Python
+A drive to turn research into profitable, scalable, and maintainable trading strategies
+New grads should apply via the separate New Grad posting.
+Benefits &amp; Compensation &mdash; Amsterdam
+Group Medical Insurance through CZ with a monthly stipend
+Short-Term Disability, Long-Term Disability, and Accident Insurance coverage provided
+Annual comprehensive physical examination and on-site annual influenza shots
+PTO, paid holidays, and parental leave for eligible full-time employees
+Defined Contribution Pension Scheme with employer contribution and Surviving Dependents Contribution Scheme
+Optional Dutch language classes
+Optional employer-provided tax preparation
+Free on-site catered meals, stocked kitchen, daily meal delivery stipends, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; Chicago
+Base Salary Range: $200k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; London
+Employer paid Private Medical Insurance through AXA (Moratorium plan)
+Employer paid Dental Insurance through BUPA
+Employer paid Critical Accident, Critical Illness, and Group Income Protection Insurance
+PTO, paid holidays, and parental leave for eligible full-time employees
+Salary Sacrifice Pension Plan with 5% employer contribution and auto-enrolment upon hire
+Daily meal delivery stipends, stocked kitchen, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; New York
+Base Salary Range: $200k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+We are proud to be an equal opportunity workplace and to provide employees with a work environment free of discrimination and harassment. All employment decisions at Headlands Tech are based on business needs, job requirements and individual qualifications, without regard to race, color, religion or belief, national origin, sex, sexual orientation, gender identity/expression, age, status as a protected veteran, status as an individual with a disability, or any other applicable legally protected characteristics. Headlands Tech will not tolerate discrimination or harassment based on any of these characteristics.
+Apply Now
+Quantitative Researcher (New Grad)
+Scope
+As a Quantitative Researcher at Headlands Tech, you&#39;ll join a team of researchers responsible for the firm&#39;s portfolio of automated electronic trading strategies. You&#39;ll research and develop predictive signals and trading models, iterating to drive measurable improvements in strategy PnL. Working closely with colleagues, you&#39;ll own ideas from hypothesis through production and be responsible for the results they generate.
+Qualifications
+Low ego; effective both collaboratively and autonomously
+Highly motivated and ambitious, focused on real-world results
+Demonstrable interest in systematic trading; internship experience preferred
+Degree in a highly technical field (computer science, engineering, statistics, mathematics or physics) required
+Strong knowledge of statistics and machine learning with practical experience applying them to noisy real-world data
+Solid software development skills, with practical experience in Java, C++, or Python
+A drive to turn research into profitable, scalable, and maintainable strategies
+Benefits &amp; Compensation &mdash; Amsterdam
+Group Medical Insurance through CZ with a monthly stipend
+Short-Term Disability, Long-Term Disability, and Accident Insurance coverage provided
+Annual comprehensive physical examination and on-site annual influenza shots
+PTO, paid holidays, and parental leave for eligible full-time employees
+Defined Contribution Pension Scheme with employer contribution and Surviving Dependents Contribution Scheme
+Optional Dutch language classes
+Optional employer-provided tax preparation
+Free on-site catered meals, stocked kitchen, daily meal delivery stipends, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; Chicago
+Base Salary Range: $200k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; London
+Employer paid Private Medical Insurance through AXA (Moratorium plan)
+Employer paid Dental Insurance through BUPA
+Employer paid Critical Accident, Critical Illness, and Group Income Protection Insurance
+PTO, paid holidays, and parental leave for eligible full-time employees
+Salary Sacrifice Pension Plan with 5% employer contribution and auto-enrolment upon hire
+Daily meal delivery stipends, stocked kitchen, and free ordering at local cafe
+Complimentary gym memberships
+Employee Assistance Program (EAP)
+Company swag, and regular team events
+Benefits &amp; Compensation &mdash; New York
+Base Salary Range: $200k - $300k
+Medical Insurance (with PPO &amp; HDHP options), coverage effective Day 1, with employer paid plan options available
+Employer paid Dental and Vision Insurance, coverage effective Day 1
+HSA with company-funded contributions up to the IRS annual limit; FSA options also available
+PTO, paid holidays, and parental leave for eligible full-time employees
+Company paid life insurance
+401(k) with Traditional, Roth, and After-Tax options; immediate enrollment, vesting, and employer match
+Free on-site catered meals, stocked kitchen, and daily meal delivery stipends
+Complimentary gym memberships
+Pre-tax commuter benefits
+Monthly tech stipend
+Employee Assistance Program (EAP)
+Optional Insurance options, including Supplemental Life &amp; AD&amp;D insurance, and Pet insurance
+Company swag, and regular team events
+We are proud to be an equal opportunity workplace and to provide employees with a work environment free of discrimination and harassment. All employment decisions at Headlands Tech are based on business needs, job requirements and individual qualifications, without regard to race, color, religion or belief, national origin, sex, sexual orientation, gender identity/expression, age, status as a protected veteran, status as an individual with a disability, or any other applicable legally protected characteristics. Headlands Tech will not tolerate discrimination or harassment based on any of these characteristics.
+Apply Now
+Don't see the role you're looking for? Click here to submit your resume for a role not listed here.
+We kindly request that you apply to one job only , as we review each candidate individually, and will ensure your profile is considered for all relevant openings.
+©2026 Headlands Tech Holdings, LLC. All&nbsp;Rights&nbsp;Reserved.
+TERMS AND CONDITIONS
+PRIVACY POLICY
+FRAUD AND IMPERSONATION WARNINGS

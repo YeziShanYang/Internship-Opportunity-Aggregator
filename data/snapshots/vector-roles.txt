@@ -1,0 +1,149 @@
+{
+"roles": [
+{
+"slug": "quantitative-trader",
+"title": "Quantitative Researcher",
+"hiring": true,
+"cardDescription": "Explore trading ideas by analyzing market data with fundamental statistical theories.",
+"responsibilities": [
+"Explore trading ideas by analyzing market data with fundamental statistical theories",
+"Apply programming, quantitative and statistical skills to the research of market trends, reversions, patterns, and complete data-driven projects",
+"Apply statistical techniques throughout the whole process from data mining to execution",
+"Be self-sufficient designing, building, maintaining and enhancing a systemic and data-driven approaches with tools necessary to test and evaluate trading algorithms and business opportunities",
+"Conduct research to improve risk management, revenue capture, market coverage and contribute to libraries of analytic tools for market data analytics and trade strategy optimization",
+"Adhere to risk and capital usage limits",
+"Coordinate daily trading activities with operations, trading support, brokers, among others",
+"Use data analysis tools to identify and respond to unique market opportunities",
+"Use cutting-edge technology to build out effective trading strategies",
+"Mentor, manage or train junior traders to complete projects and learn all facets of trading"
+],
+"qualifications": [
+"3+ years of experience, with at least 1 year in a risk-taking role",
+"Bachelor, Masters or Ph.D. degree in any scientific field",
+"Experience in linear algebra, statistics, and interaction with large datasets",
+"Strong understanding of statistical approaches and predictive modeling techniques (including regression analysis, neural networks, genetic algorithms, SVD, etc.), their underlying assumptions, limitations, and the proper use for each methodology",
+"A calculated risk-taker with demonstrated experience monetizing opportunities in financial markets",
+"Comfort working within a collaborative, team-oriented fast-changing environment which fosters free-flowing creativity",
+"Strong work ethic, compliance and willingness to do what it takes to get the job done",
+"Excellent verbal and written communication skills",
+"Strong proficiency in Python",
+"Programming languages R, C++, Lua are a plus",
+"Proven profitability track record trading across multiple strategies or asset classes is a major plus"
+]
+},
+{
+"slug": "algorithmic-trader",
+"title": "Algorithmic Trader",
+"hiring": true,
+"cardDescription": "Analyze and program algorithmic trading strategies as well as develop electronic trading applications and trading tools.",
+"responsibilities": [
+"Analyze and program algorithmic trading strategies as well as develop electronic trading applications and trading tools.",
+"Responsible for gathering futures exchange market data and developing electronic trading models using derivative theory and quantitative research methods.",
+"Develop mathematical models for both linear and non-linear financial valuations as well as risk management, by analyzing exchange systems behavior.",
+"Be responsible for developing software applications and quantitative tools for trading using statistical analyst methods.",
+"Gain knowledge with financial markets. Use statistical techniques to develop factors used in trading methods, future pricing and risk management.",
+"Develop hedging algorithms that can be employed and strategies to calculate optimal hedging products based on utility.",
+"Design, test, and optimize trading strategies using simulation algorithms.",
+"Work in computer program languages such as Python, C++ in Linux, VBA, Excel, and MATLAB as well as apply knowledge to volatile modeling, Black-Scholes pricing, factor models, and derivative theory."
+],
+"qualifications": [
+"Applicant must possess a Master’s or foreign equivalent degree in a STEM, Financial Mathematics, Finance, or related field and 3 years of professional experience as a Trader or related role.",
+"3 years of experience in developing electronic trading applications and trading tools.",
+"3 years of experience in analyzing and programming algorithmic trading strategies.",
+"3 years of experience in derivative theory and quantitative research methods.",
+"3 years of experience in statistical analysis methods.",
+"2 years of experience in profitable systematic futures trading.",
+"3 years of experience in Python, R, VBA, Excel, and MATLAB."
+]
+},
+{
+"slug": "algorithmic-developer",
+"title": "Algo Software Developer",
+"hiring": true,
+"cardDescription": "Develop, maintain, and support production quality automated trading strategies.\nApply technology and programming to automate complex trading logic.",
+"responsibilities": [
+"Develop, maintain, and support production-quality automated trading strategies and trading infrastructure systems, primarily in C++.",
+"Apply technology and programming to automate complex trading logic and enhance software for simulation, back-office, and post-trade evaluation.",
+"Build and maintain connections between trading models, execution software, and core trading infrastructure.",
+"Become an expert in market microstructure, tick data dissemination, and protocol communication with electronic exchanges.",
+"Create tools, verification processes, and risk management protections to ensure safe trading.",
+"Lead projects from inception to deployment, including design, rollout, and performance testing.",
+"Develop tools to support real-time trading operations and automate server provisioning, configuration, and monitoring.",
+"Interact regularly with trading and core development teams, fostering collaboration and innovation.",
+"Mentor and train junior developers in various aspects of trading and software development."
+],
+"qualifications": [
+"3+ years of experience in software development for trading or complex systems.",
+"Bachelor’s, Master’s, or Ph.D. in Computer Science, Engineering, Finance, or a related scientific field.",
+"Strong programming skills in C++, with experience in Linux environments; familiarity with scripting languages like Python, R, or Lua is a plus.",
+"Ability to conceptualize and understand complex systems with numerous dependencies.",
+"Passion for creating clean, bug-free software and a strong work ethic.",
+"Excellent problem-solving skills, with demonstrated debugging and testing capabilities.",
+"Comfort in a collaborative, fast-paced environment that encourages creativity.",
+"Strong verbal and written communication skills, with a motivation to learn and grow.",
+"Understanding of networking and common network protocols is advantageous."
+]
+},
+{
+"slug": "fpga-engineer",
+"title": "FPGA Engineer",
+"hiring": true,
+"cardDescription": "Design and develop FPGA-based solutions for low-latency trading systems across electronic markets.",
+"responsibilities": [
+"Design and develop FPGA-based solutions for low-latency trading systems across electronic markets.",
+"Develop FPGA projects end-to-end, from architecture and RTL design through verification, integration, deployment, and production support.",
+"Develop and maintain SystemVerilog or VHDL designs for trading, market data, and execution systems.",
+"Design automated verification and testing environments for individual modules, integrated components, and complete FPGA solutions.",
+"Integrate FPGA-based systems with trading software, network interfaces, and existing trading infrastructure.",
+"Analyze and optimize hardware for latency, throughput, resource utilization, and reliability.",
+"Diagnose and resolve issues across RTL, simulation, hardware, networking, and system integration.",
+"Create and maintain design documentation, interface specifications, verification plans, and technical documentation.",
+"Work closely with software developers, infrastructure engineers, traders, and quantitative researchers throughout the development and deployment lifecycle."
+],
+"qualifications": [
+"Professional experience developing FPGA-based hardware, preferably in financial markets, electronic trading, or other latency-sensitive applications.",
+"End-to-end experience in FPGA hardware design and verification, including architecture, RTL design, simulation, debugging, synthesis, timing analysis, and production.",
+"Experience designing FPGA hardware for electronic trading or ultra-low-latency applications.",
+"Strong proficiency in SystemVerilog or VHDL and hardware verification methodologies.",
+"Strong understanding of digital design, computer architecture, and FPGA development.",
+"Demonstrated ability to independently diagnose and solve complex hardware problems.",
+"Experience developing automated verification and testing for FPGA designs.",
+"Bachelor's, Master's, or Ph.D. degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field.",
+"Experience with high-speed interfaces, transceivers, memory architectures, or other performance-sensitive FPGA components.",
+"Experience with FPGA optimization for latency, throughput, resource utilization, timing, and determinism.",
+"Familiarity with networking, Ethernet, market data, or exchange protocols.",
+"Experience with C++ or Linux environments."
+]
+},
+{
+"slug": "infra-software-developer",
+"title": "Infra Software Developer",
+"hiring": true,
+"cardDescription": "Develop, maintain, and support production-quality software for automated trading strategies and trading systems, primarily in C++.",
+"responsibilities": [
+"Develop, maintain, and support production-quality software for automated trading strategies and trading systems, primarily in C++.",
+"Translate quantitative trading models and strategy logic into reliable, efficient, and maintainable production software.",
+"Build and maintain components for strategy execution, order management, simulation, backtesting, and post-trade analysis.",
+"Work closely with algorithmic traders and quantitative researchers to implement, test, optimize, and deploy trading strategies.",
+"Develop tools and controls to support strategy validation, monitoring, risk management, and real-time trading operations.",
+"Optimize software performance, reliability, and resource usage for latency-sensitive trading applications.",
+"Lead projects from design and development through testing, deployment, and production support.",
+"Diagnose and resolve issues across trading applications and their dependencies.",
+"Contribute to software architecture, testing practices, verification processes, and engineering standards."
+],
+"qualifications": [
+"Professional experience in software development for trading systems or quantitative trading applications.",
+"Experience with real-time systems, performance optimization, or high-performance computing.",
+"Understanding of trading strategies, order management, execution, or market microstructure.",
+"Strong programming skills in C++ and professional experience in Linux environments.",
+"Ability to understand and implement complex systems with numerous dependencies.",
+"Strong problem-solving, debugging, testing, and software engineering skills.",
+"Demonstrated ability to develop reliable, maintainable, production-quality software.",
+"Bachelor's, Master's, or Ph.D. in Computer Science, Engineering, Finance, or a related scientific or quantitative field.",
+"Experience with backtesting, simulation, or trading research tools.",
+"Familiarity with Python, R, Lua, or other scripting languages."
+]
+}
+],
+"generated": "<timestamp>"
+}

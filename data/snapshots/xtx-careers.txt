@@ -1,0 +1,163 @@
+Careers | XTX Markets
+Skip to main content
+Home
+Careers
+Philanthropy
+Ventures
+Clients
+News
+Contact
+Menu
+Home
+Careers
+Philanthropy
+Ventures
+Clients
+News
+Contact
+XTX does not deal with individual investors and does not accept deposits or provide retail trading services
+Working at XTX
+Open Positions
+London New York (all)
+View our job board to see current openings
+Hear from XTX employees
+Quant Research
+The quantitative research team is responsible for designing the statistical models that underpin our trading activities.
+Financial markets are data-rich, but the key lies in making sense of this data. We deploy state-of-the-art machine learning techniques, powered by extensive computational resources, to sift through the noise and generate price forecasts for a wide range of financial assets.
+In the fast-moving environment of financial markets, we face numerous technical challenges. However, as a cohesive team of quantitative researchers, we are constantly developing new models to stay ahead.
+My favourite aspect of the job is working in a collaborative, research-driven environment with a fast feedback loop that allows for rapid progress and keeps the whole process engaging and impactful.
+James , Quant Research
+Exchange Trading Development
+Our team works closely with the quant team to take models from a MATLAB prototype to trading tens of thousands of instruments on nearly a hundred exchanges around the world. We're a small, close-knit team and we cover the entire tick-to-trade flow, from processing incoming market data to evaluating trading signals to submitting orders.
+Our systems have to be able to process an incredible amount of incoming data in real-time without queueing, with market data from major exchanges frequently amounting to tens of gigabits per second. No technology is off-limits to us, we'll use whatever is the best tool for the job, although our favourite languages are C++ and Python.
+James , Exchange Trading Development
+OTC Trading Development
+The OTC trading development team builds XTX's client-facing/OTC platforms. Our OTC market-making system offers continuous liquidity across multiple asset classes and thousands of instruments. It speaks around a hundred market data and trading protocols. We also build a range of in-house systems for real-time performance monitoring and analysis of XTX's trading activity, which generates millions of events per second.
+Our team is drawn from a range of financial and non-financial backgrounds. We specialise in building high-performance, highly-available distributed systems. We are given a high degree of autonomy to meet requirements with the software and hardware that we see fit.
+Paul , OTC Trading Development
+Post-trade Technology
+Our team is responsible for the core technology platform, supporting all aspects of the firm's post-trade activities and primarily developed in Go.
+We maintain highly-available real-time systems and a host of tools, jobs, services and GUIs to enable us to operate effectively in a highly automated way.
+The broad range of functions we support means we collaborate with almost every department in the firm.
+What I value most about working at XTX is the firm's commitment to quality software engineering. We look to build solutions that stand the test of time and scale with the needs of the business.
+Richard , Post-trade Technology
+Trading Analysts
+Our team oversees XTX's automated trading across all asset classes globally ensuring that our systems are operating as expected and we continue to provide quality liquidity into the markets and for our clients.
+We closely monitor real world events and their impacts on markets and our strategies. We also have a focus on improving the monitoring and analytic tools that are scaleable and highly-automated which in turn enables us to supervise our trading of tens of thousands of instruments on multiple markets in real-time.
+What do I most enjoy about my role? It's the exciting and fast-paced setting, combined with our wide-ranging responsibilities.
+One moment there could be market risks to manage during stressed market conditions, the next there could be a post-trade analysis task to further optimise our trading set-up on a particular venue or the next moment we could be liaising with senior management, trading developers or the operations team to keep the business running smoothly around the clock.
+Jeremy , Trading Analysts
+Business Development
+The business development team builds and maintains relationships with our trading partners along with expanding our product and geographical reach.
+Business development is an extremely diverse role and the variety keeps things interesting and challenging.
+One day I'll be talking to the CEO of an exchange about business strategy and the next I'll be delving into the minutiae of market microstructure enhancements or describing execution performance with a client.
+I really appreciate being part of this team ethic.
+Ritesh ,
+Business Development
+Distribution
+The distribution team is responsible for building and maintaining institutional client relationships at the firm. We work with a number of different client types (hedge funds, real money managers, regional banks and retail aggregators) across a number of different asset classes (FX, metals and cash equities).
+I enjoy the role as each client's needs are unique and we explain not just what the firm can deliver for them in terms of XTX's market leading liquidity but also how market microstructure works, how to better manage their liquidity, how regulations are evolving and how using data analytics can help them to lower their cost of execution.
+I also really enjoy working closely with the trading analyst and quant teams to help solve any client queries.
+Jacqueline , Distribution
+Operations
+The Operations team's primary objective is to ensure that our global trading activities run smoothly, accurately and in a compliant fashion. We handle a broad spectrum of essential tasks, including trade reconciliations, risk monitoring, position and exposure management and accurate reporting - all involving dynamic problem-solving.
+These activities are vital for maintaining the reliability and accuracy of our operations. By focusing on developing robust, scalable solutions that leverage automation and analytics, we not only improve efficiency but also minimize operational risks. Operations therefore plays a key role in supporting the company's expansion across asset classes and international markets.
+The role is fast-paced, which I greatly enjoy. The opportunity to suggest and implement solutions in real-time is not just exciting but hugely fulfilling. Our team values innovation and is very open to new ideas to enhance processes, especially through automation. The process of making workflows more efficient and contributing positively to the team's effectiveness is genuinely motivating.
+Chunhui , Operations
+Client Onboarding
+The onboarding team works with external clients, platforms and vendors on integration to facilitate trading of our OTC products.
+Dealing with technical integrations, while working closely with external clients, has always ticked the boxes for me personally, and it's great to go home at the end of the day knowing that we have delivered solutions to our business and clients.
+Every day is different and although there are never enough hours in the day, I'm one of those people who enjoy working in a busy and productive environment. The firm is highly collaborative and the hierarchy and bureaucracy that can hinder other companies is non-existent, meaning that I am trusted to do my best and to enact change and progress. I have never been as productive as I am here and I put this down to being given the responsibility and environment in which I can flourish.
+Christine , Client Onboarding
+Legal
+The Legal Department is responsible for managing and mitigating XTX's legal risk and is closely integrated with the business.
+We have a very diverse range of work and responsibilities including documenting agreements with all external counterparties, overseeing the governance and management of all XTX group corporate entities, assisting with the interpretation and implementation of upcoming regulation and legislation, due diligence and execution of investments by XTX Ventures, representing XTX on various industry working groups and advising the business on all manner of legal queries.
+XTX is at the forefront of the technological innovation occurring in financial markets, which means that we also need to be innovative, commercial and practical in the advice that we provide.
+The work is intellectually challenging, often groundbreaking, and we operate in a highly collaborative and fast-paced environment, working closely with all departments and senior management to achieve the firm's objectives.
+Sunil , Legal
+Compliance
+The Compliance Department at XTX is a global function which is integrated with XTX's businesses and includes experienced team members based in each XTX trading entity. The Compliance team have diverse backgrounds which include experience working in financial markets as practitioners in regulation, trading, technology, governance, decisional science and, of course, compliance. Together we deploy our collective knowledge and judgement to advise our colleagues on the regulatory and compliance requirements that impact XTX.
+I really enjoy the diverse nature of the work which touches all aspects of XTX business: advising the XTX businesses on regulatory and exchange rule requirements, conferring upon and approving proposed controls frameworks, monitoring the on-going business and controls and reporting to XTX management on the effectiveness of XTX's control environment. We also manage interactions with our regulators in each jurisdiction, striving for pro-active engagement which is open, cooperative and collaborative. We operate a comprehensive compliance programme which includes advisory, risk assessment, monitoring, surveillance and on-going training, targeted to the risks associated with XTX's operations.
+Our team works with our colleagues at XTX in meeting our collective goals of adhering to the highest standards of market and personal conduct, and to maintain XTX's reputation as a well-controlled and fair market participant.
+Daniel , Compliance
+Risk
+The role of the Risk team is to support and independently challenge the firm's management of risk, and to provide direction on the design and operation of the overall risk framework. XTX is an extremely risk-focussed firm, and risk awareness is integral to the way every team operates.
+The main risks faced by XTX are operational and market related. Good risk management depends on the close consideration of problems from different angles, and the team have backgrounds in maths, computer science and economics. This mix of disciplines enables us to select appropriate data sources to prove or disprove assertions, collaboratively asking &quot;what if…?&quot;, and using the resulting insights to test business assumptions.
+For me, the role combines two areas of deep interest: I spent the first decade of my career in IT as a programmer, and the last 10 years have been in Risk. The work at XTX is very varied, the people are super-bright, and the flat hierarchy means that decisions can be taken and implemented very rapidly. It's a great place to work.
+Andrew , Risk
+Finance
+As a team, we are responsible for the control of the firm's assets, ensuring regulatory capital and liquidity requirements across multiple entities are met, as well as financial reporting and forecasting.
+We have great data quality provided by our Core Development and Operations teams, which allows us to work closely with those teams to automate processes and make changes to improve efficiency and deliver meaningful analytics for more informed decision-making at XTX.
+We are always looking for better solutions to build a more intelligent ecosystem. The environment is very fast paced and there are always new challenges to tackle.
+Jahneata , Finance
+The perks
+Onsite Facilities
+Private GP Clinic
+Counselling / Therapy Clinic
+Nutritionist &amp; 360 Testing
+Sports Massage Therapist
+Gym
+Circuits, Boxing, Yoga &amp; Personal Training
+Sauna
+Sleep Pods
+Massage Chair
+Hairdresser &amp; Nail Salon
+Monthly Cinema Screening
+Dry Cleaning Service
+Food
+Onsite Breakfast &amp; Lunch
+Fully Stocked Kitchens
+Onsite Barista
+Monthly Pizza Lunch
+Pension &amp; Financials
+Pension Scheme 1.5x Match up to 15%
+Charitable Giving Matching
+GIA &amp; ISA Options
+Will Writing Service
+Financial Advice Sessions
+Tax Advice Sessions
+Health &amp; Wellbeing
+Private Medical Insurance
+Private Dental Insurance
+Personal &amp; Business Travel Insurance
+Eyecare Allowance
+Annual Health Assessments
+Targeted Cancer Screening
+Menopause Support
+Group Life Assurance
+Critical Illness Cover
+Income Protection
+EAP Support
+Headspace Subscription
+Family Support
+Enhanced Maternity Leave
+Enhanced Paternity Leave
+Adoption &amp; Surrogacy Leave
+Carers Leave
+Compassionate Leave
+Marriage Leave
+Nursery Support Allowance
+Fertility Support Allowance
+20 Days Backup Childcare &amp; Adult Care
+Parent Support Coach
+General
+Electric Car Scheme
+Cycle to Work Scheme
+Commuter Support Allowance
+Personal Assistant Service via BlckBx
+Monthly Social Events
+Tuition Reimbursement &amp; Study Leave
+Coursera &amp; Code Academy Membership
+Language Lessons
+Employee Coaching Sessions
+Moving House Day
+Relocation Support
+Visa &amp; Immigration Support
+Employee Referral Scheme
+Philanthropy Events
+Team Building Activities
+Hospitality Tickets
+Merchandise
+Disclosures, Terms, and Notices
+Offices
+Copyright © XTX Markets Technologies Limited or one of its affiliates . All rights reserved.

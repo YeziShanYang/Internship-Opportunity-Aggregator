@@ -1,0 +1,257 @@
+2026 Stevens High Frequency Trading Competition (HFTC-26) | Stevens Institute of Technology
+Skip to Content
+Request Info
+Visit
+Apply
+Corporate Relations
+Athletics
+Alumni
+Give
+Info For
+Future Students
+Current Students
+Faculty and Staff
+Parents and Families
+High School Counselors
+Media
+Log In
+Request Info
+Visit
+Apply
+Academics
+Academics
+Stevens Institute of Technology is a student-centric research university, with technology at its core. Our four schools and one college uniquely prepare students for bright futures in diverse fields including tech, finance, medicine, energy, engineering — even art and music.
+Academics at Stevens
+Find Your Program
+Our Schools
+Undergraduate Study
+Undergraduate Study
+Majors and Minors
+General Education
+SUCCESS - The Stevens Core Curriculum
+Special Programs
+Undergraduate Research
+Study Abroad
+Academic Resources
+Graduate Study
+Stevens Online
+Corporate Education
+Samuel C. Williams Library
+Discover Stevens
+Discover Stevens
+Stevens is driven by the idea of building a better future through innovation and technology. Our hands-on experiences, industry-leading internships and cooperative learning opportunities establish a strong foundation for our students’ success.
+The Innovation University
+The Innovation University
+Our History
+Leadership &amp; Vision
+Strategic Plan
+Stevens By the Numbers
+University Culture and Engagement
+Sustainability
+News
+Events
+Student Life
+Student Life
+Our vibrant campus sits across the river from New York City, opening the door to endless opportunity and adventure. There’s never a dull moment on campus — with fraternities and sororities, clubs, athletics and arts, every student can pursue their passions beyond the classroom.
+New Students
+New Students
+Undergraduate New Students
+Graduate New Students
+The Stevens Experience
+The Stevens Experience
+Living at Stevens
+Student Groups and Activities
+Arts and Culture
+Supporting Your Journey
+Supporting Your Journey
+Counseling and Psychological Services
+Office of Student Support
+Student Health Services
+Office of Disability Services
+Meet Tillie
+Other Support Resources
+Office of Undergraduate Student Life
+Graduate Student Life
+Building Your Career
+Student Affairs
+Commencement
+Research
+Research
+From promising new classes of cancer medications to AI that detects falsehoods to &#x27;green&#x27; filters that remove chemicals and poisons from drinking water, Stevens&#x27; research is making a difference to people and our world.
+Technology With Purpose
+Research Pillars
+Faculty Research
+Student Research
+Research Centers &amp; Labs
+Partner with Us
+Admission &amp; Aid
+Admission &amp; Aid
+With 35 undergraduate majors, 58 master’s degree programs and 20 Ph.D. programs, your potential is limitless. When you enroll at Stevens, your dreams are in reach and we’re here to help make them a reality.
+Why Stevens
+Undergraduate Admissions
+Undergraduate Admissions
+How to Apply
+Dates and Deadlines
+Visit Campus
+Accepted Students
+Meet Our Staff
+Graduate Admissions
+Graduate Admissions
+Apply to a Graduate Program
+Costs and Funding
+Deadlines
+Visits and Events
+Chat with a Student
+Tuition and Financial Aid
+Tuition and Financial Aid
+Undergraduate Cost of Attendance and Aid
+Graduate Cost of Attendance and Funding
+Applying for Aid
+Student Enrollment Services
+Student Resources
+Contact Financial Aid
+International Students
+Veterans and Military
+Veterans and Military
+Military Education and Leadership Programs
+Stevens ROTC Programs
+Using Your GI Bill
+Pre-College Programs
+Visit Us
+2026 Stevens High Frequency Trading Competition
+The School of Business at Stevens Institute of Technology is pleased to announce the annual Stevens High Frequency Trading Competition (HFTC-26) ! This rigorous, high-stakes event is open to all qualified undergraduate and graduate students enrolled in an accredited university anywhere in the world.
+HFTC-26 Information
+The Competition: Structure, Strategy, and Rules HFTC-26 is a unique competition where teams are required to architect, code and deploy their own strategies for intraday algorithmic trading .
+All simulations will be executed on the SHIFT high-frequency trading simulation platform , an advanced, in-house system developed at Stevens. SHIFT provides the granular market microstructure and low-latency environment necessary to test sophisticated strategies under conditions mirroring real-world markets.
+This event is structured to achieve three primary objectives:
+Foster Innovation: Enhance coding proficiency and deepen quantitative understanding of market mechanics and trading microstructure.
+Validate Skills: Develop practical implementation skills for advanced algorithmic trading concepts using Python and the FIX Protocol .
+Identify Talent: Recognize and reward successful algorithmic strategies through significant monetary group prizes.
+Core Rules
+Category
+Detail
+Trading Assets
+Trading will involve either the 30 Dow Jones stocks (for historical simulations) or synthetic tickers (for agent-based simulation days).
+Trading Scope
+Intraday trading only .
+Initial Capital
+Teams start with a virtual balance of $1,000,000 , which is reset every competition day.
+Execution Constraints
+Trading strategies are subject to specific execution minimums and are charged standard market fees/rebates .
+Trading Software
+Teams will be provided with a virtual machine to develop strategies using the SHIFT Python API .
+Why You Should Apply: The HFTC Advantage Participation offers a direct competitive advantage for individuals pursuing careers in quantitative finance by facilitating the conversion of academic knowledge into high-level, practical application .
+1. Technical Skill Deployment
+Implementation Mastery: Master the practical development and execution of trading algorithms.
+High-Fidelity Experience: Operate within a professional-grade, low-latency infrastructure, gaining experience highly relevant to HFT roles.
+Performance Optimization: Gain direct experience developing, backtesting and refining strategies within a simulated environment.
+2. Academic Validation and Networking
+Recruitment Signal: Success in this competition serves as a significant, objective signal on a curriculum vitae, validating applied quantitative ability and execution to financial recruiters.
+Academic Development: Solidify interests and skills in advanced domains, leading to research opportunities and placement in Financial Engineering and Quantitative Finance graduate programs .
+3. Strategic Resilience
+Adaptive Challenges: The competition spans multiple weeks, featuring distinct, complex trading scenarios (including historical volatility events and r einforcement learning agents ) that necessitate continuous algorithmic adaptation .
+Quantifiable Success: Compete for a total prize pool of $3,600 , awarded based on metrics that measure performance against market dynamics. Teams are scored in an F-1 fashion across five competition days, meaning points are weighted to increase significantly with each successive round, rewarding teams that maintain consistent performance and improve over time.
+Eligibility &amp; Team Structure Requirement
+Details
+Participants
+Undergraduate or graduate students who are currently enrolled in any accredited university, domestically or internationally.
+Team Size
+Teams must comprise a minimum of two members and a maximum of four members .
+Team Composition
+Teams may be composed of students from the same or different universities.
+Prerequisites
+At least one member of each team must possess familiarity with Python programming and GitHub .
+Team Designation
+Each team must designate a Team Leader responsible for submitting the complete application package.
+Prizes Place
+Prize
+First Place
+$2,000
+Second Place
+$1,200
+Third Place
+$400
+Industry Partners
+How to Enter the Competition 1. Application Process
+Apply Here
+Application Deadline: February 1st, 2026
+No initial application fee. Teams undergo comprehensive review by Stevens finance faculty for approval.
+2. Selection and Technical Assessment
+Approved teams will receive a technical assessment to evaluate proficiency.
+Technical Assessment Release: February 6th, 2026
+Technical Assessment Deadline: February 13th, 2026
+3. Final Notification and Registration
+Final Selection Notification: February 20th, 2026
+Registration Fee: Upon selection, a $100 registration fee per team is required.
+Registration Payment Deadline: February 27th, 2026
+Competition Timeline Event
+Date
+Application Deadline
+February 1
+Technical Assessment Release
+February 6
+Technical Assessment Deadline
+February 13
+Final Selection Notification
+February 20
+Registration Payment Deadline
+February 27
+Orientation Session (Mandatory)
+March 4
+Test Run 1
+March 9
+Test Run 2
+March 13
+Competition Trading Days
+March 27 – April 24
+Award Ceremony
+May 1
+For additional inquiries, contact the coordination team at [email&#160;protected] .
+We look forward to reviewing your application and witnessing the deployment of your rigorous and innovative trading strategies. Assemble your team and secure your competitive edge!
+Apply Now for HFTC-26!
+Go to Application Form
+Advisory Board
+Dragos Bozdog - Stevens Institute of Technology
+George Calhoun - Stevens Institute of Technology
+Zhenyu Cui - Stevens Institute of Technology
+Ethan (Ye) Fang - Jefferies
+Zachary Feinstein - Stevens Institute of Technology
+Ionut Florescu - Stevens Institute of Technology
+Rahul Gupta - DRW
+Elaine Henry - Stevens Institute of Technology
+Dan Pirjol - Stevens Institute of Technology
+Josep Tribo - Stevens Institute of Technology
+Steve Yang - Stevens Institute of Technology
+Marcel Chambers - Infopro Digital
+1 Castle Point Terrace, Hoboken, NJ 07030, 201.216.5000
+Visit
+Apply
+Make a Gift
+Log In
+Academics Academics at Stevens
+Find Your Program
+Our Schools
+Undergraduate Study
+Graduate Study
+Stevens Online
+Corporate Education
+Samuel C. Williams Library
+Academic Catalog
+Stevens Institute of Technology is a student-centric research university, with technology at its core. Our four schools and one college uniquely prepare students for bright futures in diverse fields including tech, finance, medicine, energy, engineering — even art and music.
+About Offices and Services
+Policy Library
+Accreditation
+Consumer Info
+Campus Events
+Campus Safety
+Health Resources and Information
+Bookstore
+Connect Directory
+Work at Stevens
+Admissions
+Media Relations
+© 2026 Stevens Institute of Technology
+Sitemap
+Privacy Notice
+Title IX Policy
+Emergency Info

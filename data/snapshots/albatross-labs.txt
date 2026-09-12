@@ -1,0 +1,49 @@
+Home | Albatross Labs
+top of page
+ALBATROSS LABS
+Home
+Careers
+WHAT WE DO
+Albatross Labs is an automated proprietary trading firm with a focus on quantitative research. We design automated trading strategies in financial derivatives.
+CAREER OPPORTUNITIES
+Want to work remotely for one of the most consistently high performing&nbsp;crypto trading firms with the brightest minds? Check out the exciting career opportunities available at Albatross Labs.
+​
+Please apply using this link: Apply Here
+SOFTWARE&#X2F;QUANT DEVELOPER (REMOTE)
+Open for Mid-to-Senior and Internship level
+Key Responsibilities:
+Assist in developing core algorithms and models leading directly to crypto trading decisions
+Integration and latency optimization to major crypto exchanges in network and code level
+Work closely with traders to develop next-generation models and analytics
+Work on the high-level architecture of Python or Rust models and various strategies
+Provide high-level technical and investment analytics support to the trading desk
+Work closely with other researchers to develop and continuously improve upon trading strategies, and help translate algorithms into code
+Skillset Requirements:
+Prior experience in a software engineering or quantitative role within an electronic trading business
+Excellent programming skills in Python or Rust
+Experience in async programming preferred
+(optional) Experience in network programming TCP/IP, UDP, multicast, packet capture
+(optional) Experience in Linux, shell scripting
+(optional) Experience with AWS, Kubernetes, GitLab
+QUANT TRADER&#X2F;RESEARCHER (REMOTE)
+Senior Quant Researcher
+Key Responsibilities:
+Work on HFT/MFT strategies in crypto (options, perpetuals, futures, spot) markets
+Skillset Requirements:
+2+ year experience in building low latency strategies in any market
+Fluency in Python/Pandas, and Git
+Working knowledge of Rust (preferred) or C++
+​ ​
+&nbsp;
+Quant Researcher Intern
+Key Responsibilities:
+Work on high impact research and/or modeling projects in futures or options in a tight team environment
+Skillset Requirements:
+Previous experience with working with time series tick data or pricing models on futures and/or options.
+Fluency in Python/Pandas, and Git
+(preferred) Working knowledge of Rust (preferred) or C++
+(preferred) Proven records from math or programming competitions &nbsp;
+​ ​
+&nbsp;
+©2021 by albatrosslabs
+bottom of page

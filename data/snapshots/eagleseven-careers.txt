@@ -1,0 +1,215 @@
+Eagle Seven
+about us
+what we do
+careers
+contact us
+Independent Thinkers.
+Superior Technology.
+Global Reach.
+Outstanding Results.
+About Us
+Company
+We are a privately held proprietary trading firm specializing in providing liquidity to financial markets in the US and around the world. We combine the latest technology and robust risk management with a talented group of professional traders to employ a disciplined and adaptable approach to trading across a diverse range of asset classes.
+Culture
+We are a team of extraordinary people who have created an environment that is directly correlated with our firm’s success. We share a vision guided by common principles - collaboration, communication, and innovation, which empower our entrepreneurial employees to think critically, share ideas, and solve problems. Our proven track record of long term stability, our flat organizational structure, and work life balance are all essential to supporting our culture and dynamic workplace.
+What We Do
+Trading
+We execute various trading strategies across listed derivatives and securities markets on numerous global exchanges. We use our own capital and do not answer to third party investors or clients. Through our passion for trading, we are committed to continually exploring new markets and generating new strategies to capitalize on emerging opportunities.
+Technology
+Our proprietary trading platform is built to respond to the needs of an ever-changing and competitive trading environment by providing speed, innovation, transparency, and accuracy. Our technology serves the needs that span from sophisticated algorithms to outright trading and gives us the ability to implement a vast array of complex strategies and provides us with the edge required to thrive in today's dynamic trading environment.
+Careers
+Open positions
+Junior Trader
+Senior Software Developer (Shared Services)
+Technology Operations Engineer
+Energy Trader
+Algorithmic Trader
+Eagle Seven is always interested in meeting qualified candidates who are interested in becoming a member of our team. If you do not see an open role that fits your profile, please apply with our General Application
+General Application
+Junior Trader
+Eagle Seven is seeking a Junior Trader who will be responsible for supporting all aspects of trading desk operations. The right candidate will have a passion for capital markets and be a motivated self-starter. Ability and interest to work Asia/European (overnight) hours is required.
+Primary Responsibilities include:
+Executing algorithmic trading strategies in accordance with the trading desk's objectives
+Monitoring and reconciling trading positions consistently throughout the shift
+Performing start of day position and activity reconciliations
+Performing post trade analysis on a variety of algorithmic trading strategies
+Completing end of day PnL and position reporting
+Communicating with trading exchanges and internal technology groups regarding trading system issues
+Managing and reporting any potential compliance issues
+Assisting quantitative traders in performing research for new trading strategies
+Skills and Experience:
+Bachelor’s degree in business/finance, statistics, mathematics, engineering, or related field
+0-2 years of work experience; financial experience preferred, but not required
+Strong analytical, quantitative, and math skills
+Experience with Python is preferred
+Ability to work independently and successfully manage multiple tasks in a complex and fast-paced environment
+Strong organizational skills and attention to detail
+Excellent written and verbal communication skills
+Excellent computer proficiency, including Excel and other MS office applications
+Demonstrated strong work ethic and team player focused on contributing to the success of the trading desk
+Eagle Seven offers a competitive and comprehensive benefits package to all full-time employees.
+Medical PPO and HMO coverage through BlueCross BlueShield
+Health Savings Account (with enrollment into a High Deductible Health Plan)
+Dental coverage through Guardian
+Vision coverage through VSP
+401k Retirement Savings Plan with Employer Match
+Company Paid Life Insurance
+Company Paid Disability Insurance
+Paid Time Off
+Flexible Spending Account
+Pre-tax Transit Benefits
+Complimentary Lunch and Beverages
+Apply for this position
+Senior Software Developer (Shared Services)
+Eagle Seven is seeking a Senior Software Developer to design and build systems that support firmwide positions, PnL, and risk services. These systems transform high-volume trading and market data into accurate, timely, and actionable information.
+The ideal candidate enjoys building performance-sensitive distributed systems and has a strong commitment to reliability and sound software design. In this role, you will collaborate closely with traders, strategy developers, and fellow engineers to develop infrastructure that is central to the firm’s daily operations.
+&nbsp;
+Primary Responsibilities include:
+Designing and building real-time position, PnL and risk services with strict latency requirements
+Developing high performance, highly available distributed systems capable of scaling to millions of events per second
+Architecting and implementing reliable, fault-tolerant messaging systems and data pipelines
+Optimizing and tuning distributed systems for performance, scalability, and resiliency
+Partnering with trading and execution teams to support evolving business needs
+Skills and Experience:
+Bachelor’s degree in Computer Science or related field
+5+ years of experience developing high-performance distributed systems
+Strong proficiency in modern C++(C++11/14/17) including multithreading, lock-free programming, and memory model expertise
+Experience working with high message-rate or high-bandwidth systems
+Proven ability to design fault-tolerant, highly available systems
+Strong experience with relational database design and SQL (Postgress preferred)
+Solid understanding of Linux/Unix systems, networking fundamentals, and protocols (TCP/IP, UDP, and sockets)
+Experience with debugging and observability tools such as GDB, Wireshark and tcpdump
+Strong written and verbal communication skills with the ability to collaborate effectively &nbsp;across trading, research, and engineering teams
+Eagle Seven offers a competitive and comprehensive benefits package to all full-time employees.
+Medical PPO and HMO coverage through BlueCross BlueShield
+Health Savings Account (with enrollment into a High Deductible Health Plan)
+Dental coverage through Guardian
+Vision coverage through VSP
+401k Retirement Savings Plan with Employer Match
+Company Paid Life Insurance
+Company Paid Disability Insurance
+Paid Time Off
+Flexible Spending Account
+Pre-tax Transit Benefits
+Complimentary Lunch and Beverages
+The minimum base salary for this role starts at $160,000. This role is eligible for a discretionary performance bonus as part of the total compensation package, in addition to the benefits listed above. Exact compensation offered may vary based on factors including, but not limited to, the candidate's experience, qualifications, and skill set.
+Apply for this position
+Technology Operations Engineer
+Eagle Seven is seeking a Technology Operations Engineer . Our Operations Team is at the intersection of trading, development, and systems administration and plays an integral part of our firm’s success. The team manages the deployments, scheduling, monitoring, and troubleshooting for multiple trading strategies. We are seeking an individual to help us solve complex problems and improve our processes and tools. The ideal candidate is someone with a strong sense of ownership who can anticipate challenges. Must be open to working a rotating schedule between US and Asia shifts.
+&nbsp;
+Primary Responsibilities include:
+Monitoring the trading system and working to identify and resolve issues
+Identifying, diagnosing, and troubleshooting complex problems to keep trading online
+Working with the risk team and trading desks to understand and facilitate trading requirements
+Managing daily changes and communicating statuses to the company
+Automating software distribution and deployments for Linux and Windows applications to speed up our application deployments
+Building new tools to manage our system and reduce effort and errors
+&nbsp;
+Skills and Experience:
+Bachelor’s degree in Computer Science, Information Systems, or related field
+1-3 years of experience supporting, administering, or developing on Linux-based environments
+Strong proficiency with both Windows and Linux operating systems
+Working knowledge of basic scripting experience, preferably with Python
+Experience using distributed version control systems
+Understanding of configuration management tools such as Salt, Puppet, or Chef
+Exposure to infrastructure and application monitoring tools, including Zabbix, Nagios, Prometheus and Grafana
+Experience working with JIRA or similar ticketing and workflow management systems
+Knowledge of log aggregation, monitoring, and troubleshooting tools
+Proven ability to manage multiple priorities while maintaining exceptional attention to detail in a fast-paced environment
+Excellent written and verbal communication skills, with the ability to collaborate effectively across technical and business teams
+Strong problem-solving skills and a proactive approach to identifying, diagnosing, and resolving issues in a timely manner
+Demonstrated ownership, initiative, and a continuous improvement mindset
+Eagle Seven offers a competitive and comprehensive benefits package to all full-time employees.
+Medical PPO and HMO coverage through BlueCross BlueShield
+Health Savings Account (with enrollment into a High Deductible Health Plan)
+Dental coverage through Guardian
+Vision coverage through VSP
+401k Retirement Savings Plan with Employer Match
+Company Paid Life Insurance
+Company Paid Disability Insurance
+Paid Time Off
+Flexible Spending Account
+Pre-tax Transit Benefits
+Complimentary Lunch and Beverages
+The minimum base salary for this role starts at $75,000. This role is eligible for a discretionary performance bonus as part of the total compensation package, in addition to the benefits listed above. Exact compensation offered may vary based on factors including, but not limited to, the candidate's experience, qualifications, and skill set.
+Apply for this position
+Energy Trader
+Eagle Seven is seeking an experienced Energy Trader to trade energy futures and swap markets listed on ICE and CME. The trader will be responsible for managing all aspects of trading desk operations. The right candidate will have at least four years of experience in the proprietary trading industry, a passion for capital markets, work well in a collaborative team setting and be a motivated self-starter.
+Primary Responsibilities include:
+Operating grey and black box algorithmic trading strategies in accordance with the trading desk’s objectives
+Monitoring of trading activity and positions consistently throughout the shift
+Performing research and post trade analysis using the firm’s research tools on a variety of algorithmic trading strategies to improve profitability of existing models
+Work with back office to solve for trade breaks, position &amp; activity reconciliation exceptions
+Completing end of day PnL and position reporting
+Communicating with exchanges, risk managers and internal technology groups regarding production issues
+Work closely with strategy developers in order to communicate and propose certain strategy specific code changes related to execution, pricing, and risk management
+Skills and Experience:
+Bachelor’s degree in statistics, mathematics, engineering, business/finance, or related field
+4-6 years’ work experience trading financial products (e.g options, futures)
+Strong analytical, quantitative, and math skills
+Experience with Python is preferred
+Ability to work independently and successfully manage multiple tasks in a complex and fast-paced environment
+Strong organizational skills and attention to detail
+Excellent written and verbal communication skills
+Demonstrated strong work ethic and team player focused on contributing to the success of the trading desk
+Eagle Seven offers a competitive and comprehensive benefits package to all full-time employees.
+Medical PPO and HMO coverage through BlueCross BlueShield
+Health Savings Account (with enrollment into a High Deductible Health Plan)
+Dental coverage through Guardian
+Vision coverage through VSP
+401k Retirement Savings Plan with Employer Match
+Company Paid Life Insurance
+Company Paid Disability Insurance
+Paid Time Off
+Flexible Spending Account
+Pre-tax Transit Benefits
+Complimentary Lunch and Beverages
+Apply for this position
+Algorithmic Trader
+Eagle Seven is seeking an experienced Algorithmic Trader to trade futures contract listed on Eurex, ICE, and CME. The trader, along with the Head of the Desk, will be responsible for managing all aspects of trading desk operations. The right candidate will have a passion for capital markets, work well in a collaborative team setting, and be a motivated self-starter.
+Primary Responsibilities include:
+Operating grey and black box algorithmic trading strategies in accordance with the trading desk’s objectives
+Monitoring of trading activity and positions consistently throughout the shift
+Performing research and post trade analysis using the firm’s research tools on a variety of algorithmic trading strategies to improve profitability of existing models
+Applying expertise in market microstructure, historical tick data, and quantitative modeling to conduct research and develop new sources of alpha
+Working closely with strategy developers to collaborate, propose, and test certain strategy specific code changes related to execution, pricing, and risk management
+Communicating with risk managers and internal technology groups regarding production issues
+Building and maintaining quantitative modeling tools and analytics
+Working with back office to solve for trade breaks, position &amp; activity reconciliation exceptions
+Skills and Experience:
+Bachelor’s degree in statistics, mathematics, engineering, business/finance, or related field
+4-6 years of experience trading financial products (e.g options, futures)
+Strong analytical, quantitative, and math skills
+Experience with Python required
+Ability to work independently and successfully manage multiple tasks in a complex and fast-paced environment
+Strong organizational skills and attention to detail
+Excellent written and verbal communication skills
+Demonstrated strong work ethic and team player focused on contributing to the success of the trading desk
+Eagle Seven offers a competitive and comprehensive benefits package to all full-time employees.
+Medical PPO and HMO coverage through BlueCross BlueShield
+Health Savings Account (with enrollment into a High Deductible Health Plan)
+Dental coverage through Guardian
+Vision coverage through VSP
+401k Retirement Savings Plan with Employer Match
+Company Paid Life Insurance
+Company Paid Disability Insurance
+Paid Time Off
+Flexible Spending Account
+Pre-tax Transit Benefits
+Complimentary Lunch and Beverages
+Apply for this position
+General Application Form
+Add resume / PDF or Docx
+Add cover letter
+Contact us
+Have any questions or comments?
+Email at info@eagleseven.com
+Chicago Office
+550 West Jackson Blvd, Suite 1400
+Chicago, Illinois 60661
+Get driving directions
+Amsterdam Office
+Muiderstraat 9/U
+1011 PZ Amsterdam, Netherlands
+Get driving directions
+Eagle Seven Europe B.V. is regulated by the Dutch Authority for the Financial Markets (AFM) and the Dutch Central Bank (de Nederlandsche Bank). A copy of the Eagle Seven Pillar III disclosure is available upon request from the Eagle Seven Europe’s compliance department at EUcompliance@eagleseven.com.
