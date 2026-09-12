@@ -34,6 +34,61 @@ import state
 import build_xlsx
 from sources import github_repos, job_boards, page_watch, postings, snapshot
 
+# --- the database must survive the suite ---------------------------------------------
+#
+# Every path in state.py is a module global that its readers resolve at call time, and
+# _IsolatedState works by rebinding those globals at a temp directory. That is a
+# convention, not a mechanism: the day a reader switches to `from core.paths import
+# SNAPSHOTS` the rebind stops working, and the suite keeps passing while writing into
+# the real data/ tree. A green suite that has quietly stopped protecting the database
+# is worse than a red one.
+#
+# This is not hypothetical. It has already happened twice here: postings.CACHE_DIR was
+# import-bound, so tests wrote into the real data/postings_cache/, and _IsolatedState
+# never rebound PROGRAMS_CSV/SOURCES_CSV, so three tests read live data.
+#
+# So the convention gets a backstop that does not depend on the convention. The
+# committed trees are fingerprinted before the suite and re-checked after it, which
+# turns "a test wrote to the database" from invisible into a hard error.
+GUARDED_TREES = (state.DATA, state.ROOT / "out")
+
+_MANIFEST: dict[str, tuple[int, int]] = {}
+
+
+def _fingerprint() -> dict[str, tuple[int, int]]:
+    """path -> (size, mtime). A byte-identical rewrite still moves mtime, and a test
+    rewriting the database is a failure even when the bytes come out the same."""
+    seen: dict[str, tuple[int, int]] = {}
+    for tree in GUARDED_TREES:
+        if not tree.exists():
+            continue
+        for path in tree.rglob("*"):
+            if path.is_file():
+                stat = path.stat()
+                seen[str(path)] = (stat.st_size, stat.st_mtime_ns)
+    return seen
+
+
+def setUpModule():
+    _MANIFEST.update(_fingerprint())
+
+
+def tearDownModule():
+    after = _fingerprint()
+    created = sorted(set(after) - set(_MANIFEST))
+    deleted = sorted(set(_MANIFEST) - set(after))
+    modified = sorted(p for p in set(after) & set(_MANIFEST) if after[p] != _MANIFEST[p])
+    if created or deleted or modified:
+        raise AssertionError(
+            "the suite wrote to the committed data tree, so state isolation is broken. "
+            "Whatever path was touched needs adding to _IsolatedState.STATE_PATHS -- do "
+            "not relax this check.\n"
+            f"  created:  {created}\n"
+            f"  deleted:  {deleted}\n"
+            f"  modified: {modified}"
+        )
+
+
 REPO = "northwesternfintech/2027QuantInternships"
 
 BASE_README = """# Summer 2027 Quant Internships
@@ -89,17 +144,68 @@ class FakeClient:
         return FakeResponse(text=self.readme, status=self.readme_status)
 
 
-class AcceptanceTests(unittest.TestCase):
+class _IsolatedState:
+    """Redirect every state path at a temp dir.
+
+    Without this the new suites write snapshots, applied.tsv and discovered.csv into
+    the real data/ directory -- which they did, until this was added. Test runs must
+    not touch the database the job commits.
+
+    Every state global that names a real path belongs in STATE_PATHS. The three that
+    were missing -- PROGRAMS_CSV, SOURCES_CSV and postings.CACHE_DIR -- are why three
+    tests read live data and the posting cache was written in place; see the module
+    fingerprint guard above, which now catches the next omission rather than trusting
+    this list to be complete. The one class that deliberately reads the committed files
+    is LiveDataInvariantTests, so the rule reads "everything except that".
+    """
+
+    #: Rebinding these is only sound because every reader resolves them as a module
+    #: global at call time. An `from ... import SNAPSHOTS` anywhere downstream would
+    #: silently send the write back into the database.
+    STATE_PATHS = (
+        "DATA", "SNAPSHOTS", "PROPOSALS_LOG", "LAST_DELIVERED", "APPLIED_TSV",
+        "DISCOVERED_CSV", "LAST_DISCOVERY", "PROGRAMS_CSV", "SOURCES_CSV",
+        "OUT_XLSX", "OUT_TRACKED_XLSX",
+    )
+
     def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        root = pathlib.Path(self._tmp.name)
-        self._snapshots = state.SNAPSHOTS
-        self._proposals = state.PROPOSALS_LOG
-        self._last_delivered = state.LAST_DELIVERED
+        super().setUp()
+        self.isolate_state()
+
+    def isolate_state(self) -> pathlib.Path:
+        """Point every state path at a fresh temp tree and return its root.
+
+        addCleanup rather than tearDown: if setUp raises part-way through, tearDown is
+        never called and the globals would stay aimed at a deleted temp dir for the
+        rest of the run. Cleanups are registered before each rebind, so a partial
+        setUp still unwinds completely.
+        """
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = pathlib.Path(tmp.name)
+        for name in self.STATE_PATHS:
+            self.addCleanup(setattr, state, name, getattr(state, name))
+        self.addCleanup(setattr, postings, "CACHE_DIR", postings.CACHE_DIR)
+
+        state.DATA = root
         state.SNAPSHOTS = root / "snapshots"
         state.PROPOSALS_LOG = root / "proposals.log"
         state.LAST_DELIVERED = root / "last_delivered.txt"
+        state.APPLIED_TSV = root / "applied.tsv"
+        state.DISCOVERED_CSV = root / "discovered.csv"
+        state.LAST_DISCOVERY = root / "last_discovery.txt"
+        state.PROGRAMS_CSV = root / "programs.csv"
+        state.SOURCES_CSV = root / "sources.csv"
+        state.OUT_XLSX = root / "out" / "programs.xlsx"
+        state.OUT_TRACKED_XLSX = root / "out" / "tracked.xlsx"
+        postings.CACHE_DIR = root / "postings_cache"
         state.SNAPSHOTS.mkdir()
+        return root
+
+
+class AcceptanceTests(_IsolatedState, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
         # A relaxed floor: the fixture README is deliberately tiny.
         self._config = github_repos.REPO_CONFIGS["nuft-2027"]
         github_repos.REPO_CONFIGS["nuft-2027"] = type(self._config)(
@@ -122,10 +228,6 @@ class AcceptanceTests(unittest.TestCase):
 
     def tearDown(self):
         github_repos.REPO_CONFIGS["nuft-2027"] = self._config
-        state.SNAPSHOTS = self._snapshots
-        state.PROPOSALS_LOG = self._proposals
-        state.LAST_DELIVERED = self._last_delivered
-        self._tmp.cleanup()
 
     def _baseline(self, readme=BASE_README):
         result = github_repos.check(self.source, FakeClient(readme))
@@ -429,7 +531,7 @@ class AcceptanceTests(unittest.TestCase):
         self.assertIn("muted", state.PROGRAM_COLUMNS)
 
 
-class NoiseRegressionTests(unittest.TestCase):
+class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
     """Regressions for false positives that reached a real digest.
 
     The first live run reported four "changed" rows whose keys were identical. The
@@ -499,7 +601,7 @@ class NoiseRegressionTests(unittest.TestCase):
 
 
 # --- 14.7 -----------------------------------------------------------------------
-class PostingFilterTests(unittest.TestCase):
+class PostingFilterTests(_IsolatedState, unittest.TestCase):
     """The change that made WORTH A LOOK readable: fetch the posting, then judge it.
 
     A Simplify row on its own is a title and a location -- measured, 7 of 592 rows
@@ -622,27 +724,29 @@ class PostingFilterTests(unittest.TestCase):
     os.environ.get("AZURE_OPENAI_API_KEY"),
     "needs AZURE_OPENAI_API_KEY (live model calls)",
 )
-class PostingJudgementTests(unittest.TestCase):
+class PostingJudgementTests(_IsolatedState, unittest.TestCase):
     """Does the small model actually make the right call on real posting text?
 
     gpt-5-mini is weaker than Sonnet, and rules 6 and 7 ask it to *rule things out* --
     the expensive direction to get wrong. The posting text is seeded into the fetch
     cache so these are deterministic about the input while still making a real model
     call about the judgment.
+
+    Seeded into a temp cache, not the real one. These seeds used to land in
+    data/postings_cache/ and be unlinked again on the way out, which is only invisible
+    because the class skips without a key -- run it with one and it edits the database.
     """
 
     SOURCE = {"source_id": "simplify-2027", "signal": "low", "program_names": "Board"}
     URL = "https://simplify.jobs/p/00000000-0000-0000-0000-0000000000%02d"
 
     def setUp(self):
+        super().setUp()
         self._saved = os.environ.get("CLASSIFIER_PROVIDER")
         os.environ["CLASSIFIER_PROVIDER"] = "azure"
         postings.CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        self._written = []
 
     def tearDown(self):
-        for path in self._written:
-            path.unlink(missing_ok=True)
         if self._saved is None:
             os.environ.pop("CLASSIFIER_PROVIDER", None)
         else:
@@ -652,7 +756,6 @@ class PostingJudgementTests(unittest.TestCase):
         url = self.URL % n
         path = postings._cache_path(url)
         path.write_text(posting_text)
-        self._written.append(path)
         change = state.Change(
             source_id="simplify-2027", kind="added",
             key=f"ACME / {role}",
@@ -700,37 +803,6 @@ class PostingJudgementTests(unittest.TestCase):
         self.assertTrue(j.relevant, f"must not rule out a quant role: {j.why}")
 
 
-class _IsolatedState:
-    """Redirect every state path at a temp dir.
-
-    Without this the new suites write snapshots, applied.tsv and discovered.csv into
-    the real data/ directory -- which they did, until this was added. Test runs must
-    not touch the database the job commits.
-    """
-
-    def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        root = pathlib.Path(self._tmp.name)
-        self._saved = {
-            name: getattr(state, name)
-            for name in ("SNAPSHOTS", "PROPOSALS_LOG", "LAST_DELIVERED", "APPLIED_TSV",
-                         "DISCOVERED_CSV", "LAST_DISCOVERY", "DATA")
-        }
-        state.DATA = root
-        state.SNAPSHOTS = root / "snapshots"
-        state.PROPOSALS_LOG = root / "proposals.log"
-        state.LAST_DELIVERED = root / "last_delivered.txt"
-        state.APPLIED_TSV = root / "applied.tsv"
-        state.DISCOVERED_CSV = root / "discovered.csv"
-        state.LAST_DISCOVERY = root / "last_discovery.txt"
-        state.SNAPSHOTS.mkdir()
-
-    def tearDown(self):
-        for name, value in self._saved.items():
-            setattr(state, name, value)
-        self._tmp.cleanup()
-
-
 # --- 14.9: Phase 2 ---------------------------------------------------------------
 class FakeJSONClient:
     """Returns a fixed JSON payload for any URL. Stands in for an ATS."""
@@ -763,14 +835,8 @@ def _gh(title, location="New York, United States", employment_type=None, content
     return job
 
 
-class Phase2ConfigTests(unittest.TestCase):
+class Phase2ConfigTests(_IsolatedState, unittest.TestCase):
     """The registry, and the silent-skip bug it replaced."""
-
-    def test_14_9_every_method_in_sources_csv_has_a_handler(self):
-        """A typo'd method must be caught here rather than going unwatched in prod."""
-        methods = {(r.get("method") or "").strip() for r in state.read_sources()}
-        unknown = methods - set(check.CHECKERS) - {check.UNWATCHED}
-        self.assertEqual(unknown, set(), f"sources.csv has unhandled methods: {unknown}")
 
     def test_14_9b_an_unknown_method_is_a_failure_not_a_silent_skip(self):
         """The bug this replaced: `continue` produced no SourceResult at all, so a
@@ -1054,6 +1120,11 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
 
 class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
     def test_14_9o_discovery_never_writes_sources_csv(self):
+        """Discovery proposes and never adds. Watched against a seeded copy rather
+        than the real file: a test that asserts "this never writes the database" must
+        not be pointed at the database, or the run that disproves it also destroys it."""
+        state.write_sources([{"source_id": "seeded", "method": "github_readme",
+                              "url": "a/b"}])
         before = state.SOURCES_CSV.read_bytes()
         discover.record([discover.Candidate("repo", "repo:a/b", "a/b", "u", "e")])
         self.assertEqual(state.SOURCES_CSV.read_bytes(), before)
@@ -1167,11 +1238,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertTrue(notes.endswith("\u2026"), notes)
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
-
-class OwnerWorkbookTests(unittest.TestCase):
+class OwnerWorkbookTests(_IsolatedState, unittest.TestCase):
     """out/programs.xlsx is the owner's file: only what he must chase himself.
 
     Asked for directly -- it had become a dump of all 187 programmes, which is useless
@@ -1258,40 +1325,8 @@ class OwnerWorkbookTests(unittest.TestCase):
         keep, _, _ = build_xlsx.partition(programs, self.SOURCES)
         self.assertEqual([r["eligible"] for r in keep], ["YES", "CHECK", "LATER"])
 
-    def test_14_10g_both_workbooks_build_and_the_owner_file_excludes_ruled_out_rows(self):
-        from openpyxl import load_workbook
-        with tempfile.TemporaryDirectory() as tmp:
-            root = pathlib.Path(tmp)
-            saved = (state.OUT_XLSX, state.OUT_TRACKED_XLSX)
-            state.OUT_XLSX = root / "programs.xlsx"
-            state.OUT_TRACKED_XLSX = root / "tracked.xlsx"
-            try:
-                paths = build_xlsx.build()
-                self.assertEqual(len(paths), 2)
-                for path in paths:
-                    self.assertTrue(path.exists(), path)
-                owner = load_workbook(state.OUT_XLSX)
-                self.assertEqual(owner.worksheets[0].title, "Check By Hand")
-                self.assertIn("Left Out", owner.sheetnames)
-                codes = {
-                    str(row[0]).strip().upper()
-                    for row in owner["Check By Hand"].iter_rows(min_row=2, values_only=True)
-                }
-                self.assertNotIn("NO", codes)
-                self.assertNotIn("STALE", codes)
-                tracked = load_workbook(state.OUT_TRACKED_XLSX)
-                self.assertEqual(
-                    tracked.sheetnames,
-                    ["All Programs", "Sources", "Applied", "Discovered"])
-                # the full list still exists somewhere -- it moved, it was not dropped
-                self.assertEqual(
-                    tracked["All Programs"].max_row - 1, len(state.read_programs()))
-            finally:
-                state.OUT_XLSX, state.OUT_TRACKED_XLSX = saved
 
-
-
-class ClassifierSpendTests(unittest.TestCase):
+class ClassifierSpendTests(_IsolatedState, unittest.TestCase):
     """The run reports its own bill.
 
     Before this, answering "why did 2026-09-12 cost 34 cents" meant reconstructing the
@@ -1317,6 +1352,7 @@ class ClassifierSpendTests(unittest.TestCase):
             self.prompt_tokens_details = ClassifierSpendTests._PromptDetails(cached)
 
     def setUp(self):
+        super().setUp()
         classify.reset_usage()
 
     def tearDown(self):
@@ -1442,7 +1478,7 @@ class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(r.extra["rows"], 1)
 
 
-class DeterministicScreenTests(unittest.TestCase):
+class DeterministicScreenTests(_IsolatedState, unittest.TestCase):
     """screen.py may only rule OUT, only on a quoted phrase, and never on silence.
 
     Validated against the 2026-09-12 run: 77 changes the model judged, 40 of which it
@@ -1575,8 +1611,18 @@ class DeterministicScreenTests(unittest.TestCase):
 
 
 class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
+    """The screen and the classifier wired together, with no provider behind them.
+
+    These assert that a screened change reaches a verdict *without* a model call, so
+    the moment a screen rule stops matching they would fall through and bill a real
+    one -- a test that silently starts spending money on the day it starts being
+    wrong. Forcing select_provider to None makes that fall-through fail instead.
+    """
+
     def setUp(self):
         super().setUp()
+        self.addCleanup(setattr, classify, "select_provider", classify.select_provider)
+        classify.select_provider = lambda: None
         classify.reset_screen()
 
     def test_a_screened_change_is_ruled_out_with_no_model_call(self):
@@ -1604,7 +1650,7 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         self.assertIn("advanced-standing", body, "HEALTH must carry it")
 
 
-class CircuitBreakerTests(unittest.TestCase):
+class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
     """A source that keeps failing backs off, and says so.
 
     Measured 2026-09-12: nine sources sat at exactly three consecutive failures with
@@ -1707,7 +1753,7 @@ class CircuitBreakerTests(unittest.TestCase):
         self.assertIn("source failing", title)
 
 
-class AggregatorRowRenderingTests(unittest.TestCase):
+class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
     """An aggregator row names the real employer; the table must show that employer.
 
     `program_names` for a Simplify or zshah row is the list's own name, identical on
@@ -2129,3 +2175,111 @@ class AtsProbeTests(_IsolatedState, unittest.TestCase):
         found, notes, _ = self._mine({})
         self.assertEqual(found, [])
         self.assertEqual(notes, [])
+
+
+class LiveDataInvariantTests(unittest.TestCase):
+    """The only class that reads the committed data/ tree, and the reason the isolation
+    rule can be stated as "everything except this one".
+
+    These two assert things about the real database rather than about a fixture, which
+    is the point of them: a method typo'd in sources.csv goes unwatched in production
+    and nothing else would notice, and the owner's workbook is only useful if it builds
+    from the 187 rows that actually exist. They read and never write -- the module
+    fingerprint guard enforces that, for these as much as for everything else.
+    """
+
+    def test_14_9_every_method_in_sources_csv_has_a_handler(self):
+        """A typo'd method must be caught here rather than going unwatched in prod."""
+        methods = {(r.get("method") or "").strip() for r in state.read_sources()}
+        unknown = methods - set(check.CHECKERS) - {check.UNWATCHED}
+        self.assertEqual(unknown, set(), f"sources.csv has unhandled methods: {unknown}")
+
+    def test_14_10g_both_workbooks_build_and_the_owner_file_excludes_ruled_out_rows(self):
+        from openpyxl import load_workbook
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            saved = (state.OUT_XLSX, state.OUT_TRACKED_XLSX)
+            state.OUT_XLSX = root / "programs.xlsx"
+            state.OUT_TRACKED_XLSX = root / "tracked.xlsx"
+            try:
+                paths = build_xlsx.build()
+                self.assertEqual(len(paths), 2)
+                for path in paths:
+                    self.assertTrue(path.exists(), path)
+                owner = load_workbook(state.OUT_XLSX)
+                self.assertEqual(owner.worksheets[0].title, "Check By Hand")
+                self.assertIn("Left Out", owner.sheetnames)
+                codes = {
+                    str(row[0]).strip().upper()
+                    for row in owner["Check By Hand"].iter_rows(min_row=2, values_only=True)
+                }
+                self.assertNotIn("NO", codes)
+                self.assertNotIn("STALE", codes)
+                tracked = load_workbook(state.OUT_TRACKED_XLSX)
+                self.assertEqual(
+                    tracked.sheetnames,
+                    ["All Programs", "Sources", "Applied", "Discovered"])
+                # the full list still exists somewhere -- it moved, it was not dropped
+                self.assertEqual(
+                    tracked["All Programs"].max_row - 1, len(state.read_programs()))
+            finally:
+                state.OUT_XLSX, state.OUT_TRACKED_XLSX = saved
+
+
+class HarnessSelfTests(_IsolatedState, unittest.TestCase):
+    """The harness is checked by the harness, because it has lied before.
+
+    Both halves of this file's isolation are conventions a future edit can break
+    without any test going red, so each one gets an assertion of its own. The module
+    fingerprint guard covers the first (a path that was never rebound). This covers the
+    second: a class that mixes in _IsolatedState, then overrides setUp and forgets to
+    chain -- which leaves it fully unisolated while still reading as isolated at the
+    class statement, where anyone auditing would look.
+    """
+
+    def test_every_isolated_class_chains_setUp(self):
+        import ast
+        source = pathlib.Path(__file__).read_text(encoding="utf-8")
+        offenders = []
+        for node in ast.parse(source).body:
+            if not isinstance(node, ast.ClassDef):
+                continue
+            if "_IsolatedState" not in [
+                    b.id for b in node.bases if isinstance(b, ast.Name)]:
+                continue
+            setup = next((f for f in node.body if isinstance(f, ast.FunctionDef)
+                          and f.name == "setUp"), None)
+            if setup is None:
+                continue  # inherits the mixin's setUp directly
+            chains = any(
+                isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+                and n.func.attr == "setUp" and isinstance(n.func.value, ast.Call)
+                and isinstance(n.func.value.func, ast.Name)
+                and n.func.value.func.id == "super"
+                for n in ast.walk(setup))
+            if not chains:
+                offenders.append(node.name)
+        self.assertEqual(offenders, [], "these override setUp without super().setUp(), "
+                                       "so isolate_state() never runs for them")
+
+    def test_every_test_class_is_isolated_or_named_as_live(self):
+        """The isolation rule, stated as an assertion: everything except one class."""
+        import ast
+        source = pathlib.Path(__file__).read_text(encoding="utf-8")
+        unisolated = [
+            node.name for node in ast.parse(source).body
+            if isinstance(node, ast.ClassDef)
+            and any(isinstance(b, ast.Attribute) and b.attr == "TestCase"
+                    for b in node.bases)
+            and "_IsolatedState" not in [
+                b.id for b in node.bases if isinstance(b, ast.Name)]
+        ]
+        self.assertEqual(unisolated, ["LiveDataInvariantTests"])
+
+
+# Last line of the file on purpose. This sat at line 1170 for a while, above eleven
+# test classes, so `python tests/test_acceptance.py` collected 62 of 148 tests and
+# reported OK -- the 86 below it were never even imported into the run. Use
+# `python -m unittest discover -s tests`; this block is only a convenience.
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
