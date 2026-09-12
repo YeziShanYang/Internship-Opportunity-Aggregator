@@ -92,6 +92,21 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         entity_columns=("Name",),
         min_rows=60,
     ),
+    "zshah-2027": RepoConfig(
+        table_format="markdown",
+        entity_columns=("Company",),
+        role_columns=("Role",),
+        qualifier_columns=("Location",),
+        # Only the role sections. The prose sections above them ("What this is",
+        # "Scope") are themselves two-column markdown tables, and the Drop Radar
+        # table is a forecast of dates rather than a list of live openings.
+        section_include=re.compile(r"^(summer 20\d\d|fall 20\d\d|recently posted)", re.I),
+        # "Posted" is an absolute date, so it is stable per row -- unlike Simplify's
+        # relative "Age" column. The markers are not: this list is regenerated every
+        # 30 minutes and the "new this week" flag turns over constantly.
+        volatile_markers=("\U0001f195", "\u2713", "\U0001f6c2"),
+        min_rows=200,
+    ),
     "simplify-2027": RepoConfig(
         table_format="html",
         entity_columns=("Company",),
