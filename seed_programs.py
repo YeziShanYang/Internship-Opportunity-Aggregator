@@ -12,7 +12,8 @@ import sys
 
 import openpyxl
 
-import state
+from core import paths
+from persist import store
 
 # xlsx header -> programs.csv column. The spreadsheet uses human-readable headers;
 # the CSV uses the snake_case names from spec section 4.
@@ -51,7 +52,7 @@ def seed(xlsx: pathlib.Path) -> list[dict[str, str]]:
 
     rows: list[dict[str, str]] = []
     for excel_row in range(2, worksheet.max_row + 1):
-        row = {column: "" for column in state.PROGRAM_COLUMNS}
+        row = {column: "" for column in paths.PROGRAM_COLUMNS}
         for header, column in HEADER_MAP.items():
             value = worksheet.cell(excel_row, headers.index(header) + 1).value
             row[column] = "" if value is None else str(value).strip()
@@ -72,14 +73,14 @@ def main() -> int:
     parser.add_argument(
         "--xlsx",
         type=pathlib.Path,
-        default=state.ROOT.parent / "quant_math_cs_programs_freshman.xlsx",
+        default=paths.ROOT.parent / "quant_math_cs_programs_freshman.xlsx",
         help="path to the seed spreadsheet",
     )
     parser.add_argument("--force", action="store_true", help="overwrite an existing programs.csv")
     args = parser.parse_args()
 
-    if state.PROGRAMS_CSV.exists() and not args.force:
-        print(f"{state.PROGRAMS_CSV} already exists; refusing to overwrite tracking state.")
+    if paths.PROGRAMS_CSV.exists() and not args.force:
+        print(f"{paths.PROGRAMS_CSV} already exists; refusing to overwrite tracking state.")
         print("Pass --force if you really mean to re-seed from the spreadsheet.")
         return 1
     if not args.xlsx.exists():
@@ -87,9 +88,9 @@ def main() -> int:
         return 1
 
     rows = seed(args.xlsx)
-    state.write_programs(rows)
+    store.write_programs(rows)
     monitored = sum(1 for row in rows if row["source_id"])
-    print(f"wrote {len(rows)} rows to {state.PROGRAMS_CSV} ({monitored} wired to a source)")
+    print(f"wrote {len(rows)} rows to {paths.PROGRAMS_CSV} ({monitored} wired to a source)")
     return 0
 
 

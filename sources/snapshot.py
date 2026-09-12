@@ -15,7 +15,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 
-import state
+from core import models
 
 
 # Spec section 5: a new row whose title looks like an underclassman program is a
@@ -117,17 +117,17 @@ def parse_snapshot(text: str) -> Snapshot:
     return snapshot
 
 
-def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[state.Change]:
+def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.Change]:
     """Row-level diff keyed on company + role (spec section 5)."""
     old_by_key = {row.identity: row for row in old.rows}
     new_by_key = {row.identity: row for row in new.rows}
-    changes: list[state.Change] = []
+    changes: list[models.Change] = []
 
     # A brand-new firm section is worth calling out in its own right (spec section 5).
     for section in sorted(set(new.sections) - set(old.sections)):
         if section:
             changes.append(
-                state.Change(
+                models.Change(
                     source_id=source_id,
                     kind="added",
                     key=f"new section: {section}",
@@ -140,7 +140,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[state.C
     for key in sorted(new_by_key.keys() - old_by_key.keys()):
         row = new_by_key[key]
         changes.append(
-            state.Change(
+            models.Change(
                 source_id=source_id,
                 kind="added",
                 key=row.key,
@@ -154,7 +154,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[state.C
     for key in sorted(old_by_key.keys() - new_by_key.keys()):
         row = old_by_key[key]
         changes.append(
-            state.Change(
+            models.Change(
                 source_id=source_id,
                 kind="removed",
                 key=row.key,
@@ -168,7 +168,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[state.C
         before, after = old_by_key[key].value, new_by_key[key].value
         if before != after:
             changes.append(
-                state.Change(
+                models.Change(
                     source_id=source_id,
                     kind="changed",
                     key=new_by_key[key].key,

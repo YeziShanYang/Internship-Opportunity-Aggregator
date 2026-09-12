@@ -22,7 +22,9 @@ import re
 
 import httpx
 
-import state
+from core import models
+from persist import store
+from process import redirect
 from sources import postings, snapshot
 
 # Below this a response is a JavaScript shell or a block page, not a short page.
@@ -100,7 +102,7 @@ def normalise(raw_html: str) -> list[str]:
 
 def diff_pages(
     source_id: str, old: list[str], new: list[str], source: dict[str, str]
-) -> list[state.Change]:
+) -> list[models.Change]:
     """At most one Change per page per run.
 
     Page diffs are lumpy -- a nav tweak moves forty lines -- so one Change per changed
@@ -131,7 +133,7 @@ def diff_pages(
 
     program_name = source.get("program_names", "")
     return [
-        state.Change(
+        models.Change(
             source_id=source_id,
             kind="changed",
             key=f"{program_name or source_id} ({len(added)} added, {len(removed)} removed)",
@@ -147,14 +149,14 @@ def diff_pages(
     ]
 
 
-def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
+def check(source: dict[str, str], client: httpx.Client) -> models.SourceResult:
     """Check one page. Never raises: a failure is a result, not an exception."""
     source_id = source["source_id"]
 
     # Refused at config time rather than discovered at runtime. This is what makes
     # "a JavaScript shell is never a quiet day" true by construction.
     if (source.get("render_js") or "").strip().lower() == "true":
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             error=(
@@ -165,7 +167,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     # Silently ignoring a configured selector is the same class of bug as skipping an
     # unknown method: the row looks watched and is not watched as configured.
     if (source.get("selector") or "").strip():
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             error=(
@@ -178,7 +180,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
         response = client.get(source["url"])
         response.raise_for_status()
     except Exception as exc:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}"
         )
 
@@ -186,20 +188,20 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     # that had been retired could 302 to a friendly error page, return HTTP 200, and
     # clear both content floors on the error page's own prose. Nothing in this codebase
     # read `response.url`, so it reported success indefinitely.
-    severity, redirect_note = state.redirect_verdict(source["url"], str(response.url))
+    severity, redirect_note = redirect.verdict(source["url"], str(response.url))
     if severity == "fail":
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id, ok=False, error=redirect_note,
             content_length=len(response.text),
         )
 
     lines = normalise(response.text)
     text = "\n".join(lines)
-    previous_text = state.read_snapshot(source_id, ext="txt")
+    previous_text = store.read_snapshot(source_id, ext="txt")
     ratio = len(text) / max(len(response.text), 1)
 
     if len(text) < MIN_ABSOLUTE_CHARS:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             content_length=len(text),
@@ -212,7 +214,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     # but the row is no longer watching what it was configured for, so it rides along
     # in extra and HEALTH says so every morning until the url is corrected.
     if ratio < MIN_TEXT_HTML_RATIO:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             content_length=len(text),
@@ -223,7 +225,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             ),
         )
     if previous_text is not None and len(text) < SHRINK_RATIO * len(previous_text):
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             content_length=len(text),
@@ -237,7 +239,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     if redirect_note:
         extra["redirected"] = redirect_note
     if previous_text is None:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=True,
             baseline=True,
@@ -248,7 +250,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
         )
 
     changes = diff_pages(source_id, previous_text.splitlines(), lines, source)
-    return state.SourceResult(
+    return models.SourceResult(
         source_id=source_id,
         ok=True,
         changes=changes,

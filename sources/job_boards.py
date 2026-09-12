@@ -34,7 +34,8 @@ from dataclasses import dataclass
 
 import httpx
 
-import state
+from core import models
+from persist import store
 from sources import postings, snapshot
 
 GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM, EIGHTFOLD = (
@@ -642,7 +643,7 @@ def to_snapshot(kept: list[Posting]) -> snapshot.Snapshot:
     return snap
 
 
-def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
+def check(source: dict[str, str], client: httpx.Client) -> models.SourceResult:
     """Check one ATS board. Never raises: a failure is a result, not an exception."""
     source_id = source["source_id"]
     method = (source.get("method") or "").strip()
@@ -650,7 +651,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     parser = PARSERS.get(method)
     fetcher = FETCHERS.get(method)
     if (parser is None and fetcher is None) or not slug:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             error=f"no parser for method={method!r} or empty slug",
@@ -665,7 +666,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             response.raise_for_status()
             parsed = parser(response.json())
     except Exception as exc:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}"
         )
 
@@ -681,7 +682,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     suppressed_not_student = len(parsed) - len(students) + prefiltered_out
     suppressed_not_us = len(students) - len(kept)
 
-    previous_text = state.read_snapshot(source_id, ext="tsv")
+    previous_text = store.read_snapshot(source_id, ext="tsv")
     previous = snapshot.parse_snapshot(previous_text) if previous_text else None
 
     # Spec 10.1. A slug that still resolves but returns nothing is the Tier 2 version of
@@ -689,7 +690,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     # from "we have gone blind". Self-calibrating against yesterday rather than a
     # configured floor, so there is no constant to rot.
     if previous is not None and previous.rows and not parsed and not prefiltered_out:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             error=f"board returned 0 postings, down from {len(previous.rows)} tracked rows",
@@ -705,7 +706,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     }
 
     if previous is None:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=True,
             baseline=True,
@@ -726,7 +727,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
         detail = "\n".join(f"- {c.kind}: {c.key}" for c in changes[:10])
         extra["collapsed"] = len(changes)
         changes = [
-            state.Change(
+            models.Change(
                 source_id=source_id,
                 kind="changed",
                 key=f"{slug}: {len(changes)} rows changed at once",
@@ -739,7 +740,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             )
         ]
 
-    return state.SourceResult(
+    return models.SourceResult(
         source_id=source_id,
         ok=True,
         changes=changes,

@@ -39,7 +39,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-import state
+from core import paths
+from persist import store
 
 ARIAL = "Arial"
 HEADER_FILL = PatternFill("solid", fgColor="1F3864")
@@ -346,7 +347,7 @@ def covered_by(program: dict[str, str], sources: dict[str, dict[str, str]]) -> s
         source = sources.get(source_id)
         if source is None:
             return f"BROKEN source_id={source_id}"
-        if source["method"] != state.UNWATCHED_METHOD:
+        if source["method"] != paths.UNWATCHED_METHOD:
             return source_id
     target = _canon(program.get("website"))
     if target:
@@ -427,14 +428,14 @@ def build_owner_workbook(
     )
     workbook.active.title = "Check By Hand"
 
-    manual = _read(state.DATA / "manual.csv")
+    manual = _read(paths.DATA / "manual.csv")
     if manual:
         _write_sheet(
             workbook.create_sheet("Manual Watch"), MANUAL_HEADERS, manual,
             hyperlink_columns={"url"},
         )
 
-    priority = _read(state.DATA / "priority.csv")
+    priority = _read(paths.DATA / "priority.csv")
     if priority:
         for row in priority:
             row["rank"] = (
@@ -451,9 +452,9 @@ def build_owner_workbook(
         hyperlink_columns={"website"},
     )
 
-    state.OUT_XLSX.parent.mkdir(parents=True, exist_ok=True)
-    workbook.save(state.OUT_XLSX)
-    return state.OUT_XLSX
+    paths.OUT_XLSX.parent.mkdir(parents=True, exist_ok=True)
+    workbook.save(paths.OUT_XLSX)
+    return paths.OUT_XLSX
 
 
 def build_tracked_workbook(
@@ -470,10 +471,10 @@ def build_tracked_workbook(
         hyperlink_columns={"url"},
     )
 
-    applied = state.read_applied()
+    applied = store.read_applied()
     titles = {}
-    if state.APPLIED_TSV.exists():
-        for line in state.APPLIED_TSV.read_text(encoding="utf-8").splitlines():
+    if paths.APPLIED_TSV.exists():
+        for line in paths.APPLIED_TSV.read_text(encoding="utf-8").splitlines():
             if not line.strip() or line.startswith("#"):
                 continue
             parts = line.split("\t")
@@ -489,20 +490,20 @@ def build_tracked_workbook(
 
     _write_sheet(
         workbook.create_sheet("Discovered"), DISCOVERED_HEADERS,
-        sorted(state.read_discovered(), key=lambda r: (r.get("status", ""), r.get("key", ""))),
+        sorted(store.read_discovered(), key=lambda r: (r.get("status", ""), r.get("key", ""))),
         hyperlink_columns={"url"},
     )
 
-    state.OUT_TRACKED_XLSX.parent.mkdir(parents=True, exist_ok=True)
-    workbook.save(state.OUT_TRACKED_XLSX)
-    return state.OUT_TRACKED_XLSX
+    paths.OUT_TRACKED_XLSX.parent.mkdir(parents=True, exist_ok=True)
+    workbook.save(paths.OUT_TRACKED_XLSX)
+    return paths.OUT_TRACKED_XLSX
 
 
 def build() -> list[pathlib.Path]:
-    programs = state.read_programs()
+    programs = store.read_programs()
     if not programs:
         raise SystemExit("data/programs.csv is empty; run seed_programs.py first")
-    source_rows = _read(state.SOURCES_CSV)
+    source_rows = _read(paths.SOURCES_CSV)
     sources = {s["source_id"]: s for s in source_rows}
 
     keep, left_out, warnings = partition(programs, sources)

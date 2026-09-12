@@ -30,18 +30,21 @@ import classify
 import discover
 import screen
 import digest
-import state
+from core import clock, models, paths
+from gather import breaker
+from persist import store
+from process import redirect
 import build_xlsx
 from sources import github_repos, job_boards, page_watch, postings, snapshot
 
 # --- the database must survive the suite ---------------------------------------------
 #
-# Every path in state.py is a module global that its readers resolve at call time, and
-# _IsolatedState works by rebinding those globals at a temp directory. That is a
-# convention, not a mechanism: the day a reader switches to `from core.paths import
-# SNAPSHOTS` the rebind stops working, and the suite keeps passing while writing into
-# the real data/ tree. A green suite that has quietly stopped protecting the database
-# is worse than a red one.
+# Every path in core.paths is a module attribute that its readers resolve at call
+# time, and _IsolatedState works by rebinding those attributes at a temp directory.
+# That is a convention, not a mechanism: the day a reader switches to
+# `from core.paths import SNAPSHOTS` the rebind stops working, and the suite keeps
+# passing while writing into the real data/ tree. A green suite that has quietly
+# stopped protecting the database is worse than a red one.
 #
 # This is not hypothetical. It has already happened twice here: postings.CACHE_DIR was
 # import-bound, so tests wrote into the real data/postings_cache/, and _IsolatedState
@@ -50,7 +53,7 @@ from sources import github_repos, job_boards, page_watch, postings, snapshot
 # So the convention gets a backstop that does not depend on the convention. The
 # committed trees are fingerprinted before the suite and re-checked after it, which
 # turns "a test wrote to the database" from invisible into a hard error.
-GUARDED_TREES = (state.DATA, state.ROOT / "out")
+GUARDED_TREES = (paths.DATA, paths.ROOT / "out")
 
 _MANIFEST: dict[str, tuple[int, int]] = {}
 
@@ -145,27 +148,29 @@ class FakeClient:
 
 
 class _IsolatedState:
-    """Redirect every state path at a temp dir.
+    """Redirect every path in core.paths at a temp dir.
 
     Without this the new suites write snapshots, applied.tsv and discovered.csv into
     the real data/ directory -- which they did, until this was added. Test runs must
     not touch the database the job commits.
 
-    Every state global that names a real path belongs in STATE_PATHS. The three that
-    were missing -- PROGRAMS_CSV, SOURCES_CSV and postings.CACHE_DIR -- are why three
-    tests read live data and the posting cache was written in place; see the module
-    fingerprint guard above, which now catches the next omission rather than trusting
-    this list to be complete. The one class that deliberately reads the committed files
-    is LiveDataInvariantTests, so the rule reads "everything except that".
+    Every path constant belongs in STATE_PATHS. The three that were missing --
+    PROGRAMS_CSV, SOURCES_CSV and postings.CACHE_DIR -- are why three tests read live
+    data and the posting cache was written in place; see the module fingerprint guard
+    above, which now catches the next omission rather than trusting this list to be
+    complete. The one class that deliberately reads the committed files is
+    LiveDataInvariantTests, so the rule reads "everything except that".
     """
 
-    #: Rebinding these is only sound because every reader resolves them as a module
-    #: global at call time. An `from ... import SNAPSHOTS` anywhere downstream would
-    #: silently send the write back into the database.
+    #: Rebinding these is only sound because every reader resolves them as an attribute
+    #: of `core.paths` at call time. A `from core.paths import SNAPSHOTS` anywhere
+    #: downstream would bind a stale copy and silently send the write back into the
+    #: database -- which is exactly the hazard that made hardening this file step 0 of
+    #: the refactor rather than a later tidy-up.
     STATE_PATHS = (
         "DATA", "SNAPSHOTS", "PROPOSALS_LOG", "LAST_DELIVERED", "APPLIED_TSV",
         "DISCOVERED_CSV", "LAST_DISCOVERY", "PROGRAMS_CSV", "SOURCES_CSV",
-        "OUT_XLSX", "OUT_TRACKED_XLSX",
+        "OUT_XLSX", "OUT_TRACKED_XLSX", "RUN_DIR",
     )
 
     def setUp(self):
@@ -184,22 +189,23 @@ class _IsolatedState:
         self.addCleanup(tmp.cleanup)
         root = pathlib.Path(tmp.name)
         for name in self.STATE_PATHS:
-            self.addCleanup(setattr, state, name, getattr(state, name))
+            self.addCleanup(setattr, paths, name, getattr(paths, name))
         self.addCleanup(setattr, postings, "CACHE_DIR", postings.CACHE_DIR)
 
-        state.DATA = root
-        state.SNAPSHOTS = root / "snapshots"
-        state.PROPOSALS_LOG = root / "proposals.log"
-        state.LAST_DELIVERED = root / "last_delivered.txt"
-        state.APPLIED_TSV = root / "applied.tsv"
-        state.DISCOVERED_CSV = root / "discovered.csv"
-        state.LAST_DISCOVERY = root / "last_discovery.txt"
-        state.PROGRAMS_CSV = root / "programs.csv"
-        state.SOURCES_CSV = root / "sources.csv"
-        state.OUT_XLSX = root / "out" / "programs.xlsx"
-        state.OUT_TRACKED_XLSX = root / "out" / "tracked.xlsx"
+        paths.DATA = root
+        paths.SNAPSHOTS = root / "snapshots"
+        paths.PROPOSALS_LOG = root / "proposals.log"
+        paths.LAST_DELIVERED = root / "last_delivered.txt"
+        paths.APPLIED_TSV = root / "applied.tsv"
+        paths.DISCOVERED_CSV = root / "discovered.csv"
+        paths.LAST_DISCOVERY = root / "last_discovery.txt"
+        paths.PROGRAMS_CSV = root / "programs.csv"
+        paths.SOURCES_CSV = root / "sources.csv"
+        paths.OUT_XLSX = root / "out" / "programs.xlsx"
+        paths.OUT_TRACKED_XLSX = root / "out" / "tracked.xlsx"
         postings.CACHE_DIR = root / "postings_cache"
-        state.SNAPSHOTS.mkdir()
+        paths.RUN_DIR = root / ".run"
+        paths.SNAPSHOTS.mkdir()
         return root
 
 
@@ -233,7 +239,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         result = github_repos.check(self.source, FakeClient(readme))
         self.assertTrue(result.ok, result.error)
         self.assertTrue(result.baseline)
-        state.write_snapshot("nuft-2027", result.snapshot_text, ext="tsv")
+        store.write_snapshot("nuft-2027", result.snapshot_text, ext="tsv")
         return result
 
     # --- 14.2 -------------------------------------------------------------------
@@ -241,7 +247,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         """Hand-edit a stored snapshot to simulate a page change -> ACT NOW."""
         self._baseline()
         # Simulate the previous run not having seen the Jane Street row.
-        path = state.snapshot_path("nuft-2027", "tsv")
+        path = store.snapshot_path("nuft-2027", "tsv")
         kept = [
             line
             for line in path.read_text().splitlines()
@@ -282,7 +288,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
 
     def test_14_3b_three_failures_escalate_to_act_now(self):
         """Spec 10.1: at >=3 consecutive failures the source is blind, not quiet."""
-        result = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 404")
+        result = models.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 404")
         source = dict(self.source, consecutive_failures="4", last_success="2026-09-01")
         title, body = digest.render([], [result], {"nuft-2027": source})
         self.assertIn("ACT NOW", body)
@@ -331,7 +337,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
     )
     def test_14_5_identity_gated_program_is_ruled_out(self):
         """A women-only program is classified relevant: false, citing the gate."""
-        change = state.Change(
+        change = models.Change(
             source_id="nuft-2027",
             kind="added",
             key="Jane Street / INSIGHT",
@@ -351,7 +357,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
 
     def test_14_5b_without_a_key_nothing_is_dropped(self):
         """Degraded mode surfaces more, not less (rule 3)."""
-        change = state.Change(
+        change = models.Change(
             source_id="nuft-2027", kind="added", key="Some Firm / Insight", detail="x"
         )
         # Every provider must be unset, not just Anthropic. With a second backend
@@ -383,7 +389,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         one the prompt was tuned against, so the identity gate is re-tested against it
         rather than assumed to carry over.
         """
-        change = state.Change(
+        change = models.Change(
             source_id="nuft-2027",
             kind="added",
             key="Jane Street / INSIGHT",
@@ -412,7 +418,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
     # --- 14.6 -------------------------------------------------------------------
     def test_14_6_exactly_one_digest_a_day_every_day(self):
         """Every day mails, including quiet ones, and the quiet title says so."""
-        healthy = state.SourceResult(source_id="nuft-2027", ok=True)
+        healthy = models.SourceResult(source_id="nuft-2027", ok=True)
 
         # A quiet day still delivers -- that is what makes a silent morning diagnostic.
         self.assertEqual(
@@ -425,13 +431,13 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertIn("HEALTH", body)
 
         # A failing source is news, so it is not a status-only day.
-        failing = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
+        failing = models.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
         self.assertEqual(digest.should_send([], [failing]), (True, False))
         title, _ = digest.render([], [failing], {})
         self.assertNotIn("(no changes)", title)
 
         # So is a real change.
-        change = state.Change(
+        change = models.Change(
             source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
         )
         judgment = classify.Judgment(change=change, relevant=True, classified=True)
@@ -445,21 +451,21 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         morning's issue did not already contain, and two issues for one date is the
         notification-fatigue failure the cadence exists to prevent.
         """
-        healthy = state.SourceResult(source_id="nuft-2027", ok=True)
-        failing = state.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
-        change = state.Change(
+        healthy = models.SourceResult(source_id="nuft-2027", ok=True)
+        failing = models.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
+        change = models.Change(
             source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
         )
         judgment = classify.Judgment(change=change, relevant=True, classified=True)
 
         # Tick 1: nothing delivered yet, so the digest goes out.
-        self.assertEqual(state.read_last_delivered(), "", "no marker before the first run")
+        self.assertEqual(store.read_last_delivered(), "", "no marker before the first run")
         self.assertEqual(digest.should_send([], [healthy], False), (True, True))
 
         # Tick 2, an hour later, after tick 1 recorded a delivery: silence, whatever
         # this run happened to find.
-        state.write_last_delivered()
-        self.assertEqual(state.read_last_delivered(), state.today_iso())
+        store.write_last_delivered()
+        self.assertEqual(store.read_last_delivered(), clock.today_iso())
         for name, judgments, results in (
             ("a quiet retry", [], [healthy]),
             ("a retry that found changes", [judgment], [healthy]),
@@ -472,8 +478,8 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
             )
 
         # A marker from a previous day suppresses nothing.
-        state.write_last_delivered("2020-01-01")
-        self.assertNotEqual(state.read_last_delivered(), state.today_iso())
+        store.write_last_delivered("2020-01-01")
+        self.assertNotEqual(store.read_last_delivered(), clock.today_iso())
         self.assertEqual(digest.should_send([], [healthy]), (True, True))
 
     def test_14_6c_the_delivery_lock_falls_back_when_github_cannot_be_asked(self):
@@ -488,7 +494,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         saved = {name: os.environ.pop(name, None) for name in names}
         try:
             self.assertIsNone(
-                digest.delivered_issue_exists(state.today_iso()),
+                digest.delivered_issue_exists(clock.today_iso()),
                 "without a repo and token the answer is unknown, not False",
             )
         finally:
@@ -500,14 +506,14 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
     def test_eligible_column_is_never_rewritten(self):
         programs = [
             {
-                **{column: "" for column in state.PROGRAM_COLUMNS},
+                **{column: "" for column in paths.PROGRAM_COLUMNS},
                 "name": "Jane Street FTTP",
                 "eligible": "YES",
                 "status": "dormant",
             }
         ]
         sources = [dict(self.source, program_names="Jane Street FTTP")]
-        change = state.Change(
+        change = models.Change(
             source_id="nuft-2027", kind="changed", key="Jane Street / FTTP", detail="x"
         )
         judgment = classify.Judgment(
@@ -519,16 +525,16 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
             program_name="Jane Street FTTP",
             eligible_proposal="NO",
         )
-        result = state.SourceResult(
+        result = models.SourceResult(
             source_id="nuft-2027", ok=True, changes=[change], snapshot_text="x"
         )
         check.update_program_state(programs, sources, [result], [judgment])
         self.assertEqual(programs[0]["eligible"], "YES", "eligible must be untouched")
         self.assertEqual(programs[0]["status"], "open", "status is ours to maintain")
-        self.assertTrue(state.PROPOSALS_LOG.exists(), "the status change must be logged")
+        self.assertTrue(paths.PROPOSALS_LOG.exists(), "the status change must be logged")
 
     def test_muted_rows_are_silenced(self):
-        self.assertIn("muted", state.PROGRAM_COLUMNS)
+        self.assertIn("muted", paths.PROGRAM_COLUMNS)
 
 
 class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
@@ -616,7 +622,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
         detail = f"Company=[ACME](https://simplify.jobs/c/ACME); Role={key}"
         if url:
             detail += f"; Application=[ ](https://ats.example.com/x) [ ]({url})"
-        return state.Change(
+        return models.Change(
             source_id="simplify-2027", kind="added", key=key, detail=detail
         )
 
@@ -683,7 +689,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
         WORTH A LOOK. Urgency now means rolling review or a first-year-targeted row.
         """
         def judge(**kw):
-            change = state.Change(source_id="simplify-2027", kind="added",
+            change = models.Change(source_id="simplify-2027", kind="added",
                                   key="ACME / Software Engineer Intern", detail="x", **kw)
             return classify.Judgment(change=change, relevant=True, classified=True,
                                      confidence="high")
@@ -700,7 +706,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
             classify.PROFILE_LAST_REVIEWED = "2019-01-01"
             _, body = digest.render([], [], {})
             self.assertIn("interest profile was last reviewed", body)
-            classify.PROFILE_LAST_REVIEWED = state.today_iso()
+            classify.PROFILE_LAST_REVIEWED = clock.today_iso()
             _, fresh = digest.render([], [], {})
             self.assertNotIn("interest profile was last reviewed", fresh)
         finally:
@@ -756,7 +762,7 @@ class PostingJudgementTests(_IsolatedState, unittest.TestCase):
         url = self.URL % n
         path = postings._cache_path(url)
         path.write_text(posting_text)
-        change = state.Change(
+        change = models.Change(
             source_id="simplify-2027", kind="added",
             key=f"ACME / {role}",
             detail=f"Company=ACME; Role={role}; Application=[ ]({url})",
@@ -907,7 +913,7 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         payload = {"jobs": [_gh("SWE Intern")]}
         first = job_boards.check(src, FakeJSONClient(payload))
         self.assertTrue(first.baseline)
-        state.write_snapshot("empties", first.snapshot_text, ext="tsv")
+        store.write_snapshot("empties", first.snapshot_text, ext="tsv")
         second = job_boards.check(src, FakeJSONClient({"jobs": []}))
         self.assertFalse(second.ok)
         self.assertIn("0 postings", second.error)
@@ -916,7 +922,7 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         """The description arrives in the same response, so rule 6 works on Tier 2."""
         src = {"source_id": "t", "method": "greenhouse", "url": "s", "program_names": ""}
         first = job_boards.check(src, FakeJSONClient({"jobs": [_gh("SWE Intern")]}))
-        state.write_snapshot("t", first.snapshot_text, ext="tsv")
+        store.write_snapshot("t", first.snapshot_text, ext="tsv")
         second = job_boards.check(
             src,
             FakeJSONClient({"jobs": [
@@ -1071,7 +1077,7 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
 
     def test_14_9m_a_page_that_shrinks_is_a_failure(self):
         r = page_watch.check(self._src(source_id="shrink"), FakeHTMLClient(self.PAGE))
-        state.write_snapshot("shrink", r.snapshot_text, ext="txt")
+        store.write_snapshot("shrink", r.snapshot_text, ext="txt")
         # Above the absolute floor but well under 40% of the baseline, so the ratio
         # rule is what fires rather than the character minimum.
         small = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 12 + "</body></html>"
@@ -1081,7 +1087,7 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
 
     def test_14_9n_one_change_per_page_and_discovery_reads_added_text_only(self):
         r = page_watch.check(self._src(source_id="one"), FakeHTMLClient(self.PAGE))
-        state.write_snapshot("one", r.snapshot_text, ext="txt")
+        store.write_snapshot("one", r.snapshot_text, ext="txt")
         grown = self.PAGE.replace("</body>", "<p>New freshman track announced.</p></body>")
         second = page_watch.check(self._src(source_id="one"), FakeHTMLClient(grown))
         self.assertEqual(len(second.changes), 1, "a page must never emit one change per line")
@@ -1092,7 +1098,7 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         # side, so the change must not be a discovery candidate.
         had = self.PAGE.replace("</body>", "<p>Freshman track is open.</p></body>")
         base = page_watch.check(self._src(source_id="gone"), FakeHTMLClient(had))
-        state.write_snapshot("gone", base.snapshot_text, ext="txt")
+        store.write_snapshot("gone", base.snapshot_text, ext="txt")
         third = page_watch.check(self._src(source_id="gone"), FakeHTMLClient(self.PAGE))
         self.assertEqual(len(third.changes), 1)
         self.assertFalse(third.changes[0].is_discovery_candidate,
@@ -1123,20 +1129,20 @@ class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
         """Discovery proposes and never adds. Watched against a seeded copy rather
         than the real file: a test that asserts "this never writes the database" must
         not be pointed at the database, or the run that disproves it also destroys it."""
-        state.write_sources([{"source_id": "seeded", "method": "github_readme",
+        store.write_sources([{"source_id": "seeded", "method": "github_readme",
                               "url": "a/b"}])
-        before = state.SOURCES_CSV.read_bytes()
+        before = paths.SOURCES_CSV.read_bytes()
         discover.record([discover.Candidate("repo", "repo:a/b", "a/b", "u", "e")])
-        self.assertEqual(state.SOURCES_CSV.read_bytes(), before)
+        self.assertEqual(paths.SOURCES_CSV.read_bytes(), before)
 
     def test_14_9p_a_candidate_already_on_file_is_never_re_proposed(self):
         """Including rejected ones: that status is a permanent tombstone."""
-        state.write_discovered([{
+        store.write_discovered([{
             "first_proposed": "2026-01-01", "last_proposed": "2026-01-01", "kind": "repo",
             "key": "repo:seen/repo", "title": "seen/repo", "url": "u",
             "evidence": "e", "status": "rejected",
         }])
-        seen = {r["key"] for r in state.read_discovered()}
+        seen = {r["key"] for r in store.read_discovered()}
         self.assertIn("repo:seen/repo", seen)
 
     def test_14_9q_discovery_only_runs_on_monday_or_after_a_missed_week(self):
@@ -1148,12 +1154,12 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
     def test_14_9r_a_ticked_item_is_hidden_and_next_cycle_resurfaces(self):
         """Keys hash source_id + row key, so the Summer 2028 repost differs from the
         Summer 2027 one and comes back on its own -- no expiry logic needed."""
-        k27 = state.change_key("b", "SWE Intern, Summer 2027")
-        k28 = state.change_key("b", "SWE Intern, Summer 2028")
+        k27 = clock.change_key("b", "SWE Intern, Summer 2027")
+        k28 = clock.change_key("b", "SWE Intern, Summer 2028")
         self.assertNotEqual(k27, k28)
-        state.write_applied({k27: "2026-09-11"})
-        self.assertIn(k27, state.read_applied())
-        self.assertNotIn(k28, state.read_applied())
+        store.write_applied({k27: "2026-09-11"})
+        self.assertIn(k27, store.read_applied())
+        self.assertNotIn(k28, store.read_applied())
 
     def test_14_9s2_a_dismissal_is_scoped_to_its_hiring_cycle(self):
         """Next year's repost must return even when the title never says a year.
@@ -1164,17 +1170,17 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         cycle covers both, with no expiry clock that could lapse mid-season.
         """
         plain = "Quantitative Trader @ New York"
-        sept = state.change_key("js", plain, state.recruiting_cycle("2026-09-11"))
-        january = state.change_key("js", plain, state.recruiting_cycle("2027-01-15"))
-        next_july = state.change_key("js", plain, state.recruiting_cycle("2027-07-01"))
+        sept = clock.change_key("js", plain, clock.recruiting_cycle("2026-09-11"))
+        january = clock.change_key("js", plain, clock.recruiting_cycle("2027-01-15"))
+        next_july = clock.change_key("js", plain, clock.recruiting_cycle("2027-07-01"))
         self.assertEqual(sept, january, "a dismissal must hold for the whole season")
         self.assertNotEqual(sept, next_july, "the next season must be a new item")
 
     def test_14_9s3_the_cycle_rolls_over_mid_year_not_in_january(self):
         """Summer 2027 roles are advertised from about July 2026."""
-        self.assertEqual(state.recruiting_cycle("2026-09-11"), 2027)
-        self.assertEqual(state.recruiting_cycle("2027-06-30"), 2027)
-        self.assertEqual(state.recruiting_cycle("2027-07-01"), 2028)
+        self.assertEqual(clock.recruiting_cycle("2026-09-11"), 2027)
+        self.assertEqual(clock.recruiting_cycle("2027-06-30"), 2027)
+        self.assertEqual(clock.recruiting_cycle("2027-07-01"), 2028)
 
     def test_14_9t_the_digest_is_one_table_with_act_now_rows_first(self):
         """The owner asked for a table, not two prose sections.
@@ -1184,7 +1190,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         NOW row sits above every WORTH A LOOK row.
         """
         rolling = classify.Judgment(
-            change=state.Change(
+            change=models.Change(
                 source_id="js", kind="added", key="SWE Intern @ NYC", detail="x",
                 url="https://example.com/a", rolling=True,
             ),
@@ -1192,7 +1198,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
             confidence="high", why="First-year eligible.",
         )
         ordinary = classify.Judgment(
-            change=state.Change(source_id="b", kind="added", key="Quant Intern", detail="x"),
+            change=models.Change(source_id="b", kind="added", key="Quant Intern", detail="x"),
             program_name="Some Firm", relevant=True, classified=True, confidence="low",
         )
         _, body = digest.render([ordinary, rolling], [], {})
@@ -1212,7 +1218,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
     def test_14_9u_a_pipe_in_a_title_cannot_break_the_table(self):
         """One unescaped pipe silently shifts every later column in that row."""
         judgment = classify.Judgment(
-            change=state.Change(
+            change=models.Change(
                 source_id="b", kind="added", key="SWE | Intern", detail="x",
             ),
             program_name="Some | Firm", relevant=True, classified=True,
@@ -1227,7 +1233,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
     def test_14_9v_a_long_reason_is_truncated_to_a_clause(self):
         """An unbounded `why` wraps the table into the wall of text it replaced."""
         judgment = classify.Judgment(
-            change=state.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
+            change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
             program_name="Some Firm", relevant=True, classified=True,
             confidence="high", why="word " * 100,
         )
@@ -1427,7 +1433,7 @@ class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
         first = job_boards.check(self.SRC, FakeJSONClient({"jobs": []}))
         self.assertTrue(first.ok, first.error)
         self.assertEqual(first.extra["rows"], 0)
-        state.write_snapshot("quiet", first.snapshot_text, ext="tsv")
+        store.write_snapshot("quiet", first.snapshot_text, ext="tsv")
 
     def test_an_error_key_beside_an_empty_list_is_a_failure(self):
         """Greenhouse's actual rate-limit shape."""
@@ -1626,7 +1632,7 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         classify.reset_screen()
 
     def test_a_screened_change_is_ruled_out_with_no_model_call(self):
-        change = state.Change(
+        change = models.Change(
             source_id="b", kind="added", key="SWE Intern", detail="x",
             posting_text="Expected graduation date: 2027 or 2028.",
         )
@@ -1638,7 +1644,7 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(classify.USAGE.calls, 0, "no model call may have been made")
 
     def test_the_screen_reports_what_it_removed(self):
-        change = state.Change(
+        change = models.Change(
             source_id="b", kind="added", key="SWE Intern", detail="x",
             posting_text="Must be a rising senior.",
         )
@@ -1662,17 +1668,17 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
     NOW = datetime.datetime(2026, 9, 12, 12, 0, tzinfo=datetime.timezone.utc)
 
     def test_the_backoff_schedule(self):
-        self.assertEqual(state.quarantine_hours(0), 0)
-        self.assertEqual(state.quarantine_hours(2), 0, "below the threshold, keep trying")
-        self.assertEqual(state.quarantine_hours(3), 6)
-        self.assertEqual(state.quarantine_hours(4), 12)
-        self.assertEqual(state.quarantine_hours(5), 24)
-        self.assertEqual(state.quarantine_hours(6), 48)
-        self.assertEqual(state.quarantine_hours(7), 72)
-        self.assertEqual(state.quarantine_hours(40), 72, "the cap holds; boards come back")
+        self.assertEqual(breaker.quarantine_hours(0), 0)
+        self.assertEqual(breaker.quarantine_hours(2), 0, "below the threshold, keep trying")
+        self.assertEqual(breaker.quarantine_hours(3), 6)
+        self.assertEqual(breaker.quarantine_hours(4), 12)
+        self.assertEqual(breaker.quarantine_hours(5), 24)
+        self.assertEqual(breaker.quarantine_hours(6), 48)
+        self.assertEqual(breaker.quarantine_hours(7), 72)
+        self.assertEqual(breaker.quarantine_hours(40), 72, "the cap holds; boards come back")
 
     def test_a_healthy_source_is_never_skipped(self):
-        skip, _ = state.quarantine_state(
+        skip, _ = breaker.quarantine_state(
             {"consecutive_failures": "0", "last_attempt": self.NOW.isoformat()}, self.NOW
         )
         self.assertFalse(skip)
@@ -1683,7 +1689,7 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
             "last_attempt": (self.NOW - datetime.timedelta(hours=1)).isoformat(),
             "last_success": "2026-09-01T00:00:00+00:00",
         }
-        skip, why = state.quarantine_state(src, self.NOW)
+        skip, why = breaker.quarantine_state(src, self.NOW)
         self.assertTrue(skip)
         self.assertIn("quarantined for 6h", why)
 
@@ -1692,7 +1698,7 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
             "consecutive_failures": "3",
             "last_attempt": (self.NOW - datetime.timedelta(hours=7)).isoformat(),
         }
-        skip, _ = state.quarantine_state(src, self.NOW)
+        skip, _ = breaker.quarantine_state(src, self.NOW)
         self.assertFalse(skip, "6h window, 7h ago: it must be retried")
 
     def test_a_source_that_never_succeeded_says_to_check_the_url(self):
@@ -1703,17 +1709,17 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
             "last_attempt": self.NOW.isoformat(),
             "last_success": "",
         }
-        _, why = state.quarantine_state(src, self.NOW)
+        _, why = breaker.quarantine_state(src, self.NOW)
         self.assertIn("never succeeded", why)
         self.assertIn("check the URL", why)
 
     def test_no_attempt_on_record_means_try_it(self):
-        skip, _ = state.quarantine_state({"consecutive_failures": "9"}, self.NOW)
+        skip, _ = breaker.quarantine_state({"consecutive_failures": "9"}, self.NOW)
         self.assertFalse(skip, "nothing says a window has started")
 
     def test_a_corrupt_timestamp_fails_open(self):
         """A breaker that silently stops fetching on bad data is the worst outcome."""
-        skip, _ = state.quarantine_state(
+        skip, _ = breaker.quarantine_state(
             {"consecutive_failures": "5", "last_attempt": "not a date"}, self.NOW
         )
         self.assertFalse(skip)
@@ -1726,7 +1732,7 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
             "last_success": "", "last_attempt": "2026-09-12T00:00:00+00:00",
         }]
         check.update_source_state(
-            sources, [state.SourceResult(source_id="s", ok=False, quarantined=True)]
+            sources, [models.SourceResult(source_id="s", ok=False, quarantined=True)]
         )
         self.assertEqual(sources[0]["consecutive_failures"], "3", "must not increment")
         self.assertEqual(sources[0]["last_attempt"], "2026-09-12T00:00:00+00:00")
@@ -1734,14 +1740,14 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
     def test_a_real_attempt_records_last_attempt(self):
         sources = [{"source_id": "s", "consecutive_failures": "0", "last_attempt": ""}]
         check.update_source_state(
-            sources, [state.SourceResult(source_id="s", ok=False, error="HTTP 500")]
+            sources, [models.SourceResult(source_id="s", ok=False, error="HTTP 500")]
         )
         self.assertEqual(sources[0]["consecutive_failures"], "1")
         self.assertTrue(sources[0]["last_attempt"], "an attempt must start the window")
 
     def test_a_quarantined_source_is_still_reported_and_still_escalates(self):
         """The breaker changes fetch policy, never reporting policy (spec 10.1)."""
-        result = state.SourceResult(
+        result = models.SourceResult(
             source_id="gts-careers", ok=False, quarantined=True,
             error="quarantined for 6h after 3 consecutive failures",
         )
@@ -1763,7 +1769,7 @@ class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
 
     def _row(self, key, program="SimplifyJobs Summer 2027", url="https://x.test/1"):
         j = classify.Judgment(
-            change=state.Change(source_id="simplify-2027", kind="added", key=key,
+            change=models.Change(source_id="simplify-2027", kind="added", key=key,
                                 detail="x", url=url),
             program_name=program, relevant=True, classified=True, confidence="high",
         )
@@ -1871,13 +1877,13 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
     def test_the_verdict_helper_recognises_several_error_page_shapes(self):
         for final in ("https://x.test/404", "https://x.test/not-found",
                       "https://x.test/page-not-found/", "https://x.test/error"):
-            sev, _ = state.redirect_verdict("https://x.test/careers", final)
+            sev, _ = redirect.verdict("https://x.test/careers", final)
             self.assertEqual(sev, "fail", final)
 
     def test_a_query_only_change_does_not_warn(self):
         """optiver-students keeps its ?level=student through the redirect; the path is
         what identifies the page."""
-        sev, _ = state.redirect_verdict(
+        sev, _ = redirect.verdict(
             "https://optiver.com/careers/?level=student",
             "https://optiver.com/careers?level=student&utm=x",
         )
@@ -1895,9 +1901,9 @@ class MutedProgramTests(_IsolatedState, unittest.TestCase):
     """
 
     def _run(self, program_name, muted_names):
-        result = state.SourceResult(
+        result = models.SourceResult(
             source_id="s", ok=True,
-            changes=[state.Change(source_id="s", kind="added", key="Row",
+            changes=[models.Change(source_id="s", kind="added", key="Row",
                                   detail="x", program_name=program_name)],
         )
         programs = [
@@ -2043,9 +2049,9 @@ class AtsProbeTests(_IsolatedState, unittest.TestCase):
         # The probe sleeps REQUEST_DELAY_SECONDS between fetches to be polite to real
         # hosts. Against fakes that is 12 seconds of the suite doing nothing, and a
         # slow suite is a suite that stops being run.
-        original = state.REQUEST_DELAY_SECONDS
-        state.REQUEST_DELAY_SECONDS = 0.0
-        self.addCleanup(setattr, state, "REQUEST_DELAY_SECONDS", original)
+        original = paths.REQUEST_DELAY_SECONDS
+        paths.REQUEST_DELAY_SECONDS = 0.0
+        self.addCleanup(setattr, paths, "REQUEST_DELAY_SECONDS", original)
 
     class Pages:
         """Serves a fixed body per URL, and 404s anything else."""
@@ -2190,7 +2196,7 @@ class LiveDataInvariantTests(unittest.TestCase):
 
     def test_14_9_every_method_in_sources_csv_has_a_handler(self):
         """A typo'd method must be caught here rather than going unwatched in prod."""
-        methods = {(r.get("method") or "").strip() for r in state.read_sources()}
+        methods = {(r.get("method") or "").strip() for r in store.read_sources()}
         unknown = methods - set(check.CHECKERS) - {check.UNWATCHED}
         self.assertEqual(unknown, set(), f"sources.csv has unhandled methods: {unknown}")
 
@@ -2198,15 +2204,15 @@ class LiveDataInvariantTests(unittest.TestCase):
         from openpyxl import load_workbook
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)
-            saved = (state.OUT_XLSX, state.OUT_TRACKED_XLSX)
-            state.OUT_XLSX = root / "programs.xlsx"
-            state.OUT_TRACKED_XLSX = root / "tracked.xlsx"
+            saved = (paths.OUT_XLSX, paths.OUT_TRACKED_XLSX)
+            paths.OUT_XLSX = root / "programs.xlsx"
+            paths.OUT_TRACKED_XLSX = root / "tracked.xlsx"
             try:
-                paths = build_xlsx.build()
-                self.assertEqual(len(paths), 2)
-                for path in paths:
+                built = build_xlsx.build()
+                self.assertEqual(len(built), 2)
+                for path in built:
                     self.assertTrue(path.exists(), path)
-                owner = load_workbook(state.OUT_XLSX)
+                owner = load_workbook(paths.OUT_XLSX)
                 self.assertEqual(owner.worksheets[0].title, "Check By Hand")
                 self.assertIn("Left Out", owner.sheetnames)
                 codes = {
@@ -2215,15 +2221,15 @@ class LiveDataInvariantTests(unittest.TestCase):
                 }
                 self.assertNotIn("NO", codes)
                 self.assertNotIn("STALE", codes)
-                tracked = load_workbook(state.OUT_TRACKED_XLSX)
+                tracked = load_workbook(paths.OUT_TRACKED_XLSX)
                 self.assertEqual(
                     tracked.sheetnames,
                     ["All Programs", "Sources", "Applied", "Discovered"])
                 # the full list still exists somewhere -- it moved, it was not dropped
                 self.assertEqual(
-                    tracked["All Programs"].max_row - 1, len(state.read_programs()))
+                    tracked["All Programs"].max_row - 1, len(store.read_programs()))
             finally:
-                state.OUT_XLSX, state.OUT_TRACKED_XLSX = saved
+                paths.OUT_XLSX, paths.OUT_TRACKED_XLSX = saved
 
 
 class HarnessSelfTests(_IsolatedState, unittest.TestCase):

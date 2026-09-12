@@ -18,7 +18,7 @@ Three findings that shape this module:
   are dead ends for a text fetch -- Workday returns literally zero characters, because
   the posting renders entirely in JavaScript. Simplify's page returns 13K-34K characters
   of real text including the requirements block.
-* **The honest User-Agent works.** `state.USER_AGENT` and a browser string return byte
+* **The honest User-Agent works.** `paths.USER_AGENT` and a browser string return byte
   identical responses (140,325 bytes on the page tested), so there is no reason to
   pretend to be a browser. `robots.txt` allows `/p/` (`Allow: /`, and `/p` is absent
   from the disallow list) and sets no crawl-delay.
@@ -36,14 +36,14 @@ import time
 
 import httpx
 
-import state
+from core import models, paths
 
 # Rows put the ATS link and the Simplify link in the same `Application=` field, ATS
 # first. Only the second one is fetchable, so match it specifically rather than taking
 # the first URL in the row.
 POSTING_URL = re.compile(r"https://simplify\.jobs/p/[0-9a-fA-F-]+")
 
-CACHE_DIR = state.DATA / "postings_cache"
+CACHE_DIR = paths.DATA / "postings_cache"
 
 # Below this, the response is a JavaScript shell rather than a posting. The real pages
 # measured 13K-34K characters; the Workday shells measured 0.
@@ -68,7 +68,7 @@ _WHITESPACE = re.compile(r"\s+")
 _ENTITIES = {"&#x27;": "'", "&amp;": "&", "&quot;": '"', "&lt;": "<", "&gt;": ">", "&nbsp;": " "}
 
 
-def posting_url(change: state.Change) -> str | None:
+def posting_url(change: models.Change) -> str | None:
     """The Simplify posting link for a row, or None if it has none.
 
     `change.url` is deliberately not used: it holds the *company* page
@@ -136,14 +136,14 @@ def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
 
 def build_client() -> httpx.Client:
     return httpx.Client(
-        headers={"User-Agent": state.USER_AGENT},
-        timeout=state.HTTP_TIMEOUT_SECONDS,
+        headers={"User-Agent": paths.USER_AGENT},
+        timeout=paths.HTTP_TIMEOUT_SECONDS,
         follow_redirects=True,
     )
 
 
 def fetch_for_changes(
-    changes: list[state.Change], client: httpx.Client | None = None
+    changes: list[models.Change], client: httpx.Client | None = None
 ) -> dict[str, tuple[str, str]]:
     """Fetch every posting referenced by `changes`, concurrently.
 
