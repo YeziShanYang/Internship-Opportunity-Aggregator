@@ -26,6 +26,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import check
 import classify
 import discover
+import screen
 import digest
 import state
 import build_xlsx
@@ -1429,3 +1430,165 @@ class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
         )
         self.assertTrue(r.ok, r.error)
         self.assertEqual(r.extra["rows"], 1)
+
+
+class DeterministicScreenTests(unittest.TestCase):
+    """screen.py may only rule OUT, only on a quoted phrase, and never on silence.
+
+    Validated against the 2026-09-12 run: 77 changes the model judged, 40 of which it
+    ruled out. The screen reproduces 28 of those 40 with **zero** wrong rule-outs among
+    the 37 the model kept. Recall is negotiable -- a miss costs one model call. Precision
+    is not -- a wrong rule-out costs a real opportunity, so every phrase below that
+    produced a false positive in the first draft is pinned here as a test.
+    """
+
+    def assertRuledOut(self, text, rule, title="Software Engineer Intern"):
+        v = screen.screen(title, text)
+        self.assertIsNotNone(v, f"should have ruled out: {text!r}")
+        self.assertEqual(v.rule, rule)
+        return v
+
+    def assertDeferred(self, text, title="Software Engineer Intern"):
+        v = screen.screen(title, text)
+        self.assertIsNone(v, f"must defer to the model, not rule out: {text!r}\n{v}")
+
+    # --- the precision guards: real phrases that the first draft got wrong ---------
+
+    def test_or_later_is_an_open_window_and_includes_a_2030_graduate(self):
+        """Qualcomm, 2026-09-12. The first draft ruled this out. It should not."""
+        self.assertDeferred("Expected graduation date of November 2027 or later.")
+
+    def test_and_beyond_is_an_open_window(self):
+        """Mastercard, 2026-09-12."""
+        self.assertDeferred(
+            "Currently pursuing a Bachelor's degree in Computer Science, Engineering, "
+            "or a related field graduating December 2027 and beyond"
+        )
+
+    def test_graduating_after_a_year_is_an_open_window(self):
+        """Northrop Grumman, 2026-09-12."""
+        self.assertDeferred(
+            "Must be pursuing an undergraduate or graduate degree from an accredited "
+            "college or university and graduating after August 2027."
+        )
+
+    def test_an_internship_season_is_not_a_graduation_year(self):
+        """The trap the whole module is built around: a Summer 2027 posting says
+        2027 everywhere without saying anything about when you graduate."""
+        self.assertDeferred(
+            "Software Engineer Intern, Summer 2027. This internship runs June 2027 "
+            "through August 2027 and is based in New York."
+        )
+
+    def test_a_window_naming_an_acceptable_year_does_not_rule_out(self):
+        self.assertDeferred("Graduating between December 2027 and June 2030.")
+
+    def test_a_range_that_includes_sophomores_does_not_rule_out(self):
+        self.assertDeferred(
+            "Open to rising sophomores, juniors and seniors enrolled full time."
+        )
+
+    def test_bachelors_alongside_masters_does_not_rule_out(self):
+        self.assertDeferred(
+            "Pursuing a Bachelor's, Master's or PhD in Computer Science or related."
+        )
+
+    def test_no_posting_text_never_rules_out(self):
+        """Absence of evidence is never evidence -- the same instruction the prompt
+        gives the model when a posting fetch failed."""
+        self.assertDeferred("")
+        self.assertDeferred("   \n  ")
+
+    def test_it_can_only_rule_out_never_in(self):
+        """There is no affirmative verdict. The only outcomes are a rule-out or None."""
+        v = screen.screen("Quantitative Trading Intern", "Open to all undergraduates.")
+        self.assertIsNone(v)
+        self.assertFalse(hasattr(screen.Verdict("x", "y"), "relevant"))
+
+    # --- the rule-outs, each a real phrase from the validation set -----------------
+
+    def test_an_explicit_excluding_graduation_year(self):
+        v = self.assertRuledOut(
+            "Expected graduation date: 2027 or 2028.", "graduation-window"
+        )
+        self.assertIn("2027", v.why, "the reason must quote the evidence")
+
+    def test_a_december_2027_to_summer_2028_window(self):
+        self.assertRuledOut(
+            "with a graduation date between December 2027 and Summer 2028",
+            "graduation-window",
+        )
+
+    def test_degree_by_a_date_this_owner_cannot_meet(self):
+        self.assertRuledOut(
+            "Scheduled to obtain a Bachelor's degree in Computer Science by Summer 2028.",
+            "graduation-window",
+        )
+
+    def test_junior_level_standing(self):
+        self.assertRuledOut(
+            "Must be entering junior-level standing by the internship start date.",
+            "advanced-standing",
+        )
+
+    def test_rising_senior(self):
+        self.assertRuledOut("Applicants must be a rising senior.", "advanced-standing")
+
+    def test_graduate_students_only(self):
+        self.assertRuledOut(
+            "Pursuing a Master's or Ph.D. degree in Computer Science, Data Science, "
+            "or a related technical discipline.",
+            "graduate-only",
+        )
+
+    def test_already_holds_the_degree(self):
+        self.assertRuledOut(
+            "Must have graduated with a bachelor's degree from an accredited "
+            "college or university.",
+            "already-graduated",
+        )
+
+    # --- title screen (prompt rule 7) ---------------------------------------------
+
+    def test_a_plainly_out_of_field_title(self):
+        v = screen.screen("Human Resources Intern", "")
+        self.assertIsNotNone(v)
+        self.assertEqual(v.rule, "out-of-field-title")
+
+    def test_a_technical_word_rescues_an_out_of_field_title(self):
+        """Rule 7's own caveat: when a role is technical at all, keep it."""
+        self.assertDeferred("", title="Marketing Data Scientist Intern")
+        self.assertDeferred("", title="Recruiting Software Engineer Intern")
+
+    def test_an_ordinary_technical_title_is_untouched(self):
+        self.assertDeferred("", title="Quantitative Research Intern")
+
+
+class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        classify.reset_screen()
+
+    def test_a_screened_change_is_ruled_out_with_no_model_call(self):
+        change = state.Change(
+            source_id="b", kind="added", key="SWE Intern", detail="x",
+            posting_text="Expected graduation date: 2027 or 2028.",
+        )
+        judgments = classify.classify([change], {"b": {"source_id": "b", "signal": "high"}})
+        self.assertEqual(len(judgments), 1)
+        self.assertFalse(judgments[0].relevant)
+        self.assertTrue(judgments[0].classified, "a quoted phrase is a real judgment")
+        self.assertEqual(judgments[0].screen_rule, "graduation-window")
+        self.assertEqual(classify.USAGE.calls, 0, "no model call may have been made")
+
+    def test_the_screen_reports_what_it_removed(self):
+        change = state.Change(
+            source_id="b", kind="added", key="SWE Intern", detail="x",
+            posting_text="Must be a rising senior.",
+        )
+        classify.classify([change], {"b": {"source_id": "b", "signal": "high"}})
+        line = classify.screen_line()
+        self.assertIn("1 of 1", line)
+        self.assertIn("advanced-standing", line)
+        _, body = digest.render([], [], {})
+        self.assertIn("advanced-standing", body, "HEALTH must carry it")
