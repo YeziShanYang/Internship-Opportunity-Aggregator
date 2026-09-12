@@ -36,6 +36,7 @@ from __future__ import annotations
 import concurrent.futures
 import json
 import os
+import threading
 from dataclasses import dataclass, field
 
 import state
@@ -49,6 +50,37 @@ MODEL = "claude-opus-5"
 AZURE_DEFAULT_DEPLOYMENT = "gpt-5-mini"
 AZURE_DEFAULT_ENDPOINT = "https://opptracker-ai-jshi.openai.azure.com/"
 AZURE_DEFAULT_API_VERSION = "2024-12-01-preview"
+
+# Reasoning effort, split by task because the two tasks are not the same difficulty.
+#
+# Measured on the 2026-09-12 run (80 calls, $0.34): input was 245K tokens costing
+# $0.064, so 81% of the bill was output, and at effort="low" the implied output was
+# ~1,727 tokens per call against a ~150-token JSON answer. Almost all of the money is
+# reasoning tokens, which is why this is the lever that matters and the 12K posting-text
+# budget is not -- trimming that is worth 8%.
+#
+# The daily read is a narrow question against text that states the answer outright:
+# does this posting name a graduation window or an identity gate this person fails.
+# "minimal" is the bet that this needs recognition rather than deliberation, and the
+# 2026-09-15 digest is the test of it.
+CLASSIFY_REASONING_EFFORT = "minimal"
+
+# The weekly small-firm pass is a harder judgment -- is this employer small, is it
+# reachable from St. Louis or the Bay, does it hire first-years -- and it runs on a
+# fraction of the volume, so it can afford to think. The owner's instruction was
+# explicit that minimal here "is probably just going to give me a bunch of normal
+# results".
+SMALL_FIRM_REASONING_EFFORT = "medium"
+
+# Anthropic and Azure do not share an effort vocabulary; Anthropic has no "minimal".
+ANTHROPIC_EFFORT = {"minimal": "low", "low": "low", "medium": "medium", "high": "high"}
+
+# List prices per million tokens, (input, output), as published 2026-09-12. Only models
+# whose pricing has actually been checked appear here: an unpriced model reports its
+# token counts and says so, rather than inventing a dollar figure.
+PRICES_PER_MTOK = {
+    "gpt-5-mini": (0.25, 2.00),
+}
 
 # Bounds the daily bill. Any overflow still reaches the digest, just unclassified.
 # Raised from 60 when the backend moved to gpt-5-mini and postings started being
@@ -264,6 +296,91 @@ def _render_change(change: state.Change, posting: tuple[str, str] | None = None)
     return "\n".join(lines)
 
 
+@dataclass
+class Usage:
+    """What the run actually spent, accumulated across the thread pool.
+
+    This exists because the only way to answer "why did yesterday cost 34 cents" used
+    to be to reconstruct the prompts from git and solve backwards from the Azure
+    portal. The digest reports its own bill now: a cost that only shows up on a billing
+    page a day later is a cost nobody notices drifting.
+    """
+
+    provider: str = ""
+    model: str = ""
+    effort: str = ""
+    calls: int = 0
+    input_tokens: int = 0
+    cached_input_tokens: int = 0
+    output_tokens: int = 0
+    reasoning_tokens: int = 0
+    unreported: int = 0  # calls whose response carried no usage block
+
+    def estimated_usd(self) -> float | None:
+        rates = PRICES_PER_MTOK.get(self.model)
+        if rates is None:
+            return None
+        rate_in, rate_out = rates
+        # Cached input bills at a tenth of list on both providers.
+        billed_in = (self.input_tokens - self.cached_input_tokens) + self.cached_input_tokens * 0.1
+        return (billed_in * rate_in + self.output_tokens * rate_out) / 1_000_000
+
+
+USAGE = Usage()
+_USAGE_LOCK = threading.Lock()
+
+
+def reset_usage() -> None:
+    """Start a fresh tally. Called once per run, and by tests between cases."""
+    global USAGE
+    with _USAGE_LOCK:
+        USAGE = Usage()
+
+
+def _record_usage(
+    provider: str, model: str, effort: str, usage, *,
+    input_key: str, output_key: str, reasoning: int = 0, cached: int = 0,
+) -> None:
+    """Fold one response's usage into the run total.
+
+    Missing usage is counted, not assumed to be zero: a provider that stops reporting
+    would otherwise make the run look free, which is the same failure shape as a source
+    that goes quiet instead of failing (spec 10.1).
+    """
+    with _USAGE_LOCK:
+        USAGE.provider, USAGE.model, USAGE.effort = provider, model, effort
+        USAGE.calls += 1
+        if usage is None:
+            USAGE.unreported += 1
+            return
+        USAGE.input_tokens += getattr(usage, input_key, 0) or 0
+        USAGE.output_tokens += getattr(usage, output_key, 0) or 0
+        USAGE.reasoning_tokens += reasoning or 0
+        USAGE.cached_input_tokens += cached or 0
+
+
+def usage_line() -> str | None:
+    """One HEALTH line describing the run's model spend, or None if nothing was called."""
+    u = USAGE
+    if not u.calls:
+        return None
+    bits = [
+        f"classifier: {u.calls} call{'s' if u.calls != 1 else ''}",
+        f"{u.input_tokens:,} in",
+        f"{u.output_tokens:,} out",
+    ]
+    if u.cached_input_tokens:
+        bits.insert(2, f"{u.cached_input_tokens:,} cached")
+    if u.reasoning_tokens:
+        bits.append(f"{u.reasoning_tokens:,} of it reasoning")
+    cost = u.estimated_usd()
+    bits.append(f"~${cost:.4f} est." if cost is not None else f"{u.model} is unpriced here")
+    line = " · ".join(bits) + f" ({u.model}, effort={u.effort})"
+    if u.unreported:
+        line += f" — ⚠ {u.unreported} call(s) reported no usage, so this is an undercount"
+    return line
+
+
 ANTHROPIC = "anthropic"
 AZURE = "azure"
 
@@ -329,7 +446,10 @@ def _judgment_from_text(change: state.Change, text: str) -> Judgment:
     )
 
 
-def _classify_anthropic(client, model: str, change: state.Change, posting=None) -> Judgment:
+def _classify_anthropic(
+    client, model: str, change: state.Change, posting=None,
+    effort: str = CLASSIFY_REASONING_EFFORT,
+) -> Judgment:
     try:
         response = client.messages.create(
             model=model,
@@ -340,13 +460,20 @@ def _classify_anthropic(client, model: str, change: state.Change, posting=None) 
             system=SYSTEM_PROMPT,
             thinking={"type": "adaptive"},
             output_config={
-                "effort": "low",
+                "effort": ANTHROPIC_EFFORT.get(effort, "low"),
                 "format": {"type": "json_schema", "schema": RESULT_SCHEMA},
             },
             messages=[{"role": "user", "content": _render_change(change, posting)}],
         )
     except Exception as exc:
         return Judgment(change=change, error=f"{type(exc).__name__}: {exc}")
+
+    anthropic_usage = getattr(response, "usage", None)
+    _record_usage(
+        ANTHROPIC, model, effort, anthropic_usage,
+        input_key="input_tokens", output_key="output_tokens",
+        cached=getattr(anthropic_usage, "cache_read_input_tokens", 0) or 0,
+    )
 
     if getattr(response, "stop_reason", None) == "refusal":
         # Surface it rather than drop it (rule 3).
@@ -358,7 +485,10 @@ def _classify_anthropic(client, model: str, change: state.Change, posting=None) 
     return _judgment_from_text(change, text)
 
 
-def _classify_azure(client, deployment: str, change: state.Change, posting=None) -> Judgment:
+def _classify_azure(
+    client, deployment: str, change: state.Change, posting=None,
+    effort: str = CLASSIFY_REASONING_EFFORT,
+) -> Judgment:
     try:
         response = client.chat.completions.create(
             model=deployment,
@@ -366,7 +496,7 @@ def _classify_azure(client, deployment: str, change: state.Change, posting=None)
             # (`max_tokens` is rejected) and it must cover the hidden reasoning tokens
             # as well as the JSON, so the same generous 4096 applies here.
             max_completion_tokens=4096,
-            reasoning_effort="low",
+            reasoning_effort=effort,
             response_format={
                 "type": "json_schema",
                 "json_schema": {
@@ -383,6 +513,16 @@ def _classify_azure(client, deployment: str, change: state.Change, posting=None)
     except Exception as exc:
         return Judgment(change=change, error=f"{type(exc).__name__}: {exc}")
 
+    usage = getattr(response, "usage", None)
+    details = getattr(usage, "completion_tokens_details", None)
+    prompt_details = getattr(usage, "prompt_tokens_details", None)
+    _record_usage(
+        AZURE, deployment, effort, usage,
+        input_key="prompt_tokens", output_key="completion_tokens",
+        reasoning=getattr(details, "reasoning_tokens", 0) or 0,
+        cached=getattr(prompt_details, "cached_tokens", 0) or 0,
+    )
+
     choice = response.choices[0] if response.choices else None
     if choice is None:
         return Judgment(change=change, error="Azure returned no choices")
@@ -398,12 +538,13 @@ def _classify_azure(client, deployment: str, change: state.Change, posting=None)
 
 
 def classify_one(
-    provider: str, client, deployment: str, change: state.Change, posting=None
+    provider: str, client, deployment: str, change: state.Change, posting=None,
+    effort: str = CLASSIFY_REASONING_EFFORT,
 ) -> Judgment:
     """Dispatch one change to whichever backend is configured."""
     if provider == ANTHROPIC:
-        return _classify_anthropic(client, deployment, change, posting)
-    return _classify_azure(client, deployment, change, posting)
+        return _classify_anthropic(client, deployment, change, posting, effort)
+    return _classify_azure(client, deployment, change, posting, effort)
 
 
 def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> list[Judgment]:
@@ -419,6 +560,7 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
         for change in summarise_only
     ]
 
+    reset_usage()
     provider = select_provider()
     if provider is None:
         for change in to_classify:

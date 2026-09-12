@@ -1278,3 +1278,86 @@ class OwnerWorkbookTests(unittest.TestCase):
             finally:
                 state.OUT_XLSX, state.OUT_TRACKED_XLSX = saved
 
+
+
+class ClassifierSpendTests(unittest.TestCase):
+    """The run reports its own bill.
+
+    Before this, answering "why did 2026-09-12 cost 34 cents" meant reconstructing the
+    prompts from the snapshot commits and solving backwards from the Azure portal. That
+    reconstruction established that 81% of the spend was reasoning tokens -- a fact
+    nothing in the digest would have surfaced on its own, which is exactly why the cost
+    drifted unnoticed in the first place.
+    """
+
+    class _Details:
+        def __init__(self, reasoning=0):
+            self.reasoning_tokens = reasoning
+
+    class _PromptDetails:
+        def __init__(self, cached=0):
+            self.cached_tokens = cached
+
+    class _Usage:
+        def __init__(self, prompt, completion, reasoning=0, cached=0):
+            self.prompt_tokens = prompt
+            self.completion_tokens = completion
+            self.completion_tokens_details = ClassifierSpendTests._Details(reasoning)
+            self.prompt_tokens_details = ClassifierSpendTests._PromptDetails(cached)
+
+    def setUp(self):
+        classify.reset_usage()
+
+    def tearDown(self):
+        classify.reset_usage()
+
+    def _record(self, usage):
+        classify._record_usage(
+            classify.AZURE, "gpt-5-mini", "minimal", usage,
+            input_key="prompt_tokens", output_key="completion_tokens",
+            reasoning=getattr(usage.completion_tokens_details, "reasoning_tokens", 0),
+            cached=getattr(usage.prompt_tokens_details, "cached_tokens", 0),
+        )
+
+    def test_no_calls_means_no_line(self):
+        self.assertIsNone(classify.usage_line(), "a run that classified nothing")
+
+    def test_it_reproduces_the_2026_09_12_bill(self):
+        """The measured shape of that run: 245,112 in, ~138,167 out, $0.34."""
+        self._record(self._Usage(245_112, 138_167, reasoning=132_000))
+        self.assertAlmostEqual(classify.USAGE.estimated_usd(), 0.3376, places=3)
+        line = classify.usage_line()
+        self.assertIn("245,112 in", line)
+        self.assertIn("132,000 of it reasoning", line)
+        self.assertIn("effort=minimal", line)
+
+    def test_cached_input_bills_at_a_tenth(self):
+        self._record(self._Usage(1_000_000, 0, cached=1_000_000))
+        self.assertAlmostEqual(classify.USAGE.estimated_usd(), 0.025, places=4)
+
+    def test_an_unpriced_model_says_so_rather_than_guessing(self):
+        classify._record_usage(
+            classify.ANTHROPIC, "claude-opus-5", "low",
+            self._Usage(1000, 500), input_key="prompt_tokens",
+            output_key="completion_tokens",
+        )
+        self.assertIsNone(classify.USAGE.estimated_usd())
+        self.assertIn("unpriced", classify.usage_line())
+
+    def test_a_missing_usage_block_is_an_undercount_not_a_free_run(self):
+        """Spec 10.1 again: absent data must not read as zero."""
+        self._record(self._Usage(1000, 500))
+        classify._record_usage(
+            classify.AZURE, "gpt-5-mini", "minimal", None,
+            input_key="prompt_tokens", output_key="completion_tokens",
+        )
+        line = classify.usage_line()
+        self.assertEqual(classify.USAGE.calls, 2)
+        self.assertIn("undercount", line)
+        self.assertIn("2 calls", line)
+
+    def test_the_spend_line_reaches_the_digest(self):
+        self._record(self._Usage(245_112, 138_167, reasoning=132_000))
+        _, body = digest.render([], [], {})
+        self.assertIn("classifier: 1 call", body)
+        self.assertIn("~$0.33", body)
