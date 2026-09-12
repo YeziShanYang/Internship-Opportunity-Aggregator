@@ -25,7 +25,6 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-import check
 import classify
 import discover
 import screen
@@ -33,6 +32,7 @@ import digest
 from core import clock, models, paths
 from gather import breaker
 from persist import store
+from jobs import daily
 from process import redirect, suppress
 import build_xlsx
 from sources import github_repos, job_boards, page_watch, postings, snapshot
@@ -278,7 +278,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertIn("404", result.error)
 
         sources = [dict(self.source)]
-        check.update_source_state(sources, [result])
+        daily.update_source_state(sources, [result])
         self.assertEqual(sources[0]["consecutive_failures"], "1")
         self.assertEqual(sources[0]["last_success"], "", "last_success must not advance")
 
@@ -528,7 +528,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         result = models.SourceResult(
             source_id="nuft-2027", ok=True, changes=[change], snapshot_text="x"
         )
-        check.update_program_state(programs, sources, [result], [judgment])
+        daily.update_program_state(programs, sources, [result], [judgment])
         self.assertEqual(programs[0]["eligible"], "YES", "eligible must be untouched")
         self.assertEqual(programs[0]["status"], "open", "status is ours to maintain")
         self.assertTrue(paths.PROPOSALS_LOG.exists(), "the status change must be logged")
@@ -720,7 +720,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
             change=self._change(), relevant=True, classified=True,
             confidence="high", program_name="Board", new_status="CLOSED",
         )
-        check.update_program_state(programs, [self.SOURCE], [], [judgment])
+        daily.update_program_state(programs, [self.SOURCE], [], [judgment])
         self.assertEqual(programs[0]["status"], "OPEN",
                          "a low-signal board row must not flip the program's status")
 
@@ -847,7 +847,7 @@ class Phase2ConfigTests(_IsolatedState, unittest.TestCase):
     def test_14_9b_an_unknown_method_is_a_failure_not_a_silent_skip(self):
         """The bug this replaced: `continue` produced no SourceResult at all, so a
         typo'd row looked exactly like a quiet source (spec 10.1)."""
-        results = check.run_sources(
+        results = daily.run_sources(
             [{"source_id": "typo", "method": "githb_readme", "url": "x"}], only=None
         )
         self.assertEqual(len(results), 1)
@@ -1738,7 +1738,7 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
             "source_id": "s", "consecutive_failures": "3",
             "last_success": "", "last_attempt": "2026-09-12T00:00:00+00:00",
         }]
-        check.update_source_state(
+        daily.update_source_state(
             sources, [models.SourceResult(source_id="s", ok=False, quarantined=True)]
         )
         self.assertEqual(sources[0]["consecutive_failures"], "3", "must not increment")
@@ -1746,7 +1746,7 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
 
     def test_a_real_attempt_records_last_attempt(self):
         sources = [{"source_id": "s", "consecutive_failures": "0", "last_attempt": ""}]
-        check.update_source_state(
+        daily.update_source_state(
             sources, [models.SourceResult(source_id="s", ok=False, error="HTTP 500")]
         )
         self.assertEqual(sources[0]["consecutive_failures"], "1")
@@ -2205,7 +2205,7 @@ class LiveDataInvariantTests(unittest.TestCase):
     def test_14_9_every_method_in_sources_csv_has_a_handler(self):
         """A typo'd method must be caught here rather than going unwatched in prod."""
         methods = {(r.get("method") or "").strip() for r in store.read_sources()}
-        unknown = methods - set(check.CHECKERS) - {check.UNWATCHED}
+        unknown = methods - set(daily.CHECKERS) - {daily.UNWATCHED}
         self.assertEqual(unknown, set(), f"sources.csv has unhandled methods: {unknown}")
 
     def test_14_10g_both_workbooks_build_and_the_owner_file_excludes_ruled_out_rows(self):

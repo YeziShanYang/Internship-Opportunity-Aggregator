@@ -66,7 +66,7 @@ jobs:
           # quota to student subscriptions because it is Marketplace-billed.
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python check.py
+        run: python run.py all
 
       # The xlsx is rebuilt only when the CSVs actually changed. openpyxl output is not
       # byte-stable (zip timestamps), so rebuilding it unconditionally would put a
