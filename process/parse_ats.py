@@ -29,7 +29,8 @@ import re
 
 from core import clock, models
 from gather import ats
-from sources import postings, snapshot
+from process import snapshot
+from sources import postings
 
 # Either signal is enough. See the module docstring for why neither alone suffices.
 #

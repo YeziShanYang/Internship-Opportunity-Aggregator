@@ -41,7 +41,8 @@ import httpx
 
 from core import clock, paths
 from persist import store
-from sources import job_boards
+from gather import ats
+from process import parse_ats
 
 GITHUB_SEARCH = "https://api.github.com/search/repositories"
 
@@ -71,19 +72,19 @@ BUDGET_SECONDS = 180.0
 # and Eclipse's slugs appear nowhere on their careers pages except inside a Greenhouse
 # embed script, which is exactly the "click a couple more buttons" case.
 _FINGERPRINTS = (
-    (job_boards.GREENHOUSE, re.compile(
+    (ats.GREENHOUSE, re.compile(
         r"(?:job-boards|boards)(?:\.eu)?\.greenhouse\.io/(?:embed/job_board\?for=)?([A-Za-z0-9_-]+)"
     )),
-    (job_boards.GREENHOUSE, re.compile(r"greenhouse\.io/embed/job_board[^\"'\s]*?[?&]for=([A-Za-z0-9_-]+)")),
-    (job_boards.GREENHOUSE, re.compile(r"grnhse_app[^\"'\s]*?[?&]for=([A-Za-z0-9_-]+)")),
+    (ats.GREENHOUSE, re.compile(r"greenhouse\.io/embed/job_board[^\"'\s]*?[?&]for=([A-Za-z0-9_-]+)")),
+    (ats.GREENHOUSE, re.compile(r"grnhse_app[^\"'\s]*?[?&]for=([A-Za-z0-9_-]+)")),
     # The API host, which a site calling Greenhouse from its own JavaScript embeds
     # directly. Graham's slug appears nowhere else on its careers page, and
     # "boards-api" is not "boards", so the link patterns above miss it.
-    (job_boards.GREENHOUSE, re.compile(
+    (ats.GREENHOUSE, re.compile(
         r"boards-api(?:\.eu)?\.greenhouse\.io/v\d+/boards/([A-Za-z0-9_-]+)"
     )),
-    (job_boards.LEVER, re.compile(r"jobs\.(?:eu\.)?lever\.co/([A-Za-z0-9_-]+)")),
-    (job_boards.ASHBY, re.compile(r"jobs\.ashbyhq\.com/([A-Za-z0-9_-]+)")),
+    (ats.LEVER, re.compile(r"jobs\.(?:eu\.)?lever\.co/([A-Za-z0-9_-]+)")),
+    (ats.ASHBY, re.compile(r"jobs\.ashbyhq\.com/([A-Za-z0-9_-]+)")),
 )
 
 # Slugs that are never a board. `embed`, `job_board` and friends appear in the path of
@@ -160,7 +161,7 @@ def _known(sources: list[dict[str, str]]) -> set[str]:
         method = (source.get("method") or "").strip()
         if method == "github_readme":
             known.add(f"repo:{url.lower()}")
-        elif method in job_boards.PARSERS:
+        elif method in ats.SINGLE_SHOT:
             known.add(f"{method}:{url.lower()}")
     return known
 
@@ -230,7 +231,7 @@ def mine_snapshots(known: set[str]) -> list[Candidate]:
                     kind=method,
                     key=key,
                     title=slug,
-                    url=job_boards.ENDPOINTS[method].format(slug=slug),
+                    url=ats.ENDPOINTS[method].format(slug=slug),
                     evidence=f"linked from {path.name}; not in sources.csv",
                 )
     return list(found.values())
@@ -329,7 +330,7 @@ def mine_pages(
                     kind=method,
                     key=key,
                     title=slug,
-                    url=job_boards.ENDPOINTS[method].format(slug=slug),
+                    url=ats.ENDPOINTS[method].format(slug=slug),
                     evidence=(
                         f"found in the HTML of {source['source_id']}, which is watched "
                         f"as page_text; not in sources.csv"
@@ -357,11 +358,13 @@ def verify(candidates: list[Candidate], client: httpx.Client, deadline: float) -
         if budget <= 0 or time.monotonic() > deadline:
             break
         budget -= 1
-        result = job_boards.check(
-            {"source_id": candidate.key, "method": candidate.kind,
-             "url": candidate.title, "program_names": ""},
-            client,
-        )
+        source = {"source_id": candidate.key, "method": candidate.kind,
+                  "url": candidate.title, "program_names": ""}
+        fetched = ats.fetch(source, client, wants_detail=parse_ats.wants_workday_detail)
+        # No previous snapshot by construction -- a candidate has never been watched --
+        # so this is a baseline assessment, which is exactly what "does the slug
+        # actually answer" needs.
+        result = parse_ats.assess(source, fetched, previous=None)
         if not result.ok:
             continue
         rows = result.extra.get("rows", 0)
