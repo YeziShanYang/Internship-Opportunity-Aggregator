@@ -68,7 +68,14 @@ order, and to explicitly decline three of their choices.
 Each phase is independently shippable and independently revertible. Effort is
 my estimate of implementation plus test time.
 
-### Phase 1 — Truncation and malformed-payload safety (do this first)
+### Phase 1 — Truncation and malformed-payload safety — **SHIPPED, narrowed**
+
+Shipped as `MalformedPayload` in `sources/job_boards.py`. The truncation half was
+**not** built: Workday and Phenom already refuse a board they could only page part
+of, and Greenhouse/Lever/Ashby are single-shot full-board APIs with no cap, so the
+`complete` flag would have been machinery with nothing to do. The real hole was
+`{"error": "...", "jobs": []}` reading as an empty board on the 13 watched boards
+that legitimately sit at zero rows.
 
 **Why first:** it is a live correctness bug, not a nicety. Today, a Greenhouse
 board that returns `{"error": "rate limited", "jobs": []}` parses as zero rows.
@@ -90,7 +97,11 @@ bitten yet, and it will.
 *Effort: ~1 day. Risk: low. Payoff: removes a whole class of false "the
 programme closed" reports.*
 
-### Phase 2 — Replace most LLM calls with tested deterministic filters
+### Phase 2 — Deterministic pre-screen — **SHIPPED**
+
+Shipped as `screen.py`. Validated against the 2026-09-12 run as a labelled set:
+reproduces 28 of the model's 40 rule-outs with zero wrong rule-outs among the 37
+it kept, so 36% of calls disappear (the plan guessed 40-60%).
 
 **Why:** this is the cost answer, and it is also a *quality* answer. Their
 `sponsorship.py` shows the pattern: phrase-anchored regexes over whole
@@ -121,7 +132,12 @@ opportunity, so every rule needs a quoted-phrase requirement and a test.
 Payoff: I estimate 40–60% of calls eliminated, on top of the `minimal` effort
 change already shipped.*
 
-### Phase 3 — Circuit breaker with backoff
+### Phase 3 — Circuit breaker — **SHIPPED**
+
+Shipped in `state.quarantine_state` + `check.run_sources`. Note the finding that
+came out of testing it: the nine sources it would quarantine are all HTTP 403 from
+the Actions runner and HTTP 200 from a laptop on the same User-Agent, so they are
+datacenter-IP blocked rather than misconfigured. See "The 403 nine" below.
 
 - Port `health.py` almost directly: 3 consecutive failures → quarantine
   6h/12h/24h/48h/72h, one success resets, state in a committed CSV so it is
@@ -204,3 +220,29 @@ A reasonable stopping point is after Phase 4: the correctness holes are closed,
 the bill is down by roughly three quarters, and nothing about the product has
 changed. Phases 5 and 6 are genuine scope increases and worth deciding on
 separately.
+
+
+## Addendum: the 403 nine (found 2026-09-12 while testing Phase 3)
+
+Nine `page_text` sources sit at three consecutive failures with `last_success`
+empty: akuna-academy, capstone-careers, crabel-careers, graham-careers,
+gts-careers, millennium-students, tower-careers, tudor-careers,
+twosigma-campus.
+
+All nine return **HTTP 403 from the GitHub Actions runner and HTTP 200 from a
+laptop under the identical `state.USER_AGENT`**. The URLs are correct and the
+client is not being refused — the runner's IP range is. That makes this a
+different category from Citadel, which refuses our User-Agent and serves a
+browser string, and where the only route through is to misrepresent the client.
+Here nothing is being misrepresented; the request simply comes from a
+datacenter.
+
+Two of the nine are already covered by an ATS source we watch
+(`akunacapital-greenhouse`, `towerresearch-greenhouse`), so those two page
+watchers are redundant and can be deleted outright. The remaining seven need an
+ATS fingerprint hunt per the CLAUDE.md gotcha, which is Phase 5 work.
+
+This is the decision that should be made deliberately rather than by default:
+a proxy would recover all nine, and it does not involve lying about the client
+the way the Citadel case would. It is still circumventing a block the firm chose
+to apply. Worth a conversation before anyone reaches for it.
