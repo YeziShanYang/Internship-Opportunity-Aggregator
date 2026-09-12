@@ -395,5 +395,8 @@ def fetch(
         sha256=hashlib.sha256(body.encode("utf-8", "replace")).hexdigest(),
         elapsed_ms=int((time.monotonic() - started) * 1000),
         requests=result.attempt.requests or 1,
+        # How many rows the board said it had. Not derivable from the payloads once
+        # parsing has screened them, and losing it is how a filter goes silent.
+        meta={"listed": str(result.listed), "planned": str(result.planned)},
     )
     return result

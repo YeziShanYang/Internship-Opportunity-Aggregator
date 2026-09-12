@@ -18,97 +18,33 @@ that anything happened.
 from __future__ import annotations
 
 import argparse
-import os
 import sys
-import time
 
 import classify
 import digest
 import discover
 from core import clock, models, paths
-from gather import breaker, github_readme
+from gather import collect, github_readme
 from persist import artifacts, store
-from process import suppress
-from sources import github_repos, job_boards, page_watch, postings
+from process import build, suppress
+from sources import postings
 
 
-# Which module handles each `method` in sources.csv, and which HTTP client it gets.
-#
-# Two clients, not one, and that is a credential boundary rather than a style choice.
-# `github_repos.build_client` puts `Authorization: Bearer <GH_PAT>` on every request it
-# makes. While only GitHub was contacted that was harmless; the moment a job board or a
-# careers page shares the client, the PAT is sent to boards-api.greenhouse.io,
-# api.lever.co, api.ashbyhq.com and every firm's marketing site. The web client carries
-# the honest User-Agent and no credentials at all.
-GITHUB_CLIENT = "github"
-WEB_CLIENT = "web"
-
-CHECKERS: dict[str, tuple] = {
-    "github_readme": (github_repos.check, GITHUB_CLIENT),
-    "greenhouse": (job_boards.check, WEB_CLIENT),
-    "lever": (job_boards.check, WEB_CLIENT),
-    "ashby": (job_boards.check, WEB_CLIENT),
-    "workday": (job_boards.check, WEB_CLIENT),
-    "phenom": (job_boards.check, WEB_CLIENT),
-    "eightfold": (job_boards.check, WEB_CLIENT),
-    "page_text": (page_watch.check, WEB_CLIENT),
-}
-
-# Defined in core.paths so build_xlsx.py can share it. Anything else absent from
-# CHECKERS is a broken row, not a source to skip.
-UNWATCHED = paths.UNWATCHED_METHOD
+# Re-exported so the checker registry has one name for the rest of the tree. The
+# method tables themselves live with the stages that own them: which client a method
+# needs is a fetch concern (gather.collect.CLIENT_FOR) and which assessor reads it is a
+# parse concern (process.build.ASSESSORS).
+CHECKERS = collect.CLIENT_FOR
+GITHUB_CLIENT = collect.GITHUB_CLIENT
+WEB_CLIENT = collect.WEB_CLIENT
+UNWATCHED = collect.UNWATCHED
 
 
 def run_sources(
     sources: list[dict[str, str]], only: str | None
 ) -> list[models.SourceResult]:
-    results: list[models.SourceResult] = []
-    token = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
-    if not token:
-        print(
-            "note: no GH_PAT/GITHUB_TOKEN set; using unauthenticated GitHub API "
-            "(60 requests/hour instead of 5,000)",
-            file=sys.stderr,
-        )
-    with github_readme.build_client(token) as github_client, postings.build_client() as web_client:
-        clients = {GITHUB_CLIENT: github_client, WEB_CLIENT: web_client}
-        for source in sources:
-            source_id = source["source_id"]
-            if only and source_id != only:
-                continue
-            method = (source.get("method") or "").strip()
-            if method == UNWATCHED:
-                continue
-            # `--only` is an explicit instruction to look at this source now, so it
-            # bypasses the breaker; that is the affordance you want when you are
-            # debugging the source that is quarantined.
-            if not only:
-                skip, why = breaker.quarantine_state(source)
-                if skip:
-                    results.append(
-                        models.SourceResult(
-                            source_id=source_id, ok=False, quarantined=True, error=why
-                        )
-                    )
-                    continue
-            handler = CHECKERS.get(method)
-            if handler is None:
-                # Spec 10.1. This used to be a bare `continue`, which meant a typo in
-                # sources.csv produced no SourceResult at all: no health line, no
-                # failure count, and a silently unwatched source indistinguishable
-                # from a quiet one. A configuration error has to be visible.
-                results.append(
-                    models.SourceResult(
-                        source_id=source_id,
-                        ok=False,
-                        error=f"sources.csv sets method={method!r}, which no module handles",
-                    )
-                )
-                continue
-            check_fn, client_name = handler
-            results.append(check_fn(source, clients[client_name]))
-            time.sleep(paths.REQUEST_DELAY_SECONDS)  # spec section 11: be a good citizen
-    return results
+    """Gather, then process. Two stages, one call, for the callers that want both."""
+    return build.build(sources, collect.collect(sources, only))
 
 
 def update_source_state(
@@ -198,6 +134,35 @@ def update_program_state(
             program["last_changed"] = now
 
 
+def _suppress(
+    results: list[models.SourceResult], programs: list[dict[str, str]]
+) -> tuple[list[models.Change], list[models.FilterReport]]:
+    return suppress.suppress(
+        [change for result in results for change in result.changes],
+        muted=suppress.muted_programmes(programs),
+        applied=store.read_applied(),
+    )
+
+
+def _write_change_set(
+    results: list[models.SourceResult],
+    changes: list[models.Change],
+    filters: list[models.FilterReport],
+) -> None:
+    """Written whether or not this is a dry run. `.run/` is derived scratch rather than
+    the database, and a dry run is exactly when someone wants to read it. Written after
+    suppression, because a muted change is not a change this run is acting on -- but
+    the count of them is, which is what the FilterReports carry."""
+    artifacts.write(artifacts.CHANGES, "changes", models.ChangeSet(
+        changes=changes,
+        metrics=[models.SourceMetrics.of(result) for result in results],
+        # Both kinds together: the per-source screens each checker applied, and the two
+        # run-wide mute filters. One list, because "did every filter report?" has to be
+        # answerable in one place.
+        filters=[report for result in results for report in result.filters] + filters,
+    ))
+
+
 def run(args: argparse.Namespace) -> int:
     """The whole morning, over already-parsed arguments from `run.py`."""
     sources = store.read_sources()
@@ -220,26 +185,10 @@ def run(args: argparse.Namespace) -> int:
         print("no sources matched; nothing to do", file=sys.stderr)
         return 2
 
-    changes, filters = suppress.suppress(
-        [change for result in results for change in result.changes],
-        muted=suppress.muted_programmes(programs),
-        applied=store.read_applied(),
-    )
+    changes, filters = _suppress(results, programs)
     suppressed_muted = suppress.removed_by(filters, suppress.MUTED)
     suppressed_applied = suppress.removed_by(filters, suppress.APPLIED)
-
-    # Written whether or not this is a dry run. `.run/` is derived scratch rather than
-    # the database, and a dry run is exactly when someone wants to read it. Written
-    # after suppression, because a muted change is not a change this run is acting on
-    # -- but the count of them is, which is what the FilterReports carry.
-    artifacts.write(artifacts.CHANGES, "changes", models.ChangeSet(
-        changes=changes,
-        metrics=[models.SourceMetrics.of(result) for result in results],
-        # Both kinds together: the per-source screens each checker applied, and the two
-        # run-wide mute filters. One list, because "did every filter report?" has to be
-        # answerable in one place.
-        filters=[report for result in results for report in result.filters] + filters,
-    ))
+    _write_change_set(results, changes, filters)
 
     by_id = {source["source_id"]: source for source in sources}
     judgments = (
@@ -285,8 +234,8 @@ def run(args: argparse.Namespace) -> int:
     # before it ever mails; the writes below are what --dry-run actually suppresses.
     if (send and not args.dry_run and discover.due()) or args.force_discovery:
         try:
-            token = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
-            with github_readme.build_client(token) as gh, postings.build_client() as web:
+            with github_readme.build_client(collect.github_token()) as gh, \
+                    postings.build_client() as web:
                 candidates, discovery_notes = discover.run(gh, web, sources)
             if not args.dry_run:
                 discover.record(candidates)
@@ -347,3 +296,41 @@ def run(args: argparse.Namespace) -> int:
     return 0
 
 
+def gather_only(args: argparse.Namespace) -> int:
+    """`run.py gather`: fetch every source and stop. Writes `.run/raw/`."""
+    sources = store.read_sources()
+    if not sources:
+        print("data/sources.csv is empty or missing", file=sys.stderr)
+        return 2
+    artifacts.reset()
+    attempts = collect.collect(sources, args.only)
+    if not attempts:
+        print("no sources matched; nothing to do", file=sys.stderr)
+        return 2
+    failed = [a for a in attempts if not a.ok and not a.quarantined]
+    quarantined = [a for a in attempts if a.quarantined]
+    print(
+        f"{len(attempts)} sources attempted, {len(attempts) - len(failed) - len(quarantined)} "
+        f"fetched, {len(failed)} failed, {len(quarantined)} skipped by the breaker"
+    )
+    print(f"wrote {artifacts.path(artifacts.RAW_INDEX)}")
+    return 0
+
+
+def process_only(args: argparse.Namespace) -> int:
+    """`run.py process`: read `.run/raw/` and write `.run/changes.json`. No network.
+
+    Runnable repeatedly against one gather, which is the property the artifact boundary
+    exists to give: a second run must make no requests and produce the same answer.
+    """
+    sources = store.read_sources()
+    programs = store.read_programs()
+    if not sources or not programs:
+        print("data/sources.csv or data/programs.csv is empty or missing", file=sys.stderr)
+        return 2
+    results = build.build(sources, build.load_attempts())
+    changes, filters = _suppress(results, programs)
+    _write_change_set(results, changes, filters)
+    print(f"{len(results)} sources processed, {len(changes)} changes")
+    print(f"wrote {artifacts.path(artifacts.CHANGES)}")
+    return 0

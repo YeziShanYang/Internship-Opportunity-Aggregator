@@ -173,7 +173,7 @@ class RunnerTests(unittest.TestCase):
     def test_an_unsplit_verb_exits_nonzero_rather_than_doing_nothing(self):
         """A stage that exits 0 having done nothing is the same failure shape as a
         source that goes quiet instead of failing."""
-        for verb in run.STAGES:
+        for verb in run.SPLIT_BY_STEP:
             with self.subTest(verb):
                 code, message = self._run([verb])
                 self.assertEqual(code, 2)
@@ -181,7 +181,7 @@ class RunnerTests(unittest.TestCase):
                 self.assertIn("run.py all", message, "say what to do instead")
 
     def test_every_unsplit_verb_names_the_step_that_splits_it(self):
-        self.assertEqual(set(run.SPLIT_BY_STEP), set(run.STAGES))
+        self.assertLessEqual(set(run.SPLIT_BY_STEP), set(run.STAGES))
         for step in run.SPLIT_BY_STEP.values():
             self.assertRegex(step, r"^Step \d$")
 
@@ -192,3 +192,121 @@ class RunnerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class StageRegistryTests(unittest.TestCase):
+    """The two method tables must agree, and must cover the real sources.csv.
+
+    A method in `gather.collect.CLIENT_FOR` and not in `process.build.ASSESSORS` is a
+    source that fetches every morning and is never read; the reverse is a source that
+    is read and never fetched. Either one is silently unwatched, which is the exact bug
+    the registry replaced -- a typo'd method used to be a bare `continue`.
+    """
+
+    def test_the_gather_and_process_tables_cover_the_same_methods(self):
+        from gather import collect
+        from process import build as process_build
+
+        self.assertEqual(set(collect.CLIENT_FOR), set(process_build.ASSESSORS))
+
+    def test_the_github_credential_reaches_only_github(self):
+        """Sharing one client would send GH_PAT to boards-api.greenhouse.io,
+        api.lever.co, api.ashbyhq.com and every firm's marketing site."""
+        from gather import collect
+
+        needs_github = {m for m, c in collect.CLIENT_FOR.items()
+                        if c == collect.GITHUB_CLIENT}
+        self.assertEqual(needs_github, {"github_readme"})
+
+
+class ProcessStageTests(unittest.TestCase):
+    """The three non-failures that must stay distinguishable from a failure."""
+
+    SOURCE = {"source_id": "s", "method": "page_text", "url": "https://x.test/a",
+              "program_names": "P"}
+
+    def _assess(self, attempt, body=b""):
+        from process import build as process_build
+        return process_build.assess_one(self.SOURCE, attempt, body)
+
+    def test_a_quarantined_attempt_is_not_a_quiet_day(self):
+        result = self._assess(models.FetchAttempt(
+            source_id="s", ok=False, quarantined=True, error="quarantined for 6h"))
+        self.assertFalse(result.ok)
+        self.assertTrue(result.quarantined)
+        self.assertIn("quarantined", result.error)
+        self.assertEqual(result.changes, [])
+        self.assertIsNone(result.snapshot_text,
+                          "nothing was fetched, so nothing may be written back")
+
+    def test_an_unhandled_method_is_a_failure_not_a_skip(self):
+        from process import build as process_build
+        result = process_build.assess_one(
+            {"source_id": "typo", "method": "githb_readme", "url": "x"},
+            models.FetchAttempt(
+                source_id="typo", ok=False,
+                error="sources.csv sets method='githb_readme', which no module handles"),
+            None)
+        self.assertFalse(result.ok)
+        self.assertIn("no module handles", result.error)
+
+    def test_a_fetched_source_missing_from_sources_csv_is_reported(self):
+        from process import build as process_build
+        results = process_build.build(
+            [], [models.FetchAttempt(source_id="ghost", ok=True)])
+        self.assertEqual(len(results), 1)
+        self.assertFalse(results[0].ok)
+        self.assertIn("no longer present in sources.csv", results[0].error)
+
+    def test_a_failed_fetch_carries_its_error_through_to_the_result(self):
+        result = self._assess(models.FetchAttempt(
+            source_id="s", ok=False, error="ConnectError: nope", size=0))
+        self.assertFalse(result.ok)
+        self.assertIn("ConnectError", result.error)
+
+
+class RawBodyReplayTests(unittest.TestCase):
+    """A stored body plus its index row must rebuild the fetch the parser expects."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.addCleanup(setattr, paths, "RUN_DIR", paths.RUN_DIR)
+        paths.RUN_DIR = pathlib.Path(tmp.name) / ".run"
+
+    def test_a_page_body_rebuilds_as_html(self):
+        from process import build as process_build
+        attempt = models.FetchAttempt(source_id="s", ok=True, size=9)
+        fetched = process_build._rebuild("page_text", attempt, b"<p>caf\xc3\xa9</p>")
+        self.assertEqual(fetched.html, "<p>café</p>")
+
+    def test_a_readme_body_recovers_the_branch_from_meta(self):
+        """The branch is not in the README bytes and it is in the failure message when
+        a parse floor fires ("from N bytes on branch dev")."""
+        from process import build as process_build
+        attempt = models.FetchAttempt(
+            source_id="s", ok=True, meta={"branch": "master"})
+        fetched = process_build._rebuild("github_readme", attempt, b"# hi")
+        self.assertEqual((fetched.text, fetched.branch), ("# hi", "master"))
+
+    def test_an_ats_body_recovers_the_pages_details_and_board_total(self):
+        """`listed` is the count a paged board reported, and it cannot be recovered
+        from the payload once parsing has screened it -- losing it is how the Phenom
+        category filter briefly went silent."""
+        import json as _json
+
+        from process import build as process_build
+        body = _json.dumps({"pages": [{"jobs": [{"title": "x"}]}],
+                            "details": {"/p/1": {"jobPostingInfo": {}}}}).encode()
+        attempt = models.FetchAttempt(
+            source_id="s", ok=True, meta={"listed": "261", "planned": "100"})
+        fetched = process_build._rebuild("phenom", attempt, body)
+        self.assertEqual(fetched.listed, 261)
+        self.assertEqual(fetched.planned, 100)
+        self.assertEqual(len(fetched.pages), 1)
+        self.assertIn("/p/1", fetched.details)
+
+    def test_a_body_written_then_read_is_unchanged(self):
+        raw = b"\xff\xfe<html>not utf-8</html>"
+        artifacts.write_body("s", raw)
+        self.assertEqual(artifacts.read_body("s"), raw)
