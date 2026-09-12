@@ -170,20 +170,33 @@ class RunnerTests(unittest.TestCase):
             run.STAGES,
             ("gather", "process", "enrich", "screen", "classify", "render", "deliver"))
 
-    def test_an_unsplit_verb_exits_nonzero_rather_than_doing_nothing(self):
-        """A stage that exits 0 having done nothing is the same failure shape as a
-        source that goes quiet instead of failing."""
-        for verb in run.SPLIT_BY_STEP:
-            with self.subTest(verb):
-                code, message = self._run([verb])
-                self.assertEqual(code, 2)
-                self.assertIn(verb, message)
-                self.assertIn("run.py all", message, "say what to do instead")
+    def test_every_verb_has_a_handler(self):
+        """No verb may fall through. A stage that exits 0 having done nothing is the
+        same failure shape as a source that goes quiet instead of failing, so the
+        fall-through case is an AssertionError rather than a silent success."""
+        import inspect
 
-    def test_every_unsplit_verb_names_the_step_that_splits_it(self):
-        self.assertLessEqual(set(run.SPLIT_BY_STEP), set(run.STAGES))
-        for step in run.SPLIT_BY_STEP.values():
-            self.assertRegex(step, r"^Step \d$")
+        from jobs import daily
+        source = inspect.getsource(run.main)
+        for verb in run.STAGES:
+            with self.subTest(verb):
+                self.assertIn(f'args.verb == "{verb}"', source)
+                self.assertTrue(hasattr(daily, f"{verb}_only"), verb)
+        self.assertIn("unreachable", source)
+
+    def test_a_verb_reading_a_missing_artifact_says_which_stage_to_run(self):
+        """Running `classify` before `enrich` has to name the stage, not raise a
+        KeyError about a file nobody mentioned."""
+        from core import codec
+        from persist import artifacts as arts
+
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.addCleanup(setattr, paths, "RUN_DIR", paths.RUN_DIR)
+        paths.RUN_DIR = pathlib.Path(tmp.name) / ".run"
+        with self.assertRaises(codec.ArtifactError) as caught:
+            arts.read(arts.ENRICHED, "enriched", dict[str, str])
+        self.assertIn("run.py", str(caught.exception))
 
     def test_an_unknown_verb_is_rejected_by_the_parser(self):
         with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):

@@ -1,4 +1,9 @@
-"""Weekly pass for sources the watchlist does not have yet.
+"""Weekly pass for sources the watchlist does not have yet. A job, not a stage.
+
+It does GitHub search (gather), snapshot mining (a read), `record()` (persist) and
+`lines()` (render), so it cannot sit at any single level of the stage graph -- which is
+why it lives here beside the daily digest rather than pretending to be one layer.
+
 
 Every other part of this tool watches a fixed list. That list was assembled by hand
 once, and it goes stale the moment a new repo appears or a firm moves onto an ATS.
