@@ -1,0 +1,81 @@
+Careers &mdash; Marquette Partners
+WHO WE ARE
+WHAT WE DO
+CAREERS
+CONTACT
+WHO WE ARE
+WHAT WE DO
+CAREERS
+CONTACT
+banner/tag line
+banner/tagline
+Who We Are
+What We Do
+Careers
+Contact
+&nbsp;
+Careers
+Marquette Partners is always looking for the next rising star. Over the past 30 years, Marquette has successfully trained and nurtured a wide variety of talent in the trading industry. Qualities we look for in prospective traders include strong analytical and mathematical skills, critical thinking, and the ability to make decisions quickly and decisively. Programming experience is also beneficial, but not required for the position unless otherwise stated.&nbsp;
+Email your resume to: info@mqpllc.com
++ benefits
+Medical and Prescription Drug Insurance
+Dental Insurance
+Vision Insurance
+Group Life and AD&amp;D Coverage
+Short-term Disability and Maternity Coverage
+Competive Salary with Discretionary Bonus
+&nbsp;
+Experienced Quantitative Trader
+As an Experienced Quantitative Trader with a record of success you will be empowered to capitalize on your experience, building a business within a business and deploying capital across your strategies.
+You will have access to high-resolution historical data sets, high fidelity simulation and back testing tools. You will work closely with the technical and risk teams, optimizing and deploying new trading strategies.
++ Required Qualifications
+A proven track record of profitable trading leveraging quantitative analysis skills: analyzing large datasets; building statistical models; back-testing; optimization (minimum seven figures annually)
+Strong understanding and experience with practical application of statistics: hypothesis tests, confidence levels, simulation
+BS, MS, or PhD in an analytical/quantitative related field of study
+Experience with programming in MATLAB or Python
+Superb analytical and mathematical skills
+Experience pricing, analyzing, and trading futures and/or option on futures
+Ability to work successfully in a fast-moving and competitive environment
+Self-starters with strong interpersonal and decision making skills
+Willingness to work within given risk management guidelines
++ What you'll do
+Develop, maintain and enhance trading models, algorithms and systems
+Trade a range of financial instruments
+Manage execution and risk of complex trading portfolios
+Research new market opportunities leveraging varying techniques
+&nbsp;
+Experienced Trader
+Marquette Partners is always seeking to recruit talented and experienced traders for their Chicago team. Traders confident in their ability and knowledgeable across any or all asset classes will be considered. Experience in proprietary trading at a hedge fund or investment bank is preferred.&nbsp;Highly energetic, motivated, and results-driven individuals looking for a new challenge should apply.&nbsp;
++ preferred qualifications:
+A proven track record of profitable trading (minimum mid-six figures annually).
+Self-starters with strong interpersonal and decision making skills.
+Individuals who demonstrate an excellent fundamental understanding of markets and spreads.
+Ability to identify trading opportunities and develop proprietary trading strategies based on their own analysis.
+Willingness to work within given risk management guidelines.
+&nbsp;
+C++ Senior Developer
+We are expanding our organization in Chicago and we are looking for qualified developers to join our growing team. This is the perfect role for candidates looking to step into a leadership role and take on new and exciting projects.
++ Required Skills and Experience
+Strong programming skills in C++
+Minimum of 3+ years of experience
+Linux
+Trading industry and/or simulation experience preferred
+Strong communication skills
+Experience creating high throughput and low latency systems
+Multi-threaded systems
+Strong analytic and problem solving skills
+TCP/IP, UDP, sockets, network protocols
+Object-oriented design and programming
+Self-starter with the ability to work independently
+Bachelors Degree in Computer Science, Engineering or related discipline preferred
++ Desired but Not Required
+design and build complex trading systems
+FIX protocol and feed handler knowledge
+Strong understanding of full software stack
+Implement low-latency market access solutions
+Python
+Diagnose latency issues and resolve via tuning and optimizations
+Knowledge of Windows helpful
+&nbsp;
+Back to Top
+© 2016 Marquette Partners, LP

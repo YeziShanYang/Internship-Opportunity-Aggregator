@@ -1,0 +1,122 @@
+Careers | Aspect Capital
+About
+Overview
+Approach
+Leadership
+News
+Solutions
+Insight
+CSR
+Responsibility
+DE&amp;I
+Careers
+Life at Aspect
+Opportunities
+Contact
+A stimulating place to work
+As well as being a fantastic opportunity for personal growth, a career at Aspect also represents an exciting chance to help shape the future of systematic investment. We recruit talented people who are intellectually ambitious, curious to learn and who are team players. In return, we provide a truly unique culture: we care about our people and work hard to ensure that they fulfil their potential.
+We are an equal opportunities employer and firmly believe in the benefits of a diverse and inclusive workforce. We welcome applications from all backgrounds and are committed to providing a collegiate, equitable and ambitious working environment in which everyone is treated with respect, has access to equal opportunities, and is rewarded fairly for their contribution, regardless of gender, race, religious belief, age, disability, sexual orientation or social background.
+We love our office and truly believe in the importance of face‑to‑face collaboration and connection in shaping and sustaining our culture. At the same time, we recognise the importance of flexibility and its role in supporting wellbeing and mental health. As with all things, it’s about balance: we typically expect people to work from the office at least three days a week, with flexibility on the remaining days to work in the way that enables them to be most productive.
+We invest in our culture and community by subsidising social and sporting events throughout the year, providing a well‑stocked kitchen and a competitive benefits package, including enhanced maternity and paternity leave, alongside a dedicated Charity Committee.
+If you require any reasonable adjustments during the interview process, or have questions about Aspect’s culture or working environment, please don’t hesitate to get in touch.
+Life at Aspect
+DEI Committee
+Flexibility and Benefits
+B Corp
+In this video members of our Diversity, Equity and Inclusion Committee talk through some of their proudest moments since the committee started. Examples highlighted include the production of our DE&amp;I internal newsletter, marching in London Pride and the importance and impact of representation across the firm.
+In this video Director of HR, Flora Hudson-Evans, talks through the benefits and flexibility available at Aspect. Most at Aspect work in a hybrid fashion with the company committed to productivity and output rather than being in the office 5 days a week. We aim to offer an inclusive environment to enable every individual to perform at their best.
+Aspect was certified as a B Corporation in 2022. We fully support the B Corp principles, which encourage all businesses to consider the impact of their decisions on employees, customers, suppliers, the community and the environment. This video covers why we became certified and what it means for staff.
+Opportunities at Aspect
+Explore
+If you don't see a suitable role in the opportunities section, feel free to send your CV to recruitment@aspectcapital.com to register for future openings.
+Diversity, Equity and Inclusion
+Read More
+Read About Our Team
+Adrial Almérez &amp; Evan McDermid
+Business Distribution and Research Interns
+John Springett
+Chief Operating Officer
+Bas Monsewije
+Senior Researcher &amp; Deputy Portfolio Manager
+Joshua Olufsen and Rebeca Morgan
+Finance and Compliance Placements
+Katie Lane
+From Apprentice to Data Analyst
+Elizabeth Singer
+Regulatory Reporting Finance Lead
+Alice Arthur and Sofia Riccio
+Apprentices
+Jo Duncan
+Senior Trader
+Jack Haberfield
+Principal Researcher
+Alex Thompson
+Head of Fund Accounting
+Mike Kwan
+Director of Quantitative Development
+Tom Foster-Brown
+Quantitive Developer
+Sunny Ratilal
+Developer
+Aditi Lapasia and Hannah Sleath
+Research Interns
+Mariam Muazu and Ella Keza
+Business Development Interns
+Business Areas
+Research
+Technology
+Other Teams
+A successful and thriving quantitative research effort is fundamental to Aspect's business – it ensures the continuous evolution of the alpha-generating models which deliver investment returns to our clients.
+Our Researchers maintain and develop mathematical investment models, dealing with a wide range of projects covering Signal Generation, Portfolio Construction and Market Execution in a collegiate and collaborative atmosphere. Employees in this department are given plenty of autonomy whilst maintaining constant access to the knowledge and guidance of our Research Directors.
+If you have, or are working towards, an MSc or PhD with strongly analytical scientific or engineering content (e.g. physics, statistics, signal processing) and you are interested in developing a long and rewarding career at Aspect, please register your interest in future opportunities using the link below.
+Software Development
+The Software Development Team designs, builds and maintains Aspect’s highly automated execution systems which runs from front office trading to back office reconcilliations.
+The trading systems are Java-based. Back end systems include SQL Server, JMS and distributed caching technologies. We use IntelliJ and Git when developing. Our tools and processes are designed to ensure we produce software of the highest quality and deliver it to production safely and efficiently. For example, we have built a highly automated continuous integration, continuous delivery and automated testing system using Git and TeamCity that we are constantly evolving.
+The development process is agile, highly collaborative and focuses heavily on continuous improvement. Daily stand-ups, retrospectives, pairing and TDD are standard. We are always experimenting with new technologies, techniques and ways of working. We hone our craft by participating in and hosting software community events. We also attend conferences and engage directly with thought-leaders in various technical disciplines.
+IT Infrastructure
+Our Infrastructure team is responsible for Aspect’s vast technology estate. We run over 400 servers (a mix of Linux and Windows) from two data centres, provide technical support to all of our users across the whole business and 24 hour support to our London-based Trading team.
+We are always on the lookout for talented generalists to join our team who are interested in working with a broad range of technologies with a view to enhancing their careers in an open and engaging environment.
+At the heart of Aspect’s core values lies our commitment to our clients, as well as to fairness, integrity, respect and the love of a challenge .
+Whether it be a role in Investor Relations, Legal, Compliance, Operations, Finance or HR, at Aspect we can provide the opportunity to work in an exciting, stimulating environment where employees are given real opportunities to demonstrate their value and further their careers.
+We work with a small, carefully selected group of recruitment agencies and are not looking to expand that list. Recruiters, please don’t call or send over speculative CVs as we don’t have the capacity to engage with agencies at this stage, and any speculative CVs will be automatically deleted.
+Instagram
+View this post on Instagram
+A post shared by Aspect Capital (@aspectcapital)
+LinkedIn
+Data Protection
+As part of our candidate application and recruitment activities Aspect collects, processes and stores personal and special categories of data which may directly or indirectly identify you. The Applicant Privacy Notice sets out further detail explaining why we collect your personal information, what information is collected and how it is processed within the recruitment process.
+APPLICANT PRIVACY NOTICE
+Employee Privacy Notice
+Register your interest in future opportunities
+If you would like to send us your details to keep on file for any future opportunities please submit your CV and a covering letter below.
+SUBMIT DETAILS
+Details will be retained. If you would like us to delete your details after 6 months please let us know in your email.
+Latest News &amp; Insights
+Rethinking Diversification: Bonds, Commodities and Trend in the Current Market Regime
+Read more
+HedgeNordic: Aspect Capital’s Evolving Approach to Chinese Futures
+Read more
+Crisis Alpha, Cocoa Trends, and Correlated Trendlessness: Inside Aspect Capital’s Strategy with Christopher Reeve, CIO
+Read more
+Disclosures
+Privacy Policy
+Cookie Policy
+Fraud Warning
+About
+Approach
+News
+Leadership
+Solutions
+Insight
+CSR
+Careers
+Contact
+Follow us
+London
++44 20 7170 9700
+USA
++1 203 653 7800
+China
++86 21 6043 1342
+All rights reserved. &copy; Aspect Capital Limited 2026. UK registered company
+no. 3491169. 10 Portman Square, London W1H 6AZ.

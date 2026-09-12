@@ -1,0 +1,300 @@
+Student Opportunities | Hudson River Trading
+Skip navigation and jump to content
+Who We Are
+Trade With Us
+Tech Blog
+Join Our Team
+
+About
+Built by coders, led by coders. At HRT we are mathematicians, computer scientists, statisticians, physicists, and engineers.
+
+Offices
+A community of colleagues spanning 14 offices worldwide.
+
+Diversity & Inclusion
+Building the future of trading together.
+
+Contact Us
+Access our Liquidity
+As a liquidity provider, HRT develops automated trading algorithms designed to provide the best prices to our clients.
+Learn More
+Intern Spotlight: HRT AI Labs Project
+Read More ▸
+Intern Spotlight: 2025 Software Engineering Summer Projects
+Read More ▸
+Designing a SystemVerilog Language Server
+Read More ▸
+Read Our Tech Blog
+
+Work at HRT
+Join our vibrant community of curious thinkers and eager automators, working together at the forefront of innovation.
+
+Life at HRT
+A place where kindness and excellence converge across six countries and nearly all the world’s electronic markets.
+
+Student Opportunities
+Full-time & internship opportunities for current undergraduates, graduating seniors, masters, or PhD students.
+
+Talent Community
+See Open Roles
+Home
+About
+Careers at HRT
+Client Market Making
+Student Opportunities
+Work at HRT
+Life at HRT
+Offices
+Tech Blog
+Student opportunities.
+Student
+opportunities.
+Join a community guided by mathematical rigor, engineering excellence, and the belief that the best work can only be done together.
+Explore Openings
+Summer 2026
+Winter 2026
+Full-Time
+Early Talent
+FAQs
+Campus Talent Community
+Find Your Role
+Summer Internships
+Winter Internships
+Full-Time Roles
+Early Talent Oppurtunities
+FAQs
+Campus Talent Community
+Grow With Us
+Continued learning opportunities, mentorship and training, and an open collaborative culture empowers interns and new grads to have an immediate impact at HRT.
+Summer Internships
+Across our global internships, students work on real projects in collaboration with experienced mentors and build their knowledge and skills through varied learning opportunities. From NYC to Singapore, interns can also look forward to a packed social calendar that takes advantage of all the city has to offer.
+For 2028 Grads
+Software Engineering Internship
+Summer 2027
+NYC, London, Singapore &amp; Chicago
+Software Engineering Interns work on real-world projects in C++ and Python, contributing to the technology behind HRT’s trading and research environment. They collaborate closely with exceptional engineers and gain exposure to the tools and infrastructure that power our work.
+↳ Apply Here
+For 2028 Grads
+Algorithm Development Internship
+Summer 2027
+NYC, London &amp; Singapore
+Working in close collaboration with your mentors, you will apply sophisticated quantitative research and modeling techniques to understand and predict market behavior and write software to improve our trading strategies.
+↳ Apply Here
+For PhD Students
+Algorithm Development PhD Internship
+Summer 2027
+NYC, London &amp; Singapore
+Leverage your advanced research experience and expertise to apply academic research to impactful real world problems in trading across time horizons and machine learning strategies.
+↳ Apply Here
+For 2028 Grad
+Hardware Engineer Internship
+Summer 2027
+NYC, London &amp; Singapore
+Leverage your advanced research experience and expertise to apply academic research to impactful real world problems in trading across time horizons and machine learning strategies.
+↳ Apply Here
+Winter Internships
+Our winter internships offer students a focused introduction to quantitative trading through hands-on projects, technical learning, and close mentorship. Designed for those early in their exploration of the field, these short-term programs provide a meaningful glimpse into life and work at HRT.
+Women in Trading & Technology Internship
+January 2026
+New York City
+A 2-4 week exploration into automated trading for second year students from underrepresented backgrounds in tech and finance. Interns will get an introduction to all technical facets of the algorithmic trading industry, learn about who we are and what we do, and participate in hands-on independent programming projects in Python and C++.
+Applications for January 2026 are now closed. Check back soon for January 2027 applications.
+For PhD Students
+PhD Winter Internship
+January 2026
+New York City
+A 2-4 week exploration into automated trading for PhD students. Interns will get an introduction to all technical facets of the algorithmic trading industry, learn about who we are and what we do, and participate in hands-on independent programming projects in Python and C++.
+Applications for January 2026 are now closed. Check back soon for January 2027 applications.
+Full-time Roles for Graduating Students
+If you’re graduating from a bachelor’s, master’s, or PhD program in 2027, consider one of our full-time roles. New hires are immersed in a robust training program that lets them hit the ground running on their new team.
+Algorithm Developer
+NYC, London & Singapore
+Algorithm Developers are responsible for building and maintaining the models that drive our trading, relying on quantitative (mathematics, statistics, data analysis) and technical (C++/Python programming) skills to develop and improve our strategies. A typical day involves applying rigorous statistical analysis to vast quantities of market and financial data to produce predictive trading models.
+↳ Apply Here
+Software Engineer [C++/Python]
+NYC, London & Singapore
+Software Engineers create and maintain critical technology and infrastructure at HRT. Their work spans our incredible live trading system and a powerful research environment; Software Engineers bring deep knowledge of C++, OS internals, CPU architecture, and networking hardware and protocols.
+↳ Apply Here
+Hardware Design Engineer
+New York City
+Hardware Design Engineers at HRT craft sophisticated digital logic solutions in FPGA and ASIC technologies with nanosecond precision. They push boundaries in trading performance using advanced low-level logic design, low-latency hardware architectures, and novel solutions for hardware-software interaction.
+Applications are currently closed. Check back soon for 2027 applications.
+Opportunities for Early Talent
+For students early in their academic careers and interested in quantitative finance, we offer programs ranging from one day to several weeks. Follow us on social media to be notified when applications open!
+Follow
+Follow
+Follow
+Follow
+Follow
+NYC | Spring
+Inside HRT is a three-day immersive program for first and second-year students. The program aims to provide essential learning that removes barriers and creates opportunity for high-potential students pursuing a degree in computer science, mathematics, or another STEM-related field. It includes hands-on workshops, tech talks, and networking with HRTers.
+↳ Express Interest
+Inside HRT
+NYC, London & Singapore | Spring
+Explore HRT is a multi-day program for 2028 graduates who are interested in building a career in quantitative trading. Expect tech talks, 1:1 mentorship, and a look into the systems and people behind HRT’s global trading infrastructure.
+↳ Express Interest
+Explore HRT
+NYC | Spring
+Inside HRT is a three-day immersive program for first- and second-year students pursuing a degree in computer science, mathematics, or other STEM-related fields. It offers an inside look at quantitative finance through hands-on workshops, tech talks, and networking with HRTers.
+Inside HRT
+Singapore | Spring
+Explore HRT is a two-day program at our Singapore office for Year 2 STEM students, designed for those interested in building a long-term career in Singapore. Expect tech talks, 1:1 mentorship, and a look into the systems and people behind HRT’s global trading infrastructure.
+Explore HRT
+FAQs
+K
+L
+Do I need experience in financial markets to apply?
+Nope! In fact, the majority of HRTers join us with no previous finance experience. You’ll have a chance to learn on the job and through our training program.
+K
+L
+What programming languages are used in HRT interviews?
+For Algorithm Developers, you will be able to choose between C++ and Python. For Software Engineering, you’ll indicate a preference for interviewing with either C++ or Python at the application stage.
+K
+L
+Can I apply for more than one job at the same time?
+Please only apply to one job posting. You will have the opportunity to indicate if you are interested in other offices or roles in the application questions.
+K
+L
+What perks are available to interns?
+Interns enjoy fully-paid housing, travel allowances, office amenities like an on-site gym and game room, chef-prepared breakfast and lunch, dinner stipends, and hands-on professional development opportunities.
+But the internship experience expands far beyond the walls of our office — we want our interns to truly get to know their homes for the summer! Enjoy a vibrant social calendar of unforgettable events, from sporting events to food tours to live theater.
+K
+L
+What’s the difference between an Algorithm Engineer and an Algorithm Developer?
+At a high level, Algorithm Engineers are responsible for making the Algo team’s research tools and trading platform powerful, flexible, fast, and easy to use. In order to do this, AEs and SWEs work closely with Algo Developers to understand their needs.
+Algorithm Developers build and maintain the models that drive our trading, working hand in hand with Algo Engineers to help test and deploy their strategies. Algorithm Developers rely on a mix of quantitative (math, stats, data analysis) and technical (C++/Python programming) skills in researching, backtesting, and monitoring new strategies.
+Check out job descriptions and our YouTube channel for more details on role specifics!
+K
+L
+What is your WFH policy?
+Our internship is fully in-person to ensure interns take full advantage of opportunities to connect with HRTers and embed themselves in HRT’s culture.
+Full-time roles follow a hybrid model that varies by team.
+K
+L
+What happens after I submit my application? When will I hear back?
+Our team will review your application and reach out via email about any next steps. Given the high volume of applicants, please allow up to 2 weeks for your application to be reviewed.
+K
+L
+What does the interview process look like?
+Technical interviews at HRT usually consist of a coding test, 1-2 technical phone screens, and an onsite multi-round final interview. Interview length and topics can vary depending on the role. Please review the job descriptions to see required skills for the role you are interested in!
+K
+L
+What are the dates of the HRT internship programs?
+Our summer internships run from late-May to mid-August. Our Winternship is a condensed program which takes place in January.
+Emerging talent spotlight
+Join Our Team
+Campus Talent Community
+SIGN UP TODAY →
+Tech Blog
+Intern Spotlight: Software Engineering Summer Projects
+Read More →
+Tech Blog
+Intern Spotlight: HRT AI Labs Summer Projects
+Read More →
+Video
+Ask An Intern
+Watch Now →
+Tech Blog
+Intern Spotlight: Software Engineering Projects
+Read More →
+Tech Blog
+Intern Spotlight: HRT AI Labs Project
+Read More →
+Campus Talent Community
+If you&#8217;re a first or second year student interested in early student programs, or just want to share your resume with us, join our talent community so we can reach out to you when an opportunity arises!
+Join Here
+About HRT
+Hudson River Trading is a multi-asset class quantitative trading firm that provides liquidity on global markets and directly to our clients. We have built one of the world’s most advanced computing environments for research and development, modeling, and risk management, and are at the forefront of technical innovation for financial markets everywhere. We are thoughtful market leaders, committed to the health and longevity of global markets.
+Follow Us
+Follow
+Follow
+Follow
+Follow
+Follow
+Who We Are
+Home
+About
+Offices
+Diversity &amp; Inclusion
+Contact
+What We Do
+Tech Blog
+Liquidity
+Client Market Making
+Ventures
+Disclosures
+Careers
+Job Openings
+Work at HRT
+Life at HRT
+Student Opportunities
+AI &amp; Machine Learning
+Talent Community
+North America
+New York City
+3 World Trade Center
+175 Greenwich Street, 76th Floor
+New York, NY 10007
+Chicago
+111 S Wacker Drive
+Suite 4730
+Chicago, IL 60606
+Austin
+401 South 1st Street
+Suite 1150
+Austin, TX 78704
+Boulder
+1919 14th Street
+Suite 700
+Boulder, CO 80302
+Boston
+20 University Road
+5th Floor
+Cambridge, MA 02138
+Seattle
+400 University Street
+3rd Floor
+Seattle, WA 98101
+Miami
+1111 Brickell Ave
+10th Floor
+Miami, FL 33131
+Asia-Pacific
+Singapore
+Ocean Financial Centre
+10 Collyer Quay, #06-07/10
+Singapore 049315
+Singapore
+Shanghai
+6F HSBC Building, Shanghai IFC
+Suite 608-09
+Pudong, Shanghai 200120
+China
+Mumbai
+The Capital, TEC
+Level-3, Plot No. C-70, G Block,
+BKC, Bandra (East), Mumbai 400051
+India
+Seoul
+Unit 4310, Level 43
+Three International Finance Centre (Three IFC), 10 Gukjegeumyungro,
+Youngdeungpo-gu, Seoul, 07326
+South Korea
+Hong Kong
+Unit 2002-03,
+28 Stanley Street,
+Central, Hong Kong
+Europe
+London
+100 Liverpool Street
+10th Floor
+London EC2M 2AT
+United Kingdom
+Dublin
+1st Floor
+76 Sir John Rogerson&#8217;s Quay
+Dublin 2, D02 C9D0
+Ireland
+HRT® and Hudson River Trading® are registered trademarks of Hudson River Trading LLC.
+© 2002-2026 Hudson River Trading LLC. All rights reserved.
+© 2002-2026 Hudson River Trading LLC. All rights reserved. HRT® and Hudson River Trading® are registered trademarks of Hudson River Trading LLC.
