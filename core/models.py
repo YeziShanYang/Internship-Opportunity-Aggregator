@@ -131,3 +131,30 @@ class ChangeSet:
     changes: list[Change] = field(default_factory=list)
     metrics: list[SourceMetrics] = field(default_factory=list)
     filters: list[FilterReport] = field(default_factory=list)
+
+
+@dataclass
+class FetchAttempt:
+    """What one network fetch did, without its payload.
+
+    The payload goes to `.run/raw/{source_id}.body` as bytes; this is the row in
+    `.run/raw/index.json`. Separating them is what lets `run.py process --only X` read
+    one source instead of parsing every body, and it keeps the index small enough to
+    scan in one look for all ~157 sources.
+
+    `requested_url` and `final_url` are both here because the difference between them
+    is part of whether the fetch succeeded -- see `process.redirect`. `requests` is
+    greater than one for the methods whose single logical fetch is several round trips:
+    Workday pages a board and then fetches a description per survivor.
+    """
+
+    source_id: str
+    ok: bool
+    error: str = ""
+    status: int = 0
+    requested_url: str = ""
+    final_url: str = ""
+    size: int = 0
+    sha256: str = ""
+    elapsed_ms: int = 0
+    requests: int = 1
