@@ -1361,3 +1361,71 @@ class ClassifierSpendTests(unittest.TestCase):
         _, body = digest.render([], [], {})
         self.assertIn("classifier: 1 call", body)
         self.assertIn("~$0.33", body)
+
+
+class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
+    """HTTP 200 with a broken body must not read as an empty board.
+
+    `test_14_9h` already covers the busy-board case: a board that drops from N rows to
+    zero is refused. That guard infers trouble from the row count, so it cannot fire on
+    a board whose previous snapshot was legitimately empty -- and 13 of the watched
+    boards sit at zero student postings on an ordinary day. For those, an error wearing
+    an empty board's clothes looked exactly like a quiet morning.
+    """
+
+    SRC = {"source_id": "quiet", "method": "greenhouse", "url": "s", "program_names": ""}
+
+    def _baseline_of_zero_rows(self):
+        """The dangerous starting state: a real, healthy, empty board."""
+        first = job_boards.check(self.SRC, FakeJSONClient({"jobs": []}))
+        self.assertTrue(first.ok, first.error)
+        self.assertEqual(first.extra["rows"], 0)
+        state.write_snapshot("quiet", first.snapshot_text, ext="tsv")
+
+    def test_an_error_key_beside_an_empty_list_is_a_failure(self):
+        """Greenhouse's actual rate-limit shape."""
+        self._baseline_of_zero_rows()
+        r = job_boards.check(
+            self.SRC, FakeJSONClient({"error": "rate limited", "jobs": []})
+        )
+        self.assertFalse(r.ok, "an error payload must never read as a quiet board")
+        self.assertIn("rate limited", r.error)
+
+    def test_a_genuinely_empty_board_is_still_a_quiet_day(self):
+        """The guard must not cost us the true negative it is wrapped around."""
+        self._baseline_of_zero_rows()
+        r = job_boards.check(self.SRC, FakeJSONClient({"jobs": []}))
+        self.assertTrue(r.ok, r.error)
+        self.assertEqual(r.changes, [])
+
+    def test_a_missing_collection_key_is_a_failure(self):
+        self._baseline_of_zero_rows()
+        r = job_boards.check(self.SRC, FakeJSONClient({"meta": {"total": 0}}))
+        self.assertFalse(r.ok)
+        self.assertIn("no 'jobs' key", r.error)
+
+    def test_a_non_list_collection_is_a_failure(self):
+        self._baseline_of_zero_rows()
+        r = job_boards.check(self.SRC, FakeJSONClient({"jobs": "temporarily unavailable"}))
+        self.assertFalse(r.ok)
+        self.assertIn("not a list", r.error)
+
+    def test_junk_list_members_are_a_failure(self):
+        self._baseline_of_zero_rows()
+        r = job_boards.check(self.SRC, FakeJSONClient({"jobs": [1, 2, 3]}))
+        self.assertFalse(r.ok)
+        self.assertIn("non-object member", r.error)
+
+    def test_lever_gets_the_same_treatment_on_its_bare_array(self):
+        src = {"source_id": "lev", "method": "lever", "url": "s", "program_names": ""}
+        r = job_boards.check(src, FakeJSONClient({"error": "gone"}))
+        self.assertFalse(r.ok)
+        self.assertIn("expected a JSON array", r.error)
+
+    def test_an_amazon_style_null_error_is_not_an_error(self):
+        """`"error": null` ships on healthy responses; only a truthy value counts."""
+        r = job_boards.check(
+            self.SRC, FakeJSONClient({"error": None, "jobs": [_gh("SWE Intern")]})
+        )
+        self.assertTrue(r.ok, r.error)
+        self.assertEqual(r.extra["rows"], 1)

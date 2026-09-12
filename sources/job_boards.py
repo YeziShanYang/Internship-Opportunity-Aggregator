@@ -188,6 +188,74 @@ PHENOM_STUDENT_CATEGORY = re.compile(
 MAX_CHANGES_PER_BOARD = 25
 
 
+class MalformedPayload(RuntimeError):
+    """HTTP 200, but the response shape says we cannot trust what it contains.
+
+    This is the JSON counterpart of MIN_TEXT_HTML_RATIO, and it exists because the
+    obvious reading of a broken payload is the dangerous one. Greenhouse answers a
+    rate-limited request with `{"error": "...", "jobs": []}`, and
+    `payload.get("jobs", [])` turns that into "this employer has no openings".
+
+    `check` already refuses a board that drops to zero rows from a non-zero snapshot,
+    which catches this on a busy board. It cannot catch it on a quiet one: 13 of the
+    watched boards legitimately sit at zero student postings, and for those an error
+    wearing an empty board's clothes is indistinguishable from an ordinary morning.
+    So the shape is checked directly rather than inferred from the row count.
+
+    Borrowed from zshah101/Automated-List-Of-Summer-2027-and-Fall-2026-Tech-Internships,
+    whose `models.clean_listing` makes the same argument: return None, never [], because
+    reading an error as an empty board closes every role the employer has.
+    """
+
+
+def _listing(payload, key: str) -> list[dict]:
+    """The list at `payload[key]`, or raise rather than return a misleading empty.
+
+    A missing key counts as malformed: every ATS here includes the collection key even
+    when it is empty, so its absence means the shape changed under us.
+    """
+    if not isinstance(payload, dict):
+        raise MalformedPayload(f"expected a JSON object, got {type(payload).__name__}")
+    error = payload.get("error") or payload.get("errors")
+    if error:
+        raise MalformedPayload(f"payload carries an error: {str(error)[:200]!r}")
+    items = payload.get(key)
+    if items is None:
+        raise MalformedPayload(f"no {key!r} key in the payload")
+    if not isinstance(items, list):
+        raise MalformedPayload(f"{key!r} is a {type(items).__name__}, not a list")
+    if any(not isinstance(item, dict) for item in items):
+        raise MalformedPayload(f"{key!r} contains a non-object member")
+    return items
+
+
+def _listing_root(payload) -> list[dict]:
+    """Same contract for an API whose whole response is the list. Lever does this."""
+    if not isinstance(payload, list):
+        raise MalformedPayload(f"expected a JSON array, got {type(payload).__name__}")
+    if any(not isinstance(item, dict) for item in payload):
+        raise MalformedPayload("array contains a non-object member")
+    return payload
+
+
+def _page_items(payload, key: str) -> list[dict]:
+    """One page of a paginated feed.
+
+    Looser than `_listing` in exactly one way: a missing collection key is read as
+    "past the last page" rather than as malformed, because the pagination loops stop on
+    an empty batch. An explicit error key is still a failure.
+    """
+    if not isinstance(payload, dict):
+        raise MalformedPayload(f"expected a JSON object, got {type(payload).__name__}")
+    error = payload.get("error") or payload.get("errors")
+    if error:
+        raise MalformedPayload(f"payload carries an error: {str(error)[:200]!r}")
+    items = payload.get(key) or []
+    if not isinstance(items, list) or any(not isinstance(i, dict) for i in items):
+        raise MalformedPayload(f"{key!r} is not a list of objects")
+    return items
+
+
 @dataclass(frozen=True)
 class Posting:
     title: str
@@ -217,7 +285,7 @@ def _clean(raw: str) -> str:
 
 def parse_greenhouse(payload: dict) -> list[Posting]:
     out = []
-    for job in payload.get("jobs", []) or []:
+    for job in _listing(payload, "jobs"):
         employment_type = ""
         for meta in job.get("metadata") or []:
             if (meta.get("name") or "").strip().lower() in ("employment type", "job type"):
@@ -240,7 +308,7 @@ def parse_greenhouse(payload: dict) -> list[Posting]:
 
 def parse_lever(payload: list) -> list[Posting]:
     out = []
-    for job in payload or []:
+    for job in _listing_root(payload):
         categories = job.get("categories") or {}
         out.append(
             Posting(
@@ -261,7 +329,7 @@ def parse_lever(payload: list) -> list[Posting]:
 
 def parse_ashby(payload: dict) -> list[Posting]:
     out = []
-    for job in payload.get("jobs", []) or []:
+    for job in _listing(payload, "jobs"):
         if job.get("isListed") is False:
             continue
         out.append(
@@ -301,7 +369,7 @@ def fetch_workday(client: httpx.Client, base: str) -> tuple[list[Posting], int]:
         payload = response.json()
         if total is None:
             total = payload.get("total") or 0
-        batch = payload.get("jobPostings") or []
+        batch = _page_items(payload, "jobPostings")
         if not batch:
             break
         listed += batch
@@ -410,7 +478,7 @@ def fetch_phenom(client: httpx.Client, endpoint: str) -> tuple[list[Posting], in
         payload = response.json()
         if total is None:
             total = payload.get("totalCount") or 0
-        batch = payload.get("jobs") or []
+        batch = _page_items(payload, "jobs")
         if not batch:
             break
         listed += batch
