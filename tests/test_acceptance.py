@@ -1696,3 +1696,41 @@ class CircuitBreakerTests(unittest.TestCase):
         self.assertIn("gts-careers", body)
         self.assertIn("SOURCE BLIND", body, "still escalated into the table")
         self.assertIn("source failing", title)
+
+
+class AggregatorRowRenderingTests(unittest.TestCase):
+    """An aggregator row names the real employer; the table must show that employer.
+
+    `program_names` for a Simplify or zshah row is the list's own name, identical on
+    all 500+ of its rows, so using it as the Company column makes every row look like
+    it came from the same place. The employer is in the row key, as a markdown link.
+    """
+
+    def _row(self, key, program="SimplifyJobs Summer 2027", url="https://x.test/1"):
+        j = classify.Judgment(
+            change=state.Change(source_id="simplify-2027", kind="added", key=key,
+                                detail="x", url=url),
+            program_name=program, relevant=True, classified=True, confidence="high",
+        )
+        _, body = digest.render([j], [], {})
+        return next(l for l in body.splitlines() if l.startswith("| Worth"))
+
+    def test_the_linked_employer_becomes_the_company_column(self):
+        row = self._row("[InfiniteQuant](https://simplify.jobs/c/InfiniteQuant) / "
+                        "Quantitative Developer Intern @ NYC")
+        self.assertIn("| InfiniteQuant |", row)
+        self.assertIn("Quantitative Developer Intern @ NYC", row)
+        self.assertNotIn("SimplifyJobs", row, "the aggregator is not the employer")
+
+    def test_a_markdown_link_is_never_left_half_escaped(self):
+        """The bug this fixes rendered the URL twice and parenthesised the employer."""
+        row = self._row("[Lyft](https://simplify.jobs/c/Lyft) / SWE Intern @ SF")
+        self.assertNotIn("(Lyft)", row)
+        self.assertEqual(row.count("https://"), 1, row)
+
+    def test_a_slash_in_a_job_title_is_not_read_as_an_employer(self):
+        """Job-board keys are "Title @ Location". Splitting every key on " / " would
+        turn "Software Engineer / Backend Intern" into a company."""
+        row = self._row("Software Engineer / Backend Intern @ NYC", program="Jane Street")
+        self.assertIn("| Jane Street |", row)
+        self.assertIn("Software Engineer / Backend Intern", row)
