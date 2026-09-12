@@ -69,6 +69,18 @@ def run_sources(
             method = (source.get("method") or "").strip()
             if method == UNWATCHED:
                 continue
+            # `--only` is an explicit instruction to look at this source now, so it
+            # bypasses the breaker; that is the affordance you want when you are
+            # debugging the source that is quarantined.
+            if not only:
+                skip, why = state.quarantine_state(source)
+                if skip:
+                    results.append(
+                        state.SourceResult(
+                            source_id=source_id, ok=False, quarantined=True, error=why
+                        )
+                    )
+                    continue
             handler = CHECKERS.get(method)
             if handler is None:
                 # Spec 10.1. This used to be a bare `continue`, which meant a typo in
@@ -98,6 +110,12 @@ def update_source_state(
         source = by_id.get(result.source_id)
         if source is None:
             continue
+        if result.quarantined:
+            # The breaker skipped the fetch, so nothing was learned. Leaving every
+            # counter alone is what stops a quarantine from extending itself: if this
+            # incremented, a source would back off further for not being looked at.
+            continue
+        source["last_attempt"] = now
         if result.ok:
             source["last_success"] = now
             source["consecutive_failures"] = "0"

@@ -14,6 +14,7 @@ prompt was written against.
 """
 from __future__ import annotations
 
+import datetime
 import os
 import pathlib
 import re
@@ -1592,3 +1593,106 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         self.assertIn("advanced-standing", line)
         _, body = digest.render([], [], {})
         self.assertIn("advanced-standing", body, "HEALTH must carry it")
+
+
+class CircuitBreakerTests(unittest.TestCase):
+    """A source that keeps failing backs off, and says so.
+
+    Measured 2026-09-12: nine sources sat at exactly three consecutive failures with
+    an empty `last_success` -- never worked once -- and each was fetched three times
+    every morning indefinitely. The breaker stops the refetch. What it must NOT stop is
+    the reporting: a quarantined source is the strongest form of "blind, not quiet".
+    """
+
+    NOW = datetime.datetime(2026, 9, 12, 12, 0, tzinfo=datetime.timezone.utc)
+
+    def test_the_backoff_schedule(self):
+        self.assertEqual(state.quarantine_hours(0), 0)
+        self.assertEqual(state.quarantine_hours(2), 0, "below the threshold, keep trying")
+        self.assertEqual(state.quarantine_hours(3), 6)
+        self.assertEqual(state.quarantine_hours(4), 12)
+        self.assertEqual(state.quarantine_hours(5), 24)
+        self.assertEqual(state.quarantine_hours(6), 48)
+        self.assertEqual(state.quarantine_hours(7), 72)
+        self.assertEqual(state.quarantine_hours(40), 72, "the cap holds; boards come back")
+
+    def test_a_healthy_source_is_never_skipped(self):
+        skip, _ = state.quarantine_state(
+            {"consecutive_failures": "0", "last_attempt": self.NOW.isoformat()}, self.NOW
+        )
+        self.assertFalse(skip)
+
+    def test_a_source_inside_its_window_is_skipped(self):
+        src = {
+            "consecutive_failures": "3",
+            "last_attempt": (self.NOW - datetime.timedelta(hours=1)).isoformat(),
+            "last_success": "2026-09-01T00:00:00+00:00",
+        }
+        skip, why = state.quarantine_state(src, self.NOW)
+        self.assertTrue(skip)
+        self.assertIn("quarantined for 6h", why)
+
+    def test_an_expired_window_is_retried_with_no_human_involved(self):
+        src = {
+            "consecutive_failures": "3",
+            "last_attempt": (self.NOW - datetime.timedelta(hours=7)).isoformat(),
+        }
+        skip, _ = state.quarantine_state(src, self.NOW)
+        self.assertFalse(skip, "6h window, 7h ago: it must be retried")
+
+    def test_a_source_that_never_succeeded_says_to_check_the_url(self):
+        """All nine of the real quarantine candidates are in this state, and a URL
+        that never worked is a configuration bug rather than an outage."""
+        src = {
+            "consecutive_failures": "3",
+            "last_attempt": self.NOW.isoformat(),
+            "last_success": "",
+        }
+        _, why = state.quarantine_state(src, self.NOW)
+        self.assertIn("never succeeded", why)
+        self.assertIn("check the URL", why)
+
+    def test_no_attempt_on_record_means_try_it(self):
+        skip, _ = state.quarantine_state({"consecutive_failures": "9"}, self.NOW)
+        self.assertFalse(skip, "nothing says a window has started")
+
+    def test_a_corrupt_timestamp_fails_open(self):
+        """A breaker that silently stops fetching on bad data is the worst outcome."""
+        skip, _ = state.quarantine_state(
+            {"consecutive_failures": "5", "last_attempt": "not a date"}, self.NOW
+        )
+        self.assertFalse(skip)
+
+    def test_a_quarantined_run_does_not_inflate_its_own_counter(self):
+        """If skipping counted as failing, a source would back off further for not
+        having been looked at, and 6h would become 72h without new evidence."""
+        sources = [{
+            "source_id": "s", "consecutive_failures": "3",
+            "last_success": "", "last_attempt": "2026-09-12T00:00:00+00:00",
+        }]
+        check.update_source_state(
+            sources, [state.SourceResult(source_id="s", ok=False, quarantined=True)]
+        )
+        self.assertEqual(sources[0]["consecutive_failures"], "3", "must not increment")
+        self.assertEqual(sources[0]["last_attempt"], "2026-09-12T00:00:00+00:00")
+
+    def test_a_real_attempt_records_last_attempt(self):
+        sources = [{"source_id": "s", "consecutive_failures": "0", "last_attempt": ""}]
+        check.update_source_state(
+            sources, [state.SourceResult(source_id="s", ok=False, error="HTTP 500")]
+        )
+        self.assertEqual(sources[0]["consecutive_failures"], "1")
+        self.assertTrue(sources[0]["last_attempt"], "an attempt must start the window")
+
+    def test_a_quarantined_source_is_still_reported_and_still_escalates(self):
+        """The breaker changes fetch policy, never reporting policy (spec 10.1)."""
+        result = state.SourceResult(
+            source_id="gts-careers", ok=False, quarantined=True,
+            error="quarantined for 6h after 3 consecutive failures",
+        )
+        source = {"source_id": "gts-careers", "consecutive_failures": "3", "last_success": ""}
+        title, body = digest.render([], [result], {"gts-careers": source})
+        self.assertIn("not fetched at all", body)
+        self.assertIn("gts-careers", body)
+        self.assertIn("SOURCE BLIND", body, "still escalated into the table")
+        self.assertIn("source failing", title)
