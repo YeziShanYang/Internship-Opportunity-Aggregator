@@ -37,10 +37,10 @@ import concurrent.futures
 import json
 import os
 import threading
-from dataclasses import dataclass, field
 
 import screen
-from core import models, paths, text as coretext
+from core import models, paths, profile, text as coretext
+from core.models import Judgment, Usage  # re-exported: the shapes moved to core
 from enrich import bodies as enrich_bodies
 from persist import store
 
@@ -77,13 +77,6 @@ SMALL_FIRM_REASONING_EFFORT = "medium"
 # Anthropic and Azure do not share an effort vocabulary; Anthropic has no "minimal".
 ANTHROPIC_EFFORT = {"minimal": "low", "low": "low", "medium": "medium", "high": "high"}
 
-# List prices per million tokens, (input, output), as published 2026-09-12. Only models
-# whose pricing has actually been checked appear here: an unpriced model reports its
-# token counts and says so, rather than inventing a dollar figure.
-PRICES_PER_MTOK = {
-    "gpt-5-mini": (0.25, 2.00),
-}
-
 # Bounds the daily bill. Any overflow still reaches the digest, just unclassified.
 # Raised from 60 when the backend moved to gpt-5-mini and postings started being
 # fetched: a classification costs roughly $0.0015 including ~6K tokens of posting text,
@@ -94,28 +87,10 @@ MAX_CLASSIFICATIONS_PER_RUN = 250
 # troubling the deployment's 500K tokens/minute quota.
 MAX_CONCURRENT_CLASSIFICATIONS = 6
 
-# The owner's interests are perishable input, not a constant. A stale profile does not
-# fail loudly -- it quietly mis-sorts every item in every digest while the output still
-# looks well-formed. Bump this date by hand whenever OWNER_PROFILE changes; digest.py
-# reads it and nags in the CALENDAR block once it goes stale.
-PROFILE_LAST_REVIEWED = "2026-09-11"
-PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
-
-OWNER_PROFILE = (
-    "First-year undergraduate at Stanford, class of 2030, studying math and/or CS. "
-    "Does not meet the eligibility criteria for identity-restricted programmes "
-    "-- those reserved for women, transgender or gender-expansive students, "
-    "underrepresented racial minorities, or LGBTQIA+ students -- nor for \"barriers "
-    "to access and opportunity\" criteria. US citizen, US-based. "
-    "Regional St. Louis firms are viable summer options. "
-    "Interests, in order: quantitative finance and mathematics first, software "
-    "engineering second. General finance roles are adjacent and acceptable."
-)
-
 SYSTEM_PROMPT = f"""You judge whether a change on an opportunity-tracking source matters to one specific person.
 
 The person:
-{OWNER_PROFILE}
+{profile.OWNER_PROFILE}
 
 Rules, in priority order:
 
@@ -193,51 +168,6 @@ STRICT_RESULT_SCHEMA = {
 }
 
 
-@dataclass
-class Judgment:
-    """A classified change. `classified=False` means it reached the digest unjudged."""
-
-    change: models.Change
-    relevant: bool = True
-    program_name: str = ""
-    new_status: str = "unknown"
-    why: str = ""
-    confidence: str = "low"
-    suggested_action: str = ""
-    eligible_proposal: str = ""
-    classified: bool = False
-    error: str = ""
-    # Set when `screen.py` settled this deterministically instead of the model. Carried
-    # so RULED OUT can say which rule fired, and so a digest can be read back later to
-    # tell which rule set produced it.
-    screen_rule: str = ""
-    screen_version: int = 0
-
-    @property
-    def urgent(self) -> bool:
-        """Goes in ACT NOW rather than WORTH A LOOK.
-
-        ACT NOW is only useful while it stays short. This used to be "relevant and
-        confidently classified", which worked while only high-signal sources were
-        classified at all. Once every source was classified that rule promoted every
-        generic-but-eligible job-board row -- a measured run put 22 of them in ACT NOW
-        and left WORTH A LOOK empty, burying the two or three items that actually
-        needed same-day attention.
-
-        So urgency now means one of two specific things: a firm that reviews on a
-        rolling basis and closes when full, or a row that reads as aimed at
-        first-years. Merely being eligible for something is WORTH A LOOK, not ACT NOW.
-        (Failing sources are escalated into the same block separately, by digest.py.)
-        """
-        if not self.relevant:
-            return False
-        if self.change.rolling:  # closes when full; time-critical regardless of stage
-            return True
-        if not self.change.is_discovery_candidate:
-            return False
-        return self.classified and self.confidence in ("medium", "high")
-
-
 def triage(changes: list[models.Change], sources: dict[str, dict[str, str]]) -> tuple[list[models.Change], list[models.Change]]:
     """Split changes into (classify, summarise-only).
 
@@ -303,37 +233,7 @@ def _render_change(change: models.Change, posting: tuple[str, str] | None = None
     return "\n".join(lines)
 
 
-@dataclass
-class Usage:
-    """What the run actually spent, accumulated across the thread pool.
-
-    This exists because the only way to answer "why did yesterday cost 34 cents" used
-    to be to reconstruct the prompts from git and solve backwards from the Azure
-    portal. The digest reports its own bill now: a cost that only shows up on a billing
-    page a day later is a cost nobody notices drifting.
-    """
-
-    provider: str = ""
-    model: str = ""
-    effort: str = ""
-    calls: int = 0
-    input_tokens: int = 0
-    cached_input_tokens: int = 0
-    output_tokens: int = 0
-    reasoning_tokens: int = 0
-    unreported: int = 0  # calls whose response carried no usage block
-
-    def estimated_usd(self) -> float | None:
-        rates = PRICES_PER_MTOK.get(self.model)
-        if rates is None:
-            return None
-        rate_in, rate_out = rates
-        # Cached input bills at a tenth of list on both providers.
-        billed_in = (self.input_tokens - self.cached_input_tokens) + self.cached_input_tokens * 0.1
-        return (billed_in * rate_in + self.output_tokens * rate_out) / 1_000_000
-
-
-USAGE = Usage()
+USAGE = models.Usage()
 _USAGE_LOCK = threading.Lock()
 
 
@@ -341,7 +241,7 @@ def reset_usage() -> None:
     """Start a fresh tally. Called once per run, and by tests between cases."""
     global USAGE
     with _USAGE_LOCK:
-        USAGE = Usage()
+        USAGE = models.Usage()
 
 
 def _record_usage(
@@ -364,28 +264,6 @@ def _record_usage(
         USAGE.output_tokens += getattr(usage, output_key, 0) or 0
         USAGE.reasoning_tokens += reasoning or 0
         USAGE.cached_input_tokens += cached or 0
-
-
-def usage_line() -> str | None:
-    """One HEALTH line describing the run's model spend, or None if nothing was called."""
-    u = USAGE
-    if not u.calls:
-        return None
-    bits = [
-        f"classifier: {u.calls} call{'s' if u.calls != 1 else ''}",
-        f"{u.input_tokens:,} in",
-        f"{u.output_tokens:,} out",
-    ]
-    if u.cached_input_tokens:
-        bits.insert(2, f"{u.cached_input_tokens:,} cached")
-    if u.reasoning_tokens:
-        bits.append(f"{u.reasoning_tokens:,} of it reasoning")
-    cost = u.estimated_usd()
-    bits.append(f"~${cost:.4f} est." if cost is not None else f"{u.model} is unpriced here")
-    line = " · ".join(bits) + f" ({u.model}, effort={u.effort})"
-    if u.unreported:
-        line += f" — ⚠ {u.unreported} call(s) reported no usage, so this is an undercount"
-    return line
 
 
 ANTHROPIC = "anthropic"
@@ -438,10 +316,10 @@ def _judgment_from_text(change: models.Change, text: str) -> Judgment:
     try:
         payload = json.loads(text)
     except json.JSONDecodeError:
-        return Judgment(change=change, error="could not parse the model's JSON response")
+        return Judgment.failed(change, "could not parse the model's JSON response")
 
-    return Judgment(
-        change=change,
+    return Judgment.from_model(
+        change,
         relevant=bool(payload.get("relevant", True)),
         program_name=payload.get("program_name", "") or change.program_name,
         new_status=payload.get("new_status", "unknown"),
@@ -449,7 +327,6 @@ def _judgment_from_text(change: models.Change, text: str) -> Judgment:
         confidence=payload.get("confidence", "low"),
         suggested_action=payload.get("suggested_action", ""),
         eligible_proposal=payload.get("eligible_proposal", ""),
-        classified=True,
     )
 
 
@@ -473,7 +350,7 @@ def _classify_anthropic(
             messages=[{"role": "user", "content": _render_change(change, posting)}],
         )
     except Exception as exc:
-        return Judgment(change=change, error=f"{type(exc).__name__}: {exc}")
+        return Judgment.failed(change, f"{type(exc).__name__}: {exc}")
 
     anthropic_usage = getattr(response, "usage", None)
     _record_usage(
@@ -484,7 +361,7 @@ def _classify_anthropic(
 
     if getattr(response, "stop_reason", None) == "refusal":
         # Surface it rather than drop it (rule 3).
-        return Judgment(change=change, error="model declined to classify this change")
+        return Judgment.failed(change, "model declined to classify this change")
 
     text = "".join(
         block.text for block in response.content if getattr(block, "type", "") == "text"
@@ -518,7 +395,7 @@ def _classify_azure(
             ],
         )
     except Exception as exc:
-        return Judgment(change=change, error=f"{type(exc).__name__}: {exc}")
+        return Judgment.failed(change, f"{type(exc).__name__}: {exc}")
 
     usage = getattr(response, "usage", None)
     details = getattr(usage, "completion_tokens_details", None)
@@ -532,14 +409,14 @@ def _classify_azure(
 
     choice = response.choices[0] if response.choices else None
     if choice is None:
-        return Judgment(change=change, error="Azure returned no choices")
+        return Judgment.failed(change, "Azure returned no choices")
     # Azure's content filter and the token ceiling both produce a usable HTTP 200 with
     # an empty or partial body. Neither is a quiet day (spec 10.1), so both become an
     # error on the Judgment rather than a silently unclassified change.
     if choice.finish_reason == "content_filter":
-        return Judgment(change=change, error="Azure content filter declined this change")
+        return Judgment.failed(change, "Azure content filter declined this change")
     if choice.finish_reason == "length":
-        return Judgment(change=change, error="response hit max_completion_tokens before completing")
+        return Judgment.failed(change, "response hit max_completion_tokens before completing")
 
     return _judgment_from_text(change, choice.message.content or "")
 
@@ -559,8 +436,12 @@ def classify(
     sources: dict[str, dict[str, str]],
     bodies: dict[str, enrich_bodies.PostingBody] | None = None,
     verdicts: dict[str, screen.Verdict] | None = None,
-) -> list[Judgment]:
+) -> models.JudgedSet:
     """Classify what is worth classifying. Never raises, never drops a change.
+
+    Returns the judgments *and* what they cost, together, because the spend is part of
+    what the run did and reading it off a module global is what stopped `render` from
+    being runnable on its own.
 
     `bodies` is what `enrich` fetched, keyed on change_id. It is an argument rather
     than something fetched here: this stage used to make network requests in the middle
@@ -575,13 +456,12 @@ def classify(
     here, which is concretely why `run.py render` could not run on its own.
     """
     to_classify, summarise_only = triage(changes, sources)
+    # The `why` here used to say "low-signal source and the row did not match the
+    # underclassman or rolling-firm filters", which stopped being true when triage
+    # stopped bypassing low-signal sources. This list is now only ever the overflow
+    # past MAX_CLASSIFICATIONS_PER_RUN, so that is what it says.
     judgments = [
-        Judgment(
-            change=change,
-            program_name=change.program_name,
-            why="Not classified: low-signal source and the row did not match the "
-            "underclassman or rolling-firm filters.",
-        )
+        Judgment.over_budget(change, MAX_CLASSIFICATIONS_PER_RUN)
         for change in summarise_only
     ]
 
@@ -608,41 +488,25 @@ def classify(
         if verdict is None:
             to_judge.append(change)
             continue
-        judgments.append(
-            Judgment(
-                change=change,
-                program_name=change.program_name,
-                relevant=False,
-                classified=True,
-                confidence="high",
-                why=verdict.why,
-                screen_rule=verdict.rule,
-                screen_version=verdict.version,
-            )
-        )
+        judgments.append(Judgment.from_screen(
+            change, why=verdict.why, rule=verdict.rule, version=verdict.version))
 
     provider = select_provider()
     if provider is None:
         for change in to_judge:
-            judgments.append(
-                Judgment(
-                    change=change,
-                    program_name=change.program_name,
-                    why="Not classified: no classifier credentials are configured "
-                    "(neither ANTHROPIC_API_KEY nor AZURE_OPENAI_API_KEY), so this is "
-                    "surfaced unjudged rather than dropped.",
-                )
-            )
-        return judgments
+            judgments.append(Judgment.unjudged(
+                change,
+                "Not classified: no classifier credentials are configured (neither "
+                "ANTHROPIC_API_KEY nor AZURE_OPENAI_API_KEY), so this is surfaced "
+                "unjudged rather than dropped."))
+        return models.JudgedSet(judgments=judgments, usage=USAGE)
 
     try:
         client, deployment = build_client(provider)
     except Exception as exc:
         for change in to_judge:
-            judgments.append(
-                Judgment(change=change, program_name=change.program_name, error=str(exc))
-            )
-        return judgments
+            judgments.append(Judgment.failed(change, str(exc)))
+        return models.JudgedSet(judgments=judgments, usage=USAGE)
 
     def judge(change: models.Change) -> Judgment:
         return classify_one(
@@ -668,4 +532,4 @@ def classify(
                 f"{judgment.eligible_proposal}\t{judgment.why}"
             )
         judgments.append(judgment)
-    return judgments
+    return models.JudgedSet(judgments=judgments, usage=USAGE)

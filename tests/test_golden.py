@@ -29,9 +29,9 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import calendar_reminders
 import classify
-import digest
+from deliver import digest, health, issue, urgency
 import screen
-from core import clock, models
+from core import clock, models, profile
 
 GOLDEN_DIR = pathlib.Path(__file__).resolve().parent / "golden"
 
@@ -84,11 +84,11 @@ def _change(**kwargs) -> models.Change:
     return models.Change(**base)
 
 
-def _judgment(change: models.Change, **kwargs) -> classify.Judgment:
-    base = dict(change=change, program_name=change.program_name, classified=True,
+def _judgment(change: models.Change, **kwargs) -> models.Judgment:
+    base = dict(change=change, program_name=change.program_name, outcome=models.MODEL,
                 confidence="high", relevant=True)
     base.update(kwargs)
-    return classify.Judgment(**base)
+    return models.Judgment(**base)
 
 
 def scenario_full() -> dict:
@@ -140,7 +140,7 @@ def scenario_full() -> dict:
                                                 'above; this owner is a rising sophomore '
                                                 'for Summer 2027: "rising junior"',
                   screen_rule="advanced-standing", screen_version=1),
-        classify.Judgment(
+        models.Judgment(
             change=unclassified, program_name=unclassified.program_name,
             why="Not classified: no classifier credentials are configured (neither "
                 "ANTHROPIC_API_KEY nor AZURE_OPENAI_API_KEY), so this is surfaced "
@@ -157,6 +157,13 @@ def scenario_full() -> dict:
             source_id="simplify-2027", ok=True, changes=[first_year, screened],
             snapshot_text="x", content_length=1,
             extra={"rows": 514, "sections": 2, "collapsed": 41},
+            # The typed field is what HEALTH reads now. Keeping the `extra` key too,
+            # because `update_program_state` and the console summary still read it and
+            # a fixture that only sets one of the two would hide a divergence.
+            collapsed=models.BoardCollapse(
+                total=41,
+                samples=("added: Quantitative Trader @ NYC",
+                         "removed: SWE Intern @ Austin")),
             # A per-source screen that reports. These three used to be a bare
             # `continue` in github_repos, so a section_include pattern that stopped
             # matching would have emptied the source in silence.
@@ -203,10 +210,24 @@ def scenario_full() -> dict:
                   "2026-09-13T07:00+00:00 — it has never succeeded, so check the URL "
                   "rather than waiting"),
     ]
+    metrics = [models.SourceMetrics.of(r) for r in results]
     return dict(
-        judgments=judgments, results=results, sources=SOURCES,
+        judgments=judgments,
+        # Projected, because that is what the renderer is handed in the
+        # pipeline -- a digest has to be reproducible from the artifact.
+        results=metrics,
+        sources=SOURCES,
         suppressed_applied=2, suppressed_muted=3,
-        filters=[
+        # Passed in rather than pinned on a module global, which is the whole point of
+        # step 8: `render` composes strings from the data it was given.
+        usage=models.Usage(
+            provider="azure", model="gpt-5-mini", effort="minimal", calls=6,
+            input_tokens=42_000, cached_input_tokens=12_000, output_tokens=9_000,
+            reasoning_tokens=7_300),
+        # Every report from every filter site in one list, per-source and run-wide,
+        # exactly as the pipeline builds it. Passing only the run-wide half is what
+        # made the per-source lines vanish from a digest rebuilt with `run.py render`.
+        filters=[report for m in metrics for report in m.filters] + [
             # The screen's tally, arriving as the same FilterReport shape every other
             # filter uses instead of as a bespoke sentence off a module global.
             models.FilterReport(
@@ -234,7 +255,7 @@ def scenario_quiet() -> dict:
     """
     return dict(
         judgments=[], results=[
-            models.SourceResult(source_id=source_id, ok=True, snapshot_text="x")
+            models.SourceMetrics(source_id=source_id, ok=True)
             for source_id in ("janestreet-greenhouse", "simplify-2027")
         ], sources=SOURCES, status_only=True)
 
@@ -255,25 +276,15 @@ class _Pinned:
                         calendar_reminders.for_month)
         self.addCleanup(setattr, calendar_reminders, "ALWAYS", calendar_reminders.ALWAYS)
         self.addCleanup(setattr, classify, "PROFILE_LAST_REVIEWED",
-                        classify.PROFILE_LAST_REVIEWED)
-        self.addCleanup(classify.reset_usage)
+                        profile.PROFILE_LAST_REVIEWED)
 
         clock.today_iso = lambda: TODAY
         calendar_reminders.for_month = lambda when=None: (FAKE_MONTH[0], list(FAKE_MONTH[1]))
         calendar_reminders.ALWAYS = list(FAKE_ALWAYS)
-        classify.PROFILE_LAST_REVIEWED = self.STALE_REVIEW
+        profile.PROFILE_LAST_REVIEWED = self.STALE_REVIEW
 
-        # A spend tally with known numbers, so the HEALTH line that reports what the
-        # run cost is rendered rather than skipped.
-        classify.reset_usage()
-        classify.USAGE.provider = classify.AZURE
-        classify.USAGE.model = "gpt-5-mini"
-        classify.USAGE.effort = "minimal"
-        classify.USAGE.calls = 6
-        classify.USAGE.input_tokens = 42_000
-        classify.USAGE.cached_input_tokens = 12_000
-        classify.USAGE.output_tokens = 9_000
-        classify.USAGE.reasoning_tokens = 7_300
+
+
 
 
 def render(name: str) -> str:

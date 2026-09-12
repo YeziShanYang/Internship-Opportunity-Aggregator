@@ -33,7 +33,7 @@ _Proposals only — nothing has been added._
 ## ■ CALENDAR (September)
 - A dated reminder for this month.
 - A standing reminder that fires every month.
-- Your interest profile was last reviewed 2025-01-01 (20 months ago) - are quant and maths still the priority? Every relevance call in this digest assumes so. Edit OWNER_PROFILE in classify.py and bump PROFILE_LAST_REVIEWED.
+- Your interest profile was last reviewed 2025-01-01 (20 months ago) - are quant and maths still the priority? Every relevance call in this digest assumes so. Edit OWNER_PROFILE in core/profile.py and bump PROFILE_LAST_REVIEWED.
 
 ## ■ HEALTH
 - 6 sources checked · 4 healthy · 2 FAILING
@@ -42,10 +42,10 @@ _Proposals only — nothing has been added._
 - ⚠ crabel-careers: 5 consecutive failures, last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting
 - · millennium-eightfold: first run, recorded 17 rows as the baseline.
 - · job boards: 3900 postings were not student roles and 397 were outside the US.
-- · readme-ignored-columns: 514 of 1402 rows removed (simplify-2027) — column values dropped as per-run churn rather than news.
-- · readme-section-not-included: 888 of 1402 rows removed (simplify-2027) — section did not match this repo's section_include pattern.
 - ⚠ optiver-students: redirected to a different path: https://optiver.com/a -> https://www.optiver.com/b. The fetch succeeded, but this row is no longer watching the page it was configured for.
 - ⚠ simplify-2027: 41 rows changed at once and were collapsed into one item — that reads as a board restructure.
+- · readme-ignored-columns: 514 of 1402 rows removed (simplify-2027) — column values dropped as per-run churn rather than news.
+- · readme-section-not-included: 888 of 1402 rows removed (simplify-2027) — section did not match this repo's section_include pattern.
 - · screen-v1: 1 of 7 rows removed — ruled out on a quoted phrase, with no model call (advanced-standing 1). They are listed in RULED OUT with the phrase that did it.
 - classifier: 6 calls · 42,000 in · 12,000 cached · 9,000 out · 7,300 of it reasoning · ~$0.0258 est. (gpt-5-mini, effort=minimal)
 - 2 item(s) are muted in data/applied.tsv and were hidden. Delete the line to bring one back.

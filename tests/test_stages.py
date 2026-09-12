@@ -17,7 +17,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-import digest
+from deliver import digest, health, issue, urgency
 import run
 from core import models, paths
 from persist import artifacts
@@ -97,17 +97,17 @@ class FilterLineTests(unittest.TestCase):
         on 62 boards, and naming all 62 is 700 characters nobody reads to the end of.
         A truncated list is worse than a count -- an arbitrary first four reads as if
         the filter only touched those."""
-        line = digest.filter_lines(self._reports(62))[0]
+        line = health.filter_lines(self._reports(62))[0]
         self.assertIn("across 62 sources", line)
         self.assertNotIn("board-0", line)
         self.assertIn("1860 of 2480 rows removed", line)
 
     def test_a_filter_firing_on_a_few_sources_names_them(self):
-        line = digest.filter_lines(self._reports(2))[0]
+        line = health.filter_lines(self._reports(2))[0]
         self.assertIn("board-0, board-1", line)
 
     def test_a_run_wide_filter_needs_no_source_list(self):
-        line = digest.filter_lines([models.FilterReport(
+        line = health.filter_lines([models.FilterReport(
             stage="process", filter_id="muted-programme", considered=9, removed=3,
             reason="muted in programs.csv")])[0]
         self.assertIn("3 of 9 rows removed —", line)

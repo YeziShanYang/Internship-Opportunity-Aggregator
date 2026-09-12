@@ -1,4 +1,4 @@
-"""Render the digest and deliver it as a GitHub Issue (spec section 9).
+"""Render the digest body. Delivery itself is `deliver.issue`.
 
 Issues rather than email: GitHub emails the owner when an issue is opened in their own
 repo, so there is no SMTP, no API key that expires silently, and no deliverability
@@ -26,161 +26,33 @@ capped -- see should_send and delivered_issue_exists.
 from __future__ import annotations
 
 import datetime
-import os
 import re
 
-import httpx
-
 import calendar_reminders
-import classify
+from core import clock, models, profile
+from deliver import health, urgency
 from enrich import bodies as enrich_bodies
-from core import clock, models, paths
-from classify import Judgment
-
-GITHUB_API = "https://api.github.com"
-
-
-def _health_lines(
-    results: list[models.SourceResult], sources: dict[str, dict[str, str]]
-) -> tuple[list[str], list[tuple[str, str, str]]]:
-    """Return (health block lines, escalated failures as ACT NOW table rows).
-
-    The escalated half is returned as (company, position, notes) rather than a rendered
-    sentence because it shares the opportunities table: a source that has gone blind is
-    the most actionable thing the digest can carry, and burying it under the table in a
-    prose block is how it gets skimmed past.
-    """
-    healthy = [r for r in results if r.ok]
-    failing = [r for r in results if not r.ok]
-    lines = [
-        f"{len(results)} sources checked · {len(healthy)} healthy · "
-        f"{len(failing)} FAILING"
-        if failing
-        else f"{len(results)} sources checked · {len(healthy)} healthy"
-    ]
-    escalated: list[tuple[str, str, str]] = []
-    quarantined = [r for r in failing if r.quarantined]
-    if quarantined:
-        # Reported as its own fact. "We have stopped looking at this source" is a
-        # different and more serious statement than "this fetch failed", and it is the
-        # one a reader is most likely to assume did not happen.
-        lines.append(
-            f"⚠ {len(quarantined)} source(s) were not fetched at all — the circuit "
-            f"breaker has them quarantined: "
-            + ", ".join(sorted(r.source_id for r in quarantined))
-        )
-    for result in failing:
-        source = sources.get(result.source_id, {})
-        count = int(source.get("consecutive_failures") or 0)
-        last_success = source.get("last_success") or "never"
-        detail = (
-            f"{result.source_id}: {count} consecutive failure"
-            f"{'s' if count != 1 else ''}, last success {last_success}. {result.error}"
-        )
-        lines.append(f"⚠ {detail}")
-        if count >= paths.FAILURE_ESCALATION_THRESHOLD:
-            escalated.append(
-                (
-                    result.source_id,
-                    f"SOURCE BLIND — {count} failures running",
-                    f"not quiet, blind. Last success {last_success}. {result.error}",
-                )
-            )
-    for result in results:
-        if result.baseline:
-            lines.append(
-                f"· {result.source_id}: first run, recorded "
-                f"{result.extra.get('rows', 0)} rows as the baseline."
-            )
-    # Every filter reports what it removed. A filter that hides silently is how a
-    # source goes blind without anyone noticing, and Tier 2 applies two of them.
-    not_student = sum(r.extra.get("suppressed_not_student", 0) for r in results)
-    not_us = sum(r.extra.get("suppressed_not_us", 0) for r in results)
-    if not_student or not_us:
-        lines.append(
-            f"· job boards: {not_student} postings were not student roles and "
-            f"{not_us} were outside the US."
-        )
-    lines += filter_lines([report for r in results for report in r.filters])
-    for result in results:
-        # Not a failure -- the fetch worked -- but the row is watching a page it was
-        # not configured for, which is a coverage hole rather than an outage. Said out
-        # loud every morning until the url is corrected, because the failure mode it
-        # replaces was silence.
-        redirected = result.extra.get("redirected")
-        if redirected:
-            lines.append(f"⚠ {result.source_id}: {redirected}")
-    for result in results:
-        collapsed = result.extra.get("collapsed")
-        if collapsed:
-            lines.append(
-                f"⚠ {result.source_id}: {collapsed} rows changed at once and were "
-                "collapsed into one item — that reads as a board restructure."
-            )
-    return lines, escalated
-
-
-def filter_lines(reports: list[models.FilterReport]) -> list[str]:
-    """One HEALTH line per filter that actually removed something.
-
-    A filter that removed nothing is not printed -- that would be a dozen lines of
-    "0 removed" every morning, and a digest nobody reads is as good as no digest. The
-    *report* is still emitted by the filter and still lands in `.run/changes.json`, so
-    "this filter is not running" stays answerable; it just is not the reader's problem
-    until it removes something.
-
-    Reports are aggregated by filter across sources, because per-source lines would put
-    five identical sentences in HEALTH on a morning when five READMEs each excluded a
-    contents table. The source list is capped for the same reason: the student-role
-    screen legitimately fires on 62 of the watched boards, and naming all 62 is 700
-    characters of HEALTH that nobody will read to the end of.
-    """
-    by_filter: dict[str, list[models.FilterReport]] = {}
-    for report in reports:
-        if report.removed:
-            by_filter.setdefault(report.filter_id, []).append(report)
-
-    lines: list[str] = []
-    for filter_id in sorted(by_filter):
-        group = by_filter[filter_id]
-        removed = sum(r.removed for r in group)
-        considered = sum(r.considered for r in group)
-        sources = sorted({r.source_id for r in group if r.source_id})
-        if not sources:
-            where = ""
-        elif len(sources) <= MAX_FILTER_SOURCES:
-            where = f" ({', '.join(sources)})"
-        else:
-            # The count, not a truncated list: an arbitrary first four reads as if the
-            # filter only touched those, which is worse than saying how many.
-            where = f" (across {len(sources)} sources)"
-        lines.append(
-            f"· {filter_id}: {removed} of {considered} rows removed{where}"
-            f" — {group[0].reason}."
-        )
-    return lines
-
 
 def _stale_profile_line() -> str | None:
     """Nag when the owner profile has not been reviewed in a while.
 
-    Every relevance call in the digest is made against `classify.OWNER_PROFILE`. When
+    Every relevance call in the digest is made against `core.profile.OWNER_PROFILE`. When
     it drifts out of date nothing breaks visibly -- the digest still renders, the
     judgments still look confident, they are just answering last year's question. The
     CALENDAR block is the right home because it already carries recurring
     human-action reminders, and this line costs nothing on the days it does not fire.
     """
     try:
-        reviewed = datetime.date.fromisoformat(classify.PROFILE_LAST_REVIEWED)
+        reviewed = datetime.date.fromisoformat(profile.PROFILE_LAST_REVIEWED)
     except ValueError:
         return None
     days = (datetime.date.fromisoformat(clock.today_iso()) - reviewed).days
-    if days < classify.PROFILE_REVIEW_AFTER_DAYS:
+    if days < profile.PROFILE_REVIEW_AFTER_DAYS:
         return None
     return (
         f"Your interest profile was last reviewed {reviewed.isoformat()} "
         f"({days // 30} months ago) - are quant and maths still the priority? Every "
-        "relevance call in this digest assumes so. Edit OWNER_PROFILE in classify.py "
+        "relevance call in this digest assumes so. Edit OWNER_PROFILE in core/profile.py "
         "and bump PROFILE_LAST_REVIEWED."
     )
 
@@ -233,7 +105,7 @@ def _unlink(text: str) -> str:
     return _MD_LINK.sub(r"\1", text)
 
 
-def _company_and_position(judgment: Judgment) -> tuple[str, str]:
+def _company_and_position(judgment: models.Judgment) -> tuple[str, str]:
     """Split one change into the table's company and position columns.
 
     Job-board rows are already keyed "Title @ Location", which is exactly the position
@@ -262,7 +134,7 @@ def _company_and_position(judgment: Judgment) -> tuple[str, str]:
     return company, position or "page updated"
 
 
-def _notes(judgment: Judgment, suppress_reason: bool = False) -> str:
+def _notes(judgment: models.Judgment, suppress_reason: bool = False) -> str:
     """The short clause at the end of a row.
 
     Ordered most-decision-relevant first, because this is the column the width budget
@@ -302,10 +174,10 @@ def _table_row(urgency: str, company: str, position: str, notes: str, url: str =
     return f"| {urgency} | {company} | {position} | {notes} |"
 
 
-def _judgment_row(judgment: Judgment, suppress_reason: bool = False) -> str:
+def _judgment_row(judgment: models.Judgment, suppress_reason: bool = False) -> str:
     company, position = _company_and_position(judgment)
     return _table_row(
-        URGENCY_ACT_NOW if judgment.urgent else URGENCY_WORTH_A_LOOK,
+        URGENCY_ACT_NOW if urgency.is_urgent(judgment) else URGENCY_WORTH_A_LOOK,
         company,
         position,
         _notes(judgment, suppress_reason),
@@ -314,8 +186,8 @@ def _judgment_row(judgment: Judgment, suppress_reason: bool = False) -> str:
 
 
 def render(
-    judgments: list[Judgment],
-    results: list[models.SourceResult],
+    judgments: list[models.Judgment],
+    results: list[models.SourceMetrics],
     sources: dict[str, dict[str, str]],
     suppressed_applied: int = 0,
     suppressed_muted: int = 0,
@@ -323,6 +195,7 @@ def render(
     status_only: bool = False,
     enriched: dict[str, enrich_bodies.PostingBody] | None = None,
     filters: list[models.FilterReport] | None = None,
+    usage: models.Usage | None = None,
 ) -> tuple[str, str]:
     """Return (issue title, issue body).
 
@@ -331,10 +204,11 @@ def render(
     block, which is exactly what a reminder with nothing to report should look like.
     """
     today = clock.today_iso()
-    health_lines, escalated = _health_lines(results, sources)
+    health_lines, escalated = health.source_lines(results, sources)
 
-    act_now = [j for j in judgments if j.urgent]
-    worth_a_look = [j for j in judgments if j.relevant and not j.urgent]
+    act_now = [j for j in judgments if urgency.is_urgent(j)]
+    worth_a_look = [j for j in judgments
+                    if j.relevant and not urgency.is_urgent(j)]
     ruled_out = [j for j in judgments if not j.relevant]
 
     if escalated:
@@ -421,13 +295,15 @@ def render(
     enrich_line = enrich_bodies.health_line(enriched or {})
     if enrich_line:
         body.append(f"- {enrich_line}")
-    # The screen's tally arrives here as the same FilterReport every other filter
-    # emits, rather than as a bespoke sentence read off a module global. That global is
-    # why a stage could not be run on its own: `render` on a fresh process printed an
-    # empty screen line against freshly-initialised counters.
-    for line in filter_lines(filters or []):
+    # Every filter in the pipeline reports through one shape and is rendered by one
+    # function, here: the per-source screens each checker applied, the two run-wide
+    # mute filters, and the deterministic screen. The screen's tally used to be a
+    # bespoke sentence read off a module global, which is why a stage could not be run
+    # on its own -- `render` on a fresh process printed an empty line against
+    # freshly-initialised counters.
+    for line in health.filter_lines(filters or []):
         body.append(f"- {line}")
-    spend = classify.usage_line()
+    spend = health.usage_line(usage or models.Usage())
     if spend:
         body.append(f"- {spend}")
     if suppressed_applied:
@@ -452,113 +328,3 @@ def render(
         )
 
     return title, "\n".join(body)
-
-
-def should_send(
-    judgments: list[Judgment],
-    results: list[models.SourceResult],
-    already_delivered_today: bool = False,
-) -> tuple[bool, bool]:
-    """Return (send, status_only).
-
-    Exactly one digest a day, every day. There is no "nothing to say" branch any more:
-    a reminder the owner can set their morning around is worth more than an inbox saved
-    from a short status mail, and it removes the one genuinely bad state the change-only
-    cadence had -- a silent morning that could mean either "quiet day" or "broken job".
-
-    `already_delivered_today` is the whole of the "exactly once" guarantee and it is
-    absolute: it suppresses real changes and failing sources too, which the old
-    change-only cadence deliberately did not. That is the point. A retry firing after a
-    successful delivery has nothing new to tell the owner that the morning's issue did
-    not already contain, and mailing the same date twice is the fatigue failure this
-    cadence exists to avoid. The digest is not the only record -- the state commit and
-    data/proposals.log still capture everything the retry saw.
-    """
-    if already_delivered_today:
-        return False, False
-    has_news = (
-        bool(judgments)
-        or any(not result.ok for result in results)
-        or any(result.baseline for result in results)
-    )
-    return True, not has_news
-
-
-def delivered_issue_exists(date: str) -> bool | None:
-    """Has a digest for `date` already been opened? None when GitHub cannot be asked.
-
-    data/last_delivered.txt cannot answer this on its own. A run reads that marker from
-    the commit it checked out, and the SHA is pinned when GitHub *dispatches* the run --
-    which, given ticks that arrive 3-5 hours late, is not necessarily in cron order. A
-    tick nominally scheduled first can dispatch second and check out a tree from before
-    the other tick pushed its state, see a stale marker, and mail a duplicate.
-
-    The issue list has no such problem. The issue *is* the email, so the open issues are
-    the delivery log itself, and every run sees the same one regardless of what it
-    checked out. Matching on the date in the title covers all three title shapes.
-
-    Returns None rather than False when the question cannot be answered, so the caller
-    can fall back to the marker instead of treating "I could not check" as "not yet
-    delivered" and mailing twice.
-    """
-    repo = os.environ.get("GITHUB_REPOSITORY")
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
-    if not repo or not token:
-        return None
-    try:
-        response = httpx.get(
-            f"{GITHUB_API}/repos/{repo}/issues",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/vnd.github+json",
-                "User-Agent": paths.USER_AGENT,
-            },
-            # Sorted newest first, so 50 covers any plausible backlog of same-day ticks
-            # without paginating.
-            params={
-                "state": "all",
-                "sort": "created",
-                "direction": "desc",
-                "per_page": 50,
-            },
-            timeout=paths.HTTP_TIMEOUT_SECONDS,
-        )
-        if response.status_code >= 300:
-            return None
-        issues = response.json()
-    except (httpx.HTTPError, ValueError):
-        return None
-    if not isinstance(issues, list):
-        return None
-    return any(
-        date in (issue.get("title") or "")
-        for issue in issues
-        # The issues endpoint returns pull requests too; they are not digests.
-        if isinstance(issue, dict) and "pull_request" not in issue
-    )
-
-
-def deliver(title: str, body: str) -> str:
-    """Open an issue. Returns a human-readable description of what happened."""
-    repo = os.environ.get("GITHUB_REPOSITORY")
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
-    if not repo or not token:
-        return (
-            "not delivered: GITHUB_REPOSITORY and GITHUB_TOKEN must both be set "
-            "(they are, automatically, inside GitHub Actions)"
-        )
-    response = httpx.post(
-        f"{GITHUB_API}/repos/{repo}/issues",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "User-Agent": paths.USER_AGENT,
-        },
-        json={"title": title, "body": body},
-        timeout=paths.HTTP_TIMEOUT_SECONDS,
-    )
-    if response.status_code >= 300:
-        raise RuntimeError(
-            f"could not open issue: HTTP {response.status_code} {response.text[:300]}"
-        )
-    return f"opened issue {response.json().get('html_url')}"

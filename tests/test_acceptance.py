@@ -28,8 +28,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import classify
 import discover
 import screen
-import digest
-from core import clock, models, paths, text as coretext
+from deliver import digest, health, issue, urgency
+from core import clock, models, paths, profile, text as coretext
 from gather import breaker
 from persist import store
 from jobs import daily
@@ -92,6 +92,17 @@ def tearDownModule():
             f"  deleted:  {deleted}\n"
             f"  modified: {modified}"
         )
+
+
+def _metrics(*results) -> list[models.SourceMetrics]:
+    """Project results the way the pipeline does before rendering.
+
+    `deliver` renders from SourceMetrics, not SourceResult, so that a digest can be
+    rebuilt from `.run/changes.json` with no network. A SourceResult carries the same
+    attribute names and would work here by accident; projecting explicitly keeps the
+    test honest about which shape the renderer is promised.
+    """
+    return [models.SourceMetrics.of(r) for r in results]
 
 
 # The three per-source checks, as the tests drive them: fetch, read yesterday, assess.
@@ -288,9 +299,9 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(change.key, "Jane Street / QT")
         self.assertTrue(change.rolling, "Jane Street must be flagged rolling (rule 4)")
 
-        judgments = classify.classify(result.changes, {"nuft-2027": self.source})
-        self.assertTrue(any(j.urgent for j in judgments), "rolling change must be urgent")
-        _, body = digest.render(judgments, [result], {"nuft-2027": self.source})
+        judgments = classify.classify(result.changes, {"nuft-2027": self.source}).judgments
+        self.assertTrue(any(urgency.is_urgent(j) for j in judgments), "rolling change must be urgent")
+        _, body = digest.render(judgments, _metrics(result), {"nuft-2027": self.source})
         self.assertIn("ACT NOW", body)
         self.assertIn("Jane Street / QT", body)
 
@@ -308,7 +319,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(sources[0]["consecutive_failures"], "1")
         self.assertEqual(sources[0]["last_success"], "", "last_success must not advance")
 
-        _, body = digest.render([], [result], {"nuft-2027": sources[0]})
+        _, body = digest.render([], _metrics(result), {"nuft-2027": sources[0]})
         self.assertIn("HEALTH", body)
         self.assertIn("1 FAILING", body)
 
@@ -316,7 +327,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         """Spec 10.1: at >=3 consecutive failures the source is blind, not quiet."""
         result = models.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 404")
         source = dict(self.source, consecutive_failures="4", last_success="2026-09-01")
-        title, body = digest.render([], [result], {"nuft-2027": source})
+        title, body = digest.render([], _metrics(result), {"nuft-2027": source})
         self.assertIn("ACT NOW", body)
         self.assertIn("SOURCE BLIND", body)
         self.assertIn("4 failures running", body)
@@ -374,7 +385,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
             ),
             program_name="Jane Street INSIGHT",
         )
-        judgments = classify.classify([change], {"nuft-2027": self.source})
+        judgments = classify.classify([change], {"nuft-2027": self.source}).judgments
         self.assertEqual(len(judgments), 1)
         judgment = judgments[0]
         self.assertTrue(judgment.classified, judgment.error)
@@ -392,7 +403,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         names = ("ANTHROPIC_API_KEY", "AZURE_OPENAI_API_KEY", "CLASSIFIER_PROVIDER")
         saved = {n: os.environ.pop(n, None) for n in names}
         try:
-            judgments = classify.classify([change], {"nuft-2027": self.source})
+            judgments = classify.classify([change], {"nuft-2027": self.source}).judgments
         finally:
             for name, value in saved.items():
                 if value is not None:
@@ -429,7 +440,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         saved = os.environ.get("CLASSIFIER_PROVIDER")
         os.environ["CLASSIFIER_PROVIDER"] = "azure"
         try:
-            judgments = classify.classify([change], {"nuft-2027": self.source})
+            judgments = classify.classify([change], {"nuft-2027": self.source}).judgments
         finally:
             if saved is None:
                 os.environ.pop("CLASSIFIER_PROVIDER", None)
@@ -448,26 +459,26 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
 
         # A quiet day still delivers -- that is what makes a silent morning diagnostic.
         self.assertEqual(
-            digest.should_send([], [healthy]),
+            issue.should_send([], _metrics(healthy)),
             (True, True),
             "a quiet day must still mail; silence has to mean the job is broken",
         )
-        title, body = digest.render([], [healthy], {}, status_only=True)
+        title, body = digest.render([], _metrics(healthy), {}, status_only=True)
         self.assertIn("(no changes)", title)
         self.assertIn("HEALTH", body)
 
         # A failing source is news, so it is not a status-only day.
         failing = models.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 500")
-        self.assertEqual(digest.should_send([], [failing]), (True, False))
-        title, _ = digest.render([], [failing], {})
+        self.assertEqual(issue.should_send([], _metrics(failing)), (True, False))
+        title, _ = digest.render([], _metrics(failing), {})
         self.assertNotIn("(no changes)", title)
 
         # So is a real change.
         change = models.Change(
             source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
         )
-        judgment = classify.Judgment(change=change, relevant=True, classified=True)
-        self.assertEqual(digest.should_send([judgment], [healthy]), (True, False))
+        judgment = models.Judgment(change=change, relevant=True, outcome=models.MODEL)
+        self.assertEqual(issue.should_send([judgment], _metrics(healthy)), (True, False))
 
     def test_14_6b_a_schedule_retry_never_mails_a_second_time(self):
         """The morning schedule fires three ticks; only the first may deliver.
@@ -482,11 +493,11 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         change = models.Change(
             source_id="nuft-2027", kind="added", key="Jane Street / FTTP", detail="x"
         )
-        judgment = classify.Judgment(change=change, relevant=True, classified=True)
+        judgment = models.Judgment(change=change, relevant=True, outcome=models.MODEL)
 
         # Tick 1: nothing delivered yet, so the digest goes out.
         self.assertEqual(store.read_last_delivered(), "", "no marker before the first run")
-        self.assertEqual(digest.should_send([], [healthy], False), (True, True))
+        self.assertEqual(issue.should_send([], _metrics(healthy), False), (True, True))
 
         # Tick 2, an hour later, after tick 1 recorded a delivery: silence, whatever
         # this run happened to find.
@@ -498,7 +509,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
             ("a retry that found a broken source", [], [failing]),
         ):
             self.assertEqual(
-                digest.should_send(judgments, results, already_delivered_today=True),
+                issue.should_send(judgments, _metrics(*results), already_delivered_today=True),
                 (False, False),
                 f"{name} must not mail a second issue for the same date",
             )
@@ -506,13 +517,13 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         # A marker from a previous day suppresses nothing.
         store.write_last_delivered("2020-01-01")
         self.assertNotEqual(store.read_last_delivered(), clock.today_iso())
-        self.assertEqual(digest.should_send([], [healthy]), (True, True))
+        self.assertEqual(issue.should_send([], _metrics(healthy)), (True, True))
 
     def test_14_6c_the_delivery_lock_falls_back_when_github_cannot_be_asked(self):
         """"Could not check" must never be read as "not yet delivered".
 
         The local marker is read from the commit a run checked out, and late ticks do
-        not dispatch in cron order, so digest.delivered_issue_exists asks GitHub for the
+        not dispatch in cron order, so issue.already_sent asks GitHub for the
         authoritative answer. When it cannot, it has to say so rather than guess, or the
         caller would treat an unanswerable question as a green light and mail twice.
         """
@@ -520,7 +531,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         saved = {name: os.environ.pop(name, None) for name in names}
         try:
             self.assertIsNone(
-                digest.delivered_issue_exists(clock.today_iso()),
+                issue.already_sent(clock.today_iso()),
                 "without a repo and token the answer is unknown, not False",
             )
         finally:
@@ -542,10 +553,10 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         change = models.Change(
             source_id="nuft-2027", kind="changed", key="Jane Street / FTTP", detail="x"
         )
-        judgment = classify.Judgment(
+        judgment = models.Judgment(
             change=change,
             relevant=True,
-            classified=True,
+            outcome=models.MODEL,
             confidence="high",
             new_status="open",
             program_name="Jane Street FTTP",
@@ -720,10 +731,10 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
 
     def test_14_7f_ruled_out_items_stay_visible_with_their_reasons(self):
         """Filtering is only safe if a wrong call is auditable."""
-        judgment = classify.Judgment(
+        judgment = models.Judgment(
             change=self._change(),
             relevant=False,
-            classified=True,
+            outcome=models.MODEL,
             confidence="high",
             why="The posting requires third or fourth year standing.",
         )
@@ -742,33 +753,35 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
         def judge(**kw):
             change = models.Change(source_id="simplify-2027", kind="added",
                                   key="ACME / Software Engineer Intern", detail="x", **kw)
-            return classify.Judgment(change=change, relevant=True, classified=True,
+            return models.Judgment(change=change, relevant=True, outcome=models.MODEL,
                                      confidence="high")
 
-        self.assertFalse(judge().urgent, "merely eligible is WORTH A LOOK, not ACT NOW")
-        self.assertTrue(judge(rolling=True).urgent, "rolling firms close when full")
-        self.assertTrue(judge(is_discovery_candidate=True).urgent,
+        self.assertFalse(urgency.is_urgent(judge()),
+                         "merely eligible is WORTH A LOOK, not ACT NOW")
+        self.assertTrue(urgency.is_urgent(judge(rolling=True)),
+                        "rolling firms close when full")
+        self.assertTrue(urgency.is_urgent(judge(is_discovery_candidate=True)),
                         "first-year-targeted rows are the point of the tool")
 
     def test_14_7g_a_stale_owner_profile_nags_in_the_calendar(self):
         """A stale profile mis-sorts everything while still looking well-formed."""
-        saved = classify.PROFILE_LAST_REVIEWED
+        saved = profile.PROFILE_LAST_REVIEWED
         try:
-            classify.PROFILE_LAST_REVIEWED = "2019-01-01"
+            profile.PROFILE_LAST_REVIEWED = "2019-01-01"
             _, body = digest.render([], [], {})
             self.assertIn("interest profile was last reviewed", body)
-            classify.PROFILE_LAST_REVIEWED = clock.today_iso()
+            profile.PROFILE_LAST_REVIEWED = clock.today_iso()
             _, fresh = digest.render([], [], {})
             self.assertNotIn("interest profile was last reviewed", fresh)
         finally:
-            classify.PROFILE_LAST_REVIEWED = saved
+            profile.PROFILE_LAST_REVIEWED = saved
 
     def test_14_7h_noisy_boards_never_write_to_programs_csv(self):
         """One aggregate programs.csv row must not be driven by 35 per-row judgments."""
         programs = [{"name": "Board", "status": "OPEN", "last_checked": "",
                      "last_changed": "", "snapshot_hash": "", "source_id": "simplify-2027"}]
-        judgment = classify.Judgment(
-            change=self._change(), relevant=True, classified=True,
+        judgment = models.Judgment(
+            change=self._change(), relevant=True, outcome=models.MODEL,
             confidence="high", program_name="Board", new_status="CLOSED",
         )
         daily.update_program_state(programs, [self.SOURCE], [], [judgment])
@@ -818,7 +831,7 @@ class PostingJudgementTests(_IsolatedState, unittest.TestCase):
             key=f"ACME / {role}",
             detail=f"Company=ACME; Role={role}; Application=[ ]({url})",
         )
-        judgments = classify.classify([change], {"simplify-2027": self.SOURCE})
+        judgments = classify.classify([change], {"simplify-2027": self.SOURCE}).judgments
         self.assertEqual(len(judgments), 1)
         return judgments[0]
 
@@ -1247,17 +1260,17 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         from the document structure into the row order and needs asserting: every ACT
         NOW row sits above every WORTH A LOOK row.
         """
-        rolling = classify.Judgment(
+        rolling = models.Judgment(
             change=models.Change(
                 source_id="js", kind="added", key="SWE Intern @ NYC", detail="x",
                 url="https://example.com/a", rolling=True,
             ),
-            program_name="Jane Street", relevant=True, classified=True,
+            program_name="Jane Street", relevant=True, outcome=models.MODEL,
             confidence="high", why="First-year eligible.",
         )
-        ordinary = classify.Judgment(
+        ordinary = models.Judgment(
             change=models.Change(source_id="b", kind="added", key="Quant Intern", detail="x"),
-            program_name="Some Firm", relevant=True, classified=True, confidence="low",
+            program_name="Some Firm", relevant=True, outcome=models.MODEL, confidence="low",
         )
         _, body = digest.render([ordinary, rolling], [], {})
 
@@ -1275,11 +1288,11 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
 
     def test_14_9u_a_pipe_in_a_title_cannot_break_the_table(self):
         """One unescaped pipe silently shifts every later column in that row."""
-        judgment = classify.Judgment(
+        judgment = models.Judgment(
             change=models.Change(
                 source_id="b", kind="added", key="SWE | Intern", detail="x",
             ),
-            program_name="Some | Firm", relevant=True, classified=True,
+            program_name="Some | Firm", relevant=True, outcome=models.MODEL,
             confidence="high", why="Fine | really",
         )
         _, body = digest.render([judgment], [], {})
@@ -1290,9 +1303,9 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
 
     def test_14_9v_a_long_reason_is_truncated_to_a_clause(self):
         """An unbounded `why` wraps the table into the wall of text it replaced."""
-        judgment = classify.Judgment(
+        judgment = models.Judgment(
             change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
-            program_name="Some Firm", relevant=True, classified=True,
+            program_name="Some Firm", relevant=True, outcome=models.MODEL,
             confidence="high", why="word " * 100,
         )
         _, body = digest.render([judgment], [], {})
@@ -1431,13 +1444,13 @@ class ClassifierSpendTests(_IsolatedState, unittest.TestCase):
         )
 
     def test_no_calls_means_no_line(self):
-        self.assertIsNone(classify.usage_line(), "a run that classified nothing")
+        self.assertIsNone(health.usage_line(classify.USAGE), "a run that classified nothing")
 
     def test_it_reproduces_the_2026_09_12_bill(self):
         """The measured shape of that run: 245,112 in, ~138,167 out, $0.34."""
         self._record(self._Usage(245_112, 138_167, reasoning=132_000))
         self.assertAlmostEqual(classify.USAGE.estimated_usd(), 0.3376, places=3)
-        line = classify.usage_line()
+        line = health.usage_line(classify.USAGE)
         self.assertIn("245,112 in", line)
         self.assertIn("132,000 of it reasoning", line)
         self.assertIn("effort=minimal", line)
@@ -1453,7 +1466,7 @@ class ClassifierSpendTests(_IsolatedState, unittest.TestCase):
             output_key="completion_tokens",
         )
         self.assertIsNone(classify.USAGE.estimated_usd())
-        self.assertIn("unpriced", classify.usage_line())
+        self.assertIn("unpriced", health.usage_line(classify.USAGE))
 
     def test_a_missing_usage_block_is_an_undercount_not_a_free_run(self):
         """Spec 10.1 again: absent data must not read as zero."""
@@ -1462,14 +1475,14 @@ class ClassifierSpendTests(_IsolatedState, unittest.TestCase):
             classify.AZURE, "gpt-5-mini", "minimal", None,
             input_key="prompt_tokens", output_key="completion_tokens",
         )
-        line = classify.usage_line()
+        line = health.usage_line(classify.USAGE)
         self.assertEqual(classify.USAGE.calls, 2)
         self.assertIn("undercount", line)
         self.assertIn("2 calls", line)
 
     def test_the_spend_line_reaches_the_digest(self):
         self._record(self._Usage(245_112, 138_167, reasoning=132_000))
-        _, body = digest.render([], [], {})
+        _, body = digest.render([], [], {}, usage=classify.USAGE)
         self.assertIn("classifier: 1 call", body)
         self.assertIn("~$0.33", body)
 
@@ -1694,7 +1707,7 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
             source_id="b", kind="added", key="SWE Intern", detail="x",
             posting_text="Expected graduation date: 2027 or 2028.",
         )
-        judgments = classify.classify([change], {"b": {"source_id": "b", "signal": "high"}})
+        judgments = classify.classify([change], {"b": {"source_id": "b", "signal": "high"}}).judgments
         self.assertEqual(len(judgments), 1)
         self.assertFalse(judgments[0].relevant)
         self.assertTrue(judgments[0].classified, "a quoted phrase is a real judgment")
@@ -1827,7 +1840,7 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
             error="quarantined for 6h after 3 consecutive failures",
         )
         source = {"source_id": "gts-careers", "consecutive_failures": "3", "last_success": ""}
-        title, body = digest.render([], [result], {"gts-careers": source})
+        title, body = digest.render([], _metrics(result), {"gts-careers": source})
         self.assertIn("not fetched at all", body)
         self.assertIn("gts-careers", body)
         self.assertIn("SOURCE BLIND", body, "still escalated into the table")
@@ -1843,10 +1856,10 @@ class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
     """
 
     def _row(self, key, program="SimplifyJobs Summer 2027", url="https://x.test/1"):
-        j = classify.Judgment(
+        j = models.Judgment(
             change=models.Change(source_id="simplify-2027", kind="added", key=key,
                                 detail="x", url=url),
-            program_name=program, relevant=True, classified=True, confidence="high",
+            program_name=program, relevant=True, outcome=models.MODEL, confidence="high",
         )
         _, body = digest.render([j], [], {})
         return next(l for l in body.splitlines() if l.startswith("| Worth"))
@@ -1920,7 +1933,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
             self._src("https://www.twosigma.com/careers/students/", source_id="twosigma-campus"),
             FakeHTMLClient(self.PAGE, final_url="https://www.twosigma.com/careers/"),
         )
-        _, body = digest.render([], [r], {"twosigma-campus": {"source_id": "twosigma-campus"}})
+        _, body = digest.render([], _metrics(r), {"twosigma-campus": {"source_id": "twosigma-campus"}})
         self.assertIn("twosigma-campus", body)
         self.assertIn("no longer watching the page it was configured for", body)
 
