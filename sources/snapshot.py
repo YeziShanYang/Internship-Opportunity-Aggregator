@@ -15,7 +15,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 
-from core import models
+from core import clock, models
 
 
 # Spec section 5: a new row whose title looks like an underclassman program is a
@@ -130,6 +130,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
                 models.Change(
                     source_id=source_id,
                     kind="added",
+                    change_id=clock.change_id(source_id, f"section :: {section}"),
                     key=f"new section: {section}",
                     detail=f'A section that was not in the previous snapshot: "{section}".',
                     is_discovery_candidate=True,
@@ -143,6 +144,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
             models.Change(
                 source_id=source_id,
                 kind="added",
+                change_id=clock.change_id(source_id, key),
                 key=row.key,
                 detail=f"New row: {row.value}",
                 url=row.url,
@@ -157,6 +159,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
             models.Change(
                 source_id=source_id,
                 kind="removed",
+                change_id=clock.change_id(source_id, key),
                 key=row.key,
                 detail=f"Row disappeared. It previously read: {row.value}",
                 url=row.url,
@@ -171,6 +174,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
                 models.Change(
                     source_id=source_id,
                     kind="changed",
+                    change_id=clock.change_id(source_id, key),
                     key=new_by_key[key].key,
                     detail=f"Was: {before}\nNow: {after}",
                     url=new_by_key[key].url,

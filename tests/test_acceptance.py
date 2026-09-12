@@ -1011,6 +1011,13 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         )
         self.assertEqual(r.extra["postings"], 2, "the pre-filter total must be reported")
         self.assertEqual(r.extra["suppressed_not_student"], 1)
+        # And as a named report, not only as a total. This regressed once while Tier 2
+        # was being split into gather/process: the category screen moved into the
+        # parser, the count was still being taken from the fetcher, and a 2-posting
+        # board reported 1 posting. The count has to come from the board's own total.
+        phenom = [f for f in r.filters if f.filter_id == "ats-phenom-category"]
+        self.assertEqual(len(phenom), 1, r.filters)
+        self.assertEqual((phenom[0].considered, phenom[0].removed), (2, 1))
 
     def test_14_9n_a_phenom_field_may_be_a_list_a_dict_or_a_string(self):
         """Field types are per-field and undocumented; the first version of the fetcher

@@ -23,6 +23,9 @@ class Change:
     kind: str  # added | removed | changed
     key: str  # human-readable row identity, e.g. "Akuna Capital / QD"
     detail: str  # what changed, as text the classifier and the reader both see
+    # Opaque join key, set once by `process` and used by every stage after it. See
+    # core.clock.change_id for why this is not the same thing as change_key.
+    change_id: str = ""
     url: str = ""
     program_name: str = ""  # filled from sources.csv program_names
     is_discovery_candidate: bool = False
@@ -57,6 +60,20 @@ class FilterReport:
     samples: tuple[str, ...] = ()  # up to 5 removed keys, so a bad filter can be audited
 
 
+@dataclass(frozen=True)
+class BoardCollapse:
+    """A board that restructured rather than restocked.
+
+    Carried typed rather than as an `extra` key so HEALTH cannot forget it: collapsing
+    is what stands between a Greenhouse schema tweak and a 1,400-item digest, and a
+    collapse nobody is told about is a board silently reporting one item on the morning
+    it changed everything.
+    """
+
+    total: int
+    samples: tuple[str, ...] = ()
+
+
 @dataclass
 class SourceResult:
     """Outcome of checking one source.
@@ -81,6 +98,9 @@ class SourceResult:
     # bag of counters -- and "the filter was added, the HEALTH line was not" is exactly
     # how this rule has been broken twice.
     filters: list[FilterReport] = field(default_factory=list)
+    # Set when this board moved more rows at once than reads as news. The changes list
+    # holds the single collapsed item; this is the fact HEALTH reports.
+    collapsed: BoardCollapse | None = None
     # True when the circuit breaker skipped the fetch. Neither a success nor a new
     # failure: the counters must not move, or a quarantine would inflate itself.
     quarantined: bool = False
@@ -163,3 +183,22 @@ class FetchAttempt:
     sha256: str = ""
     elapsed_ms: int = 0
     requests: int = 1
+
+
+@dataclass(frozen=True)
+class Posting:
+    """One job as an ATS describes it, before any screen has run.
+
+    Lives in `core` rather than next to the parsers because both `gather` and `process`
+    need the shape: the fetcher decides which Workday descriptions are worth a second
+    request, and the parser decides which postings survive the student and location
+    screens. A stage may only import at or below its own level, so the shape they share
+    has to sit under both.
+    """
+
+    title: str
+    location: str
+    department: str
+    employment_type: str
+    url: str
+    text: str  # description; goes to the classifier, never into the snapshot
