@@ -257,7 +257,10 @@ def run(args) -> int:
     artifacts.write(artifacts.CHANGES, "changes", models.ChangeSet(
         changes=changes,
         metrics=[models.SourceMetrics.of(result) for result in results],
-        filters=filters,
+        # Both kinds together: the per-source screens each checker applied, and the two
+        # run-wide mute filters. One list, because "did every filter report?" has to be
+        # answerable in one place.
+        filters=[report for result in results for report in result.filters] + filters,
     ))
 
     by_id = {source["source_id"]: source for source in sources}

@@ -42,6 +42,8 @@ _Proposals only — nothing has been added._
 - ⚠ crabel-careers: 5 consecutive failures, last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting
 - · millennium-eightfold: first run, recorded 17 rows as the baseline.
 - · job boards: 3900 postings were not student roles and 397 were outside the US.
+- · readme-ignored-columns: 514 of 1402 rows removed (simplify-2027) — column values dropped as per-run churn rather than news.
+- · readme-section-not-included: 888 of 1402 rows removed (simplify-2027) — section did not match this repo's section_include pattern.
 - ⚠ optiver-students: redirected to a different path: https://optiver.com/a -> https://www.optiver.com/b. The fetch succeeded, but this row is no longer watching the page it was configured for.
 - ⚠ simplify-2027: 41 rows changed at once and were collapsed into one item — that reads as a board restructure.
 - screen v1: 1 of 7 changes ruled out on a quoted phrase, with no model call (advanced-standing 1). They are listed in RULED OUT with the phrase that did it.
