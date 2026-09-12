@@ -31,8 +31,10 @@ issue. It rides along in Monday's digest as an extra section.
 from __future__ import annotations
 
 import datetime
+import html as html_module
 import re
 import time
+import urllib.parse
 from dataclasses import dataclass
 
 import httpx
@@ -55,11 +57,70 @@ PUSHED_WITHIN_DAYS = 120
 MAX_SLUG_VERIFICATIONS = 20
 BUDGET_SECONDS = 180.0
 
-# Where a board slug hides inside a link we already store.
+# Where a board slug hides inside a link we already store, or inside a careers page.
+#
+# Every pattern is anchored on the vendor's DOMAIN, never on a bare keyword. That is
+# not stylistic. CLAUDE.md used to advise grepping the HTML for `lever`, `workday`,
+# `greenhouse` and friends, and measured across the 65 watched pages that produced ten
+# false positives out of twenty-four hits -- nine pages matched only on the word
+# "leverage", and one on "the use of leverage" plus an "HR Workday system" disclosure.
+# A keyword grep cannot tell a job board from an adjective.
+#
+# The `?for=` and `embed/job_board` shapes matter as much as the plain link: Verition's
+# and Eclipse's slugs appear nowhere on their careers pages except inside a Greenhouse
+# embed script, which is exactly the "click a couple more buttons" case.
 _FINGERPRINTS = (
-    (job_boards.GREENHOUSE, re.compile(r"(?:job-boards|boards)\.greenhouse\.io/([A-Za-z0-9_-]+)")),
-    (job_boards.LEVER, re.compile(r"jobs\.lever\.co/([A-Za-z0-9_-]+)")),
+    (job_boards.GREENHOUSE, re.compile(
+        r"(?:job-boards|boards)(?:\.eu)?\.greenhouse\.io/(?:embed/job_board\?for=)?([A-Za-z0-9_-]+)"
+    )),
+    (job_boards.GREENHOUSE, re.compile(r"greenhouse\.io/embed/job_board[^\"'\s]*?[?&]for=([A-Za-z0-9_-]+)")),
+    (job_boards.GREENHOUSE, re.compile(r"grnhse_app[^\"'\s]*?[?&]for=([A-Za-z0-9_-]+)")),
+    # The API host, which a site calling Greenhouse from its own JavaScript embeds
+    # directly. Graham's slug appears nowhere else on its careers page, and
+    # "boards-api" is not "boards", so the link patterns above miss it.
+    (job_boards.GREENHOUSE, re.compile(
+        r"boards-api(?:\.eu)?\.greenhouse\.io/v\d+/boards/([A-Za-z0-9_-]+)"
+    )),
+    (job_boards.LEVER, re.compile(r"jobs\.(?:eu\.)?lever\.co/([A-Za-z0-9_-]+)")),
     (job_boards.ASHBY, re.compile(r"jobs\.ashbyhq\.com/([A-Za-z0-9_-]+)")),
+)
+
+# Slugs that are never a board. `embed`, `job_board` and friends appear in the path of
+# the very URLs the patterns above match, so without this the probe proposes a board
+# called "embed" on every Greenhouse-embedding page in the watchlist.
+# Links worth following one hop from a watched careers page. The owner's description of
+# the bug was literally "you just need to click a couple more buttons", and measured:
+# probing only the watched page rediscovered 8 of the 11 boards the hand audit found.
+# Eclipse's and Verition's slugs appear nowhere on their careers pages -- they are on
+# an "all jobs" / "open positions" page one link deeper, inside a Greenhouse embed.
+_JOB_LINK = re.compile(
+    r"""href=["']([^"']*(?:all-?jobs|open-?positions|open-?roles|job-?openings|"""
+    r"""current-?openings|careers?/(?:jobs|openings|search)|view-?jobs|"""
+    r"""join-?us/jobs|positions)[^"']*)["']""",
+    re.IGNORECASE,
+)
+# Bounded hard: this runs over ~65 pages inside the weekly discovery budget, so a page
+# that links to forty things must not turn into forty fetches.
+MAX_HOPS_PER_PAGE = 3
+
+_NOT_A_SLUG = frozenset({
+    "embed", "job_board", "job_boards", "jobs", "js", "board", "boards", "api", "v1",
+    "for", "www", "assets", "static", "images", "css", "error", "404",
+})
+
+# Vendors we can recognise but cannot yet watch, because their slug is a whole tenant
+# URL rather than a name, or because no method reads them. Finding one is still worth
+# saying: it means the firm HAS a machine-readable board and the page_text row watching
+# its marketing page is the wrong target. Reported for a human, never auto-proposed.
+_UNSUPPORTED_VENDORS = (
+    ("workday", re.compile(r"[A-Za-z0-9_-]+\.(?:wd\d+\.)?myworkdayjobs\.com|myworkdaysite\.com")),
+    ("phenom", re.compile(r"cdn\.phenompeople\.com|phenom\.com/api")),
+    ("eightfold", re.compile(r"\.eightfold\.ai|/api/apply/v2/jobs")),
+    ("workable", re.compile(r"(?:apply|[A-Za-z0-9_-]+)\.workable\.com")),
+    ("smartrecruiters", re.compile(r"(?:api|jobs|careers)\.smartrecruiters\.com")),
+    ("icims", re.compile(r"[A-Za-z0-9_-]+\.icims\.com")),
+    ("rippling", re.compile(r"(?:api|ats)\.rippling\.com")),
+    ("teamtailor", re.compile(r"[A-Za-z0-9_-]+\.teamtailor\.com")),
 )
 
 
@@ -174,6 +235,116 @@ def mine_snapshots(known: set[str]) -> list[Candidate]:
     return list(found.values())
 
 
+def _read_page(client: httpx.Client, url: str) -> list[str]:
+    """Fetch one page, or [] if it cannot be read.
+
+    A page we cannot read is page_watch's problem to report, not the probe's -- the
+    probe going quiet about an unreachable page is correct, because something else is
+    already shouting about it.
+    """
+    try:
+        response = client.get(url)
+        if response.status_code >= 400:
+            return []
+        body = response.text
+    except Exception:
+        return []
+    time.sleep(state.REQUEST_DELAY_SECONDS)
+    return [body]
+
+
+def _job_links(html: str, base: str) -> list[str]:
+    """Absolute, same-site links from a careers page that look like a listing page."""
+    out: list[str] = []
+    seen = set()
+    for href in _JOB_LINK.findall(html):
+        target = urllib.parse.urljoin(base, html_module.unescape(href))
+        parts = urllib.parse.urlsplit(target)
+        if parts.scheme not in ("http", "https"):
+            continue
+        # Same registrable-ish host only. Following off-site links would turn a probe
+        # of our own watchlist into a crawler.
+        if parts.netloc.removeprefix("www.") != urllib.parse.urlsplit(base).netloc.removeprefix("www."):
+            continue
+        clean = parts._replace(fragment="").geturl()
+        if clean.rstrip("/") == base.rstrip("/") or clean in seen:
+            continue
+        seen.add(clean)
+        out.append(clean)
+    return out
+
+
+def mine_pages(
+    sources: list[dict[str, str]], client: httpx.Client, known: set[str], deadline: float
+) -> tuple[list[Candidate], list[str]]:
+    """Probe every page_text source for the real job board hiding behind it.
+
+    This exists because of a specific, repeated failure. A `page_text` row is supposed
+    to be the fallback for a firm on no public ATS, and the decision that a firm has no
+    public ATS was a documented *manual* step -- so roughly fifty rows were added
+    without anyone running the check. The owner found it by hand: "you just need to
+    click a couple more buttons and it brought you to some sort of Greenhouse site with
+    the actual job board postings on it." The subsequent audit found thirteen such rows,
+    every one carrying a note asserting the firm was on no public ATS.
+
+    A rule that lives only in a document is a rule that gets skipped, so the probe now
+    runs itself. It **proposes and never adds** (`discover.record` writes
+    data/discovered.csv, never sources.csv), which is the standing rule for everything
+    in this module.
+
+    Returns (candidates, notes). The notes carry the vendors we can recognise but
+    cannot watch -- finding one still means the firm has a machine-readable board and
+    the page_text row is pointed at the wrong thing.
+    """
+    found: dict[str, Candidate] = {}
+    notes: list[str] = []
+    for source in sources:
+        if (source.get("method") or "").strip() != "page_text":
+            continue
+        if time.monotonic() > deadline:
+            notes.append("discovery: the page probe ran out of budget before finishing.")
+            break
+        url = (source.get("url") or "").strip()
+        if not url:
+            continue
+        pages = _read_page(client, url)
+        if not pages:
+            continue
+        # One hop deeper, because that is where the bug actually lives.
+        for link in _job_links(pages[0], url)[:MAX_HOPS_PER_PAGE]:
+            if time.monotonic() > deadline:
+                break
+            pages += _read_page(client, link)
+        html = "\n".join(pages)
+
+        for method, pattern in _FINGERPRINTS:
+            for slug in pattern.findall(html):
+                if slug.lower() in _NOT_A_SLUG:
+                    continue
+                key = f"{method}:{slug.lower()}"
+                if key in known or key in found:
+                    continue
+                found[key] = Candidate(
+                    kind=method,
+                    key=key,
+                    title=slug,
+                    url=job_boards.ENDPOINTS[method].format(slug=slug),
+                    evidence=(
+                        f"found in the HTML of {source['source_id']}, which is watched "
+                        f"as page_text; not in sources.csv"
+                    ),
+                )
+        for vendor, pattern in _UNSUPPORTED_VENDORS:
+            if pattern.search(html):
+                notes.append(
+                    f"discovery: {source['source_id']} is watched as page_text but its "
+                    f"HTML carries a {vendor} fingerprint — it has a real board this "
+                    "tool cannot read yet. Worth a look by hand."
+                )
+                break
+    return list(found.values()), notes
+
+
 def verify(candidates: list[Candidate], client: httpx.Client, deadline: float) -> list[Candidate]:
     """Drop mined slugs that do not actually answer, so no dead proposal is made."""
     checked: list[Candidate] = []
@@ -225,6 +396,12 @@ def run(
         candidates += verify(mine_snapshots(known), web, deadline)
     except Exception as exc:
         notes.append(f"discovery: ATS fingerprint mining failed ({type(exc).__name__}).")
+    try:
+        mined, page_notes = mine_pages(sources, web, known, deadline)
+        notes += page_notes
+        candidates += verify(mined, web, deadline)
+    except Exception as exc:
+        notes.append(f"discovery: the page_text ATS probe failed ({type(exc).__name__}).")
 
     # A key already on file is never re-proposed, whatever its status. `rejected` is a
     # permanent tombstone; without this the same candidates arrive every Monday.
