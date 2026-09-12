@@ -159,6 +159,26 @@ def _cell(text: str, limit: int = 0) -> str:
     return text
 
 
+# An aggregator row's key carries the real employer, as a markdown link:
+# "[InfiniteQuant](https://simplify.jobs/c/InfiniteQuant) / Quantitative Trader @ NYC".
+# Matching the link shape rather than splitting every key on " / " is deliberate: a
+# job-board key is "Title @ Location", and a title containing a slash ("Software
+# Engineer / Backend") would otherwise be read as a company called "Software Engineer".
+_LINKED_ENTITY = re.compile(r"^\[([^\]]+)\]\([^)]*\)\s*/\s*(.+)$")
+_MD_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+
+
+def _unlink(text: str) -> str:
+    """Markdown link syntax down to its label.
+
+    Escaping the brackets instead, which is what the first version did, rendered
+    "[InfiniteQuant](url) / Quantitative Trader" as "(InfiniteQuant)(url) /
+    Quantitative Trader" inside the cell -- the URL printed twice and the employer in
+    parentheses.
+    """
+    return _MD_LINK.sub(r"\1", text)
+
+
 def _company_and_position(judgment: Judgment) -> tuple[str, str]:
     """Split one change into the table's company and position columns.
 
@@ -170,6 +190,15 @@ def _company_and_position(judgment: Judgment) -> tuple[str, str]:
     change = judgment.change
     company = judgment.program_name or change.program_name or change.source_id
     position = change.key
+
+    # Prefer the employer named in the row over the aggregator that carried it. For a
+    # Simplify or zshah row, `program_names` is the list's own name, which is the same
+    # useless string on every one of its 500+ rows.
+    linked = _LINKED_ENTITY.match(position)
+    if linked:
+        return _unlink(linked.group(1)), _unlink(linked.group(2))
+
+    position = _unlink(position)
     if company and position.lower().startswith(company.lower()):
         position = position[len(company):].lstrip(" -–—:·,").strip()
         # What is left of a page-text key is the bare change count, "(2 added, 0
@@ -211,7 +240,9 @@ def _table_row(urgency: str, company: str, position: str, notes: str, url: str =
     company = _cell(company, COMPANY_CHARS)
     position = _cell(position, POSITION_CHARS)
     if url:
-        # Square brackets in the title would terminate the link text early.
+        # Any remaining brackets would terminate the link text early. By here the
+        # markdown links are already reduced to their labels by `_unlink`, so this is
+        # a backstop for a literal bracket in a job title.
         label = position.replace("[", "(").replace("]", ")")
         position = f"[{label}]({url})"
     return f"| {urgency} | {company} | {position} | {notes} |"
