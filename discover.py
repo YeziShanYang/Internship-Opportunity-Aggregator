@@ -39,7 +39,8 @@ from dataclasses import dataclass
 
 import httpx
 
-import state
+from core import clock, paths
+from persist import store
 from sources import job_boards
 
 GITHUB_SEARCH = "https://api.github.com/search/repositories"
@@ -140,10 +141,10 @@ def due(today: str | None = None) -> bool:
     this project has already seen happen -- would otherwise skip a whole week in
     silence, and silence is the one signal this tool is built to make meaningful.
     """
-    date = datetime.date.fromisoformat(today or state.today_iso())
+    date = datetime.date.fromisoformat(today or clock.today_iso())
     if date.weekday() == 0:
         return True
-    last = state.read_last_discovery()
+    last = store.read_last_discovery()
     if not last:
         return False
     try:
@@ -166,7 +167,7 @@ def _known(sources: list[dict[str, str]]) -> set[str]:
 
 def search_repos(client: httpx.Client, known: set[str], deadline: float) -> list[Candidate]:
     found: dict[str, Candidate] = {}
-    cutoff = datetime.date.fromisoformat(state.today_iso()) - datetime.timedelta(
+    cutoff = datetime.date.fromisoformat(clock.today_iso()) - datetime.timedelta(
         days=PUSHED_WITHIN_DAYS
     )
     for query in SEARCH_QUERIES:
@@ -206,16 +207,16 @@ def search_repos(client: httpx.Client, known: set[str], deadline: float) -> list
                     f"\"{query.split(' in:')[0]}\""
                 ),
             )
-        time.sleep(state.REQUEST_DELAY_SECONDS)
+        time.sleep(paths.REQUEST_DELAY_SECONDS)
     return list(found.values())
 
 
 def mine_snapshots(known: set[str]) -> list[Candidate]:
     """Board slugs already sitting in the snapshots we store. No network."""
     found: dict[str, Candidate] = {}
-    if not state.SNAPSHOTS.exists():
+    if not paths.SNAPSHOTS.exists():
         return []
-    for path in sorted(state.SNAPSHOTS.glob("*")):
+    for path in sorted(paths.SNAPSHOTS.glob("*")):
         try:
             text = path.read_text(encoding="utf-8")
         except OSError:
@@ -249,7 +250,7 @@ def _read_page(client: httpx.Client, url: str) -> list[str]:
         body = response.text
     except Exception:
         return []
-    time.sleep(state.REQUEST_DELAY_SECONDS)
+    time.sleep(paths.REQUEST_DELAY_SECONDS)
     return [body]
 
 
@@ -374,7 +375,7 @@ def verify(candidates: list[Candidate], client: httpx.Client, deadline: float) -
                 evidence=f"{candidate.evidence}; API returns {total} postings, {rows} US student rows",
             )
         )
-        time.sleep(state.REQUEST_DELAY_SECONDS)
+        time.sleep(paths.REQUEST_DELAY_SECONDS)
     return checked
 
 
@@ -385,7 +386,7 @@ def run(
     deadline = time.monotonic() + BUDGET_SECONDS
     notes: list[str] = []
     known = _known(sources)
-    seen = {row["key"] for row in state.read_discovered()}
+    seen = {row["key"] for row in store.read_discovered()}
 
     candidates: list[Candidate] = []
     try:
@@ -413,8 +414,8 @@ def record(candidates: list[Candidate]) -> None:
     """Append to data/discovered.csv. Never touches sources.csv."""
     if not candidates:
         return
-    rows = state.read_discovered()
-    today = state.today_iso()
+    rows = store.read_discovered()
+    today = clock.today_iso()
     for candidate in candidates:
         rows.append(
             {
@@ -428,7 +429,7 @@ def record(candidates: list[Candidate]) -> None:
                 "status": "proposed",
             }
         )
-    state.write_discovered(rows)
+    store.write_discovered(rows)
 
 
 def lines(candidates: list[Candidate], limit: int = 10) -> list[str]:

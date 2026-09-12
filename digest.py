@@ -33,14 +33,14 @@ import httpx
 
 import calendar_reminders
 import classify
-import state
+from core import clock, models, paths
 from classify import Judgment
 
 GITHUB_API = "https://api.github.com"
 
 
 def _health_lines(
-    results: list[state.SourceResult], sources: dict[str, dict[str, str]]
+    results: list[models.SourceResult], sources: dict[str, dict[str, str]]
 ) -> tuple[list[str], list[tuple[str, str, str]]]:
     """Return (health block lines, escalated failures as ACT NOW table rows).
 
@@ -77,7 +77,7 @@ def _health_lines(
             f"{'s' if count != 1 else ''}, last success {last_success}. {result.error}"
         )
         lines.append(f"⚠ {detail}")
-        if count >= state.FAILURE_ESCALATION_THRESHOLD:
+        if count >= paths.FAILURE_ESCALATION_THRESHOLD:
             escalated.append(
                 (
                     result.source_id,
@@ -131,7 +131,7 @@ def _stale_profile_line() -> str | None:
         reviewed = datetime.date.fromisoformat(classify.PROFILE_LAST_REVIEWED)
     except ValueError:
         return None
-    days = (datetime.date.fromisoformat(state.today_iso()) - reviewed).days
+    days = (datetime.date.fromisoformat(clock.today_iso()) - reviewed).days
     if days < classify.PROFILE_REVIEW_AFTER_DAYS:
         return None
     return (
@@ -269,7 +269,7 @@ def _judgment_row(judgment: Judgment, suppress_reason: bool = False) -> str:
 
 def render(
     judgments: list[Judgment],
-    results: list[state.SourceResult],
+    results: list[models.SourceResult],
     sources: dict[str, dict[str, str]],
     suppressed_applied: int = 0,
     suppressed_muted: int = 0,
@@ -282,7 +282,7 @@ def render(
     same shape every day: on a quiet day that is the calendar block and the health
     block, which is exactly what a reminder with nothing to report should look like.
     """
-    today = state.today_iso()
+    today = clock.today_iso()
     health_lines, escalated = _health_lines(results, sources)
 
     act_now = [j for j in judgments if j.urgent]
@@ -399,7 +399,7 @@ def render(
 
 def should_send(
     judgments: list[Judgment],
-    results: list[state.SourceResult],
+    results: list[models.SourceResult],
     already_delivered_today: bool = False,
 ) -> tuple[bool, bool]:
     """Return (send, status_only).
@@ -454,7 +454,7 @@ def delivered_issue_exists(date: str) -> bool | None:
             headers={
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/vnd.github+json",
-                "User-Agent": state.USER_AGENT,
+                "User-Agent": paths.USER_AGENT,
             },
             # Sorted newest first, so 50 covers any plausible backlog of same-day ticks
             # without paginating.
@@ -464,7 +464,7 @@ def delivered_issue_exists(date: str) -> bool | None:
                 "direction": "desc",
                 "per_page": 50,
             },
-            timeout=state.HTTP_TIMEOUT_SECONDS,
+            timeout=paths.HTTP_TIMEOUT_SECONDS,
         )
         if response.status_code >= 300:
             return None
@@ -495,10 +495,10 @@ def deliver(title: str, body: str) -> str:
         headers={
             "Authorization": f"Bearer {token}",
             "Accept": "application/vnd.github+json",
-            "User-Agent": state.USER_AGENT,
+            "User-Agent": paths.USER_AGENT,
         },
         json={"title": title, "body": body},
-        timeout=state.HTTP_TIMEOUT_SECONDS,
+        timeout=paths.HTTP_TIMEOUT_SECONDS,
     )
     if response.status_code >= 300:
         raise RuntimeError(

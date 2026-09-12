@@ -40,7 +40,8 @@ import threading
 from dataclasses import dataclass, field
 
 import screen
-import state
+from core import models, paths
+from persist import store
 from sources import postings
 
 MODEL = "claude-opus-5"
@@ -164,7 +165,7 @@ RESULT_SCHEMA = {
     "properties": {
         "relevant": {"type": "boolean"},
         "program_name": {"type": "string"},
-        "new_status": {"type": "string", "enum": list(state.PROGRAM_STATUSES)},
+        "new_status": {"type": "string", "enum": list(paths.PROGRAM_STATUSES)},
         "why": {"type": "string"},
         "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
         "suggested_action": {"type": "string"},
@@ -196,7 +197,7 @@ STRICT_RESULT_SCHEMA = {
 class Judgment:
     """A classified change. `classified=False` means it reached the digest unjudged."""
 
-    change: state.Change
+    change: models.Change
     relevant: bool = True
     program_name: str = ""
     new_status: str = "unknown"
@@ -237,7 +238,7 @@ class Judgment:
         return self.classified and self.confidence in ("medium", "high")
 
 
-def triage(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> tuple[list[state.Change], list[state.Change]]:
+def triage(changes: list[models.Change], sources: dict[str, dict[str, str]]) -> tuple[list[models.Change], list[models.Change]]:
     """Split changes into (classify, summarise-only).
 
     Everything is classified now. This used to bypass low-signal sources -- Simplify's
@@ -256,8 +257,8 @@ def triage(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> t
     still marks which sources are noisy, and the overflow sort below prefers rolling
     and discovery rows when a day exceeds the cap.
     """
-    to_classify: list[state.Change] = list(changes)
-    summarise_only: list[state.Change] = []
+    to_classify: list[models.Change] = list(changes)
+    summarise_only: list[models.Change] = []
 
     if len(to_classify) > MAX_CLASSIFICATIONS_PER_RUN:
         # Keep the most interesting ones; the rest still get reported, unclassified.
@@ -267,7 +268,7 @@ def triage(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> t
     return to_classify, summarise_only
 
 
-def _render_change(change: state.Change, posting: tuple[str, str] | None = None) -> str:
+def _render_change(change: models.Change, posting: tuple[str, str] | None = None) -> str:
     """Render one change for the model. `posting` is the (text, error) from a fetch.
 
     The distinction between "no posting text" and "the fetch failed" is load-bearing:
@@ -471,7 +472,7 @@ def build_client(provider: str):
     return client, os.environ.get("AZURE_OPENAI_DEPLOYMENT", AZURE_DEFAULT_DEPLOYMENT)
 
 
-def _judgment_from_text(change: state.Change, text: str) -> Judgment:
+def _judgment_from_text(change: models.Change, text: str) -> Judgment:
     """Parse a provider's JSON body into a Judgment. Shared by both backends."""
     try:
         payload = json.loads(text)
@@ -492,7 +493,7 @@ def _judgment_from_text(change: state.Change, text: str) -> Judgment:
 
 
 def _classify_anthropic(
-    client, model: str, change: state.Change, posting=None,
+    client, model: str, change: models.Change, posting=None,
     effort: str = CLASSIFY_REASONING_EFFORT,
 ) -> Judgment:
     try:
@@ -531,7 +532,7 @@ def _classify_anthropic(
 
 
 def _classify_azure(
-    client, deployment: str, change: state.Change, posting=None,
+    client, deployment: str, change: models.Change, posting=None,
     effort: str = CLASSIFY_REASONING_EFFORT,
 ) -> Judgment:
     try:
@@ -583,7 +584,7 @@ def _classify_azure(
 
 
 def classify_one(
-    provider: str, client, deployment: str, change: state.Change, posting=None,
+    provider: str, client, deployment: str, change: models.Change, posting=None,
     effort: str = CLASSIFY_REASONING_EFFORT,
 ) -> Judgment:
     """Dispatch one change to whichever backend is configured."""
@@ -592,7 +593,7 @@ def classify_one(
     return _classify_azure(client, deployment, change, posting, effort)
 
 
-def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) -> list[Judgment]:
+def classify(changes: list[models.Change], sources: dict[str, dict[str, str]]) -> list[Judgment]:
     """Classify what is worth classifying. Never raises, never drops a change."""
     to_classify, summarise_only = triage(changes, sources)
     judgments = [
@@ -620,13 +621,13 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
     # `postings` for the ones that arrive bare, which in practice means Simplify rows.
     fetched = postings.fetch_for_changes([c for c in to_classify if not c.posting_text])
 
-    def posting_for(change: state.Change):
+    def posting_for(change: models.Change):
         if change.posting_text:
             return (change.posting_text, "")
         url = postings.posting_url(change)
         return fetched.get(url) if url else None
 
-    to_judge: list[state.Change] = []
+    to_judge: list[models.Change] = []
     for change in to_classify:
         SCREEN.considered += 1
         posting = posting_for(change)
@@ -672,7 +673,7 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
             )
         return judgments
 
-    def judge(change: state.Change) -> Judgment:
+    def judge(change: models.Change) -> Judgment:
         return classify_one(
             provider, client, deployment, change, posting_for(change)
         )
@@ -684,14 +685,14 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
     #
     # `pool.map` yields results in input order, which matters: proposals.log is an
     # audit trail and must not reorder run to run. Writes happen below, on one thread,
-    # after every judgment is in -- `state.append_proposal` appends to a file and is
+    # after every judgment is in -- `store.append_proposal` appends to a file and is
     # not safe to call from the pool.
     with concurrent.futures.ThreadPoolExecutor(MAX_CONCURRENT_CLASSIFICATIONS) as pool:
         judged = list(pool.map(judge, to_judge))
 
     for change, judgment in zip(to_judge, judged):
         if judgment.eligible_proposal:
-            state.append_proposal(
+            store.append_proposal(
                 f"{change.source_id}\t{change.key}\tproposed eligible="
                 f"{judgment.eligible_proposal}\t{judgment.why}"
             )

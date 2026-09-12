@@ -20,7 +20,9 @@ import time
 import classify
 import digest
 import discover
-import state
+from core import clock, models, paths
+from gather import breaker
+from persist import store
 from sources import github_repos, job_boards, page_watch, postings
 
 # Which module handles each `method` in sources.csv, and which HTTP client it gets.
@@ -45,15 +47,15 @@ CHECKERS: dict[str, tuple] = {
     "page_text": (page_watch.check, WEB_CLIENT),
 }
 
-# Defined in state.py so build_xlsx.py can share it. Anything else absent from
+# Defined in core.paths so build_xlsx.py can share it. Anything else absent from
 # CHECKERS is a broken row, not a source to skip.
-UNWATCHED = state.UNWATCHED_METHOD
+UNWATCHED = paths.UNWATCHED_METHOD
 
 
 def run_sources(
     sources: list[dict[str, str]], only: str | None
-) -> list[state.SourceResult]:
-    results: list[state.SourceResult] = []
+) -> list[models.SourceResult]:
+    results: list[models.SourceResult] = []
     token = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
     if not token:
         print(
@@ -74,10 +76,10 @@ def run_sources(
             # bypasses the breaker; that is the affordance you want when you are
             # debugging the source that is quarantined.
             if not only:
-                skip, why = state.quarantine_state(source)
+                skip, why = breaker.quarantine_state(source)
                 if skip:
                     results.append(
-                        state.SourceResult(
+                        models.SourceResult(
                             source_id=source_id, ok=False, quarantined=True, error=why
                         )
                     )
@@ -89,7 +91,7 @@ def run_sources(
                 # failure count, and a silently unwatched source indistinguishable
                 # from a quiet one. A configuration error has to be visible.
                 results.append(
-                    state.SourceResult(
+                    models.SourceResult(
                         source_id=source_id,
                         ok=False,
                         error=f"sources.csv sets method={method!r}, which no module handles",
@@ -98,15 +100,15 @@ def run_sources(
                 continue
             check_fn, client_name = handler
             results.append(check_fn(source, clients[client_name]))
-            time.sleep(state.REQUEST_DELAY_SECONDS)  # spec section 11: be a good citizen
+            time.sleep(paths.REQUEST_DELAY_SECONDS)  # spec section 11: be a good citizen
     return results
 
 
 def update_source_state(
-    sources: list[dict[str, str]], results: list[state.SourceResult]
+    sources: list[dict[str, str]], results: list[models.SourceResult]
 ) -> None:
     by_id = {source["source_id"]: source for source in sources}
-    now = state.iso()
+    now = clock.iso()
     for result in results:
         source = by_id.get(result.source_id)
         if source is None:
@@ -128,7 +130,7 @@ def update_source_state(
 def update_program_state(
     programs: list[dict[str, str]],
     sources: list[dict[str, str]],
-    results: list[state.SourceResult],
+    results: list[models.SourceResult],
     judgments: list[classify.Judgment],
 ) -> None:
     """Update the tracking columns only.
@@ -138,7 +140,7 @@ def update_program_state(
     to the tracking `status` column, which the tool owns, and only when the model was
     reasonably sure.
     """
-    now = state.iso()
+    now = clock.iso()
     by_source = {source["source_id"]: source for source in sources}
     by_name = {program["name"]: program for program in programs}
 
@@ -153,7 +155,7 @@ def update_program_state(
                 continue
             program["last_checked"] = now
             if result.ok and result.snapshot_text is not None:
-                program["snapshot_hash"] = state.sha256_text(result.snapshot_text)
+                program["snapshot_hash"] = clock.sha256_text(result.snapshot_text)
             if result.changes:
                 program["last_changed"] = now
 
@@ -178,10 +180,10 @@ def update_program_state(
         if judgment.change.source_id in noisy:
             continue
         program = by_name.get(judgment.program_name)
-        if program is None or judgment.new_status not in state.PROGRAM_STATUSES:
+        if program is None or judgment.new_status not in paths.PROGRAM_STATUSES:
             continue
         if judgment.new_status != "unknown" and program["status"] != judgment.new_status:
-            state.append_proposal(
+            store.append_proposal(
                 f"{judgment.change.source_id}\t{judgment.program_name}\tstatus "
                 f"{program['status']} -> {judgment.new_status}\t{judgment.why}"
             )
@@ -212,8 +214,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    sources = state.read_sources()
-    programs = state.read_programs()
+    sources = store.read_sources()
+    programs = store.read_programs()
     if not sources:
         print("data/sources.csv is empty or missing", file=sys.stderr)
         return 2
@@ -240,7 +242,7 @@ def main(argv: list[str] | None = None) -> int:
     # A change is dropped only when EVERY programme its source informs is muted:
     # muting "Jane Street INSIGHT" must not also silence FTTP news arriving on the same
     # row.
-    def _all_muted(change: state.Change) -> bool:
+    def _all_muted(change: models.Change) -> bool:
         names = [n.strip() for n in (change.program_name or "").split("|") if n.strip()]
         return bool(names) and all(name in muted for name in names)
 
@@ -252,12 +254,12 @@ def main(argv: list[str] | None = None) -> int:
     # before classification, which also saves the model call. This used to be populated
     # by ticking a checkbox in a delivered digest; the digest is a table now and a table
     # cell cannot hold a working checkbox, so the file is hand-edited.
-    applied = state.read_applied()
+    applied = store.read_applied()
     before_applied = len(changes)
     changes = [
         change
         for change in changes
-        if state.change_key(change.source_id, change.key) not in applied
+        if clock.change_key(change.source_id, change.key) not in applied
     ]
     suppressed_applied = before_applied - len(changes)
 
@@ -279,8 +281,8 @@ def main(argv: list[str] | None = None) -> int:
     # digest.delivered_issue_exists. Either source saying "delivered" is enough --
     # a stale marker cannot cause a duplicate, only a redundant suppression, and the
     # marker is only ever stale in the direction of a delivery this run did not see.
-    today = state.today_iso()
-    marker_delivered = state.read_last_delivered() == today
+    today = clock.today_iso()
+    marker_delivered = store.read_last_delivered() == today
     issue_delivered = digest.delivered_issue_exists(today)
     delivered_today = (
         marker_delivered if issue_delivered is None else (issue_delivered or marker_delivered)
@@ -309,7 +311,7 @@ def main(argv: list[str] | None = None) -> int:
                 candidates, discovery_notes = discover.run(gh, web, sources)
             if not args.dry_run:
                 discover.record(candidates)
-                state.write_last_discovery()
+                store.write_last_discovery()
             if candidates:
                 discovery_lines = discover.lines(candidates)
         except Exception as exc:  # the digest must never be lost because this broke
@@ -343,15 +345,15 @@ def main(argv: list[str] | None = None) -> int:
 
     for result in results:
         if result.ok and result.snapshot_text is not None:
-            state.write_snapshot(
+            store.write_snapshot(
                 result.source_id, result.snapshot_text, ext=result.snapshot_ext
             )
-    state.write_sources(sources)
-    state.write_programs(programs)
+    store.write_sources(sources)
+    store.write_programs(programs)
 
     if send:
         print(digest.deliver(title, body))
-        state.write_last_delivered()
+        store.write_last_delivered()
     else:
         print(
             f"a digest was already delivered on {today}: this run is a schedule retry, "

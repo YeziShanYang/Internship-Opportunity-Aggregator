@@ -23,7 +23,8 @@ from dataclasses import dataclass, field
 
 import httpx
 
-import state
+from core import models, paths
+from persist import store
 from sources.snapshot import (  # shared with job_boards and page_watch
     DISCOVERY_PATTERN,
     ROLLING_PATTERN,
@@ -340,40 +341,40 @@ def fetch_readme(client: httpx.Client, repo: str) -> tuple[str, str]:
     meta = client.get(f"{GITHUB_API}/repos/{repo}")
     meta.raise_for_status()
     branch = meta.json().get("default_branch") or "main"
-    time.sleep(state.REQUEST_DELAY_SECONDS)
+    time.sleep(paths.REQUEST_DELAY_SECONDS)
     readme = client.get(f"{RAW_BASE}/{repo}/{branch}/README.md")
     readme.raise_for_status()
     return readme.text, branch
 
 
 def build_client(token: str | None) -> httpx.Client:
-    headers = {"User-Agent": state.USER_AGENT, "Accept": "application/vnd.github+json"}
+    headers = {"User-Agent": paths.USER_AGENT, "Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return httpx.Client(
-        headers=headers, timeout=state.HTTP_TIMEOUT_SECONDS, follow_redirects=True
+        headers=headers, timeout=paths.HTTP_TIMEOUT_SECONDS, follow_redirects=True
     )
 
 
-def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
+def check(source: dict[str, str], client: httpx.Client) -> models.SourceResult:
     """Check one Tier 1 repo. Never raises: a failure is a result, not an exception."""
     source_id = source["source_id"]
     config = REPO_CONFIGS.get(source_id)
     if config is None:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id, ok=False, error=f"no parser config for {source_id!r}"
         )
 
     try:
         text, branch = fetch_readme(client, source["url"])
     except httpx.HTTPStatusError as exc:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             error=f"HTTP {exc.response.status_code} fetching {exc.request.url}",
         )
     except Exception as exc:  # network, DNS, timeout, decode
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}"
         )
 
@@ -390,7 +391,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
             f"expected at least {config.min_sections}"
         )
     if shortfall:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=False,
             content_length=len(text),
@@ -401,10 +402,10 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
         )
 
     rendered = render_snapshot(parsed)
-    previous = state.read_snapshot(source_id, ext="tsv")
+    previous = store.read_snapshot(source_id, ext="tsv")
     extra = {"rows": len(parsed.rows), "sections": len(parsed.sections), "branch": branch}
     if previous is None:
-        return state.SourceResult(
+        return models.SourceResult(
             source_id=source_id,
             ok=True,
             content_length=len(text),
@@ -416,7 +417,7 @@ def check(source: dict[str, str], client: httpx.Client) -> state.SourceResult:
     changes = diff_snapshots(source_id, parse_snapshot(previous), parsed)
     for change in changes:
         change.program_name = source.get("program_names", "")
-    return state.SourceResult(
+    return models.SourceResult(
         source_id=source_id,
         ok=True,
         changes=changes,

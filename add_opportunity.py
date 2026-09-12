@@ -33,7 +33,8 @@ import urllib.parse
 import urllib.request
 import urllib.robotparser
 
-import state
+from core import clock, paths
+from persist import store
 
 VALID_ELIGIBLE = {
     "YES", "NO", "LATER", "CHECK", "INVITE", "VIA CLUB",
@@ -73,7 +74,7 @@ def _robots_allows(url: str) -> tuple[bool | None, str]:
     """
     parts = urllib.parse.urlparse(url)
     robots_url = f"{parts.scheme}://{parts.netloc}/robots.txt"
-    request = urllib.request.Request(robots_url, headers={"User-Agent": state.USER_AGENT})
+    request = urllib.request.Request(robots_url, headers={"User-Agent": paths.USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=10) as response:
             body = response.read(500_000).decode("utf-8", "replace")
@@ -90,7 +91,7 @@ def _robots_allows(url: str) -> tuple[bool | None, str]:
     parser = urllib.robotparser.RobotFileParser()
     parser.parse(body.splitlines())
     try:
-        allowed = parser.can_fetch(state.USER_AGENT, url)
+        allowed = parser.can_fetch(paths.USER_AGENT, url)
     except Exception:
         return None, "robots.txt unparseable - could not verify"
     return allowed, "allowed by robots.txt" if allowed else "DISALLOWED by robots.txt"
@@ -102,14 +103,14 @@ def probe(url: str) -> dict:
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": state.USER_AGENT,
+            "User-Agent": paths.USER_AGENT,
             "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9",
         },
     )
     result = {"url": url, "robots": robots_note, "robots_allows": robots_ok}
     try:
-        with urllib.request.urlopen(request, timeout=state.HTTP_TIMEOUT_SECONDS) as response:
+        with urllib.request.urlopen(request, timeout=paths.HTTP_TIMEOUT_SECONDS) as response:
             body = response.read(1_000_000).decode("utf-8", "replace")
             result.update(status=response.status, final_url=response.geturl())
     except urllib.error.HTTPError as exc:
@@ -221,10 +222,10 @@ def add(entries: list[dict], dry_run: bool, source_article: str = "") -> int:
             print(f"  {problem}", file=sys.stderr)
         return 1
 
-    programs = state.read_programs()
-    sources = state.read_sources()
-    manual = _load(state.DATA / "manual.csv", MANUAL_COLUMNS)
-    priority = _load(state.DATA / "priority.csv", PRIORITY_COLUMNS)
+    programs = store.read_programs()
+    sources = store.read_sources()
+    manual = _load(paths.DATA / "manual.csv", MANUAL_COLUMNS)
+    priority = _load(paths.DATA / "priority.csv", PRIORITY_COLUMNS)
 
     existing = {p["name"].strip().lower() for p in programs}
     existing_sources = {s["source_id"] for s in sources}
@@ -233,7 +234,7 @@ def add(entries: list[dict], dry_run: bool, source_article: str = "") -> int:
     next_rank = max([int(p["rank"]) for p in priority if str(p["rank"]).isdigit()] or [0]) + 1
 
     added, skipped, placements = [], [], []
-    today = state.today_iso()
+    today = clock.today_iso()
 
     for entry in entries:
         name = entry["name"].strip()
@@ -241,7 +242,7 @@ def add(entries: list[dict], dry_run: bool, source_article: str = "") -> int:
             skipped.append(name)
             continue
 
-        row = {column: "" for column in state.PROGRAM_COLUMNS}
+        row = {column: "" for column in paths.PROGRAM_COLUMNS}
         row.update(
             category=entry["category"],
             name=name,
@@ -259,7 +260,7 @@ def add(entries: list[dict], dry_run: bool, source_article: str = "") -> int:
         if source:
             source_id = source.get("source_id") or _slugify(name, existing_sources)
             if source_id not in existing_sources:
-                source_row = {column: "" for column in state.SOURCE_COLUMNS}
+                source_row = {column: "" for column in paths.SOURCE_COLUMNS}
                 source_row.update(
                     source_id=source_id,
                     tier=str(source.get("tier", 3)),
@@ -327,18 +328,18 @@ def add(entries: list[dict], dry_run: bool, source_article: str = "") -> int:
     if not added:
         return 0
 
-    state.write_programs(programs)
-    state.write_sources(sources)
+    store.write_programs(programs)
+    store.write_sources(sources)
     if manual:
-        _save(state.DATA / "manual.csv", MANUAL_COLUMNS, manual)
+        _save(paths.DATA / "manual.csv", MANUAL_COLUMNS, manual)
     if priority:
-        _save(state.DATA / "priority.csv", PRIORITY_COLUMNS, priority)
+        _save(paths.DATA / "priority.csv", PRIORITY_COLUMNS, priority)
     for row in added:
-        state.append_proposal(
+        store.append_proposal(
             f"add-opportunity\t{row['name']}\tadded from {source_article or 'a supplied article'}"
             f"\teligible={row['eligible']} (agent-set; confirm by hand)"
         )
-    print(f"\nwrote {state.PROGRAMS_CSV.name}, {state.SOURCES_CSV.name} and the watchlist CSVs")
+    print(f"\nwrote {paths.PROGRAMS_CSV.name}, {paths.SOURCES_CSV.name} and the watchlist CSVs")
     print("next: python build_xlsx.py, then review `git diff` before committing")
     return 0
 
