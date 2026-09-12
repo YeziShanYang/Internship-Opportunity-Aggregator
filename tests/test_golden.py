@@ -30,6 +30,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import calendar_reminders
 import classify
 import digest
+import screen
 from core import clock, models
 
 GOLDEN_DIR = pathlib.Path(__file__).resolve().parent / "golden"
@@ -205,6 +206,16 @@ def scenario_full() -> dict:
     return dict(
         judgments=judgments, results=results, sources=SOURCES,
         suppressed_applied=2, suppressed_muted=3,
+        filters=[
+            # The screen's tally, arriving as the same FilterReport shape every other
+            # filter uses instead of as a bespoke sentence off a module global.
+            models.FilterReport(
+                stage="screen", filter_id="screen-v1", considered=7, removed=1,
+                reason="ruled out on a quoted phrase, with no model call "
+                       "(advanced-standing 1). They are listed in RULED OUT with the "
+                       "phrase that did it",
+                samples=("Senior Platform Engineer @ Remote",)),
+        ],
         discovery_lines=[
             "_Proposals only — nothing has been added._", "",
             "- **greenhouse** `drweng` — linked from simplify-2027.tsv → "
@@ -246,19 +257,14 @@ class _Pinned:
         self.addCleanup(setattr, classify, "PROFILE_LAST_REVIEWED",
                         classify.PROFILE_LAST_REVIEWED)
         self.addCleanup(classify.reset_usage)
-        self.addCleanup(classify.reset_screen)
 
         clock.today_iso = lambda: TODAY
         calendar_reminders.for_month = lambda when=None: (FAKE_MONTH[0], list(FAKE_MONTH[1]))
         calendar_reminders.ALWAYS = list(FAKE_ALWAYS)
         classify.PROFILE_LAST_REVIEWED = self.STALE_REVIEW
 
-        # A screen tally and a spend tally with known numbers, so the two HEALTH lines
-        # that report what the run cost are rendered rather than skipped.
-        classify.reset_screen()
-        classify.SCREEN.considered = 7
-        classify.SCREEN.screened = 1
-        classify.SCREEN.by_rule = {"advanced-standing": 1}
+        # A spend tally with known numbers, so the HEALTH line that reports what the
+        # run cost is rendered rather than skipped.
         classify.reset_usage()
         classify.USAGE.provider = classify.AZURE
         classify.USAGE.model = "gpt-5-mini"
@@ -309,7 +315,7 @@ class GoldenDigestTests(_Pinned, unittest.TestCase):
                      "no longer watching the page", "collapsed into one item",
                      "first run, recorded", "are muted in data/applied.tsv",
                      "readme-section-not-included: 888 of 1402 rows removed",
-                     "muted=true in data/programs.csv", "screen v1",
+                     "muted=true in data/programs.csv", "screen-v1",
                      "classifier: 6 calls", "are quant and maths still the priority"):
             self.assertIn(line, body, line)
 

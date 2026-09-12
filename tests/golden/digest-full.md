@@ -46,7 +46,7 @@ _Proposals only — nothing has been added._
 - · readme-section-not-included: 888 of 1402 rows removed (simplify-2027) — section did not match this repo's section_include pattern.
 - ⚠ optiver-students: redirected to a different path: https://optiver.com/a -> https://www.optiver.com/b. The fetch succeeded, but this row is no longer watching the page it was configured for.
 - ⚠ simplify-2027: 41 rows changed at once and were collapsed into one item — that reads as a board restructure.
-- screen v1: 1 of 7 changes ruled out on a quoted phrase, with no model call (advanced-standing 1). They are listed in RULED OUT with the phrase that did it.
+- · screen-v1: 1 of 7 rows removed — ruled out on a quoted phrase, with no model call (advanced-standing 1). They are listed in RULED OUT with the phrase that did it.
 - classifier: 6 calls · 42,000 in · 12,000 cached · 9,000 out · 7,300 of it reasoning · ~$0.0258 est. (gpt-5-mini, effort=minimal)
 - 2 item(s) are muted in data/applied.tsv and were hidden. Delete the line to bring one back.
 - 3 item(s) were hidden because every programme their source informs is muted=true in data/programs.csv.

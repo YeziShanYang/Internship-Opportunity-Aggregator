@@ -9,5 +9,4 @@ Opportunity digest — 2026-09-12
 
 ## ■ HEALTH
 - 2 sources checked · 2 healthy
-- screen v1: 1 of 7 changes ruled out on a quoted phrase, with no model call (advanced-standing 1). They are listed in RULED OUT with the phrase that did it.
 - classifier: 6 calls · 42,000 in · 12,000 cached · 9,000 out · 7,300 of it reasoning · ~$0.0258 est. (gpt-5-mini, effort=minimal)
