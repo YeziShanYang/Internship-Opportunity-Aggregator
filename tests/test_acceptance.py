@@ -1894,3 +1894,89 @@ class MutedProgramTests(_IsolatedState, unittest.TestCase):
         _, body = digest.render([], [], {}, suppressed_muted=3)
         self.assertIn("3 item(s) were hidden", body)
         self.assertIn("muted=true", body)
+
+
+class EightfoldTests(_IsolatedState, unittest.TestCase):
+    """Millennium's campus board was the largest hole the 2026-09-12 audit found.
+
+    `millennium-students` watched a careers page whose own note asserted "Millennium is
+    on no public ATS", while campusjobs.mlp.com answers our honest User-Agent with 59
+    campus postings. 17 of them are US.
+    """
+
+    SRC = {"source_id": "mlp", "method": "eightfold",
+           "url": "https://campusjobs.mlp.com/api/apply/v2/jobs?domain=mlp.com",
+           "program_names": ""}
+
+    def _page(self, positions, count):
+        return {"count": count, "positions": positions}
+
+    def _pos(self, name, location="New York, New York, United States of America"):
+        return {"name": name, "location": location, "department": "Trading",
+                "business_unit": "Equities", "type": "ATS",
+                "canonicalPositionUrl": f"https://mlp.eightfold.ai/careers/job/{abs(hash(name)) % 10**12}",
+                "job_description": ""}
+
+    class Client:
+        """Paginates like Eightfold: ten at a time, `num` ignored."""
+
+        def __init__(self, positions, count=None, page=10):
+            self.positions, self.count, self.page = positions, count, page
+            self.calls = 0
+
+        def get(self, url, *args, params=None, **kwargs):
+            self.calls += 1
+            start = (params or {}).get("start", 0)
+            batch = self.positions[start:start + self.page]
+            return FakeResponse(
+                payload={"count": self.count if self.count is not None else len(self.positions),
+                         "positions": batch},
+                url=url,
+            )
+
+    def test_it_pages_until_the_count_is_reached(self):
+        positions = [self._pos(f"2027 Quantitative Researcher Intern {i}") for i in range(59)]
+        client = self.Client(positions)
+        r = job_boards.check(self.SRC, client)
+        self.assertTrue(r.ok, r.error)
+        self.assertEqual(r.extra["postings"], 59)
+        self.assertEqual(r.extra["rows"], 59)
+        self.assertEqual(client.calls, 6, "59 postings at ten a page")
+
+    def test_non_us_postings_are_dropped_and_counted_by_the_shared_screen(self):
+        """No private filter inside the fetcher: the campus board needs none, and a
+        second screen here is the duplication that already caused one bug."""
+        positions = [
+            self._pos("2027 Quantitative Researcher Intern, Austin"),
+            self._pos("2027 Applied AI Engineer Intern", "London, United Kingdom"),
+            self._pos("2027 Sector Specialist Intern", "Dubai, United Arab Emirates"),
+        ]
+        r = job_boards.check(self.SRC, self.Client(positions))
+        self.assertEqual(r.extra["rows"], 1)
+        self.assertEqual(r.extra["suppressed_not_us"], 2)
+
+    def test_a_partial_page_through_is_refused_rather_than_half_read(self):
+        """Same refusal as Workday and Phenom: half a board that looks healthy is
+        worse than a board that reports itself broken."""
+        positions = [self._pos(f"2027 Intern {i}") for i in range(10)]
+        r = job_boards.check(self.SRC, self.Client(positions, count=59))
+        self.assertFalse(r.ok)
+        self.assertIn("silently partial", r.error)
+
+    def test_the_url_comes_from_the_canonical_position_url(self):
+        positions = [self._pos("2027 Quantitative Developer Intern")]
+        r = job_boards.check(self.SRC, self.Client(positions))
+        self.assertIn("mlp.eightfold.ai/careers/job/", r.snapshot_text)
+
+    def test_the_type_field_is_not_mistaken_for_an_employment_type(self):
+        """Every Eightfold row says type="ATS", which is not an employment type."""
+        r = job_boards.check(self.SRC, self.Client([self._pos("2027 Intern")]))
+        self.assertNotIn("Type=ATS", r.snapshot_text)
+
+    def test_an_error_payload_is_refused(self):
+        class Broken:
+            def get(self, url, *a, **k):
+                return FakeResponse(payload={"error": "rate limited", "positions": []}, url=url)
+        r = job_boards.check(self.SRC, Broken())
+        self.assertFalse(r.ok)
+        self.assertIn("rate limited", r.error)

@@ -37,8 +37,8 @@ import httpx
 import state
 from sources import postings, snapshot
 
-GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM = (
-    "greenhouse", "lever", "ashby", "workday", "phenom",
+GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM, EIGHTFOLD = (
+    "greenhouse", "lever", "ashby", "workday", "phenom", "eightfold",
 )
 
 ENDPOINTS = {
@@ -50,6 +50,11 @@ ENDPOINTS = {
     WORKDAY: "{slug}/jobs",
     # Phenom, like Workday, takes the whole endpoint URL as its slug.
     PHENOM: "{slug}",
+    # Eightfold likewise: the tenant host varies per employer
+    # (campusjobs.mlp.com, mlp.eightfold.ai, career.mlp.com all front the same board).
+    # The entry is needed even though a fetcher handles the requests, because `check`
+    # reads ENDPOINTS when it collapses a board restructure into one item.
+    EIGHTFOLD: "{slug}",
 }
 
 # Workday rejects a limit above 20 (50 and 100 return an empty list), and it keeps
@@ -166,6 +171,12 @@ NON_US_LOCATION = re.compile(
 # same way Workday's is. Measured on Susquehanna: 263 postings over three pages.
 PHENOM_PAGE = 100
 PHENOM_MAX_PAGES = 30
+
+# Eightfold ignores a larger `num` and serves ten at a time whatever you ask for, so
+# the page size is descriptive rather than a request. 40 pages is 400 postings, well
+# clear of Millennium's 59.
+EIGHTFOLD_PAGE = 10
+EIGHTFOLD_MAX_PAGES = 40
 
 # Phenom carries a real recruiting category per posting, which is better evidence than
 # any title regex and is why this method exists as its own fetcher. Measured on
@@ -522,10 +533,76 @@ def fetch_phenom(client: httpx.Client, endpoint: str) -> tuple[list[Posting], in
     return out, len(listed) - len(out)
 
 
+def fetch_eightfold(client: httpx.Client, endpoint: str) -> tuple[list[Posting], int]:
+    """Read an Eightfold-hosted board.
+
+    Millennium is why this exists, and it was the largest single hole the 2026-09-12
+    source audit found: `millennium-students` watched a careers page whose note said
+    "Millennium is on no public ATS", while `campusjobs.mlp.com` answers our honest
+    User-Agent with 59 campus postings -- "2027 Quantitative Researcher Intern,
+    Austin", "2027 Applied AI Engineer Intern, New York" and so on.
+
+    Unlike Phenom this fetcher applies no screen of its own. It does not need one: the
+    board is campus-only by construction, and measured on all 59 postings every one of
+    the 17 US titles already matches the shared STUDENT_TITLE screen with none caught
+    by the NOT_A_STUDENT_ROLE veto. Adding a second private filter here would be the
+    duplication that already caused one bug in this module.
+
+    Descriptions are absent from the list payload -- `job_description` is present and
+    empty -- so postings come back with no text and `sources.postings` fetches the
+    body for any row that actually changes. That is the cheaper shape anyway: 59
+    detail fetches a day to read two of them is what WORKDAY_MAX_DETAILS exists to
+    prevent.
+    """
+    listed: list[dict] = []
+    total = None
+    for page in range(EIGHTFOLD_MAX_PAGES):
+        response = client.get(
+            endpoint,
+            params={"start": page * EIGHTFOLD_PAGE, "num": EIGHTFOLD_PAGE},
+            headers={"Accept": "application/json"},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if total is None:
+            total = payload.get("count") or 0
+        batch = _page_items(payload, "positions")
+        if not batch:
+            break
+        listed += batch
+        if len(listed) >= total:
+            break
+
+    # The same refusal as Workday and Phenom: half a board that looks healthy is worse
+    # than a board that reports itself broken.
+    if total and len(listed) < total:
+        raise RuntimeError(
+            f"board reports {total} postings but only {len(listed)} could be paged; "
+            "this source would be silently partial, so it is reported as failing"
+        )
+
+    out = []
+    for job in listed:
+        out.append(
+            Posting(
+                title=(job.get("name") or "").strip(),
+                location=(job.get("location") or "").strip(),
+                department=(job.get("department") or job.get("business_unit") or "").strip()
+                or "(no department)",
+                employment_type="",
+                # The canonical url is on the Eightfold host and is fetchable; the
+                # `type` field says "ATS" on every row and is not an employment type.
+                url=(job.get("canonicalPositionUrl") or "").strip(),
+                text="",
+            )
+        )
+    return out, 0
+
+
 PARSERS = {GREENHOUSE: parse_greenhouse, LEVER: parse_lever, ASHBY: parse_ashby}
 # Workday needs POST + pagination + a second request per survivor, so it does not fit
 # the parse-one-payload shape the other three share.
-FETCHERS = {WORKDAY: fetch_workday, PHENOM: fetch_phenom}
+FETCHERS = {WORKDAY: fetch_workday, PHENOM: fetch_phenom, EIGHTFOLD: fetch_eightfold}
 
 
 def to_snapshot(kept: list[Posting]) -> snapshot.Snapshot:
