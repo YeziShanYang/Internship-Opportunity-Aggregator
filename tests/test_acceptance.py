@@ -35,7 +35,9 @@ from persist import store
 from jobs import daily
 from process import redirect, suppress
 import build_xlsx
-from sources import github_repos, job_boards, page_watch, postings, snapshot
+from gather import ats, github_readme, page
+from process import parse_ats, parse_page, parse_readme, snapshot
+from sources import postings
 
 # --- the database must survive the suite ---------------------------------------------
 #
@@ -92,6 +94,30 @@ def tearDownModule():
         )
 
 
+# The three per-source checks, as the tests drive them: fetch, read yesterday, assess.
+# These replace `github_repos.check` / `job_boards.check` / `page_watch.check`, which
+# were shims over exactly this and existed only so the split could land one module at
+# a time. Spelling them out here is the point -- a test that drives the two stages is
+# testing the pipeline the job runs, not a convenience wrapper around it.
+def _check_readme(source, client):
+    fetched = github_readme.fetch(source, client)
+    previous = store.read_snapshot(source["source_id"], ext="tsv")
+    return parse_readme.assess(
+        source, parse_readme.REPO_CONFIGS.get(source["source_id"]), fetched, previous)
+
+
+def _check_ats(source, client):
+    fetched = ats.fetch(source, client, wants_detail=parse_ats.wants_workday_detail)
+    previous = store.read_snapshot(source["source_id"], ext="tsv")
+    return parse_ats.assess(source, fetched, previous)
+
+
+def _check_page(source, client):
+    fetched = page.fetch(source, client)
+    previous = store.read_snapshot(source["source_id"], ext="txt")
+    return parse_page.assess(source, fetched, previous)
+
+
 REPO = "northwesternfintech/2027QuantInternships"
 
 BASE_README = """# Summer 2027 Quant Internships
@@ -142,7 +168,7 @@ class FakeClient:
         self.readme_status = readme_status
 
     def get(self, url: str, *args, **kwargs):
-        if url.startswith(github_repos.GITHUB_API):
+        if url.startswith(github_readme.GITHUB_API):
             return FakeResponse(payload={"default_branch": "main"})
         return FakeResponse(text=self.readme, status=self.readme_status)
 
@@ -213,8 +239,8 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
     def setUp(self):
         super().setUp()
         # A relaxed floor: the fixture README is deliberately tiny.
-        self._config = github_repos.REPO_CONFIGS["nuft-2027"]
-        github_repos.REPO_CONFIGS["nuft-2027"] = type(self._config)(
+        self._config = parse_readme.REPO_CONFIGS["nuft-2027"]
+        parse_readme.REPO_CONFIGS["nuft-2027"] = type(self._config)(
             table_format="markdown",
             role_columns=("Role",),
             heading_as_entity=True,
@@ -233,10 +259,10 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         }
 
     def tearDown(self):
-        github_repos.REPO_CONFIGS["nuft-2027"] = self._config
+        parse_readme.REPO_CONFIGS["nuft-2027"] = self._config
 
     def _baseline(self, readme=BASE_README):
-        result = github_repos.check(self.source, FakeClient(readme))
+        result = _check_readme(self.source, FakeClient(readme))
         self.assertTrue(result.ok, result.error)
         self.assertTrue(result.baseline)
         store.write_snapshot("nuft-2027", result.snapshot_text, ext="tsv")
@@ -255,7 +281,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         ]
         path.write_text("\n".join(kept) + "\n")
 
-        result = github_repos.check(self.source, FakeClient(BASE_README))
+        result = _check_readme(self.source, FakeClient(BASE_README))
         self.assertTrue(result.ok)
         self.assertEqual(len(result.changes), 1, result.changes)
         change = result.changes[0]
@@ -272,7 +298,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
     def test_14_3_a_404_is_health_not_a_change(self):
         """A source returning 404 lands in HEALTH and bumps consecutive_failures."""
         self._baseline()
-        result = github_repos.check(self.source, FakeClient("", readme_status=404))
+        result = _check_readme(self.source, FakeClient("", readme_status=404))
         self.assertFalse(result.ok)
         self.assertEqual(result.changes, [], "a failure must never look like a change")
         self.assertIn("404", result.error)
@@ -298,11 +324,11 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
 
     def test_14_3c_an_empty_readme_is_a_failure_not_a_quiet_day(self):
         """A restructure that parses to nothing must alert, not report zero changes."""
-        github_repos.REPO_CONFIGS["nuft-2027"] = type(self._config)(
+        parse_readme.REPO_CONFIGS["nuft-2027"] = type(self._config)(
             table_format="markdown", role_columns=("Role",), heading_as_entity=True,
             min_rows=2, min_sections=1,
         )
-        result = github_repos.check(self.source, FakeClient("# Nothing here\n"))
+        result = _check_readme(self.source, FakeClient("# Nothing here\n"))
         self.assertFalse(result.ok)
         self.assertIn("parsed only", result.error)
         self.assertEqual(result.changes, [])
@@ -318,7 +344,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
 |-------|-------|
 |Freshman Insight Program|[Apply](https://xanadutrading.example/apply)|
 """
-        result = github_repos.check(self.source, FakeClient(readme))
+        result = _check_readme(self.source, FakeClient(readme))
         self.assertTrue(result.ok)
         candidates = [c for c in result.changes if c.is_discovery_candidate]
         self.assertTrue(candidates, "must flag the freshman row as a discovery candidate")
@@ -547,13 +573,13 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
     the posting itself had not changed at all.
     """
 
-    CONFIG = github_repos.REPO_CONFIGS["simplify-2027"]
+    CONFIG = parse_readme.REPO_CONFIGS["simplify-2027"]
 
     def _rows(self, body: str):
         html = f"""## 💻 Software Engineering Internship Roles
 <table><thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Age</th></tr></thead>
 {body}</table>"""
-        return github_repos.extract(html, self.CONFIG).rows
+        return parse_readme.extract(html, self.CONFIG).rows
 
     def test_carry_forward_is_resolved_in_the_value_not_just_the_key(self):
         leading = self._rows(
@@ -588,7 +614,7 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
 
     def test_cruz_keeps_its_status_markers(self):
         """Cruz uses "🔥 [CLOSING SOON]" as real signal - it must NOT be stripped."""
-        config = github_repos.REPO_CONFIGS["underclassmen-cruz"]
+        config = parse_readme.REPO_CONFIGS["underclassmen-cruz"]
         markdown = (
             "## Scholarships\n"
             "| Status | Organization | Scholarship | Application | Deadline |\n"
@@ -596,8 +622,8 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
             "| ✅ **[OPEN]** | Unigo | Make Me Laugh | x | Dec 1 |\n"
         )
         closing = markdown.replace("✅ **[OPEN]**", "🔥 **[CLOSING SOON]**")
-        open_rows = github_repos.extract(markdown, config).rows
-        closing_rows = github_repos.extract(closing, config).rows
+        open_rows = parse_readme.extract(markdown, config).rows
+        closing_rows = parse_readme.extract(closing, config).rows
         self.assertEqual(open_rows[0].key, closing_rows[0].key, "same posting, same key")
         self.assertNotEqual(
             open_rows[0].value,
@@ -870,7 +896,7 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
             _gh("Quantitative Trader", employment_type="Summer Internship"),
             _gh("Software Engineer", employment_type="Full-Time: Experienced"),
         ]}
-        r = job_boards.check(
+        r = _check_ats(
             {"source_id": "js", "method": "greenhouse", "url": "janestreet", "program_names": ""},
             FakeJSONClient(payload),
         )
@@ -884,7 +910,7 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
             _gh("Software Engineer Intern", location="Hong Kong"),
             _gh("Software Engineer Intern", location="London, United Kingdom"),
         ]}
-        r = job_boards.check(
+        r = _check_ats(
             {"source_id": "b", "method": "greenhouse", "url": "s", "program_names": ""},
             FakeJSONClient(payload),
         )
@@ -897,8 +923,8 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         a = {"jobs": [_gh("SWE Intern", content="<p>original blurb</p>")]}
         b = {"jobs": [_gh("SWE Intern", content="<p>completely rewritten blurb</p>")]}
         src = {"source_id": "b", "method": "greenhouse", "url": "s", "program_names": ""}
-        first = job_boards.check(src, FakeJSONClient(a)).snapshot_text
-        second = job_boards.check(src, FakeJSONClient(b)).snapshot_text
+        first = _check_ats(src, FakeJSONClient(a)).snapshot_text
+        second = _check_ats(src, FakeJSONClient(b)).snapshot_text
         self.assertEqual(first, second)
 
     def test_14_9g_a_homoglyph_title_cannot_forge_a_new_row(self):
@@ -911,19 +937,19 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
     def test_14_9h_a_board_that_empties_is_a_failure_not_a_quiet_day(self):
         src = {"source_id": "empties", "method": "greenhouse", "url": "s", "program_names": ""}
         payload = {"jobs": [_gh("SWE Intern")]}
-        first = job_boards.check(src, FakeJSONClient(payload))
+        first = _check_ats(src, FakeJSONClient(payload))
         self.assertTrue(first.baseline)
         store.write_snapshot("empties", first.snapshot_text, ext="tsv")
-        second = job_boards.check(src, FakeJSONClient({"jobs": []}))
+        second = _check_ats(src, FakeJSONClient({"jobs": []}))
         self.assertFalse(second.ok)
         self.assertIn("0 postings", second.error)
 
     def test_14_9i_posting_text_rides_along_so_no_second_fetch_is_needed(self):
         """The description arrives in the same response, so rule 6 works on Tier 2."""
         src = {"source_id": "t", "method": "greenhouse", "url": "s", "program_names": ""}
-        first = job_boards.check(src, FakeJSONClient({"jobs": [_gh("SWE Intern")]}))
+        first = _check_ats(src, FakeJSONClient({"jobs": [_gh("SWE Intern")]}))
         store.write_snapshot("t", first.snapshot_text, ext="tsv")
-        second = job_boards.check(
+        second = _check_ats(
             src,
             FakeJSONClient({"jobs": [
                 _gh("SWE Intern"),
@@ -940,25 +966,25 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
         for title in ("Internal Audit Analyst", "Internal Sales Consultant",
                       "International Equity Fund Analyst", "Internationalisation Lead"):
             with self.subTest(title=title):
-                self.assertFalse(job_boards.STUDENT_TITLE.search(title), title)
-                self.assertFalse(job_boards.STUDENT_TITLE_WORKDAY.search(title), title)
+                self.assertFalse(parse_ats.STUDENT_TITLE.search(title), title)
+                self.assertFalse(parse_ats.STUDENT_TITLE_WORKDAY.search(title), title)
         for title in ("Software Engineer Intern", "Winternship 2027",
                       "Internship - Trading", "Interns Program"):
             with self.subTest(title=title):
-                self.assertTrue(job_boards.STUDENT_TITLE.search(title), title)
+                self.assertTrue(parse_ats.STUDENT_TITLE.search(title), title)
 
     def test_14_9k_a_foreign_workday_row_is_dropped_before_its_detail_fetch(self):
         """RBC Early Talent: 136 of 152 titles pass the title filter and all but ~36
         are Canadian. Paying for a description before screening the location pushed
         the board past WORKDAY_MAX_DETAILS and reported it as failing."""
-        self.assertTrue(job_boards.NON_US_LOCATION.search("TORONTO, Ontario, Canada"))
-        self.assertTrue(job_boards.NON_US_LOCATION.search("Bengaluru, India"))
+        self.assertTrue(parse_ats.NON_US_LOCATION.search("TORONTO, Ontario, Canada"))
+        self.assertTrue(parse_ats.NON_US_LOCATION.search("Bengaluru, India"))
         # Unrecognised and multi-location rows must survive to the detail fetch --
         # dropping a real US role to tidy the digest is the expensive error.
         for keep in ("2 Locations", "", "Chicago, Illinois, United States of America",
                      "Springfield"):
             with self.subTest(location=keep):
-                self.assertFalse(job_boards.NON_US_LOCATION.search(keep), keep)
+                self.assertFalse(parse_ats.NON_US_LOCATION.search(keep), keep)
 
     def test_14_9l_a_phenom_discovery_programme_survives_with_no_intern_in_its_title(self):
         """The Jane Street trap in a second ATS. Susquehanna's Discovery Programs are
@@ -979,7 +1005,7 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
                       "country": "United States", "apply_url": "https://x.invalid/3",
                       "description": "<p>x</p>", "qualifications": ""}},
         ]}
-        r = job_boards.check(
+        r = _check_ats(
             {"source_id": "sig", "method": "phenom",
              "url": "https://careers.example.invalid/api/jobs", "program_names": ""},
             FakeJSONClient(payload),
@@ -1004,7 +1030,7 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
                       "apply_url": "https://x.invalid/2", "description": "<p>x</p>",
                       "qualifications": ""}},
         ]}
-        r = job_boards.check(
+        r = _check_ats(
             {"source_id": "sig2", "method": "phenom",
              "url": "https://careers.example.invalid/api/jobs", "program_names": ""},
             FakeJSONClient(payload),
@@ -1022,10 +1048,10 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
     def test_14_9n_a_phenom_field_may_be_a_list_a_dict_or_a_string(self):
         """Field types are per-field and undocumented; the first version of the fetcher
         called .strip() on a list and failed the entire board."""
-        self.assertEqual(job_boards._phenom_field(["Interns + Co-ops"]), "Interns + Co-ops")
-        self.assertEqual(job_boards._phenom_field({"name": "New Graduates"}), "New Graduates")
-        self.assertEqual(job_boards._phenom_field("  Intern  "), "Intern")
-        self.assertEqual(job_boards._phenom_field(None), "")
+        self.assertEqual(parse_ats._phenom_field(["Interns + Co-ops"]), "Interns + Co-ops")
+        self.assertEqual(parse_ats._phenom_field({"name": "New Graduates"}), "New Graduates")
+        self.assertEqual(parse_ats._phenom_field("  Intern  "), "Intern")
+        self.assertEqual(parse_ats._phenom_field(None), "")
 
     def test_14_9o_aqr_style_summer_analyst_titles_are_student_roles(self):
         """Measured gap, 2026-09-11: "intern" alone found 140 US student rows across the
@@ -1040,8 +1066,8 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
                       "2027 Cubist Quant Academy - Developers"):
             with self.subTest(title=title):
                 self.assertTrue(
-                    job_boards.is_student_posting(
-                        job_boards.Posting(title, "New York", "x", "", "u", "")),
+                    parse_ats.is_student_posting(
+                        models.Posting(title, "New York", "x", "", "u", "")),
                     title)
 
     def test_14_9p_a_campus_recruiter_is_not_a_student_role(self):
@@ -1053,8 +1079,8 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
                       "Quantitative Campus Recruiter"):
             with self.subTest(title=title):
                 self.assertFalse(
-                    job_boards.is_student_posting(
-                        job_boards.Posting(title, "New York", "x", "", "u", "")),
+                    parse_ats.is_student_posting(
+                        models.Posting(title, "New York", "x", "", "u", "")),
                     title)
 
 
@@ -1068,35 +1094,35 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         return base
 
     def test_14_9j_render_js_true_is_refused_loudly(self):
-        r = page_watch.check(self._src(render_js="true"), FakeHTMLClient(self.PAGE))
+        r = _check_page(self._src(render_js="true"), FakeHTMLClient(self.PAGE))
         self.assertFalse(r.ok)
         self.assertIn("render_js=true", r.error)
 
     def test_14_9k_a_configured_selector_is_refused_rather_than_ignored(self):
-        r = page_watch.check(self._src(selector=".main"), FakeHTMLClient(self.PAGE))
+        r = _check_page(self._src(selector=".main"), FakeHTMLClient(self.PAGE))
         self.assertFalse(r.ok)
         self.assertIn("selector", r.error)
 
     def test_14_9l_a_javascript_shell_is_a_failure(self):
         shell = "<html>" + "<script>var x=1;</script>" * 3000 + "<body><p>Menu</p></body></html>"
-        r = page_watch.check(self._src(), FakeHTMLClient(shell))
+        r = _check_page(self._src(), FakeHTMLClient(shell))
         self.assertFalse(r.ok)
 
     def test_14_9m_a_page_that_shrinks_is_a_failure(self):
-        r = page_watch.check(self._src(source_id="shrink"), FakeHTMLClient(self.PAGE))
+        r = _check_page(self._src(source_id="shrink"), FakeHTMLClient(self.PAGE))
         store.write_snapshot("shrink", r.snapshot_text, ext="txt")
         # Above the absolute floor but well under 40% of the baseline, so the ratio
         # rule is what fires rather than the character minimum.
         small = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 12 + "</body></html>"
-        second = page_watch.check(self._src(source_id="shrink"), FakeHTMLClient(small))
+        second = _check_page(self._src(source_id="shrink"), FakeHTMLClient(small))
         self.assertFalse(second.ok)
         self.assertIn("shrank", second.error)
 
     def test_14_9n_one_change_per_page_and_discovery_reads_added_text_only(self):
-        r = page_watch.check(self._src(source_id="one"), FakeHTMLClient(self.PAGE))
+        r = _check_page(self._src(source_id="one"), FakeHTMLClient(self.PAGE))
         store.write_snapshot("one", r.snapshot_text, ext="txt")
         grown = self.PAGE.replace("</body>", "<p>New freshman track announced.</p></body>")
-        second = page_watch.check(self._src(source_id="one"), FakeHTMLClient(grown))
+        second = _check_page(self._src(source_id="one"), FakeHTMLClient(grown))
         self.assertEqual(len(second.changes), 1, "a page must never emit one change per line")
         self.assertTrue(second.changes[0].is_discovery_candidate)
 
@@ -1104,9 +1130,9 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         # freshman line, then remove it: the only "Freshman" text is in the removed
         # side, so the change must not be a discovery candidate.
         had = self.PAGE.replace("</body>", "<p>Freshman track is open.</p></body>")
-        base = page_watch.check(self._src(source_id="gone"), FakeHTMLClient(had))
+        base = _check_page(self._src(source_id="gone"), FakeHTMLClient(had))
         store.write_snapshot("gone", base.snapshot_text, ext="txt")
-        third = page_watch.check(self._src(source_id="gone"), FakeHTMLClient(self.PAGE))
+        third = _check_page(self._src(source_id="gone"), FakeHTMLClient(self.PAGE))
         self.assertEqual(len(third.changes), 1)
         self.assertFalse(third.changes[0].is_discovery_candidate,
                          "a closure must not be flagged as a discovery")
@@ -1115,7 +1141,7 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         """Four watched sources are vendor JSON feeds served as a single line. A line
         differ on one line can only ever say "the whole feed changed"."""
         feed = '[{"title":"Quant Intern","id":1},{"title":"SWE Intern","id":2}]'
-        lines = page_watch.normalise(feed)
+        lines = parse_page.normalise(feed)
         self.assertEqual(len(lines), 2, lines)
 
     def test_14_9r_no_digest_line_can_exceed_the_cap(self):
@@ -1123,11 +1149,11 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         push a single line past GitHub's 65,536-character issue-body limit and fail
         delivery -- a one-byte upstream edit costing the whole digest."""
         monster = "x" * 200_000
-        changes = page_watch.diff_pages(
+        changes = parse_page.diff_pages(
             "s", [], [monster], {"program_names": "P", "url": "u"})
         self.assertTrue(changes)
         longest = max(len(line) for line in changes[0].detail.splitlines())
-        self.assertLessEqual(longest, page_watch.MAX_DIFF_LINE_CHARS + 40, longest)
+        self.assertLessEqual(longest, parse_page.MAX_DIFF_LINE_CHARS + 40, longest)
         self.assertIn("chars]", changes[0].detail, "truncation must be visible, not silent")
 
 
@@ -1437,7 +1463,7 @@ class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
 
     def _baseline_of_zero_rows(self):
         """The dangerous starting state: a real, healthy, empty board."""
-        first = job_boards.check(self.SRC, FakeJSONClient({"jobs": []}))
+        first = _check_ats(self.SRC, FakeJSONClient({"jobs": []}))
         self.assertTrue(first.ok, first.error)
         self.assertEqual(first.extra["rows"], 0)
         store.write_snapshot("quiet", first.snapshot_text, ext="tsv")
@@ -1445,7 +1471,7 @@ class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
     def test_an_error_key_beside_an_empty_list_is_a_failure(self):
         """Greenhouse's actual rate-limit shape."""
         self._baseline_of_zero_rows()
-        r = job_boards.check(
+        r = _check_ats(
             self.SRC, FakeJSONClient({"error": "rate limited", "jobs": []})
         )
         self.assertFalse(r.ok, "an error payload must never read as a quiet board")
@@ -1454,37 +1480,37 @@ class MalformedPayloadTests(_IsolatedState, unittest.TestCase):
     def test_a_genuinely_empty_board_is_still_a_quiet_day(self):
         """The guard must not cost us the true negative it is wrapped around."""
         self._baseline_of_zero_rows()
-        r = job_boards.check(self.SRC, FakeJSONClient({"jobs": []}))
+        r = _check_ats(self.SRC, FakeJSONClient({"jobs": []}))
         self.assertTrue(r.ok, r.error)
         self.assertEqual(r.changes, [])
 
     def test_a_missing_collection_key_is_a_failure(self):
         self._baseline_of_zero_rows()
-        r = job_boards.check(self.SRC, FakeJSONClient({"meta": {"total": 0}}))
+        r = _check_ats(self.SRC, FakeJSONClient({"meta": {"total": 0}}))
         self.assertFalse(r.ok)
         self.assertIn("no 'jobs' key", r.error)
 
     def test_a_non_list_collection_is_a_failure(self):
         self._baseline_of_zero_rows()
-        r = job_boards.check(self.SRC, FakeJSONClient({"jobs": "temporarily unavailable"}))
+        r = _check_ats(self.SRC, FakeJSONClient({"jobs": "temporarily unavailable"}))
         self.assertFalse(r.ok)
         self.assertIn("not a list", r.error)
 
     def test_junk_list_members_are_a_failure(self):
         self._baseline_of_zero_rows()
-        r = job_boards.check(self.SRC, FakeJSONClient({"jobs": [1, 2, 3]}))
+        r = _check_ats(self.SRC, FakeJSONClient({"jobs": [1, 2, 3]}))
         self.assertFalse(r.ok)
         self.assertIn("non-object member", r.error)
 
     def test_lever_gets_the_same_treatment_on_its_bare_array(self):
         src = {"source_id": "lev", "method": "lever", "url": "s", "program_names": ""}
-        r = job_boards.check(src, FakeJSONClient({"error": "gone"}))
+        r = _check_ats(src, FakeJSONClient({"error": "gone"}))
         self.assertFalse(r.ok)
         self.assertIn("expected a JSON array", r.error)
 
     def test_an_amazon_style_null_error_is_not_an_error(self):
         """`"error": null` ships on healthy responses; only a truthy value counts."""
-        r = job_boards.check(
+        r = _check_ats(
             self.SRC, FakeJSONClient({"error": None, "jobs": [_gh("SWE Intern")]})
         )
         self.assertTrue(r.ok, r.error)
@@ -1829,7 +1855,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
         return base
 
     def test_the_aqr_case_a_redirect_to_404_is_a_failure(self):
-        r = page_watch.check(
+        r = _check_page(
             self._src("https://www.aqr.com/About-Us/Our-Internship-Program"),
             FakeHTMLClient(self.PAGE, final_url="https://www.aqr.com/404"),
         )
@@ -1840,7 +1866,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
     def test_the_two_sigma_case_a_path_change_warns_but_does_not_fail(self):
         """The fetch worked and the text is real -- calling it a failed fetch would be
         a lie. But the row is no longer watching what its program_names claims."""
-        r = page_watch.check(
+        r = _check_page(
             self._src("https://www.twosigma.com/careers/students/"),
             FakeHTMLClient(self.PAGE, final_url="https://www.twosigma.com/careers/"),
         )
@@ -1848,7 +1874,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
         self.assertIn("redirected to a different path", r.extra["redirected"])
 
     def test_a_warned_redirect_reaches_HEALTH_every_morning(self):
-        r = page_watch.check(
+        r = _check_page(
             self._src("https://www.twosigma.com/careers/students/", source_id="twosigma-campus"),
             FakeHTMLClient(self.PAGE, final_url="https://www.twosigma.com/careers/"),
         )
@@ -1858,7 +1884,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
 
     def test_a_www_only_difference_is_silent(self):
         """osqf.org -> www.osqf.org. Real, and worth nothing."""
-        r = page_watch.check(
+        r = _check_page(
             self._src("https://osqf.org/"),
             FakeHTMLClient(self.PAGE, final_url="https://www.osqf.org/"),
         )
@@ -1867,7 +1893,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
 
     def test_a_trailing_slash_difference_is_silent(self):
         """www.tower-research.com/open-positions/ -> tower-research.com/open-positions/"""
-        r = page_watch.check(
+        r = _check_page(
             self._src("https://www.tower-research.com/open-positions/"),
             FakeHTMLClient(self.PAGE, final_url="https://tower-research.com/open-positions"),
         )
@@ -1875,7 +1901,7 @@ class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
         self.assertNotIn("redirected", r.extra)
 
     def test_no_redirect_at_all_is_silent(self):
-        r = page_watch.check(
+        r = _check_page(
             self._src("https://example.invalid/careers"), FakeHTMLClient(self.PAGE)
         )
         self.assertTrue(r.ok, r.error)
@@ -1998,7 +2024,7 @@ class EightfoldTests(_IsolatedState, unittest.TestCase):
     def test_it_pages_until_the_count_is_reached(self):
         positions = [self._pos(f"2027 Quantitative Researcher Intern {i}") for i in range(59)]
         client = self.Client(positions)
-        r = job_boards.check(self.SRC, client)
+        r = _check_ats(self.SRC, client)
         self.assertTrue(r.ok, r.error)
         self.assertEqual(r.extra["postings"], 59)
         self.assertEqual(r.extra["rows"], 59)
@@ -2012,7 +2038,7 @@ class EightfoldTests(_IsolatedState, unittest.TestCase):
             self._pos("2027 Applied AI Engineer Intern", "London, United Kingdom"),
             self._pos("2027 Sector Specialist Intern", "Dubai, United Arab Emirates"),
         ]
-        r = job_boards.check(self.SRC, self.Client(positions))
+        r = _check_ats(self.SRC, self.Client(positions))
         self.assertEqual(r.extra["rows"], 1)
         self.assertEqual(r.extra["suppressed_not_us"], 2)
 
@@ -2020,25 +2046,25 @@ class EightfoldTests(_IsolatedState, unittest.TestCase):
         """Same refusal as Workday and Phenom: half a board that looks healthy is
         worse than a board that reports itself broken."""
         positions = [self._pos(f"2027 Intern {i}") for i in range(10)]
-        r = job_boards.check(self.SRC, self.Client(positions, count=59))
+        r = _check_ats(self.SRC, self.Client(positions, count=59))
         self.assertFalse(r.ok)
         self.assertIn("silently partial", r.error)
 
     def test_the_url_comes_from_the_canonical_position_url(self):
         positions = [self._pos("2027 Quantitative Developer Intern")]
-        r = job_boards.check(self.SRC, self.Client(positions))
+        r = _check_ats(self.SRC, self.Client(positions))
         self.assertIn("mlp.eightfold.ai/careers/job/", r.snapshot_text)
 
     def test_the_type_field_is_not_mistaken_for_an_employment_type(self):
         """Every Eightfold row says type="ATS", which is not an employment type."""
-        r = job_boards.check(self.SRC, self.Client([self._pos("2027 Intern")]))
+        r = _check_ats(self.SRC, self.Client([self._pos("2027 Intern")]))
         self.assertNotIn("Type=ATS", r.snapshot_text)
 
     def test_an_error_payload_is_refused(self):
         class Broken:
             def get(self, url, *a, **k):
                 return FakeResponse(payload={"error": "rate limited", "positions": []}, url=url)
-        r = job_boards.check(self.SRC, Broken())
+        r = _check_ats(self.SRC, Broken())
         self.assertFalse(r.ok)
         self.assertIn("rate limited", r.error)
 

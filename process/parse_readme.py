@@ -23,7 +23,7 @@ import re
 from dataclasses import dataclass, field
 
 from core import models
-from sources.snapshot import (  # shared with job_boards and page_watch
+from process.snapshot import (  # shared with job_boards and page_watch
     DISCOVERY_PATTERN,
     ROLLING_PATTERN,
     ROWS_HEADER,

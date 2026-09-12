@@ -27,7 +27,8 @@ import re
 from core import clock, models
 from gather import page
 from process import redirect
-from sources import postings, snapshot
+from process import snapshot
+from sources import postings
 
 # Below this a response is a JavaScript shell or a block page, not a short page.
 # Calibrated against measurements, not guessed: the thinnest real page in the watchlist
