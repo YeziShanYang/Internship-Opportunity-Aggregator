@@ -2,7 +2,14 @@
 
 Issues rather than email: GitHub emails the owner when an issue is opened in their own
 repo, so there is no SMTP, no API key that expires silently, and no deliverability
-problem. It also doubles as a lightweight application tracker -- comment and close.
+problem.
+
+The body is one table -- urgency, company, position, notes -- and nothing else but the
+calendar and health footers. It used to be two prose sections of checkbox list items,
+which read as an explanation of the project rather than a list of things to go and do.
+The checkboxes went with it: a GitHub task list only renders as a tickable box in a list
+item, never inside a table cell, so the table and tick-to-dismiss were mutually
+exclusive. `data/applied.tsv` survives as a hand-editable mute list.
 
 Cadence is exactly one digest a day, every day -- no more and no less. The owner asked
 for a reminder they can rely on, and a fixed daily arrival is what makes silence
@@ -32,8 +39,16 @@ from classify import Judgment
 GITHUB_API = "https://api.github.com"
 
 
-def _health_lines(results: list[state.SourceResult], sources: dict[str, dict[str, str]]) -> tuple[list[str], list[str]]:
-    """Return (health block lines, escalated-failure lines for ACT NOW)."""
+def _health_lines(
+    results: list[state.SourceResult], sources: dict[str, dict[str, str]]
+) -> tuple[list[str], list[tuple[str, str, str]]]:
+    """Return (health block lines, escalated failures as ACT NOW table rows).
+
+    The escalated half is returned as (company, position, notes) rather than a rendered
+    sentence because it shares the opportunities table: a source that has gone blind is
+    the most actionable thing the digest can carry, and burying it under the table in a
+    prose block is how it gets skimmed past.
+    """
     healthy = [r for r in results if r.ok]
     failing = [r for r in results if not r.ok]
     lines = [
@@ -42,7 +57,7 @@ def _health_lines(results: list[state.SourceResult], sources: dict[str, dict[str
         if failing
         else f"{len(results)} sources checked · {len(healthy)} healthy"
     ]
-    escalated: list[str] = []
+    escalated: list[tuple[str, str, str]] = []
     for result in failing:
         source = sources.get(result.source_id, {})
         count = int(source.get("consecutive_failures") or 0)
@@ -54,8 +69,11 @@ def _health_lines(results: list[state.SourceResult], sources: dict[str, dict[str
         lines.append(f"⚠ {detail}")
         if count >= state.FAILURE_ESCALATION_THRESHOLD:
             escalated.append(
-                f"**{result.source_id} has failed {count} times running** — this source "
-                f"is blind, not quiet. Last success {last_success}. {result.error}"
+                (
+                    result.source_id,
+                    f"SOURCE BLIND — {count} failures running",
+                    f"not quiet, blind. Last success {last_success}. {result.error}",
+                )
             )
     for result in results:
         if result.baseline:
@@ -106,33 +124,98 @@ def _stale_profile_line() -> str | None:
     )
 
 
-def _judgment_line(judgment: Judgment, suppress_reason: bool = False) -> str:
+# Column budgets for the opportunities table. GitHub wraps a long cell rather than
+# scrolling it, so an unbounded `why` turns four tidy rows into a wall of text and
+# defeats the point of the table. These are the widths at which a row still reads as a
+# row on a phone.
+POSITION_CHARS = 70
+COMPANY_CHARS = 34
+NOTE_CHARS = 96
+
+URGENCY_ACT_NOW = "**ACT NOW**"
+URGENCY_WORTH_A_LOOK = "Worth a look"
+
+
+def _cell(text: str, limit: int = 0) -> str:
+    """Flatten arbitrary text into something safe inside a markdown table cell.
+
+    Three hazards, all of which have to be handled here rather than at the call sites:
+    a literal pipe ends the cell, a newline ends the whole row, and an over-long value
+    wraps the table into unreadability.
+    """
+    text = re.sub(r"\s+", " ", (text or "").replace("|", "\\|")).strip()
+    if limit and len(text) > limit:
+        text = text[:limit].rsplit(" ", 1)[0].rstrip(" ,;.:-—–") + "…"
+    return text
+
+
+def _company_and_position(judgment: Judgment) -> tuple[str, str]:
+    """Split one change into the table's company and position columns.
+
+    Job-board rows are already keyed "Title @ Location", which is exactly the position
+    column. Page-text rows are keyed on the programme name instead -- "Optiver
+    FutureFocus (3 added, 1 removed)" -- so the company name would otherwise be printed
+    twice and waste the only two columns that carry the identity of the thing.
+    """
     change = judgment.change
-    head = f"**{judgment.program_name or change.source_id} — {change.key}**"
-    bits = [head]
+    company = judgment.program_name or change.program_name or change.source_id
+    position = change.key
+    if company and position.lower().startswith(company.lower()):
+        position = position[len(company):].lstrip(" -–—:·,").strip()
+        # What is left of a page-text key is the bare change count, "(2 added, 0
+        # removed)", which is not a position and reads as a typo as a link label.
+        if position.startswith("("):
+            position = f"page updated {position}"
+    return company, position or "page updated"
+
+
+def _notes(judgment: Judgment, suppress_reason: bool = False) -> str:
+    """The short clause at the end of a row.
+
+    Ordered most-decision-relevant first, because this is the column the width budget
+    truncates. A rolling deadline changes what the owner does today; a confidence
+    caveat only changes how much he trusts the row he is already reading.
+    """
+    change = judgment.change
+    bits: list[str] = []
+    if change.rolling:
+        bits.append("ROLLING — closes when full")
     if judgment.why and not (suppress_reason and not judgment.classified):
         bits.append(judgment.why)
-    elif change.kind == "added":
-        bits.append("New row appeared.")
     elif change.kind == "removed":
-        bits.append("Row disappeared.")
-    else:
-        bits.append("Row changed.")
-    if change.rolling:
-        bits.append("ROLLING review — closes when full.")
+        bits.append("row disappeared")
+    elif change.kind == "changed":
+        bits.append("row changed")
     if judgment.suggested_action:
         bits.append(judgment.suggested_action)
     if not judgment.classified:
-        bits.append("_Unverified — open the page to confirm._")
-    if judgment.confidence == "low" and judgment.classified:
-        bits.append("_Low confidence — surfaced deliberately rather than dropped._")
-    line = " ".join(bits)
-    if change.url:
-        line += f" → {change.url}"
-    # The trailing marker is what makes "tick it and never see it again" work. It is an
-    # HTML comment, so GitHub renders nothing, and it survives the owner editing the
-    # line. See collect_applied.
-    return line + f" <!--k:{state.change_key(change.source_id, change.key)}-->"
+        bits.append("unverified — open the page")
+    elif judgment.confidence == "low":
+        bits.append("low confidence, kept deliberately")
+    # The model ends `why` with a full stop, so joining raw gives "...dropped.; low
+    # confidence" -- two marks of punctuation in a row inside a 96-character budget.
+    return _cell("; ".join(bit.rstrip(" .") for bit in bits if bit.strip()), NOTE_CHARS)
+
+
+def _table_row(urgency: str, company: str, position: str, notes: str, url: str = "") -> str:
+    company = _cell(company, COMPANY_CHARS)
+    position = _cell(position, POSITION_CHARS)
+    if url:
+        # Square brackets in the title would terminate the link text early.
+        label = position.replace("[", "(").replace("]", ")")
+        position = f"[{label}]({url})"
+    return f"| {urgency} | {company} | {position} | {notes} |"
+
+
+def _judgment_row(judgment: Judgment, suppress_reason: bool = False) -> str:
+    company, position = _company_and_position(judgment)
+    return _table_row(
+        URGENCY_ACT_NOW if judgment.urgent else URGENCY_WORTH_A_LOOK,
+        company,
+        position,
+        _notes(judgment, suppress_reason),
+        judgment.change.url,
+    )
 
 
 def render(
@@ -175,18 +258,23 @@ def render(
         body.append(f"> Note: {reasons.pop()}")
         body.append("")
 
-    if escalated or act_now:
-        body.append(f"## ■ ACT NOW ({len(escalated) + len(act_now)})")
-        for line in escalated:
-            body.append(f"- {line}")
-        for judgment in act_now:
-            body.append(f"- [ ] {_judgment_line(judgment, suppress_reason)}")
+    # One table rather than two sections, sorted so every ACT NOW row sits above every
+    # WORTH A LOOK row. The urgency column carries the distinction the headings used to.
+    if escalated or act_now or worth_a_look:
+        body.append(
+            f"## ■ OPPORTUNITIES ({len(escalated) + len(act_now) + len(worth_a_look)})"
+        )
         body.append("")
-
-    if worth_a_look:
-        body.append(f"## ■ WORTH A LOOK ({len(worth_a_look)})")
+        body.append("| Urgency | Company | Position | Notes |")
+        body.append("|---|---|---|---|")
+        for source_id, position, notes in escalated:
+            body.append(
+                _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes, NOTE_CHARS))
+            )
+        for judgment in act_now:
+            body.append(_judgment_row(judgment, suppress_reason))
         for judgment in worth_a_look:
-            body.append(f"- [ ] {_judgment_line(judgment, suppress_reason)}")
+            body.append(_judgment_row(judgment, suppress_reason))
         body.append("")
 
     if ruled_out:
@@ -227,8 +315,8 @@ def render(
         body.append(f"- {line}")
     if suppressed_applied:
         body.append(
-            f"- {suppressed_applied} item(s) you ticked off in an earlier digest were "
-            "hidden. Untick one in its original issue to bring it back."
+            f"- {suppressed_applied} item(s) are muted in data/applied.tsv and were "
+            "hidden. Delete the line to bring one back."
         )
     if ruled_out:
         # Surfaced here as well as in the collapsed block: the filter silently eating
@@ -324,52 +412,6 @@ def delivered_issue_exists(date: str) -> bool | None:
         # The issues endpoint returns pull requests too; they are not digests.
         if isinstance(issue, dict) and "pull_request" not in issue
     )
-
-
-_TICKED = re.compile(r"^\s*[-*]\s*\[[xX]\].*?<!--k:([0-9a-f]{10})-->", re.MULTILINE)
-
-
-def collect_applied(limit: int = 14) -> dict[str, str]:
-    """Keys the owner has ticked off in recently delivered digests.
-
-    The digest is already the interface -- it arrives as an issue the owner reads, and
-    CLAUDE.md has always described it as doubling as an application tracker. Ticking a
-    checkbox edits the issue body, so the state is already stored on GitHub; this just
-    reads it back. No new tool, no file to edit, nothing to remember.
-
-    Returns {} rather than raising when GitHub cannot be asked, so an API problem loses
-    a suppression rather than the digest.
-    """
-    repo = os.environ.get("GITHUB_REPOSITORY")
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
-    if not repo or not token:
-        return {}
-    try:
-        response = httpx.get(
-            f"{GITHUB_API}/repos/{repo}/issues",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/vnd.github+json",
-                "User-Agent": state.USER_AGENT,
-            },
-            params={"state": "all", "sort": "created", "direction": "desc", "per_page": limit},
-            timeout=state.HTTP_TIMEOUT_SECONDS,
-        )
-        if response.status_code >= 300:
-            return {}
-        issues = response.json()
-    except (httpx.HTTPError, ValueError):
-        return {}
-    if not isinstance(issues, list):
-        return {}
-    marked: dict[str, str] = {}
-    for issue in issues:
-        if not isinstance(issue, dict) or "pull_request" in issue:
-            continue
-        when = (issue.get("updated_at") or "")[:10]
-        for key in _TICKED.findall(issue.get("body") or ""):
-            marked.setdefault(key, when)
-    return marked
 
 
 def deliver(title: str, body: str) -> str:

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import os
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -176,7 +177,8 @@ class AcceptanceTests(unittest.TestCase):
         source = dict(self.source, consecutive_failures="4", last_success="2026-09-01")
         title, body = digest.render([], [result], {"nuft-2027": source})
         self.assertIn("ACT NOW", body)
-        self.assertIn("failed 4 times running", body)
+        self.assertIn("SOURCE BLIND", body)
+        self.assertIn("4 failures running", body)
         self.assertIn("source failing", title)
 
     def test_14_3c_an_empty_readme_is_a_failure_not_a_quiet_day(self):
@@ -258,8 +260,8 @@ class AcceptanceTests(unittest.TestCase):
         self.assertFalse(judgments[0].classified)
         self.assertTrue(judgments[0].relevant, "unclassified changes must still surface")
         _, body = digest.render(judgments, [], {})
-        self.assertIn("WORTH A LOOK", body)
-        self.assertIn("Unverified", body)
+        self.assertIn("Worth a look", body)
+        self.assertIn("unverified", body)
 
     @unittest.skipUnless(
         os.environ.get("AZURE_OPENAI_API_KEY"),
@@ -1092,14 +1094,66 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(state.recruiting_cycle("2027-06-30"), 2027)
         self.assertEqual(state.recruiting_cycle("2027-07-01"), 2028)
 
-    def test_14_9s_the_digest_marks_each_item_with_its_key(self):
+    def test_14_9t_the_digest_is_one_table_with_act_now_rows_first(self):
+        """The owner asked for a table, not two prose sections.
+
+        Urgency became a column rather than a heading, so the ordering guarantee moved
+        from the document structure into the row order and needs asserting: every ACT
+        NOW row sits above every WORTH A LOOK row.
+        """
+        rolling = classify.Judgment(
+            change=state.Change(
+                source_id="js", kind="added", key="SWE Intern @ NYC", detail="x",
+                url="https://example.com/a", rolling=True,
+            ),
+            program_name="Jane Street", relevant=True, classified=True,
+            confidence="high", why="First-year eligible.",
+        )
+        ordinary = classify.Judgment(
+            change=state.Change(source_id="b", kind="added", key="Quant Intern", detail="x"),
+            program_name="Some Firm", relevant=True, classified=True, confidence="low",
+        )
+        _, body = digest.render([ordinary, rolling], [], {})
+
+        self.assertIn("## \u25a0 OPPORTUNITIES (2)", body)
+        self.assertIn("| Urgency | Company | Position | Notes |", body)
+        self.assertNotIn("WORTH A LOOK (", body, "the old section heading is gone")
+
+        rows = [line for line in body.splitlines() if line.startswith("| ")]
+        urgencies = [row.split("|")[1].strip() for row in rows[1:]]
+        self.assertEqual(
+            urgencies, [digest.URGENCY_ACT_NOW, digest.URGENCY_WORTH_A_LOOK],
+            "the rolling item is urgent and must be rendered above the ordinary one",
+        )
+        self.assertIn("[SWE Intern @ NYC](https://example.com/a)", body)
+
+    def test_14_9u_a_pipe_in_a_title_cannot_break_the_table(self):
+        """One unescaped pipe silently shifts every later column in that row."""
         judgment = classify.Judgment(
-            change=state.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
-            relevant=True, classified=True, confidence="low",
+            change=state.Change(
+                source_id="b", kind="added", key="SWE | Intern", detail="x",
+            ),
+            program_name="Some | Firm", relevant=True, classified=True,
+            confidence="high", why="Fine | really",
         )
         _, body = digest.render([judgment], [], {})
-        self.assertIn("- [ ]", body)
-        self.assertIn(f"<!--k:{state.change_key('b', 'SWE Intern')}-->", body)
+        row = next(line for line in body.splitlines() if "Intern" in line)
+        delimiters = len(re.findall(r"(?<!\\)\|", row))
+        self.assertEqual(delimiters, 5, f"row has stray delimiters: {row}")
+        self.assertIn(r"SWE \| Intern", row)
+
+    def test_14_9v_a_long_reason_is_truncated_to_a_clause(self):
+        """An unbounded `why` wraps the table into the wall of text it replaced."""
+        judgment = classify.Judgment(
+            change=state.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
+            program_name="Some Firm", relevant=True, classified=True,
+            confidence="high", why="word " * 100,
+        )
+        _, body = digest.render([judgment], [], {})
+        row = next(line for line in body.splitlines() if "SWE Intern" in line)
+        notes = row.split("|")[4].strip()
+        self.assertLessEqual(len(notes), digest.NOTE_CHARS + 1)
+        self.assertTrue(notes.endswith("\u2026"), notes)
 
 
 if __name__ == "__main__":
