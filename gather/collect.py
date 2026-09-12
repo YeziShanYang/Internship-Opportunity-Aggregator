@@ -4,11 +4,8 @@ This is one of only three packages allowed to make a network request, and the on
 that makes ~157 of them. Nothing here parses, filters or diffs; the bodies land on disk
 exactly as fetched and `process` decides what they mean.
 
-Two clients, not one, and that is a credential boundary rather than a style choice.
-`github_readme.build_client` puts `Authorization: Bearer <GH_PAT>` on every request it
-makes. While only GitHub was contacted that was harmless; the moment a job board or a
-careers page shares the client, the PAT is sent to boards-api.greenhouse.io,
-api.lever.co, api.ashbyhq.com and every firm's marketing site.
+Two clients, not one, and that is a credential boundary rather than a style choice --
+see `gather.clients`.
 
 Three things that are *not* failures and must each stay distinguishable from one, and
 from each other, all the way to HEALTH (spec 10.1):
@@ -25,14 +22,11 @@ from each other, all the way to HEALTH (spec 10.1):
 from __future__ import annotations
 
 import json
-import os
-import sys
 import time
 
 from core import models, paths
-from gather import ats, breaker, github_readme, page
+from gather import ats, breaker, clients, github_readme, page
 from persist import artifacts
-from sources import postings
 
 GITHUB_CLIENT = "github"
 WEB_CLIENT = "web"
@@ -55,17 +49,6 @@ CLIENT_FOR = {
 UNWATCHED = paths.UNWATCHED_METHOD
 
 
-def github_token() -> str | None:
-    token = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
-    if not token:
-        print(
-            "note: no GH_PAT/GITHUB_TOKEN set; using unauthenticated GitHub API "
-            "(60 requests/hour instead of 5,000)",
-            file=sys.stderr,
-        )
-    return token
-
-
 def _encode_body(method: str, fetched) -> bytes:
     """The bytes to store for this method's fetch.
 
@@ -83,11 +66,13 @@ def _encode_body(method: str, fetched) -> bytes:
     return text.encode("utf-8")
 
 
-def fetch_one(source: dict[str, str], clients: dict) -> tuple[models.FetchAttempt, bytes]:
+def fetch_one(
+    source: dict[str, str], by_name: dict
+) -> tuple[models.FetchAttempt, bytes]:
     """Fetch one source and return (attempt, body). Never raises."""
     source_id = source["source_id"]
     method = (source.get("method") or "").strip()
-    client = clients[CLIENT_FOR[method]]
+    client = by_name[CLIENT_FOR[method]]
 
     if method == "page_text":
         fetched = page.fetch(source, client)
@@ -114,9 +99,9 @@ def collect(sources: list[dict[str, str]], only: str | None) -> list[models.Fetc
     source nobody will notice has gone blind.
     """
     attempts: list[models.FetchAttempt] = []
-    token = github_token()
-    with github_readme.build_client(token) as github, postings.build_client() as web:
-        clients = {GITHUB_CLIENT: github, WEB_CLIENT: web}
+    with clients.build_github_client(clients.github_token()) as github, \
+            clients.build_web_client() as web:
+        by_name = {GITHUB_CLIENT: github, WEB_CLIENT: web}
         for source in sources:
             source_id = source["source_id"]
             if only and source_id != only:
@@ -141,7 +126,7 @@ def collect(sources: list[dict[str, str]], only: str | None) -> list[models.Fetc
                         source_id=source_id, ok=False, quarantined=True, error=why))
                     continue
 
-            attempt, body = fetch_one(source, clients)
+            attempt, body = fetch_one(source, by_name)
             if attempt.ok:
                 artifacts.write_body(source_id, body)
             attempts.append(attempt)

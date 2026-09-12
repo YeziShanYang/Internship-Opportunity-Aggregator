@@ -40,9 +40,9 @@ import threading
 from dataclasses import dataclass, field
 
 import screen
-from core import models, paths
+from core import models, paths, text as coretext
+from enrich import bodies as enrich_bodies
 from persist import store
-from sources import postings
 
 MODEL = "claude-opus-5"
 
@@ -294,7 +294,7 @@ def _render_change(change: models.Change, posting: tuple[str, str] | None = None
     if text:
         lines.append("")
         lines.append("--- POSTING TEXT (fetched from the live listing) ---")
-        lines.append(text[:postings.MAX_TEXT_CHARS])
+        lines.append(text[:coretext.MAX_TEXT_CHARS])
     elif error:
         lines.append("")
         lines.append(f"--- POSTING TEXT UNAVAILABLE: {error} ---")
@@ -593,8 +593,21 @@ def classify_one(
     return _classify_azure(client, deployment, change, posting, effort)
 
 
-def classify(changes: list[models.Change], sources: dict[str, dict[str, str]]) -> list[Judgment]:
-    """Classify what is worth classifying. Never raises, never drops a change."""
+def classify(
+    changes: list[models.Change],
+    sources: dict[str, dict[str, str]],
+    bodies: dict[str, enrich_bodies.PostingBody] | None = None,
+) -> list[Judgment]:
+    """Classify what is worth classifying. Never raises, never drops a change.
+
+    `bodies` is what `enrich` fetched, keyed on change_id. It is an argument rather
+    than something fetched here: this stage used to make network requests in the middle
+    of itself, which meant a model-call stage was also an I/O stage and there was no way
+    to see what it had fetched or to re-run it without paying for the fetches again.
+
+    None means "this caller has not run enrich", and every change is then judged on its
+    row alone -- which is a weaker judgment, not a wrong one, and the prompt is told so.
+    """
     to_classify, summarise_only = triage(changes, sources)
     judgments = [
         Judgment(
@@ -609,29 +622,21 @@ def classify(changes: list[models.Change], sources: dict[str, dict[str, str]]) -
     reset_usage()
     reset_screen()
 
-    # The posting fetch moved above the provider branch because the deterministic
-    # screen reads the same text the model would have, and it runs whether or not a
-    # provider is configured. Costing nothing but network, it makes degraded mode
-    # sharper rather than weaker: a change it rules out carries the employer's own
-    # quoted sentence, which is the standard prompt rule 6 sets for the model itself.
-    # Spec 8 rule 3 objects to dropping things on a *guess*; this is evidence.
-    #
-    # Tier 2 and Tier 3 already carry their text: an ATS returns the description in the
-    # same response that lists the job, and a page diff *is* the text. Only ask
-    # `postings` for the ones that arrive bare, which in practice means Simplify rows.
-    fetched = postings.fetch_for_changes([c for c in to_classify if not c.posting_text])
+    # The posting text is read by the deterministic screen as well as by the model, and
+    # the screen runs whether or not a provider is configured. That makes degraded mode
+    # sharper rather than weaker: a change the screen rules out carries the employer's
+    # own quoted sentence, which is the standard prompt rule 6 sets for the model
+    # itself. Spec 8 rule 3 objects to dropping things on a *guess*; this is evidence.
+    table = bodies or {}
 
     def posting_for(change: models.Change):
-        if change.posting_text:
-            return (change.posting_text, "")
-        url = postings.posting_url(change)
-        return fetched.get(url) if url else None
+        return enrich_bodies.for_change(table, change)
 
     to_judge: list[models.Change] = []
     for change in to_classify:
         SCREEN.considered += 1
         posting = posting_for(change)
-        verdict = screen.screen(change.key, (posting or ("", ""))[0])
+        verdict = screen.screen(change.key, posting[0])
         if verdict is None:
             to_judge.append(change)
             continue

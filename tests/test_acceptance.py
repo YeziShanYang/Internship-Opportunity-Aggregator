@@ -29,7 +29,7 @@ import classify
 import discover
 import screen
 import digest
-from core import clock, models, paths
+from core import clock, models, paths, text as coretext
 from gather import breaker
 from persist import store
 from jobs import daily
@@ -37,7 +37,7 @@ from process import redirect, suppress
 import build_xlsx
 from gather import ats, github_readme, page
 from process import parse_ats, parse_page, parse_readme, snapshot
-from sources import postings
+from enrich import bodies as enrich_bodies, postings
 
 # --- the database must survive the suite ---------------------------------------------
 #
@@ -666,10 +666,35 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(summarise_only, [])
 
     def test_14_7b_posting_url_prefers_the_posting_over_the_company_page(self):
-        """/c/ is a company listing; only /p/ carries this role's requirements."""
+        """/c/ is a company listing; only /p/ carries this role's requirements.
+
+        The live path no longer discovers this by regex: the producer records
+        `Change.posting_url` while it still has the parsed cells. Both are asserted --
+        the typed field is what `enrich` uses, and the recovery is the documented
+        fallback for a row read back out of a frozen-format snapshot.
+        """
         url = "https://simplify.jobs/p/06a6fa65-37c0-461f-be1e-748f50cdf55c"
-        self.assertEqual(postings.posting_url(self._change(url=url)), url)
-        self.assertIsNone(postings.posting_url(self._change()))
+        change = self._change(url=url)
+        self.assertEqual(enrich_bodies.needs_fetch(change), url)
+        self.assertEqual(
+            enrich_bodies.needs_fetch(
+                models.Change(source_id="s", kind="added", key="k", detail="d",
+                              posting_url=url)),
+            url, "the typed field is used without touching the rendered detail")
+        self.assertEqual(enrich_bodies.needs_fetch(self._change()), "")
+        self.assertEqual(postings.recover_posting_url(change.detail), url)
+
+    def test_14_7b2_an_inline_body_is_never_refetched(self):
+        """Greenhouse content=true, Lever and Ashby descriptionPlain, and a page diff
+        all arrive with the text already attached. Paying for it again would be ~35
+        wasted requests a morning."""
+        change = models.Change(source_id="s", kind="added", key="k", detail="d",
+                               posting_text="Expected graduation 2030.")
+        self.assertEqual(enrich_bodies.needs_fetch(change), "")
+        table = enrich_bodies.collect([change])
+        self.assertEqual(table[change.change_id].origin, enrich_bodies.INLINE)
+        self.assertEqual(enrich_bodies.for_change(table, change),
+                         ("Expected graduation 2030.", ""))
 
     def test_14_7c_posting_text_reaches_the_model(self):
         rendered = classify._render_change(
@@ -690,7 +715,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
 
     def test_14_7e_a_javascript_shell_is_a_failure_not_an_empty_posting(self):
         """Workday returns HTTP 200 with no text; that is an error, not a blank page."""
-        self.assertLess(len(postings.extract_text("<html><body></body></html>")),
+        self.assertLess(len(coretext.extract_text("<html><body></body></html>")),
                         postings.MIN_USEFUL_CHARS)
 
     def test_14_7f_ruled_out_items_stay_visible_with_their_reasons(self):

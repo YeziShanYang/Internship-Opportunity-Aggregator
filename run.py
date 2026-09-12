@@ -3,6 +3,7 @@
     run.py all --dry-run          the whole pipeline, printing the digest
     run.py gather                 fetch all ~157 sources into .run/raw/ and stop
     run.py process                parse .run/raw/ and diff it. No network at all
+    run.py enrich                 fetch the posting behind each changed row
 
 The point of the verbs is not that anyone runs them one at a time every morning --
 `run.py all` does the whole thing in one process, so the Actions workflow keeps its
@@ -30,8 +31,8 @@ STAGES = ("gather", "process", "enrich", "screen", "classify", "render", "delive
 # Which migration step makes each verb independently runnable. Printed rather than
 # kept in a comment, so someone hitting the wall is told where to look.
 SPLIT_BY_STEP = {
-    "enrich": "Step 6", "screen": "Step 7", "classify": "Step 7",
-    "render": "Step 8", "deliver": "Step 9",
+    "screen": "Step 7", "classify": "Step 7", "render": "Step 8",
+    "deliver": "Step 9",
 }
 
 
@@ -82,6 +83,8 @@ def main(argv: list[str] | None = None) -> int:
         return daily.gather_only(args)
     if args.verb == "process":
         return daily.process_only(args)
+    if args.verb == "enrich":
+        return daily.enrich_only(args)
     return _not_yet_split(args.verb, SPLIT_BY_STEP[args.verb])
 
 

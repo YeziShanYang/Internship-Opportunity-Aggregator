@@ -42,6 +42,12 @@ class Row:
     key: str
     value: str
     url: str = ""
+    # The fetchable posting page for this row, when the producer knew which link that
+    # was. Deliberately NOT rendered into the snapshot: the committed TSV format is
+    # frozen (74 files and every past diff depend on it), so a row recovered by
+    # `parse_snapshot` gets a best-effort value instead -- which is only ever needed
+    # for a `removed` row, whose posting has gone anyway.
+    posting_url: str = ""
 
     @property
     def identity(self) -> str:
@@ -76,6 +82,23 @@ _TRACKING_PARAM = re.compile(r"[?&](utm_[a-z]+|ref)=[^&\s)]*")
 
 
 _URL = re.compile(r"https?://[^\s)\]]+")
+
+# The one link shape in the watchlist that is fetchable as a posting. Measured: rows
+# put the employer's ATS link and the Simplify link in the same cell, ATS first, and
+# only the second returns readable text -- a Workday posting renders entirely in
+# JavaScript and yields zero characters.
+_FETCHABLE_POSTING = re.compile(r"https://simplify\.jobs/p/[0-9a-fA-F-]+")
+
+
+def _recover_posting_url(value: str) -> str:
+    """Best effort, for a row read back out of a committed snapshot.
+
+    The live path does not use this: the producer records `posting_url` while it still
+    has the parsed cells. This exists because the snapshot format is frozen, so a row
+    recovered from a TSV has to recover its typed roles from the rendered value.
+    """
+    match = _FETCHABLE_POSTING.search(value)
+    return match.group(0) if match else ""
 
 SECTIONS_HEADER = "# sections"
 ROWS_HEADER = "# rows"
@@ -112,7 +135,8 @@ def parse_snapshot(text: str) -> Snapshot:
         section, key, value = parts[0], parts[1], "\t".join(parts[2:])
         urls = _URL.findall(value)
         snapshot.rows.append(
-            Row(section=section, key=key, value=value, url=urls[0] if urls else "")
+            Row(section=section, key=key, value=value, url=urls[0] if urls else "",
+                posting_url=_recover_posting_url(value))
         )
     return snapshot
 
@@ -148,6 +172,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
                 key=row.key,
                 detail=f"New row: {row.value}",
                 url=row.url,
+                posting_url=row.posting_url,
                 is_discovery_candidate=bool(DISCOVERY_PATTERN.search(f"{row.key} {row.value}")),
                 rolling=bool(ROLLING_PATTERN.search(f"{row.key} {row.value}")),
             )
@@ -163,6 +188,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
                 key=row.key,
                 detail=f"Row disappeared. It previously read: {row.value}",
                 url=row.url,
+                posting_url=row.posting_url,
                 rolling=bool(ROLLING_PATTERN.search(f"{key} {row.value}")),
             )
         )
@@ -178,6 +204,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
                     key=new_by_key[key].key,
                     detail=f"Was: {before}\nNow: {after}",
                     url=new_by_key[key].url,
+                    posting_url=new_by_key[key].posting_url,
                     is_discovery_candidate=bool(DISCOVERY_PATTERN.search(f"{key} {after}")),
                     rolling=bool(ROLLING_PATTERN.search(f"{key} {after}")),
                 )

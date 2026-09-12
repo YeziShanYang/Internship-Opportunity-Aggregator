@@ -36,7 +36,8 @@ import time
 
 import httpx
 
-from core import models, paths
+from core import paths, text as coretext
+from gather import clients
 
 # Rows put the ATS link and the Simplify link in the same `Application=` field, ATS
 # first. Only the second one is fetchable, so match it specifically rather than taking
@@ -49,9 +50,9 @@ CACHE_DIR = paths.DATA / "postings_cache"
 # measured 13K-34K characters; the Workday shells measured 0.
 MIN_USEFUL_CHARS = 500
 
-# What the classifier is given. Postings run to ~34K characters and the tail is boilerplate
-# (benefits, EEO statements, "about us"), while the requirements block sits near the top.
-MAX_TEXT_CHARS = 12_000
+# Re-exported so callers have one name for it; it lives in core.text because `process`
+# needs it and may not import this layer.
+MAX_TEXT_CHARS = coretext.MAX_TEXT_CHARS
 
 # Politeness. robots.txt sets no crawl-delay, so this is self-imposed.
 MAX_CONCURRENCY = 6
@@ -62,39 +63,29 @@ PER_REQUEST_DELAY_SECONDS = 0.2
 # to a relevance decision.
 TOTAL_BUDGET_SECONDS = 240.0
 
-_SCRIPT_OR_STYLE = re.compile(r"<(script|style)\b[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
-_TAG = re.compile(r"<[^>]+>")
-_WHITESPACE = re.compile(r"\s+")
-_ENTITIES = {"&#x27;": "'", "&amp;": "&", "&quot;": '"', "&lt;": "<", "&gt;": ">", "&nbsp;": " "}
+def recover_posting_url(*haystacks: str) -> str:
+    """Best-effort: find a fetchable posting link in already-rendered row text.
 
-
-def posting_url(change: models.Change) -> str | None:
-    """The Simplify posting link for a row, or None if it has none.
-
-    `change.url` is deliberately not used: it holds the *company* page
-    (`simplify.jobs/c/ABB`), which lists a company's roles rather than this posting's
-    requirements.
+    A fallback, not the main path. The producer that built the row knows which of its
+    links is the posting page and records it on `Change.posting_url`; this only runs for
+    a row recovered from a committed TSV, where the typed roles were never stored
+    because the snapshot format is frozen. Returns "" rather than None so callers do
+    not need two absent values.
     """
-    for haystack in (change.detail, change.key):
+    for haystack in haystacks:
         if not haystack:
             continue
         match = POSTING_URL.search(haystack)
         if match:
             return match.group(0)
-    return None
+    return ""
 
 
 def _cache_path(url: str):
     return CACHE_DIR / f"{hashlib.sha1(url.encode()).hexdigest()}.txt"
 
 
-def extract_text(html: str) -> str:
-    """Strip a page to readable text. Crude on purpose -- the model tolerates noise."""
-    text = _SCRIPT_OR_STYLE.sub(" ", html)
-    text = _TAG.sub(" ", text)
-    for entity, char in _ENTITIES.items():
-        text = text.replace(entity, char)
-    return _WHITESPACE.sub(" ", text).strip()
+extract_text = coretext.extract_text
 
 
 def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
@@ -134,27 +125,18 @@ def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
     return text, ""
 
 
-def build_client() -> httpx.Client:
-    return httpx.Client(
-        headers={"User-Agent": paths.USER_AGENT},
-        timeout=paths.HTTP_TIMEOUT_SECONDS,
-        follow_redirects=True,
-    )
+build_client = clients.build_web_client
 
 
-def fetch_for_changes(
-    changes: list[models.Change], client: httpx.Client | None = None
+def fetch_many(
+    urls: list[str], client: httpx.Client | None = None
 ) -> dict[str, tuple[str, str]]:
-    """Fetch every posting referenced by `changes`, concurrently.
+    """Fetch every URL concurrently. Returns {url: (text, error)}.
 
-    Returns {url: (text, error)}. Changes with no posting link are simply absent, which
-    the caller reads as "nothing to add" rather than as a failure.
+    Renamed from `fetch_for_changes`, which took a list of Changes and did the
+    URL-derivation itself -- so the fetching layer had to know how a row stores its
+    links. It takes URLs now and `enrich.bodies` owns the derivation.
     """
-    urls = []
-    for change in changes:
-        url = posting_url(change)
-        if url and url not in urls:
-            urls.append(url)
     if not urls:
         return {}
 

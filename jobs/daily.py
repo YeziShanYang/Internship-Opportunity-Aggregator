@@ -24,10 +24,10 @@ import classify
 import digest
 import discover
 from core import clock, models, paths
-from gather import collect, github_readme
+from enrich import bodies as enrich_bodies
+from gather import clients, collect
 from persist import artifacts, store
 from process import build, suppress
-from sources import postings
 
 
 # Re-exported so the checker registry has one name for the rest of the tree. The
@@ -134,6 +134,21 @@ def update_program_state(
             program["last_changed"] = now
 
 
+def _enrich(
+    changes: list[models.Change], args: argparse.Namespace
+) -> dict[str, enrich_bodies.PostingBody]:
+    """Run the enrich stage and record what it managed."""
+    if args.no_classify:
+        # Nothing downstream will read a posting body, so fetching ~35 of them would be
+        # pure cost. Still writes the (empty) artifact, so a reader can tell the stage
+        # ran and declined rather than never having run.
+        bodies: dict[str, enrich_bodies.PostingBody] = {}
+    else:
+        bodies = enrich_bodies.collect(changes)
+    artifacts.write(artifacts.ENRICHED, "enriched", bodies)
+    return bodies
+
+
 def _suppress(
     results: list[models.SourceResult], programs: list[dict[str, str]]
 ) -> tuple[list[models.Change], list[models.FilterReport]]:
@@ -191,8 +206,12 @@ def run(args: argparse.Namespace) -> int:
     _write_change_set(results, changes, filters)
 
     by_id = {source["source_id"]: source for source in sources}
+
+    # The second source-network stage, named rather than hidden. O(changes): bodies are
+    # fetched for the rows that moved, not for the ~4,000 postings on the boards.
+    bodies = _enrich(changes, args)
     judgments = (
-        [] if args.no_classify else classify.classify(changes, by_id)
+        [] if args.no_classify else classify.classify(changes, by_id, bodies)
     )
     artifacts.write(artifacts.JUDGED, "judged", judgments)
 
@@ -234,8 +253,8 @@ def run(args: argparse.Namespace) -> int:
     # before it ever mails; the writes below are what --dry-run actually suppresses.
     if (send and not args.dry_run and discover.due()) or args.force_discovery:
         try:
-            with github_readme.build_client(collect.github_token()) as gh, \
-                    postings.build_client() as web:
+            with clients.build_github_client(clients.github_token()) as gh, \
+                    clients.build_web_client() as web:
                 candidates, discovery_notes = discover.run(gh, web, sources)
             if not args.dry_run:
                 discover.record(candidates)
@@ -251,6 +270,7 @@ def run(args: argparse.Namespace) -> int:
         judgments, results, by_id, suppressed_applied=suppressed_applied,
         suppressed_muted=suppressed_muted,
         discovery_lines=discovery_lines, status_only=status_only,
+        enriched=bodies,
     )
     for note in discovery_notes:
         body += f"\n- ⚠ {note}"
@@ -333,4 +353,15 @@ def process_only(args: argparse.Namespace) -> int:
     _write_change_set(results, changes, filters)
     print(f"{len(results)} sources processed, {len(changes)} changes")
     print(f"wrote {artifacts.path(artifacts.CHANGES)}")
+    return 0
+
+
+def enrich_only(args: argparse.Namespace) -> int:
+    """`run.py enrich`: fetch the posting behind each change in `.run/changes.json`."""
+    change_set = artifacts.read(artifacts.CHANGES, "changes", models.ChangeSet)
+    bodies = enrich_bodies.collect(change_set.changes)
+    artifacts.write(artifacts.ENRICHED, "enriched", bodies)
+    line = enrich_bodies.health_line(bodies)
+    print(line or f"{len(bodies)} change(s), none needed a posting fetch")
+    print(f"wrote {artifacts.path(artifacts.ENRICHED)}")
     return 0
