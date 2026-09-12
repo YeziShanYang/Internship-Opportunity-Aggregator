@@ -24,7 +24,7 @@ from __future__ import annotations
 import difflib
 import re
 
-from core import models
+from core import clock, models
 from gather import page
 from process import redirect
 from sources import postings, snapshot
@@ -138,6 +138,10 @@ def diff_pages(
         models.Change(
             source_id=source_id,
             kind="changed",
+            # One change per page per run, so the page *is* the identity. Stable across
+            # runs on purpose: `enrich` and `screen` look themselves up by this, and a
+            # key that folded in the added/removed counts would change every morning.
+            change_id=clock.change_id(source_id, "page"),
             key=f"{program_name or source_id} ({len(added)} added, {len(removed)} removed)",
             detail="\n".join(body),
             url=source.get("url", ""),

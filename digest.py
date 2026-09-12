@@ -130,7 +130,9 @@ def filter_lines(reports: list[models.FilterReport]) -> list[str]:
 
     Reports are aggregated by filter across sources, because per-source lines would put
     five identical sentences in HEALTH on a morning when five READMEs each excluded a
-    contents table.
+    contents table. The source list is capped for the same reason: the student-role
+    screen legitimately fires on 62 of the watched boards, and naming all 62 is 700
+    characters of HEALTH that nobody will read to the end of.
     """
     by_filter: dict[str, list[models.FilterReport]] = {}
     for report in reports:
@@ -142,11 +144,18 @@ def filter_lines(reports: list[models.FilterReport]) -> list[str]:
         group = by_filter[filter_id]
         removed = sum(r.removed for r in group)
         considered = sum(r.considered for r in group)
-        where = ", ".join(sorted({r.source_id for r in group if r.source_id}))
+        sources = sorted({r.source_id for r in group if r.source_id})
+        if not sources:
+            where = ""
+        elif len(sources) <= MAX_FILTER_SOURCES:
+            where = f" ({', '.join(sources)})"
+        else:
+            # The count, not a truncated list: an arbitrary first four reads as if the
+            # filter only touched those, which is worse than saying how many.
+            where = f" (across {len(sources)} sources)"
         lines.append(
-            f"· {filter_id}: {removed} of {considered} rows removed"
-            + (f" ({where})" if where else "")
-            + f" — {group[0].reason}."
+            f"· {filter_id}: {removed} of {considered} rows removed{where}"
+            f" — {group[0].reason}."
         )
     return lines
 
@@ -182,6 +191,9 @@ def _stale_profile_line() -> str | None:
 POSITION_CHARS = 70
 COMPANY_CHARS = 34
 NOTE_CHARS = 96
+
+# Past this many sources, a filter line reports the count instead of the names.
+MAX_FILTER_SOURCES = 6
 
 URGENCY_ACT_NOW = "**ACT NOW**"
 URGENCY_WORTH_A_LOOK = "Worth a look"

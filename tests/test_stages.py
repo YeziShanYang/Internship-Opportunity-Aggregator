@@ -17,6 +17,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
+import digest
 import run
 from core import models, paths
 from persist import artifacts
@@ -77,6 +78,39 @@ class FilterReportTests(unittest.TestCase):
         one of the 187 programmes must not silence a board that names none of them."""
         kept, _ = suppress.suppress([_change("a")], muted={"Anything"}, applied={})
         self.assertEqual(len(kept), 1)
+
+
+class FilterLineTests(unittest.TestCase):
+    """How filter reports read in HEALTH."""
+
+    def _reports(self, n: int) -> list[models.FilterReport]:
+        return [
+            models.FilterReport(
+                stage="process", filter_id="ats-not-a-student-role",
+                source_id=f"board-{i}", considered=40, removed=30,
+                reason="title gives no sign of a student role")
+            for i in range(n)
+        ]
+
+    def test_a_filter_firing_on_many_sources_reports_a_count_not_a_list(self):
+        """Measured on the live watchlist: the student-role screen legitimately fires
+        on 62 boards, and naming all 62 is 700 characters nobody reads to the end of.
+        A truncated list is worse than a count -- an arbitrary first four reads as if
+        the filter only touched those."""
+        line = digest.filter_lines(self._reports(62))[0]
+        self.assertIn("across 62 sources", line)
+        self.assertNotIn("board-0", line)
+        self.assertIn("1860 of 2480 rows removed", line)
+
+    def test_a_filter_firing_on_a_few_sources_names_them(self):
+        line = digest.filter_lines(self._reports(2))[0]
+        self.assertIn("board-0, board-1", line)
+
+    def test_a_run_wide_filter_needs_no_source_list(self):
+        line = digest.filter_lines([models.FilterReport(
+            stage="process", filter_id="muted-programme", considered=9, removed=3,
+            reason="muted in programs.csv")])[0]
+        self.assertIn("3 of 9 rows removed —", line)
 
 
 class ChangeSetArtifactTests(unittest.TestCase):

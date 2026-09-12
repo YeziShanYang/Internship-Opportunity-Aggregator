@@ -49,3 +49,24 @@ def change_key(source_id: str, key: str, cycle: int | None = None) -> str:
     """
     cycle = recruiting_cycle() if cycle is None else cycle
     return hashlib.sha1(f"{source_id}|{key}|{cycle}".encode()).hexdigest()[:10]
+
+
+def change_id(source_id: str, identity: str) -> str:
+    """Opaque stable id for one changed row, computed once and used as the join key.
+
+    Not to be confused with `change_key` above, and the two are easy to confuse, so:
+
+    * `change_key` is the *mute* key. It is cycle-scoped and hashes the human-readable
+      row text, because a dismissal should lapse when next season's repost arrives.
+      It is what data/applied.tsv stores, and re-keying it invalidates that file.
+    * `change_id` is the *join* key. It is cycle-independent and hashes the row's
+      section-qualified identity, because `enrich`, `screen` and `classify` all need to
+      look up their own contribution for one row and must agree on the name of it
+      within a single run.
+
+    It exists to delete a re-parse. `job_boards` used to recover the employer from a
+    rendered diff key with `key.split(" @ ")[0].split(" #")[0]` -- taking a string the
+    code had assembled two frames earlier back apart, and getting it wrong whenever a
+    title contained " @ " or the row had picked up an ordinal.
+    """
+    return hashlib.sha1(f"{source_id}|{identity}".encode()).hexdigest()[:12]
