@@ -10,11 +10,13 @@ breaker. Then the whole source audit: 12 boards added, an `eightfold` method rea
 Millennium's 59 campus postings, redirect detection, and the automatic ATS probe.
 See "Part 1 outcome" at the end and `git log` from `ddfc990`.
 
-*Not started, and the work this document exists for:* **the stage refactor, Part 2
-below.** Start at Step 0.
+*Shipped:* **the stage refactor, Part 2 below.** All ten steps (0 through 9) landed.
+See "Part 2 outcome" at the end for what actually happened, including the four places
+the plan turned out to be wrong about the code. Part 2's step list is kept as a record
+of the sequence, not as work to do.
 
-Baseline as of now: **157 sources**, **148 tests** green via
-`.venv/bin/python -m unittest discover -s tests`.
+Baseline when Part 2 started: **157 sources**, **148 tests**. Now: **158 sources**,
+**219 tests** green via `.venv/bin/python -m unittest discover -s tests`.
 
 This document is a proposal plus a record. It is **not** a description of how the code
 currently works — `CLAUDE.md` in the parent directory is. Delete sections as they stop
@@ -142,7 +144,7 @@ digest that promises state which was never saved.*
 
 ---
 
-# Part 2 — the stage refactor (APPROVED, NOT STARTED)
+# Part 2 — the stage refactor (SHIPPED)
 
 ## Why
 
@@ -562,3 +564,97 @@ This is the decision that should be made deliberately rather than by default:
 a proxy would recover all nine, and it does not involve lying about the client
 the way the Citadel case would. It is still circumventing a block the firm chose
 to apply. Worth a conversation before anyone reaches for it.
+
+---
+
+## Part 2 outcome (recorded 2026-09-12)
+
+All ten steps landed, one commit per step except where a step needed two or three. The
+target shape is the shape the code has. 219 tests, 6 skipped without API keys.
+
+### What the verification actually showed
+
+- **129 of the 130 committed snapshots are byte-identical** after a full non-dry run of
+  all 153 sources through the refactored pipeline, executed against a copy of `data/`
+  so the database was never written. The one that differs, `simplify-2027.tsv`, differs
+  by three content lines — a new Klaviyo posting and an InfiniteQuant role retitled —
+  which is exactly the three changes the run reported. `sources.csv` came back with the
+  same 158 rows and the same columns.
+- **The artifact boundary holds.** `run.py gather` then `run.py process` twice gives
+  byte-identical `changes.json` with no second fetch; process takes 0.69s over 153
+  sources against 43MB of stored bodies. `run.py all` then `run.py render` gives a
+  byte-identical digest and title with no network and no model call.
+- **All 81 ATS sources returned identical row counts** across the Tier 2 split, and the
+  aggregate "4154 postings were not student roles and 397 were outside the US" was
+  unchanged to the digit.
+- **The layering test catches violations.** Verified by injecting four — an uphill
+  `process`→`deliver` import, `httpx` in `process`, `httpx` in `core`, and a
+  `write_text` buried inside a function in `classify` — and all four were named with
+  file and line.
+
+### Four places the plan was wrong about the code
+
+1. **The `74` in step 2 was right, and "130 snapshots" was a different number.**
+   `data/snapshots/` holds 130 files, of which 74 are `.tsv` with a parse/render
+   round-trip and 56 are `.txt` page text with no codec. The plan's 74-of-74 measurement
+   was correct.
+2. **Step 0's `__main__` block hid 86 tests, not ~60**, and sat at line 1170 rather than
+   1161. It also could not have revealed new failures, because `unittest discover`
+   imports the module and always ran all 148 — the block only ever mattered for direct
+   invocation.
+3. **`14_9o` could not move to `LiveDataInvariantTests`.** The plan says move all three
+   live-data tests there, but that test calls `discover.record()`, which writes
+   `discovered.csv`; un-isolating it would have pointed that write at the real database.
+   A test asserting "this never writes the database" must not be aimed at the database.
+   It got a seeded temp copy instead.
+4. **"Move the collapse prose to `deliver/`" was half right.** The markdown did not
+   belong in the fetcher, and it is in `process` now. But the collapsed item's `detail`
+   is the *classifier's* input, not digest markdown, so moving it into `deliver` would
+   have relocated the model's context into the renderer. The collapse is a typed
+   `BoardCollapse` on the result so HEALTH cannot forget it; the `detail` stayed where
+   the model can see it.
+
+### Three bugs the refactor found, all pre-existing
+
+- **Phenom's recruiting-category filter went silent** the moment the screen moved into
+  the parser: the count was still being taken from the fetcher, so a 2-posting board
+  reported 1 posting. Caught by the suite, inside the very commit the plan warned was
+  the riskiest and for exactly the reason it named. The count now comes from the board's
+  own reported total, and the live digest says it out loud for the first time:
+  `ats-phenom-category: 161 of 261 rows removed (sig-phenom)`.
+- **`github_repos`' three section screens reported through nothing at all.** Measured on
+  the live board: Simplify's `section_include` excludes 941 of 1,579 rows and
+  `ignore_columns` drops 638 column values, and no digest had ever mentioned either. A
+  heading rename would have emptied the source in silence, with the row-count floor
+  reporting a README restructure that had not happened.
+- **The over-budget `why` was stale.** It said "low-signal source and the row did not
+  match the underclassman or rolling-firm filters", which stopped being true when
+  triage stopped bypassing low-signal sources.
+
+### What the test harness turned out to be hiding (step 0)
+
+`python tests/test_acceptance.py` collected 62 of 148 tests and printed OK. Three tests
+read live data because `_IsolatedState` never rebound `PROGRAMS_CSV`/`SOURCES_CSV`.
+`PostingJudgementTests` seeded fixtures into the real `data/postings_cache/` — invisible
+only because it skips without a key. And `ScreenIntegrationTests` would have billed a
+live model call on the day a screen rule stopped matching. The fingerprint guard in
+`setUpModule`/`tearDownModule` now fails the run if `data/` or `out/` moves at all, and
+it was verified by deliberately leaking a snapshot write.
+
+### Left undone, deliberately
+
+- **`RowFacts` and full typed URL roles.** The concrete payoff the plan named was
+  deleting `postings.posting_url`'s regex and `digest`'s `_LINKED_ENTITY`/`_unlink`
+  heuristics. The first is done: `Change.posting_url` is recorded by the producer that
+  had the parsed cells, and the regex survives only as a documented fallback for a row
+  read back out of a frozen-format snapshot. The markdown-link heuristics in the
+  renderer are still there — they parse an *aggregator's own* cell text, which no
+  producer upstream has in a better form, so typing the field would move the heuristic
+  rather than remove it.
+- **`gather/resolve.py` and the `resolve` job.** Listed in the target shape; it is
+  Phase 5 work, not part of the stage split, and `jobs.discovery.mine_pages` already
+  does the domain-anchored probe weekly.
+- **Folding `build_xlsx.py`, `add_opportunity.py`, `seed_programs.py` and
+  `calendar_reminders.py` into the stage model.** Scoped out by the plan; they are named
+  in the layering test's exception list with a reason each, so the exception is visible
+  rather than assumed.
