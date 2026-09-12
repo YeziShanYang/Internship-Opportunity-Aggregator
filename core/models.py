@@ -34,30 +34,6 @@ class Change:
     posting_text: str = ""
 
 
-@dataclass
-class SourceResult:
-    """Outcome of checking one source.
-
-    Spec section 10.1: a failure must never be indistinguishable from a quiet day, so
-    every check returns one of these whether it worked or not. `ok=False` and
-    `ok=True, changes=[]` are different facts and are reported differently.
-    """
-
-    source_id: str
-    ok: bool
-    changes: list[Change] = field(default_factory=list)
-    error: str = ""
-    content_length: int = 0
-    snapshot_text: str | None = None  # new snapshot to persist, if the check succeeded
-    baseline: bool = False  # first ever sight of this source: record, do not report
-    # Tier 1 and 2 store a canonical TSV; Tier 3 stores normalised page text.
-    snapshot_ext: str = "tsv"
-    extra: dict[str, Any] = field(default_factory=dict)
-    # True when the circuit breaker skipped the fetch. Neither a success nor a new
-    # failure: the counters must not move, or a quarantine would inflate itself.
-    quarantined: bool = False
-
-
 @dataclass(frozen=True)
 class FilterReport:
     """What one filter removed, in the one shape all of them use.
@@ -79,6 +55,35 @@ class FilterReport:
     source_id: str = ""  # "" means run-wide rather than per-source
     reason: str = ""  # one human sentence, for HEALTH. NEVER parsed
     samples: tuple[str, ...] = ()  # up to 5 removed keys, so a bad filter can be audited
+
+
+@dataclass
+class SourceResult:
+    """Outcome of checking one source.
+
+    Spec section 10.1: a failure must never be indistinguishable from a quiet day, so
+    every check returns one of these whether it worked or not. `ok=False` and
+    `ok=True, changes=[]` are different facts and are reported differently.
+    """
+
+    source_id: str
+    ok: bool
+    changes: list[Change] = field(default_factory=list)
+    error: str = ""
+    content_length: int = 0
+    snapshot_text: str | None = None  # new snapshot to persist, if the check succeeded
+    baseline: bool = False  # first ever sight of this source: record, do not report
+    # Tier 1 and 2 store a canonical TSV; Tier 3 stores normalised page text.
+    snapshot_ext: str = "tsv"
+    extra: dict[str, Any] = field(default_factory=dict)
+    # What each of this source's own filters removed. Separate from `extra` because a
+    # filter report is a fact the digest is obliged to print, while `extra` is a loose
+    # bag of counters -- and "the filter was added, the HEALTH line was not" is exactly
+    # how this rule has been broken twice.
+    filters: list[FilterReport] = field(default_factory=list)
+    # True when the circuit breaker skipped the fetch. Neither a success nor a new
+    # failure: the counters must not move, or a quarantine would inflate itself.
+    quarantined: bool = False
 
 
 @dataclass

@@ -155,7 +155,29 @@ def scenario_full() -> dict:
         models.SourceResult(
             source_id="simplify-2027", ok=True, changes=[first_year, screened],
             snapshot_text="x", content_length=1,
-            extra={"rows": 514, "sections": 2, "collapsed": 41}),
+            extra={"rows": 514, "sections": 2, "collapsed": 41},
+            # A per-source screen that reports. These three used to be a bare
+            # `continue` in github_repos, so a section_include pattern that stopped
+            # matching would have emptied the source in silence.
+            filters=[
+                models.FilterReport(
+                    stage="process", filter_id="readme-section-not-included",
+                    source_id="simplify-2027", considered=1402, removed=888,
+                    reason="section did not match this repo's section_include pattern",
+                    samples=("Data Science, AI & Machine Learning", "Hardware")),
+                models.FilterReport(
+                    stage="process", filter_id="readme-ignored-columns",
+                    source_id="simplify-2027", considered=1402, removed=514,
+                    reason="column values dropped as per-run churn rather than news",
+                    samples=("Software Engineering: Age",)),
+                # Reports zero, so it must NOT appear in HEALTH -- the report still
+                # reaches the artifact, which is what keeps "is this filter running"
+                # answerable without a dozen "0 removed" lines every morning.
+                models.FilterReport(
+                    stage="process", filter_id="readme-no-entity-column",
+                    source_id="simplify-2027", considered=1402, removed=0,
+                    reason="table has no recognisable company column"),
+            ]),
         models.SourceResult(
             source_id="optiver-students", ok=True, changes=[page],
             snapshot_text="x", snapshot_ext="txt", content_length=1,
@@ -286,6 +308,7 @@ class GoldenDigestTests(_Pinned, unittest.TestCase):
                      "circuit breaker has them quarantined", "were not student roles",
                      "no longer watching the page", "collapsed into one item",
                      "first run, recorded", "are muted in data/applied.tsv",
+                     "readme-section-not-included: 888 of 1402 rows removed",
                      "muted=true in data/programs.csv", "screen v1",
                      "classifier: 6 calls", "are quant and maths still the priority"):
             self.assertIn(line, body, line)
@@ -297,6 +320,12 @@ class GoldenDigestTests(_Pinned, unittest.TestCase):
         self.assertIn("(no changes)", body.splitlines()[0])
         self.assertNotIn("OPPORTUNITIES", body)
         self.assertLess(len(body.splitlines()), 20, body)
+
+    def test_a_filter_that_removed_nothing_is_not_printed_in_health(self):
+        """It is still emitted onto the artifact, which is where "is this filter
+        running at all" is answered. HEALTH is for what the reader has to act on, and a
+        dozen "0 removed" lines a morning is how a digest stops being read."""
+        self.assertNotIn("readme-no-entity-column", render("full"))
 
 
 def _update() -> int:

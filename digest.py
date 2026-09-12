@@ -100,6 +100,7 @@ def _health_lines(
             f"· job boards: {not_student} postings were not student roles and "
             f"{not_us} were outside the US."
         )
+    lines += filter_lines([report for r in results for report in r.filters])
     for result in results:
         # Not a failure -- the fetch worked -- but the row is watching a page it was
         # not configured for, which is a coverage hole rather than an outage. Said out
@@ -116,6 +117,38 @@ def _health_lines(
                 "collapsed into one item — that reads as a board restructure."
             )
     return lines, escalated
+
+
+def filter_lines(reports: list[models.FilterReport]) -> list[str]:
+    """One HEALTH line per filter that actually removed something.
+
+    A filter that removed nothing is not printed -- that would be a dozen lines of
+    "0 removed" every morning, and a digest nobody reads is as good as no digest. The
+    *report* is still emitted by the filter and still lands in `.run/changes.json`, so
+    "this filter is not running" stays answerable; it just is not the reader's problem
+    until it removes something.
+
+    Reports are aggregated by filter across sources, because per-source lines would put
+    five identical sentences in HEALTH on a morning when five READMEs each excluded a
+    contents table.
+    """
+    by_filter: dict[str, list[models.FilterReport]] = {}
+    for report in reports:
+        if report.removed:
+            by_filter.setdefault(report.filter_id, []).append(report)
+
+    lines: list[str] = []
+    for filter_id in sorted(by_filter):
+        group = by_filter[filter_id]
+        removed = sum(r.removed for r in group)
+        considered = sum(r.considered for r in group)
+        where = ", ".join(sorted({r.source_id for r in group if r.source_id}))
+        lines.append(
+            f"· {filter_id}: {removed} of {considered} rows removed"
+            + (f" ({where})" if where else "")
+            + f" — {group[0].reason}."
+        )
+    return lines
 
 
 def _stale_profile_line() -> str | None:
