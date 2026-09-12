@@ -39,6 +39,7 @@ import os
 import threading
 from dataclasses import dataclass, field
 
+import screen
 import state
 from sources import postings
 
@@ -205,6 +206,11 @@ class Judgment:
     eligible_proposal: str = ""
     classified: bool = False
     error: str = ""
+    # Set when `screen.py` settled this deterministically instead of the model. Carried
+    # so RULED OUT can say which rule fired, and so a digest can be read back later to
+    # tell which rule set produced it.
+    screen_rule: str = ""
+    screen_version: int = 0
 
     @property
     def urgent(self) -> bool:
@@ -324,6 +330,45 @@ class Usage:
         # Cached input bills at a tenth of list on both providers.
         billed_in = (self.input_tokens - self.cached_input_tokens) + self.cached_input_tokens * 0.1
         return (billed_in * rate_in + self.output_tokens * rate_out) / 1_000_000
+
+
+@dataclass
+class ScreenStats:
+    """What the deterministic screen removed, for HEALTH.
+
+    Every filter reports what it removed. This one removes changes *before* the model
+    is asked, so without this counter it would be the most invisible filter in the
+    pipeline -- and a screen rule that silently over-matches is exactly how a real
+    opening disappears.
+    """
+
+    considered: int = 0
+    screened: int = 0
+    by_rule: dict[str, int] = field(default_factory=dict)
+
+
+SCREEN = ScreenStats()
+
+
+def reset_screen() -> None:
+    global SCREEN
+    SCREEN = ScreenStats()
+
+
+def screen_line() -> str | None:
+    if not SCREEN.considered:
+        return None
+    if not SCREEN.screened:
+        return (
+            f"screen v{screen.VERSION}: 0 of {SCREEN.considered} changes matched a "
+            "rule-out phrase; all went to the model."
+        )
+    rules = ", ".join(f"{rule} {n}" for rule, n in sorted(SCREEN.by_rule.items()))
+    return (
+        f"screen v{screen.VERSION}: {SCREEN.screened} of {SCREEN.considered} changes "
+        f"ruled out on a quoted phrase, with no model call ({rules}). They are listed "
+        "in RULED OUT with the phrase that did it."
+    )
 
 
 USAGE = Usage()
@@ -561,9 +606,52 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
     ]
 
     reset_usage()
+    reset_screen()
+
+    # The posting fetch moved above the provider branch because the deterministic
+    # screen reads the same text the model would have, and it runs whether or not a
+    # provider is configured. Costing nothing but network, it makes degraded mode
+    # sharper rather than weaker: a change it rules out carries the employer's own
+    # quoted sentence, which is the standard prompt rule 6 sets for the model itself.
+    # Spec 8 rule 3 objects to dropping things on a *guess*; this is evidence.
+    #
+    # Tier 2 and Tier 3 already carry their text: an ATS returns the description in the
+    # same response that lists the job, and a page diff *is* the text. Only ask
+    # `postings` for the ones that arrive bare, which in practice means Simplify rows.
+    fetched = postings.fetch_for_changes([c for c in to_classify if not c.posting_text])
+
+    def posting_for(change: state.Change):
+        if change.posting_text:
+            return (change.posting_text, "")
+        url = postings.posting_url(change)
+        return fetched.get(url) if url else None
+
+    to_judge: list[state.Change] = []
+    for change in to_classify:
+        SCREEN.considered += 1
+        posting = posting_for(change)
+        verdict = screen.screen(change.key, (posting or ("", ""))[0])
+        if verdict is None:
+            to_judge.append(change)
+            continue
+        SCREEN.screened += 1
+        SCREEN.by_rule[verdict.rule] = SCREEN.by_rule.get(verdict.rule, 0) + 1
+        judgments.append(
+            Judgment(
+                change=change,
+                program_name=change.program_name,
+                relevant=False,
+                classified=True,
+                confidence="high",
+                why=verdict.why,
+                screen_rule=verdict.rule,
+                screen_version=verdict.version,
+            )
+        )
+
     provider = select_provider()
     if provider is None:
-        for change in to_classify:
+        for change in to_judge:
             judgments.append(
                 Judgment(
                     change=change,
@@ -578,28 +666,16 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
     try:
         client, deployment = build_client(provider)
     except Exception as exc:
-        for change in to_classify:
+        for change in to_judge:
             judgments.append(
                 Judgment(change=change, program_name=change.program_name, error=str(exc))
             )
         return judgments
 
-    # One batch fetch for the whole run rather than a serial fetch per change: ~35
-    # postings resolve in well under a second warm, and the module caps its own total
-    # wall clock so a hung host cannot stall the daily job.
-    #
-    # Tier 2 and Tier 3 already carry their text: an ATS returns the description in the
-    # same response that lists the job, and a page diff *is* the text. Only ask
-    # `postings` for the ones that arrive bare, which in practice means Simplify rows.
-    fetched = postings.fetch_for_changes([c for c in to_classify if not c.posting_text])
-
     def judge(change: state.Change) -> Judgment:
-        if change.posting_text:
-            posting = (change.posting_text, "")
-        else:
-            url = postings.posting_url(change)
-            posting = fetched.get(url) if url else None
-        return classify_one(provider, client, deployment, change, posting)
+        return classify_one(
+            provider, client, deployment, change, posting_for(change)
+        )
 
     # Concurrent because the loop got long. Classifying every source instead of only
     # the high-signal ones took a run from a handful of calls to ~35 on a normal day
@@ -611,9 +687,9 @@ def classify(changes: list[state.Change], sources: dict[str, dict[str, str]]) ->
     # after every judgment is in -- `state.append_proposal` appends to a file and is
     # not safe to call from the pool.
     with concurrent.futures.ThreadPoolExecutor(MAX_CONCURRENT_CLASSIFICATIONS) as pool:
-        judged = list(pool.map(judge, to_classify))
+        judged = list(pool.map(judge, to_judge))
 
-    for change, judgment in zip(to_classify, judged):
+    for change, judgment in zip(to_judge, judged):
         if judgment.eligible_proposal:
             state.append_proposal(
                 f"{change.source_id}\t{change.key}\tproposed eligible="

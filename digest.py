@@ -315,6 +315,11 @@ def render(
         body.append(f"- {line}")
     # What the run cost, in the run's own report. A cost that only appears on a billing
     # page a day later is a cost nobody notices drifting upward.
+    # Before the spend line, because it explains part of it: a change the screen
+    # settled is a model call that did not happen.
+    screened = classify.screen_line()
+    if screened:
+        body.append(f"- {screened}")
     spend = classify.usage_line()
     if spend:
         body.append(f"- {spend}")
