@@ -22,7 +22,8 @@ import digest
 import discover
 from core import clock, models, paths
 from gather import breaker
-from persist import store
+from persist import artifacts, store
+from process import suppress
 from sources import github_repos, job_boards, page_watch, postings
 
 # Which module handles each `method` in sources.csv, and which HTTP client it gets.
@@ -212,8 +213,15 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="render the quiet-day (status only) digest and ignore the once-a-day lock",
     )
-    args = parser.parse_args(argv)
+    return run(parser.parse_args(argv))
 
+
+def run(args) -> int:
+    """The pipeline itself, over already-parsed arguments.
+
+    Split from `main` so `jobs.daily` can compose it without round-tripping a
+    Namespace back through argv. Step 5 moves this body into `jobs/daily.py`.
+    """
     sources = store.read_sources()
     programs = store.read_programs()
     if not sources:
@@ -223,50 +231,40 @@ def main(argv: list[str] | None = None) -> int:
         print("data/programs.csv is empty or missing; run seed_programs.py", file=sys.stderr)
         return 2
 
+    # Cleared before the run, not after: a stage must never read half of this run's
+    # artifacts and half of yesterday's. The codec's version check catches a shape
+    # change and cannot catch a source that failed today and left last run's body in
+    # place, which would read as a fetch that worked.
+    artifacts.reset()
+
     results = run_sources(sources, args.only)
     if not results:
         print("no sources matched; nothing to do", file=sys.stderr)
         return 2
 
-    changes = [change for result in results for change in result.changes]
-    muted = {
-        program["name"]
-        for program in programs
-        if (program.get("muted") or "").strip().lower() == "true"
-    }
-    # `program_names` in sources.csv is "|"-separated, and this used to compare the
-    # whole field against one programme name -- so the muted column silently did
-    # nothing for every source covering more than one programme. A filter that does
-    # not filter is the same failure shape as a filter that does not report.
-    #
-    # A change is dropped only when EVERY programme its source informs is muted:
-    # muting "Jane Street INSIGHT" must not also silence FTTP news arriving on the same
-    # row.
-    def _all_muted(change: models.Change) -> bool:
-        names = [n.strip() for n in (change.program_name or "").split("|") if n.strip()]
-        return bool(names) and all(name in muted for name in names)
+    changes, filters = suppress.suppress(
+        [change for result in results for change in result.changes],
+        muted=suppress.muted_programmes(programs),
+        applied=store.read_applied(),
+    )
+    suppressed_muted = suppress.removed_by(filters, suppress.MUTED)
+    suppressed_applied = suppress.removed_by(filters, suppress.APPLIED)
 
-    before_muted = len(changes)
-    changes = [change for change in changes if not _all_muted(change)]
-    suppressed_muted = before_muted - len(changes)
-
-    # Anything muted in data/applied.tsv -- applied to, or not interested -- is dropped
-    # before classification, which also saves the model call. This used to be populated
-    # by ticking a checkbox in a delivered digest; the digest is a table now and a table
-    # cell cannot hold a working checkbox, so the file is hand-edited.
-    applied = store.read_applied()
-    before_applied = len(changes)
-    changes = [
-        change
-        for change in changes
-        if clock.change_key(change.source_id, change.key) not in applied
-    ]
-    suppressed_applied = before_applied - len(changes)
+    # Written whether or not this is a dry run. `.run/` is derived scratch rather than
+    # the database, and a dry run is exactly when someone wants to read it. Written
+    # after suppression, because a muted change is not a change this run is acting on
+    # -- but the count of them is, which is what the FilterReports carry.
+    artifacts.write(artifacts.CHANGES, "changes", models.ChangeSet(
+        changes=changes,
+        metrics=[models.SourceMetrics.of(result) for result in results],
+        filters=filters,
+    ))
 
     by_id = {source["source_id"]: source for source in sources}
     judgments = (
         [] if args.no_classify else classify.classify(changes, by_id)
     )
+    artifacts.write(artifacts.JUDGED, "judged", judgments)
 
     update_source_state(sources, results)
     update_program_state(programs, sources, results, judgments)
@@ -326,6 +324,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     for note in discovery_notes:
         body += f"\n- ⚠ {note}"
+
+    # The exact bytes that would be posted. This is the artifact worth having most: it
+    # is what a later `run.py render` has to reproduce byte-for-byte, and it is the
+    # evidence for "the refactor did not change the digest".
+    artifacts.write_text(artifacts.DIGEST, body)
+    artifacts.write_text(artifacts.DIGEST_TITLE, title + "\n")
 
     print(f"{len(results)} sources checked, {len(changes)} changes, {len(judgments)} judged")
     for result in results:

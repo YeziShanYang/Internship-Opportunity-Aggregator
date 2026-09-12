@@ -33,6 +33,9 @@ ENRICHED = "enriched.json"
 SCREENED = "screened.json"
 JUDGED = "judged.json"
 DIGEST = "digest.md"
+# The title is part of the delivered artifact and has to survive the stage boundary
+# too, so it gets a file rather than being smuggled into the first line of the body.
+DIGEST_TITLE = "digest.title"
 
 
 def path(name: str) -> pathlib.Path:

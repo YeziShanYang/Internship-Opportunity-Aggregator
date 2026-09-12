@@ -56,3 +56,78 @@ class SourceResult:
     # True when the circuit breaker skipped the fetch. Neither a success nor a new
     # failure: the counters must not move, or a quarantine would inflate itself.
     quarantined: bool = False
+
+
+@dataclass(frozen=True)
+class FilterReport:
+    """What one filter removed, in the one shape all of them use.
+
+    Every filter reports what it removed. That rule is older than this dataclass and
+    has been broken twice, both times the same way: the filter was added, the HEALTH
+    line was not, and the digest stayed plausible while a source went blind. Two of the
+    six filter sites reported through *nothing at all* until this shape existed -- the
+    `muted` filter, and github_repos' section_include/section_exclude/ignore_columns.
+
+    With one shape, "this filter removed rows and emitted no FilterReport" becomes a
+    testable assertion instead of an invisible hole.
+    """
+
+    stage: str
+    filter_id: str
+    considered: int = 0
+    removed: int = 0
+    source_id: str = ""  # "" means run-wide rather than per-source
+    reason: str = ""  # one human sentence, for HEALTH. NEVER parsed
+    samples: tuple[str, ...] = ()  # up to 5 removed keys, so a bad filter can be audited
+
+
+@dataclass
+class SourceMetrics:
+    """Everything one source check reported, except the payload.
+
+    The snapshot text is deliberately absent. It is 22KB for one repo, its home is
+    data/snapshots/ where git already tracks it, and carrying it through the stage
+    handoff as well would make .run/changes.json unreadable in exactly the way these
+    artifacts exist to prevent.
+
+    `ok=False` and `ok=True, change_count=0` stay different facts here, the same way
+    they are on SourceResult (spec 10.1).
+    """
+
+    source_id: str
+    ok: bool
+    error: str = ""
+    quarantined: bool = False
+    baseline: bool = False
+    content_length: int = 0
+    snapshot_ext: str = "tsv"
+    change_count: int = 0
+    extra: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def of(cls, result: SourceResult) -> SourceMetrics:
+        return cls(
+            source_id=result.source_id,
+            ok=result.ok,
+            error=result.error,
+            quarantined=result.quarantined,
+            baseline=result.baseline,
+            content_length=result.content_length,
+            snapshot_ext=result.snapshot_ext,
+            change_count=len(result.changes),
+            extra=dict(result.extra),
+        )
+
+
+@dataclass
+class ChangeSet:
+    """The `.run/changes.json` payload: what moved, and what every filter removed.
+
+    Written after suppression rather than before, because a change that was muted is
+    not a change this run is acting on -- but the count of them is, which is what the
+    FilterReports carry.
+    """
+
+    changes: list[Change] = field(default_factory=list)
+    metrics: list[SourceMetrics] = field(default_factory=list)
+    filters: list[FilterReport] = field(default_factory=list)
