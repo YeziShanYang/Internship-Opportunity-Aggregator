@@ -28,6 +28,7 @@ from enrich import bodies as enrich_bodies
 from gather import clients, collect
 from persist import artifacts, store
 from process import build, suppress
+import screen
 
 
 # Re-exported so the checker registry has one name for the rest of the tree. The
@@ -149,6 +150,16 @@ def _enrich(
     return bodies
 
 
+def _screen(
+    changes: list[models.Change],
+    bodies: dict[str, enrich_bodies.PostingBody],
+) -> dict[str, screen.Verdict]:
+    """Run the deterministic screen and record its verdicts."""
+    verdicts = screen.apply(changes, bodies)
+    artifacts.write(artifacts.SCREENED, "screened", verdicts)
+    return verdicts
+
+
 def _suppress(
     results: list[models.SourceResult], programs: list[dict[str, str]]
 ) -> tuple[list[models.Change], list[models.FilterReport]]:
@@ -210,8 +221,11 @@ def run(args: argparse.Namespace) -> int:
     # The second source-network stage, named rather than hidden. O(changes): bodies are
     # fetched for the rows that moved, not for the ~4,000 postings on the boards.
     bodies = _enrich(changes, args)
+    verdicts = _screen(changes, bodies)
+    filters.append(screen.report(changes, verdicts))
     judgments = (
-        [] if args.no_classify else classify.classify(changes, by_id, bodies)
+        [] if args.no_classify
+        else classify.classify(changes, by_id, bodies, verdicts)
     )
     artifacts.write(artifacts.JUDGED, "judged", judgments)
 
@@ -270,7 +284,7 @@ def run(args: argparse.Namespace) -> int:
         judgments, results, by_id, suppressed_applied=suppressed_applied,
         suppressed_muted=suppressed_muted,
         discovery_lines=discovery_lines, status_only=status_only,
-        enriched=bodies,
+        enriched=bodies, filters=filters,
     )
     for note in discovery_notes:
         body += f"\n- ⚠ {note}"
@@ -364,4 +378,17 @@ def enrich_only(args: argparse.Namespace) -> int:
     line = enrich_bodies.health_line(bodies)
     print(line or f"{len(bodies)} change(s), none needed a posting fetch")
     print(f"wrote {artifacts.path(artifacts.ENRICHED)}")
+    return 0
+
+
+def screen_only(args: argparse.Namespace) -> int:
+    """`run.py screen`: rule out what a quoted phrase settles. No network, no model."""
+    change_set = artifacts.read(artifacts.CHANGES, "changes", models.ChangeSet)
+    bodies = artifacts.read(
+        artifacts.ENRICHED, "enriched", dict[str, enrich_bodies.PostingBody])
+    verdicts = _screen(change_set.changes, bodies)
+    print(digest.filter_lines([screen.report(change_set.changes, verdicts)])[0]
+          if verdicts else
+          f"0 of {len(change_set.changes)} change(s) matched a rule-out phrase")
+    print(f"wrote {artifacts.path(artifacts.SCREENED)}")
     return 0

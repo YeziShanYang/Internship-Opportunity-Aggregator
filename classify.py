@@ -333,45 +333,6 @@ class Usage:
         return (billed_in * rate_in + self.output_tokens * rate_out) / 1_000_000
 
 
-@dataclass
-class ScreenStats:
-    """What the deterministic screen removed, for HEALTH.
-
-    Every filter reports what it removed. This one removes changes *before* the model
-    is asked, so without this counter it would be the most invisible filter in the
-    pipeline -- and a screen rule that silently over-matches is exactly how a real
-    opening disappears.
-    """
-
-    considered: int = 0
-    screened: int = 0
-    by_rule: dict[str, int] = field(default_factory=dict)
-
-
-SCREEN = ScreenStats()
-
-
-def reset_screen() -> None:
-    global SCREEN
-    SCREEN = ScreenStats()
-
-
-def screen_line() -> str | None:
-    if not SCREEN.considered:
-        return None
-    if not SCREEN.screened:
-        return (
-            f"screen v{screen.VERSION}: 0 of {SCREEN.considered} changes matched a "
-            "rule-out phrase; all went to the model."
-        )
-    rules = ", ".join(f"{rule} {n}" for rule, n in sorted(SCREEN.by_rule.items()))
-    return (
-        f"screen v{screen.VERSION}: {SCREEN.screened} of {SCREEN.considered} changes "
-        f"ruled out on a quoted phrase, with no model call ({rules}). They are listed "
-        "in RULED OUT with the phrase that did it."
-    )
-
-
 USAGE = Usage()
 _USAGE_LOCK = threading.Lock()
 
@@ -597,6 +558,7 @@ def classify(
     changes: list[models.Change],
     sources: dict[str, dict[str, str]],
     bodies: dict[str, enrich_bodies.PostingBody] | None = None,
+    verdicts: dict[str, screen.Verdict] | None = None,
 ) -> list[Judgment]:
     """Classify what is worth classifying. Never raises, never drops a change.
 
@@ -607,6 +569,10 @@ def classify(
 
     None means "this caller has not run enrich", and every change is then judged on its
     row alone -- which is a weaker judgment, not a wrong one, and the prompt is told so.
+
+    `verdicts` is what the deterministic screen settled, keyed on change_id. It is an
+    argument for the same reason: the loop and its tally used to be a module global
+    here, which is concretely why `run.py render` could not run on its own.
     """
     to_classify, summarise_only = triage(changes, sources)
     judgments = [
@@ -620,7 +586,6 @@ def classify(
     ]
 
     reset_usage()
-    reset_screen()
 
     # The posting text is read by the deterministic screen as well as by the model, and
     # the screen runs whether or not a provider is configured. That makes degraded mode
@@ -632,16 +597,17 @@ def classify(
     def posting_for(change: models.Change):
         return enrich_bodies.for_change(table, change)
 
+    # The screen runs as its own stage. If this caller did not run it, run it here
+    # rather than skipping it: it costs nothing, it works without a provider, and
+    # skipping it would send changes to the model that a quoted phrase already settles.
+    settled = screen.apply(to_classify, table) if verdicts is None else verdicts
+
     to_judge: list[models.Change] = []
     for change in to_classify:
-        SCREEN.considered += 1
-        posting = posting_for(change)
-        verdict = screen.screen(change.key, posting[0])
+        verdict = settled.get(change.change_id)
         if verdict is None:
             to_judge.append(change)
             continue
-        SCREEN.screened += 1
-        SCREEN.by_rule[verdict.rule] = SCREEN.by_rule.get(verdict.rule, 0) + 1
         judgments.append(
             Judgment(
                 change=change,

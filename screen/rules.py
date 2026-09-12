@@ -155,6 +155,10 @@ class Verdict:
     why: str
     rule: str
     version: int = VERSION
+    # Which change this settled. Redundant with the key of the table that holds it, and
+    # worth the duplication: `.run/screened.json` is read by a human wondering why a row
+    # was ruled out, and an entry that does not name its own row is a puzzle.
+    change_id: str = ""
 
 
 def _quote(text: str, limit: int = 180) -> str:

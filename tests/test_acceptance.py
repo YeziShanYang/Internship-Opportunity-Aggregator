@@ -1687,7 +1687,7 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         super().setUp()
         self.addCleanup(setattr, classify, "select_provider", classify.select_provider)
         classify.select_provider = lambda: None
-        classify.reset_screen()
+        classify.reset_usage()
 
     def test_a_screened_change_is_ruled_out_with_no_model_call(self):
         change = models.Change(
@@ -1702,16 +1702,33 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(classify.USAGE.calls, 0, "no model call may have been made")
 
     def test_the_screen_reports_what_it_removed(self):
+        """Through the same FilterReport every other filter emits, and reaching HEALTH
+        as a value passed in rather than read off a module global -- which is what used
+        to make `render` on its own print an empty screen line."""
         change = models.Change(
             source_id="b", kind="added", key="SWE Intern", detail="x",
-            posting_text="Must be a rising senior.",
+            change_id="c1", posting_text="Must be a rising senior.",
         )
-        classify.classify([change], {"b": {"source_id": "b", "signal": "high"}})
-        line = classify.screen_line()
-        self.assertIn("1 of 1", line)
-        self.assertIn("advanced-standing", line)
-        _, body = digest.render([], [], {})
+        verdicts = screen.apply([change])
+        self.assertEqual(list(verdicts), ["c1"])
+        report = screen.report([change], verdicts)
+        self.assertEqual((report.considered, report.removed), (1, 1))
+        self.assertIn("advanced-standing", report.reason)
+        _, body = digest.render([], [], {}, filters=[report])
         self.assertIn("advanced-standing", body, "HEALTH must carry it")
+        self.assertIn("screen-v1", body, "and the rule-set version it came from")
+
+    def test_the_screen_has_no_opinion_rather_than_a_negative_one(self):
+        """A change absent from the table is one no rule settled. An entry saying
+        "not ruled out" would read as a positive judgment, and there is no such thing
+        as a deterministic rule-in."""
+        change = models.Change(
+            source_id="b", kind="added", key="Quant Trader", detail="x",
+            change_id="c2", posting_text="All undergraduate years welcome.")
+        self.assertEqual(screen.apply([change]), {})
+        report = screen.report([change], {})
+        self.assertEqual((report.considered, report.removed), (1, 0))
+        self.assertIn("all went to the model", report.reason)
 
 
 class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
