@@ -101,6 +101,14 @@ def _health_lines(
             f"{not_us} were outside the US."
         )
     for result in results:
+        # Not a failure -- the fetch worked -- but the row is watching a page it was
+        # not configured for, which is a coverage hole rather than an outage. Said out
+        # loud every morning until the url is corrected, because the failure mode it
+        # replaces was silence.
+        redirected = result.extra.get("redirected")
+        if redirected:
+            lines.append(f"⚠ {result.source_id}: {redirected}")
+    for result in results:
         collapsed = result.extra.get("collapsed")
         if collapsed:
             lines.append(
@@ -264,6 +272,7 @@ def render(
     results: list[state.SourceResult],
     sources: dict[str, dict[str, str]],
     suppressed_applied: int = 0,
+    suppressed_muted: int = 0,
     discovery_lines: list[str] | None = None,
     status_only: bool = False,
 ) -> tuple[str, str]:
@@ -368,6 +377,13 @@ def render(
         body.append(
             f"- {suppressed_applied} item(s) are muted in data/applied.tsv and were "
             "hidden. Delete the line to bring one back."
+        )
+    if suppressed_muted:
+        # This filter reported through nothing at all until 2026-09-12, which is how it
+        # went unnoticed that it was not filtering either.
+        body.append(
+            f"- {suppressed_muted} item(s) were hidden because every programme their "
+            "source informs is muted=true in data/programs.csv."
         )
     if ruled_out:
         # Surfaced here as well as in the collapsed block: the filter silently eating

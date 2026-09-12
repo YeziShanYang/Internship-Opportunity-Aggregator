@@ -231,7 +231,21 @@ def main(argv: list[str] | None = None) -> int:
         for program in programs
         if (program.get("muted") or "").strip().lower() == "true"
     }
-    changes = [change for change in changes if change.program_name not in muted]
+    # `program_names` in sources.csv is "|"-separated, and this used to compare the
+    # whole field against one programme name -- so the muted column silently did
+    # nothing for every source covering more than one programme. A filter that does
+    # not filter is the same failure shape as a filter that does not report.
+    #
+    # A change is dropped only when EVERY programme its source informs is muted:
+    # muting "Jane Street INSIGHT" must not also silence FTTP news arriving on the same
+    # row.
+    def _all_muted(change: state.Change) -> bool:
+        names = [n.strip() for n in (change.program_name or "").split("|") if n.strip()]
+        return bool(names) and all(name in muted for name in names)
+
+    before_muted = len(changes)
+    changes = [change for change in changes if not _all_muted(change)]
+    suppressed_muted = before_muted - len(changes)
 
     # Anything muted in data/applied.tsv -- applied to, or not interested -- is dropped
     # before classification, which also saves the model call. This used to be populated
@@ -304,6 +318,7 @@ def main(argv: list[str] | None = None) -> int:
 
     title, body = digest.render(
         judgments, results, by_id, suppressed_applied=suppressed_applied,
+        suppressed_muted=suppressed_muted,
         discovery_lines=discovery_lines, status_only=status_only,
     )
     for note in discovery_notes:
