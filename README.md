@@ -10,8 +10,7 @@ changed on which morning" forever, for free.
 
 **Status: Phases 1 and 2 shipped.** 120 sources — five GitHub repo trackers, 60 ATS
 boards (Greenhouse/Workday/Ashby/Lever/Phenom), 52 watched pages and three `manual`
-rows — with Issue delivery, one digest a day, a weekly source-discovery pass, and
-tick-to-dismiss.
+rows — with Issue delivery, one digest a day and a weekly source-discovery pass.
 
 Sources divide by *intake path*, not by tier: aggregator lists that someone else
 curates, and named employers. For a named employer the watcher points either at the
