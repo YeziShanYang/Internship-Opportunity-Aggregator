@@ -301,6 +301,20 @@ class Judgment:
     suggested_action: str = ""
     eligible_proposal: str = ""
     error: str = ""
+    # The three facts the owner actually decides on, read off the posting body rather
+    # than inferred from the row. They are separate fields and not folded into `why`
+    # because the digest renders them as their own bullets, and because `deadline` is
+    # the input to the urgency rule -- see deliver.urgency. A row's own text cannot
+    # supply any of them: measured on simplify-2027, 7 of 592 rows mention a class year
+    # at all, which is why ACT NOW was structurally empty of opportunities until these
+    # existed.
+    #
+    # `deadline` is "rolling", an ISO date, or "". Anything else is displayed verbatim
+    # and never treated as urgent -- an unparseable value must not silently promote or
+    # demote a row.
+    class_year: str = ""
+    location: str = ""
+    deadline: str = ""
     # Set when the deterministic screen settled this instead of the model. Carried so
     # RULED OUT can say which rule fired, and so a digest can be read back later to
     # tell which rule set produced it.

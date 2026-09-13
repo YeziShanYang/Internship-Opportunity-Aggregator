@@ -128,13 +128,21 @@ def scenario_full() -> dict:
     judgments = [
         _judgment(rolling, why="Jane Street reviews on a rolling basis and this is a "
                                "trading seat open to all undergraduate years.",
-                  suggested_action="Apply this week."),
+                  suggested_action="Apply this week.",
+                  class_year="all undergraduate years", location="New York, NY",
+                  deadline="rolling"),
         _judgment(first_year, why="Explicitly open to first- and second-year "
-                                  "undergraduates, which is an unusually good match."),
-        _judgment(page, why="The page added a 2027 FutureFocus date."),
+                                  "undergraduates, which is an unusually good match.",
+                  class_year="first- and second-year undergraduates",
+                  location="New York, NY", deadline="2026-09-20"),
+        _judgment(page, why="The page added a 2027 FutureFocus date.",
+                  location="Chicago, IL or Amsterdam, NL"),
         _judgment(plain, why="Campus board row with no class-year gate stated, so a "
                              "first-year is eligible on the face of it and the note is "
-                             "long enough to exercise the truncation budget properly."),
+                             "long enough that it would have been clipped mid-clause "
+                             "under the old 96-character budget.",
+                  class_year="Bachelor's, no year stated", location="Austin, TX",
+                  deadline="2027-03-31"),
         _judgment(gone, why="Row disappeared from the board.", confidence="low"),
         _judgment(screened, relevant=False, why='Posting requires junior standing or '
                                                 'above; this owner is a rising sophomore '
@@ -327,8 +335,14 @@ class GoldenDigestTests(_Pinned, unittest.TestCase):
                      "first run, recorded", "are muted in data/applied.tsv",
                      "readme-section-not-included: 888 of 1402 rows removed",
                      "muted=true in data/programs.csv", "screen-v1",
-                     "classifier: 6 calls", "are quant and maths still the priority"):
+                     "classifier: 6 calls", "are quant and maths still the priority",
+                     # The Notes bullets, so the golden cannot go on protecting a
+                     # digest that quietly stopped rendering them.
+                     "• **Deadline:** rolling — closes when full",
+                     "• **Year:** first- and second-year undergraduates",
+                     "• **Location:** Austin, TX", "• **Next:** Apply this week"):
             self.assertIn(line, body, line)
+        self.assertNotIn("\u2026", body, "nothing in the digest is truncated any more")
 
     def test_the_quiet_digest_says_no_changes_in_its_title_and_stays_short(self):
         """Quiet days mail, so the title has to carry the whole message for someone

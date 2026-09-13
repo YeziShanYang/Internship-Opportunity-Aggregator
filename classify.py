@@ -133,7 +133,24 @@ title alone. Say so in `why`, use confidence "low", and do NOT rule the item out
 class-year grounds -- you have not seen the requirements.
 
 `why` must be one sentence and must name the specific reason -- the class year, the
-identity gate, the deadline -- not a generic statement of interest."""
+identity gate, the deadline -- not a generic statement of interest.
+
+Three more fields are read straight off the POSTING TEXT and rendered as their own
+bullets in the digest, so each must stand alone without `why` for context. Report what
+the posting says, never what you infer, and leave a field empty rather than guessing --
+an empty bullet is simply not shown, whereas a wrong one is read as fact:
+
+* `class_year` -- who the posting says may apply, as a short phrase quoting its own
+  words where possible: "any undergraduate", "graduating 2029-2030", "rising junior",
+  "Bachelor's, no year stated". This is the field the owner scans first.
+* `location` -- where the role sits, as written: "New York, NY", "London, UK",
+  "remote", "Chicago or NYC". Several locations is fine; list them.
+* `deadline` -- when applications close. Exactly one of: the word `rolling` when the
+  posting says it reviews on a rolling basis or closes when full; an ISO `YYYY-MM-DD`
+  date when it states or clearly implies one; or the empty string when it states none.
+  Do NOT invent a date, and do not put prose here -- a phrase like "apply early" goes
+  in `suggested_action`. `rolling` and a near date are what put a row in ACT NOW, so a
+  guess here costs the owner a wasted morning or a missed opening."""
 
 RESULT_SCHEMA = {
     "type": "object",
@@ -145,6 +162,9 @@ RESULT_SCHEMA = {
         "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
         "suggested_action": {"type": "string"},
         "eligible_proposal": {"type": "string"},
+        "class_year": {"type": "string"},
+        "location": {"type": "string"},
+        "deadline": {"type": "string"},
     },
     "required": [
         "relevant",
@@ -153,6 +173,9 @@ RESULT_SCHEMA = {
         "why",
         "confidence",
         "suggested_action",
+        "class_year",
+        "location",
+        "deadline",
     ],
     "additionalProperties": False,
 }
@@ -311,6 +334,24 @@ def build_client(provider: str):
     return client, os.environ.get("AZURE_OPENAI_DEPLOYMENT", AZURE_DEFAULT_DEPLOYMENT)
 
 
+# Values the model uses to mean "the posting does not say". Left out of the digest
+# rather than printed, because "Deadline: not specified" is a bullet that costs a line
+# and tells the owner nothing he did not already know from its absence.
+_UNSTATED = {"", "-", "n/a", "na", "none", "null", "unknown", "not specified",
+             "not stated", "unspecified", "not listed", "tbd"}
+
+
+def _clean(value) -> str:
+    """One short field off the model, with the not-stated synonyms flattened to "".
+
+    A small model asked for an optional string will sometimes answer the question
+    rather than leave it blank, and each of those answers renders as a bullet claiming
+    to be information. Normalising them here keeps that out of every consumer.
+    """
+    text = " ".join(str(value or "").split())
+    return "" if text.lower().strip(" .") in _UNSTATED else text
+
+
 def _judgment_from_text(change: models.Change, text: str) -> Judgment:
     """Parse a provider's JSON body into a Judgment. Shared by both backends."""
     try:
@@ -327,6 +368,9 @@ def _judgment_from_text(change: models.Change, text: str) -> Judgment:
         confidence=payload.get("confidence", "low"),
         suggested_action=payload.get("suggested_action", ""),
         eligible_proposal=payload.get("eligible_proposal", ""),
+        class_year=_clean(payload.get("class_year")),
+        location=_clean(payload.get("location")),
+        deadline=_clean(payload.get("deadline")),
     )
 
 

@@ -70,3 +70,23 @@ def change_id(source_id: str, identity: str) -> str:
     title contained " @ " or the row had picked up an ordinal.
     """
     return hashlib.sha1(f"{source_id}|{identity}".encode()).hexdigest()[:12]
+
+
+def days_until(date: str, today: str | None = None) -> int | None:
+    """Whole days from today to an ISO `YYYY-MM-DD`, or None if it is not one.
+
+    None means "this is not a date", and every caller has to decide what to do about
+    that rather than being handed a number that silently reads as "no time left" or as
+    "plenty". The value comes from a language model, so unparseable is a normal case
+    and not an error: `deliver.urgency` treats it as "not urgent" and the digest still
+    prints the raw text so the owner can read it himself.
+
+    Negative is returned rather than clamped. A deadline that has already passed is a
+    different fact from one closing today, and squashing the two would let a stale
+    posting sit in ACT NOW indefinitely.
+    """
+    try:
+        when = datetime.date.fromisoformat((date or "").strip())
+    except ValueError:
+        return None
+    return (datetime.date.fromisoformat(today or today_iso()) - when).days * -1

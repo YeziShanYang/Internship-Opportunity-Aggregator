@@ -57,13 +57,25 @@ def _stale_profile_line() -> str | None:
     )
 
 
-# Column budgets for the opportunities table. GitHub wraps a long cell rather than
-# scrolling it, so an unbounded `why` turns four tidy rows into a wall of text and
-# defeats the point of the table. These are the widths at which a row still reads as a
-# row on a phone.
-POSITION_CHARS = 70
-COMPANY_CHARS = 34
-NOTE_CHARS = 96
+# Nothing in the table is truncated. It used to be: a 96-character budget on Notes and
+# 70 on Position, on the theory that GitHub wraps a long cell rather than scrolling it
+# and an unbounded `why` turns four tidy rows into a wall of text.
+#
+# That traded the wrong thing away. The owner's objection, on the 2026-09-13 digest,
+# was that every Notes cell ended in an ellipsis two lines in -- and because the model
+# writes `why` as one sentence beginning with the posting's requirement, the clause
+# that got cut was reliably the decisive one ("...and is a Summer 2027 role, so a
+# first-year" — then nothing). A clipped sentence is worse than a tall cell: it ends
+# mid-clause and the only way to recover the rest is to open the posting, which is the
+# work the digest exists to save. Height is now managed by splitting the cell into
+# labelled bullets instead, so a long note is scannable rather than a paragraph.
+#
+# Bullets inside a table cell are `<br>`-joined: GitHub renders a line break there but
+# does not render a markdown list, so "- " per line would print literal hyphens.
+BULLET_JOIN = "<br>"
+BULLET = "• "
+
+ROLLING_NOTE = "rolling — closes when full"
 
 # Past this many sources, a filter line reports the count instead of the names.
 MAX_FILTER_SOURCES = 6
@@ -72,17 +84,31 @@ URGENCY_ACT_NOW = "**ACT NOW**"
 URGENCY_WORTH_A_LOOK = "Worth a look"
 
 
-def _cell(text: str, limit: int = 0) -> str:
+def _cell(text: str) -> str:
     """Flatten arbitrary text into something safe inside a markdown table cell.
 
-    Three hazards, all of which have to be handled here rather than at the call sites:
-    a literal pipe ends the cell, a newline ends the whole row, and an over-long value
-    wraps the table into unreadability.
+    Two hazards, both of which have to be handled here rather than at the call sites: a
+    literal pipe ends the cell, and a newline ends the whole row. Length is deliberately
+    not one of them -- see the note on the bullet constants above.
     """
-    text = re.sub(r"\s+", " ", (text or "").replace("|", "\\|")).strip()
-    if limit and len(text) > limit:
-        text = text[:limit].rsplit(" ", 1)[0].rstrip(" ,;.:-—–") + "…"
-    return text
+    return re.sub(r"\s+", " ", (text or "").replace("|", "\\|")).strip()
+
+
+def _bullets(items: list[tuple[str, str]]) -> str:
+    """(label, value) pairs as a bulleted list inside one table cell.
+
+    An empty value is dropped rather than printed as "Year: not specified": a bullet
+    that costs a line and says only that the posting was silent is noise, and its
+    absence already carries the same information. An empty *label* is allowed, for the
+    caveats, which read as sentences rather than as fields.
+    """
+    lines = []
+    for label, value in items:
+        value = _cell(value).rstrip(" .;,")
+        if not value:
+            continue
+        lines.append(f"{BULLET}**{label}:** {value}" if label else f"{BULLET}{value}")
+    return BULLET_JOIN.join(lines)
 
 
 # An aggregator row's key carries the real employer, as a markdown link:
@@ -134,37 +160,57 @@ def _company_and_position(judgment: models.Judgment) -> tuple[str, str]:
     return company, position or "page updated"
 
 
-def _notes(judgment: models.Judgment, suppress_reason: bool = False) -> str:
-    """The short clause at the end of a row.
+def _deadline_note(judgment: models.Judgment) -> str:
+    """The deadline bullet's text: the rolling sentinel spelled out, or the date.
 
-    Ordered most-decision-relevant first, because this is the column the width budget
-    truncates. A rolling deadline changes what the owner does today; a confidence
-    caveat only changes how much he trusts the row he is already reading.
+    A value the model returned that is neither `rolling` nor an ISO date is still
+    shown, verbatim. It just never counts as urgent -- see `deliver.urgency`. Showing
+    it is the point: a deadline the code could not parse is exactly the one the owner
+    needs to read for himself.
+    """
+    if judgment.change.rolling or urgency.is_rolling(judgment):
+        return ROLLING_NOTE
+    return judgment.deadline
+
+
+def _notes(judgment: models.Judgment, suppress_reason: bool = False) -> str:
+    """The Notes cell: four labelled facts, then the caveats.
+
+    Bullets rather than one run-on clause, because this column answers four separate
+    questions and the owner reads them in this order: how long do I have (Deadline),
+    can I even apply (Year), where is it (Location), and why did this reach me (Why).
+    All four used to be crushed into a single semicolon-joined sentence, which is what
+    made the truncation so costly -- the class year and the location were inside the
+    model's one prose sentence, so they were both only ever present by luck.
+
+    Ordered most-decision-relevant first. A rolling deadline changes what the owner
+    does today; a confidence caveat only changes how much he trusts a row he is already
+    reading, so it goes last.
     """
     change = judgment.change
-    bits: list[str] = []
-    if change.rolling:
-        bits.append("ROLLING — closes when full")
+    items: list[tuple[str, str]] = [
+        ("Deadline", _deadline_note(judgment)),
+        ("Year", judgment.class_year),
+        ("Location", judgment.location),
+    ]
     if judgment.why and not (suppress_reason and not judgment.classified):
-        bits.append(judgment.why)
+        items.append(("Why", judgment.why))
     elif change.kind == "removed":
-        bits.append("row disappeared")
+        items.append(("Why", "row disappeared from the source"))
     elif change.kind == "changed":
-        bits.append("row changed")
+        items.append(("Why", "row changed on the source"))
     if judgment.suggested_action:
-        bits.append(judgment.suggested_action)
+        items.append(("Next", judgment.suggested_action))
     if not judgment.classified:
-        bits.append("unverified — open the page")
+        items.append(("", "⚠ unverified — open the page"))
     elif judgment.confidence == "low":
-        bits.append("low confidence, kept deliberately")
-    # The model ends `why` with a full stop, so joining raw gives "...dropped.; low
-    # confidence" -- two marks of punctuation in a row inside a 96-character budget.
-    return _cell("; ".join(bit.rstrip(" .") for bit in bits if bit.strip()), NOTE_CHARS)
+        items.append(("", "low confidence, kept deliberately"))
+    return _bullets(items)
 
 
 def _table_row(urgency: str, company: str, position: str, notes: str, url: str = "") -> str:
-    company = _cell(company, COMPANY_CHARS)
-    position = _cell(position, POSITION_CHARS)
+    company = _cell(company)
+    position = _cell(position)
     if url:
         # Any remaining brackets would terminate the link text early. By here the
         # markdown links are already reduced to their labels by `_unlink`, so this is
@@ -241,7 +287,7 @@ def render(
         body.append("|---|---|---|---|")
         for source_id, position, notes in escalated:
             body.append(
-                _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes, NOTE_CHARS))
+                _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes))
             )
         for judgment in act_now:
             body.append(_judgment_row(judgment, suppress_reason))
