@@ -15,6 +15,7 @@ prompt was written against.
 from __future__ import annotations
 
 import datetime
+import json
 import os
 import pathlib
 import re
@@ -765,6 +766,58 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
         self.assertTrue(urgency.is_urgent(judge(is_discovery_candidate=True)),
                         "first-year-targeted rows are the point of the tool")
 
+    def test_14_7g3_a_near_deadline_is_urgent_and_a_far_one_is_not(self):
+        """The other half of the rule, and the reason ACT NOW was empty of
+        opportunities on 2026-09-13.
+
+        Both surviving urgency tests read regexes over the snapshot row -- a title, a
+        location and some links -- while the deadline sits in the posting body `enrich`
+        had already fetched. On simplify-2027, which supplies nearly all the volume, 7
+        of 592 rows mention a class year at all, so no row on that source could be
+        promoted however urgent it was: the 2026-09-13 digest carried 18 real
+        opportunities and put none of them in ACT NOW.
+        """
+        today = clock.today_iso()
+        soon = (datetime.date.fromisoformat(today)
+                + datetime.timedelta(days=urgency.URGENT_WITHIN_DAYS - 1)).isoformat()
+        far = (datetime.date.fromisoformat(today)
+               + datetime.timedelta(days=urgency.URGENT_WITHIN_DAYS + 30)).isoformat()
+        past = (datetime.date.fromisoformat(today)
+                - datetime.timedelta(days=1)).isoformat()
+
+        def judge(deadline):
+            return models.Judgment(
+                change=models.Change(source_id="simplify-2027", kind="added",
+                                     key="ACME / Software Engineer Intern", detail="x"),
+                relevant=True, outcome=models.MODEL, confidence="high",
+                deadline=deadline)
+
+        self.assertTrue(urgency.is_urgent(judge(soon)), "closing inside the window")
+        self.assertTrue(urgency.is_urgent(judge("rolling")),
+                        "the posting says it closes when full")
+        self.assertFalse(urgency.is_urgent(judge(far)),
+                         "an autumn close date is WORTH A LOOK, or the block floods")
+        self.assertFalse(urgency.is_urgent(judge(past)),
+                         "a lapsed deadline must not sit in ACT NOW forever")
+        self.assertFalse(urgency.is_urgent(judge("apply early!")),
+                         "an unparseable deadline never promotes a row")
+        self.assertFalse(
+            urgency.is_urgent(models.Judgment(
+                change=models.Change(source_id="s", kind="added", key="k", detail="d"),
+                relevant=False, outcome=models.MODEL, deadline="rolling")),
+            "a ruled-out row is never urgent, whatever its deadline")
+
+    def test_14_7g4_an_unparseable_deadline_is_still_shown_to_the_owner(self):
+        """It cannot promote a row, so it must not vanish either -- otherwise the
+        failure mode is a close date the code did not understand and nobody saw."""
+        judgment = models.Judgment(
+            change=models.Change(source_id="s", kind="added", key="SWE Intern",
+                                 detail="d"),
+            relevant=True, outcome=models.MODEL, confidence="high",
+            deadline="end of September", why="open to any undergraduate")
+        _, body = digest.render([judgment], [], {})
+        self.assertIn("end of September", body)
+
     def test_14_7g_a_stale_owner_profile_nags_in_the_calendar(self):
         """A stale profile mis-sorts everything while still looking well-formed."""
         saved = profile.PROFILE_LAST_REVIEWED
@@ -1303,8 +1356,11 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(delimiters, 5, f"row has stray delimiters: {row}")
         self.assertIn(r"SWE \| Intern", row)
 
-    def test_14_9v_a_long_reason_is_truncated_to_a_clause(self):
-        """An unbounded `why` wraps the table into the wall of text it replaced."""
+    def test_14_9v_a_long_reason_is_kept_whole_and_never_ellipsised(self):
+        """Notes are not truncated. Asked for directly after the 2026-09-13 digest,
+        where every cell ended in an ellipsis two lines in -- and because `why` is one
+        sentence leading with the posting's requirement, the clause that got cut was
+        reliably the decisive one."""
         judgment = models.Judgment(
             change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
             program_name="Some Firm", relevant=True, outcome=models.MODEL,
@@ -1313,8 +1369,107 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         _, body = digest.render([judgment], [], {})
         row = next(line for line in body.splitlines() if "SWE Intern" in line)
         notes = row.split("|")[4].strip()
-        self.assertLessEqual(len(notes), digest.NOTE_CHARS + 1)
-        self.assertTrue(notes.endswith("\u2026"), notes)
+        self.assertNotIn("\u2026", notes, "the note was clipped")
+        self.assertEqual(notes.count("word"), 100, "the note lost words")
+
+    def test_14_9w_the_notes_cell_is_bullets_not_one_run_on_clause(self):
+        """The column answers four separate questions -- deadline, class year,
+        location, and why this reached him -- and they were crushed into one
+        semicolon-joined sentence. Bullets, `<br>`-joined because GitHub renders a line
+        break inside a table cell and does not render a markdown list."""
+        judgment = models.Judgment(
+            change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
+            program_name="Some Firm", relevant=True, outcome=models.MODEL,
+            confidence="high", why="Posting is open to any undergraduate",
+            class_year="any undergraduate", location="New York, NY",
+            deadline="2026-10-15", suggested_action="Apply this week",
+        )
+        _, body = digest.render([judgment], [], {})
+        row = next(line for line in body.splitlines() if "SWE Intern" in line)
+        notes = row.split("|")[4].strip()
+        self.assertEqual(notes.count(digest.BULLET_JOIN), 4, notes)
+        for label in ("Deadline", "Year", "Location", "Why", "Next"):
+            self.assertIn(f"**{label}:**", notes)
+        # Deadline first: it is the only one of the four that changes what he does today.
+        self.assertTrue(notes.startswith(f"{digest.BULLET}**Deadline:** 2026-10-15"), notes)
+
+    def test_14_9x_a_field_the_posting_did_not_state_prints_no_bullet(self):
+        """"Year: not specified" costs a line and says only what its absence already
+        said. An unclassified row has none of the three, and must not render three
+        empty bullets."""
+        judgment = models.Judgment(
+            change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
+            program_name="Some Firm", relevant=True, why="Surfaced unjudged",
+        )
+        _, body = digest.render([judgment], [], {})
+        row = next(line for line in body.splitlines() if "SWE Intern" in line)
+        notes = row.split("|")[4].strip()
+        for label in ("Deadline", "Year", "Location"):
+            self.assertNotIn(f"**{label}:**", notes)
+        self.assertIn("unverified", notes)
+
+
+class ClassifierFieldContractTests(_IsolatedState, unittest.TestCase):
+    """The three posting-derived fields, checked at the seam rather than over the wire.
+
+    Both providers return structured output against `RESULT_SCHEMA`, so what can
+    actually go wrong here is not the transport but the parse: a field silently dropped
+    on the way into `Judgment`, or a small model answering "not specified" and that
+    string being rendered as though it were information. Neither needs an API key to
+    test, and a live call cannot be made in CI without one anyway.
+    """
+
+    CHANGE = models.Change(source_id="s", kind="added", key="SWE Intern", detail="d")
+
+    def test_the_schema_requires_all_three_fields_of_both_providers(self):
+        """OpenAI's strict mode requires every declared property in `required`;
+        Anthropic's does not. A field present in one schema and not the other is a
+        field that arrives from one backend and not the other, which would make the
+        digest's content depend on which credential happened to be configured."""
+        for name in ("class_year", "location", "deadline"):
+            self.assertIn(name, classify.RESULT_SCHEMA["properties"], name)
+            self.assertIn(name, classify.RESULT_SCHEMA["required"], name)
+            self.assertIn(name, classify.STRICT_RESULT_SCHEMA["required"], name)
+
+    def test_the_fields_survive_the_parse_into_a_judgment(self):
+        judgment = classify._judgment_from_text(self.CHANGE, json.dumps({
+            "relevant": True, "program_name": "P", "new_status": "OPEN",
+            "why": "open to any undergraduate", "confidence": "high",
+            "suggested_action": "Apply", "class_year": "any undergraduate",
+            "location": "New York, NY", "deadline": "2026-10-01",
+        }))
+        self.assertEqual(judgment.class_year, "any undergraduate")
+        self.assertEqual(judgment.location, "New York, NY")
+        self.assertEqual(judgment.deadline, "2026-10-01")
+
+    def test_a_not_stated_answer_becomes_empty_rather_than_a_bullet(self):
+        """A small model asked for an optional string will answer the question rather
+        than leave it blank, and each of those answers renders as a bullet claiming to
+        be information."""
+        for stated in ("", "N/A", "not specified", "  Unknown ", "None", "TBD"):
+            judgment = classify._judgment_from_text(self.CHANGE, json.dumps({
+                "relevant": True, "program_name": "P", "new_status": "OPEN",
+                "why": "w", "confidence": "high", "suggested_action": "",
+                "class_year": stated, "location": stated, "deadline": stated,
+            }))
+            with self.subTest(stated):
+                self.assertEqual(judgment.deadline, "")
+                self.assertEqual(judgment.class_year, "")
+                self.assertEqual(judgment.location, "")
+                self.assertFalse(urgency.is_urgent(judgment),
+                                 "an absent deadline is not a deadline")
+
+    def test_a_missing_field_does_not_fail_the_whole_judgment(self):
+        """A provider that omits one of the three must still yield a usable verdict.
+        Nothing is ever dropped for a provider's shortcoming (spec 8 rule 3) -- the
+        bullet is simply not rendered."""
+        judgment = classify._judgment_from_text(self.CHANGE, json.dumps({
+            "relevant": True, "program_name": "P", "new_status": "OPEN",
+            "why": "w", "confidence": "high", "suggested_action": "",
+        }))
+        self.assertTrue(judgment.classified)
+        self.assertEqual((judgment.class_year, judgment.location, judgment.deadline),
+                         ("", "", ""))
 
 
 class OwnerWorkbookTests(_IsolatedState, unittest.TestCase):
