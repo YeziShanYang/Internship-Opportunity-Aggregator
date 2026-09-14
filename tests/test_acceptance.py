@@ -626,6 +626,44 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
         cold = self._rows("<tbody><tr><td>Acme</td><td>SWE Intern</td><td>NYC</td><td>9d</td></tr></tbody>")
         self.assertEqual(hot[0].key, cold[0].key, "the marker must not split one posting in two")
 
+    def test_a_section_tally_does_not_churn_every_row_beneath_it(self):
+        """zshah-2027 writes each section's row count into the section heading.
+
+        `Row.identity` is section-qualified, so a tally ticking by one rewrites the
+        diff key of every row under that heading -- each becomes a `removed` and an
+        `added` at once. On 2026-09-14 two of the three counts moved overnight, the run
+        reported 469 changes over rows whose own text had not moved, and it then failed
+        to deliver at all because the digest passed GitHub's 65,536-character issue
+        body limit. Same family as the "Age" column and the flame above it.
+        """
+        config = parse_readme.REPO_CONFIGS["zshah-2027"]
+
+        def rows(count: int):
+            markdown = (
+                f"## Summer 2027 ({count} employer-stated)\n"
+                "| Company | Role | Location | Posted |\n"
+                "| --- | --- | --- | --- |\n"
+                "| Acme | Quant Intern | NYC | 2026-09-01 |\n"
+            )
+            return parse_readme.extract(markdown, config).rows
+
+        before, after = rows(300), rows(301)
+        self.assertTrue(before, "the section must still match section_include")
+        self.assertEqual(
+            [row.identity for row in before],
+            [row.identity for row in after],
+            "a heading tally must not change any row's diff key",
+        )
+        self.assertEqual(before[0].section, "Summer 2027")
+
+    def test_a_named_qualifier_in_a_heading_is_not_a_tally(self):
+        """The tally strip is anchored on a digit so real names survive it."""
+        self.assertEqual(
+            parse_readme.stable_heading("Quantitative Finance (Advanced)"),
+            "Quantitative Finance (Advanced)",
+        )
+        self.assertEqual(parse_readme.stable_heading("Summer 2027"), "Summer 2027")
+
     def test_cruz_keeps_its_status_markers(self):
         """Cruz uses "🔥 [CLOSING SOON]" as real signal - it must NOT be stripped."""
         config = parse_readme.REPO_CONFIGS["underclassmen-cruz"]

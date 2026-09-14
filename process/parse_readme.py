@@ -181,6 +181,32 @@ def _split_markdown_row(line: str) -> list[str]:
 _SEPARATOR = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$")
 _HEADING = re.compile(r"^(#{1,6})\s+(.*)$")
 
+# A trailing parenthetical that starts with a digit is a tally the README author
+# regenerates, not part of the section's name: "Summer 2027 (300 employer-stated)",
+# "Recently posted -- cycle not stated (179 roles)".
+_HEADING_TALLY = re.compile(r"\s*\(\d[^)]*\)\s*$")
+
+
+def stable_heading(text: str) -> str:
+    """A section heading with its row tally removed.
+
+    The heading is a row's `section`, so it is part of every row's snapshot text -- and
+    a count inside it belongs to the whole section, which means one posting appearing
+    anywhere below it rewrites *every* row and the diff reports the entire section as
+    changed. That is what happened on 2026-09-14: two of zshah-2027's three counts
+    ticked overnight and the run reported 469 changes over 480 rows whose own text had
+    not moved, then died posting a digest past GitHub's 65,536-character issue body
+    limit. It is the same failure as Simplify's relative "Age" column and its "recently
+    posted" flame, and it is the third time a value that churns independently of the
+    posting has been read as news.
+
+    Anchored on a leading digit inside the parentheses so that a qualifier which is
+    part of the name -- "Quantitative Finance (Advanced)" -- is left alone. Normalising
+    here rather than in `clean_cell` keeps it off table cells, where a parenthetical is
+    the posting's own text and is stable per row.
+    """
+    return _HEADING_TALLY.sub("", clean_cell(text))
+
 
 def parse_markdown_tables(text: str) -> list[Table]:
     lines = text.splitlines()
@@ -191,7 +217,7 @@ def parse_markdown_tables(text: str) -> list[Table]:
         line = lines[index]
         match = _HEADING.match(line)
         if match:
-            heading = clean_cell(match.group(2))
+            heading = stable_heading(match.group(2))
             index += 1
             continue
         # A table is a `|` line followed by a `|---|` separator.
@@ -228,7 +254,7 @@ def parse_html_tables(text: str) -> list[Table]:
     the only thing that says which category a table belongs to.
     """
     headings: list[tuple[int, str]] = [
-        (match.start(), clean_cell(match.group(2)))
+        (match.start(), stable_heading(match.group(2)))
         for match in re.finditer(r"(?m)^(#{1,6})\s+(.*)$", text)
     ]
     tables: list[Table] = []

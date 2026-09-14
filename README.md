@@ -180,8 +180,23 @@ Simplify also needs two markers neutralised: a bare `↳` in the Company cell me
 position within its group does not churn), and `🔥` meaning "recently posted", which
 falls off after a few days and would otherwise make a posting look removed and re-added.
 Cruz-Lopez uses `🔥` differently — as `Status=🔥 [CLOSING SOON]`, which is real signal —
-so the strip is scoped per repo, not global. `tests/test_acceptance.py::NoiseRegressionTests`
-locks all four behaviours down.
+so the strip is scoped per repo, not global.
+
+One more value churns independently of any posting, and it is the most damaging of them
+because it is not in a cell at all: a **section heading that carries its own row tally**.
+zshah-2027 writes `## Summer 2027 (300 employer-stated)`, and `Row.identity` is
+section-qualified — deliberately, since two repos list the same company under more than
+one heading — so the count is part of the diff key of every row beneath it. One posting
+appearing anywhere in the section renumbers the heading, and all ~300 rows report as a
+`removed` and an `added` at once. On 2026-09-14 two of that repo's three counts ticked
+overnight, the run reported **469 changes** over rows whose own text had not moved, and
+then delivered nothing at all: the digest exceeded GitHub's 65,536-character issue body
+limit, the POST failed `422`, and because the crash came before the state commit the day
+left no snapshot either. `parse_readme.stable_heading` strips a trailing parenthetical
+that begins with a digit, anchored on the digit so a heading whose name really does end
+in parentheses — `Quantitative Finance (Advanced)` — is left alone.
+
+`tests/test_acceptance.py::NoiseRegressionTests` locks all of these behaviours down.
 
 ### Reading the git log
 
