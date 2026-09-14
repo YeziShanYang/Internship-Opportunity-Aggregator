@@ -48,7 +48,7 @@ import classify
 from core import clock, paths, profile
 from persist import store
 from gather import ats
-from process import parse_ats
+from process import parse_ats, parse_readme
 
 GITHUB_SEARCH = "https://api.github.com/search/repositories"
 
@@ -147,36 +147,59 @@ class Candidate:
     # what the digest prints; `evidence` is the mechanical proof that it can be watched
     # at all and stays in data/discovered.csv for whoever goes and looks.
     description: str = ""
+    # The watched *aggregator* this slug was mined out of, when it was. Set only for
+    # aggregators, because that is the case where adding the board is redundant: the
+    # aggregator's own rows already reach the digest every morning. A slug found behind
+    # a watched `page_text` row is the opposite -- the 2026-09-12 audit found 13 of
+    # those pointing at marketing pages above the real board -- so those are left blank.
+    covered_by: str = ""
 
 
 PRIORITY_SYSTEM_PROMPT = f"""You triage newly discovered *sources* for an opportunity tracker.
 
 A source is a job board, a company careers page, or a GitHub repository that lists
 internships. It is watched every morning and its changes are reported. You are not
-judging a single posting -- you are judging whether watching this source at all is
-likely to surface opportunities this person can apply to.
+judging a posting -- you are judging whether adding this source is worth the owner's
+attention at all.
 
 THE PERSON:
 {profile.OWNER_PROFILE}
 
-Answer two things.
+The watchlist already holds about 150 sources: five internship aggregators, and the
+boards of some seventy named firms. So the question is never "is this a real internship
+source". It is "does this carry something the owner would not otherwise see". Be
+sparing. Three sources he adds are worth more than eighteen he skims past.
 
-"priority": "high" or "low".
-  high -- a quantitative trading firm, hedge fund, market maker, or a technology or
-    finance employer that plausibly runs internships or early-career programmes this
-    person could apply to within the next two or three years; or a repository that
-    aggregates internships in maths, CS, quant or software.
-  low -- the employer's work is outside maths, CS, quant, software and finance; or it
-    hires only experienced staff and runs no student programme; or it recruits only
-    outside the United States; or the repository tracks a field this person is not in.
+"priority": answer "high" only if at least one of these is true.
+
+  - QUANTITATIVE FINANCE. A proprietary trading firm, market maker, hedge fund or quant
+    research shop. This is his first field, and the one where he wants every posting a
+    firm has rather than whichever ones an aggregator happened to list.
+  - THE ST. LOUIS REGION. His home is in the St. Louis area, so a firm with a Missouri
+    or Metro-East office is a viable summer with no housing to solve.
+  - A LARGE AGGREGATOR. A repository with thousands of stars tracking maths, CS or quant
+    internships. A small one only duplicates the five already watched.
+  - YOU CANNOT TELL WHAT THE FIRM DOES. Not a licence to guess: if the material does not
+    identify the business, say "high" and let a human look. Discarding is permanent, so
+    an unidentified source must never be thrown away on a hunch.
+
+Answer "low" for everything else. In particular:
+
+  - ALREADY COVERED. The input says "already watched: <source>" when the board was mined
+    out of an aggregator this tracker reads every morning, which means its postings
+    already reach him in the digest. On its own that is enough for "low" -- overridden
+    only by quantitative finance or St. Louis, where whole-board coverage is the point.
+  - A generic software employer that runs an internship. Real, but one of thousands, and
+    the aggregators list it already.
+  - A business whose engineering is not software: aerospace, energy, hardware,
+    manufacturing, agriculture, insurance. One software internship among twenty
+    mechanical ones does not change what the firm is.
+  - Experienced-hire-only, clearance-gated, or recruiting only outside the United States.
+  - A test or staging duplicate of a board already proposed.
 
 "description": exactly one sentence, plain and specific, saying what the source is and
-  why it does or does not matter to this person. Name the firm's actual business rather
-  than restating its name. No preamble.
-
-When you are genuinely unsure, answer "high". The two mistakes are not symmetrical: a
-wrong "high" costs one line in a weekly list the owner skims, while a wrong "low"
-discards the source permanently and he never learns it existed."""
+  why it does or does not matter to him. Name the firm's actual business rather than
+  restating its name. No preamble."""
 
 
 PRIORITY_SCHEMA = {
@@ -237,6 +260,8 @@ def triage(candidates: list[Candidate]) -> tuple[list[Candidate], list[Candidate
                 f"name: {candidate.title}\n"
                 f"url: {candidate.url}\n"
                 f"how it was found: {candidate.evidence}"
+                + (f"\nalready watched: {candidate.covered_by}"
+                   if candidate.covered_by else "")
             ),
             schema=PRIORITY_SCHEMA,
             schema_name="source_priority",
@@ -358,6 +383,13 @@ def mine_snapshots(known: set[str]) -> list[Candidate]:
                     title=slug,
                     url=ats.ENDPOINTS[method].format(slug=slug),
                     evidence=f"linked from {path.name}; not in sources.csv",
+                    # REPO_CONFIGS *is* the aggregator set: a github_readme source
+                    # without a parser config cannot be read at all. A slug mined from
+                    # any other snapshot -- an ATS board, a watched page -- is not
+                    # covered by anything and is left blank.
+                    covered_by=(
+                        path.stem if path.stem in parse_readme.REPO_CONFIGS else ""
+                    ),
                 )
     return list(found.values())
 
