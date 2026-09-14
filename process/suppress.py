@@ -17,6 +17,7 @@ from core import clock, models
 
 MUTED = "muted-programme"
 APPLIED = "applied-tsv"
+DISAPPEARED = "removed-posting"
 
 # Enough removed keys to audit a filter that has started over-matching, few enough that
 # the artifact stays readable.
@@ -66,6 +67,25 @@ def suppress(
     why the owner is not seeing it.
     """
     reports: list[models.FilterReport] = []
+
+    # A posting that has left the board is not an opportunity: the owner cannot apply to
+    # it, so it costs him a line and offers nothing to do with it. Dropped first because
+    # it is the most fundamental of the three statements -- the other two say "you are
+    # not being shown this", this one says "there is nothing there".
+    #
+    # Dropped here rather than in the renderer so the rows never reach `enrich` or
+    # `classify`: on 2026-09-14 removals were 40 of 67 changes, which is 40 posting
+    # fetches and 40 model calls spent on postings that no longer exist. The count still
+    # goes to HEALTH, because a board shedding an implausible number of rows at once is
+    # usually a parser or format problem rather than a hiring freeze, and this count is
+    # the cheapest place that shows up.
+    considered = len(changes)
+    dropped = [change for change in changes if change.kind == "removed"]
+    changes = [change for change in changes if change.kind != "removed"]
+    reports.append(_report(
+        DISAPPEARED, considered, dropped,
+        "no longer on the source. A posting that has gone cannot be applied to",
+    ))
 
     considered = len(changes)
     dropped = [change for change in changes if _all_muted(change, muted)]
