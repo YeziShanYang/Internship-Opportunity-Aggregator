@@ -24,10 +24,6 @@ from dataclasses import dataclass, field
 
 from core import clock, models
 from process.snapshot import (  # shared with parse_ats and parse_page
-    DISCOVERY_PATTERN,
-    ROLLING_PATTERN,
-    ROWS_HEADER,
-    SECTIONS_HEADER,
     Row,
     Snapshot,
     diff_snapshots,
