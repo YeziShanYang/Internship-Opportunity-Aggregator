@@ -465,6 +465,97 @@ def _classify_azure(
     return _judgment_from_text(change, choice.message.content or "")
 
 
+def call_json(
+    provider: str, client, deployment: str, *,
+    system: str, user: str, schema: dict, schema_name: str,
+    effort: str = CLASSIFY_REASONING_EFFORT,
+) -> tuple[dict | None, str]:
+    """One schema-constrained model call. Returns (parsed, error); never raises.
+
+    Exists so that a caller which is not classifying a `Change` -- the weekly discovery
+    pass, which judges whether a newly found *source* is worth watching -- does not have
+    to open its own client, duplicate the two provider dialects, or keep its own token
+    tally. Every model call in this project records into the same `USAGE`, because the
+    spend line in HEALTH is only honest if nothing bills off to the side.
+
+    `schema` must satisfy both dialects at once: all properties required and
+    `additionalProperties: false`, which is what Azure's strict mode demands and
+    Anthropic accepts.
+    """
+    try:
+        if provider == ANTHROPIC:
+            response = client.messages.create(
+                model=deployment,
+                max_tokens=4096,
+                system=system,
+                thinking={"type": "adaptive"},
+                output_config={
+                    "effort": ANTHROPIC_EFFORT.get(effort, "low"),
+                    "format": {"type": "json_schema", "schema": schema},
+                },
+                messages=[{"role": "user", "content": user}],
+            )
+        else:
+            response = client.chat.completions.create(
+                model=deployment,
+                max_completion_tokens=4096,
+                reasoning_effort=effort,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": schema_name, "strict": True, "schema": schema,
+                    },
+                },
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
+            )
+    except Exception as exc:
+        return None, f"{type(exc).__name__}: {exc}"
+
+    if provider == ANTHROPIC:
+        usage = getattr(response, "usage", None)
+        _record_usage(
+            ANTHROPIC, deployment, effort, usage,
+            input_key="input_tokens", output_key="output_tokens",
+            cached=getattr(usage, "cache_read_input_tokens", 0) or 0,
+        )
+        if getattr(response, "stop_reason", None) == "refusal":
+            return None, "model declined to answer"
+        text = "".join(
+            b.text for b in response.content if getattr(b, "type", "") == "text"
+        )
+    else:
+        usage = getattr(response, "usage", None)
+        details = getattr(usage, "completion_tokens_details", None)
+        prompt_details = getattr(usage, "prompt_tokens_details", None)
+        _record_usage(
+            AZURE, deployment, effort, usage,
+            input_key="prompt_tokens", output_key="completion_tokens",
+            reasoning=getattr(details, "reasoning_tokens", 0) or 0,
+            cached=getattr(prompt_details, "cached_tokens", 0) or 0,
+        )
+        choice = response.choices[0] if response.choices else None
+        if choice is None:
+            return None, "the provider returned no choices"
+        # An HTTP 200 whose body is empty or truncated is not an answer. Same rule as
+        # everywhere else: it has to read as a failure, not as a verdict.
+        if choice.finish_reason == "content_filter":
+            return None, "the content filter declined this request"
+        if choice.finish_reason == "length":
+            return None, "response hit max_completion_tokens before completing"
+        text = choice.message.content or ""
+
+    try:
+        parsed = json.loads(text)
+    except (ValueError, TypeError) as exc:
+        return None, f"unparseable response: {type(exc).__name__}"
+    if not isinstance(parsed, dict):
+        return None, "response was not a JSON object"
+    return parsed, ""
+
+
 def classify_one(
     provider: str, client, deployment: str, change: models.Change, posting=None,
     effort: str = CLASSIFY_REASONING_EFFORT,

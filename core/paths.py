@@ -38,7 +38,11 @@ APPLIED_TSV = DATA / "applied.tsv"
 # hand-edited: `rejected` is a permanent tombstone, never re-proposed.
 DISCOVERED_CSV = DATA / "discovered.csv"
 DISCOVERED_COLUMNS = [
-    "first_proposed", "last_proposed", "kind", "key", "title", "url", "evidence", "status",
+    "first_proposed", "last_proposed", "kind", "key", "title", "url", "evidence",
+    # One sentence from the priority triage: what the source is and why it does or does
+    # not matter. Written for a discarded row as well as a kept one -- a row whose only
+    # record was "discarded" would say nothing about what was thrown away.
+    "description", "status",
 ]
 LAST_DISCOVERY = DATA / "last_discovery.txt"
 # The date of the last digest actually delivered. The schedule fires several times

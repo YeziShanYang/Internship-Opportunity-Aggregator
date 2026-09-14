@@ -137,7 +137,8 @@ deliver/    (level 7)    every string the owner reads is composed here
 
 jobs/                    compose stages into something runnable. Not stages themselves
   daily.py               the morning digest
-  discovery.py           the Monday pass that proposes new sources and never adds one
+  discovery.py           the Monday pass that proposes new sources and never adds one,
+                         triaged high/low priority with one sentence on each survivor
 
 calendar_reminders.py    standing reminders for what cannot be automated
 build_xlsx.py            CSVs → out/programs.xlsx (yours) + out/tracked.xlsx (the tool's)
