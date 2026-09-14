@@ -22,7 +22,7 @@ import html
 import re
 from dataclasses import dataclass, field
 
-from core import models
+from core import clock, models
 from process.snapshot import (  # shared with parse_ats and parse_page
     DISCOVERY_PATTERN,
     ROLLING_PATTERN,
@@ -306,6 +306,43 @@ def _strip_markers(text: str, markers: tuple[str, ...]) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+# Emoji and pictographs, for the *key* only. Enumerating a repo's decorations by hand
+# is what failed on 2026-09-14: three `volatile_markers` knobs were already configured
+# for zshah-2027 and a fourth flag still churned 39 postings, because the list can only
+# ever hold the decorations somebody already noticed. A README author's cosmetics are
+# essentially always emoji, so the generic rule carries every repo added from here on,
+# including the ones whose quirks nobody has looked at yet.
+#
+# Arrows (U+2190-21FF) are deliberately absent: `↳` and `⤷` are the carry-forward
+# markers, which mean "same company as the row above" and are resolved rather than
+# dropped. Ranges, not a blanket "non-ASCII": accented company names and CJK are
+# identity, and stripping them would merge real postings.
+_EMOJI = re.compile(
+    "[" 
+    "\U0001F000-\U0001FAFF"  # pictographs, emoticons, transport, flags, supplements
+    "\u2600-\u27BF"          # misc symbols and dingbats: ✅, ✓, ❗
+    "\u2B00-\u2BFF"          # stars and arrows-in-boxes: ⭐
+    "\uFE0F\u200D\u20E3"      # variation selector, ZWJ, combining keycap
+    "]+"
+)
+
+
+def _key_text(text: str) -> str:
+    """The identity-bearing part of a cell: emoji removed, whitespace collapsed.
+
+    Applied to the key and never to the value. The value is the record of what the row
+    actually said -- Cruz-Lopez's `Status=🔥 [CLOSING SOON]` is real signal and an
+    OPEN -> CLOSING SOON transition is exactly what must be reported -- while the key is
+    the diff identity, where the same character is pure churn.
+
+    Falls back to the unstripped text when stripping would empty the cell, rather than
+    dropping the row: an entity that is *only* a pictograph is still an entity, and
+    losing it would report a removal and an addition every time the parser ran.
+    """
+    stripped = re.sub(r"\s+", " ", _EMOJI.sub(" ", text)).strip()
+    return stripped or re.sub(r"\s+", " ", text).strip()
+
+
 @dataclass
 class _Tally:
     """One filter's running counts while a README is being flattened."""
@@ -388,14 +425,17 @@ def extract_reported(
             # this showed up as an added/removed pair rather than as a `changed` row.
             role = cells.get(role_column, "") if role_column else ""
             role = _strip_markers(role, config.volatile_markers)
-            entity, role = entity.strip(), role.strip()
+            # `_key_text` last, and on every part: the write-back into `cells` above is
+            # what the value renders from, so the value keeps the decorations and only
+            # the identity loses them.
+            entity, role = _key_text(entity), _key_text(role)
             if not entity and not role:
                 continue
             key = f"{entity} / {role}" if role else entity
             for qualifier in config.qualifier_columns:
-                value_ = _strip_markers(
+                value_ = _key_text(_strip_markers(
                     cells.get(qualifier, ""), config.volatile_markers
-                ).strip()
+                ))
                 if value_:
                     key = f"{key} @ {value_}"
             value_parts = [
@@ -437,6 +477,23 @@ def extract_reported(
         for filter_id, tally in tallies.items()
     ]
 
+
+# A repo that moves this much of itself in one run has restructured, not restocked.
+# `parse_ats` has had this guard since Phase 2 and the READMEs did not, which is the
+# only reason 2026-09-14 could reach the digest at all: 480 of zshah-2027's 514 rows
+# reported as changed and the pipeline treated every one as news.
+#
+# Proportional, unlike the ATS boards' flat 25. An aggregator legitimately posts dozens
+# of real rows on a busy morning -- simplify-2027 moved 38 of 625 that same day, all of
+# them genuine -- so a flat count would either collapse a real morning or never fire on
+# a 600-row repo. Both conditions are required: the ratio is what catches a restructure,
+# and the floor is what stops a 12-row repo tripping on three postings.
+MAX_CHANGE_RATIO = 0.25
+MIN_CHANGES_TO_COLLAPSE = 25
+
+# How many of a collapsed repo's rows to name. The digest gets the count; these are for
+# whoever goes and looks at why.
+MAX_COLLAPSE_SAMPLES = 10
 
 _REASONS = {
     SECTION_EXCLUDED: "section matched this repo's section_exclude pattern",
@@ -515,9 +572,47 @@ def assess(
             filters=filters,
         )
 
-    changes = diff_snapshots(source_id, parse_snapshot(previous), parsed)
+    previous_snapshot = parse_snapshot(previous)
+    changes = diff_snapshots(source_id, previous_snapshot, parsed)
     for change in changes:
         change.program_name = source.get("program_names", "")
+
+    # Measured against whichever snapshot is larger, so a repo that empties is caught by
+    # the same rule as one that doubles: 500 rows becoming 5 is 495 removals, which is a
+    # format break and not a hiring freeze. Counting removals here is deliberate even
+    # though `process.suppress` drops them from the digest downstream -- a mass removal
+    # is the single clearest signal that a parser has stopped matching, and this guard
+    # is the last place it is still visible.
+    collapsed = None
+    scale = max(len(parsed.rows), len(previous_snapshot.rows), 1)
+    if len(changes) >= MIN_CHANGES_TO_COLLAPSE and len(changes) > MAX_CHANGE_RATIO * scale:
+        samples = tuple(f"{c.kind}: {c.key}" for c in changes[:MAX_COLLAPSE_SAMPLES])
+        collapsed = models.BoardCollapse(total=len(changes), samples=samples)
+        extra["collapsed"] = len(changes)
+        # The new snapshot is still returned and still committed, so the run re-baselines
+        # and tomorrow diffs against today rather than reporting the same storm again.
+        # Nothing is lost by withholding the rows: git is the database, and the state
+        # commit records exactly which lines moved on which morning either way.
+        changes = [
+            models.Change(
+                source_id=source_id,
+                kind="changed",
+                change_id=clock.change_id(source_id, "repo-restructure"),
+                key=(
+                    f"{source_id}: {collapsed.total} of {scale} rows changed at once"
+                ),
+                detail=(
+                    f"{collapsed.total} of {scale} rows moved in a single run "
+                    f"({collapsed.total / scale:.0%}), which reads as a README "
+                    "restructure rather than news. The snapshot has been re-baselined, "
+                    f"so this will not repeat tomorrow. First {len(samples)}:\n"
+                    + "\n".join(f"- {s}" for s in samples)
+                ),
+                url=source.get("url", ""),
+                program_name=source.get("program_names", ""),
+            )
+        ]
+
     return models.SourceResult(
         source_id=source_id,
         ok=True,
@@ -526,4 +621,5 @@ def assess(
         snapshot_text=rendered,
         extra=extra,
         filters=filters,
+        collapsed=collapsed,
     )
