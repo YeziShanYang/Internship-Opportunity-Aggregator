@@ -22,6 +22,7 @@ import re
 import sys
 import time
 import tempfile
+import types
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
@@ -35,7 +36,7 @@ from core import clock, models, paths, profile, text as coretext
 from gather import breaker
 from persist import cache, store
 from jobs import daily
-from process import redirect, suppress
+from process import parse_readme, redirect, suppress
 import build_xlsx
 from gather import ats, github_readme, page
 from process import parse_ats, parse_page, parse_readme, snapshot
@@ -656,6 +657,59 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
         )
         self.assertEqual(before[0].section, "Summer 2027")
 
+    def test_an_emoji_anywhere_in_the_key_is_stripped_generically(self):
+        """No config knob: any repo's decorations come off the identity.
+
+        zshah-2027 already had three markers configured by hand and a fourth still
+        churned 39 postings on 2026-09-14, because an enumerated list can only hold the
+        decorations somebody already noticed. The real row that exposed it:
+
+            removed  AllianceBernstein / Infrastructure Engineering Summer Intern 🇺🇸 🆕
+            added    AllianceBernstein / Infrastructure Engineering Summer Intern 🇺🇸
+        """
+        config = parse_readme.REPO_CONFIGS["zshah-2027"]
+
+        def rows(role: str):
+            markdown = (
+                "## Summer 2027\n"
+                "| Company | Role | Location |\n"
+                "| --- | --- | --- |\n"
+                f"| AllianceBernstein | {role} | Nashville |\n"
+            )
+            return parse_readme.extract(markdown, config).rows
+
+        flagged = rows("Infrastructure Engineering Summer Intern 🇺🇸 🆕")
+        plain = rows("Infrastructure Engineering Summer Intern")
+        self.assertEqual(
+            flagged[0].key, plain[0].key, "a decoration must not fork one posting in two"
+        )
+        self.assertIn("🇺🇸", flagged[0].value, "the value still records what the row said")
+
+    def test_a_carry_forward_arrow_is_not_treated_as_a_decoration(self):
+        """`↳` means "same company as above" and is resolved, never stripped.
+
+        Arrows are excluded from the emoji ranges for exactly this reason: stripping it
+        would empty the Company cell and the row would lose its employer entirely.
+        """
+        config = parse_readme.REPO_CONFIGS["simplify-2027"]
+        html = (
+            "## Software Engineering\n"
+            "<table><thead><tr><th>Company</th><th>Role</th></tr></thead>"
+            "<tbody><tr><td>Acme</td><td>SWE Intern</td></tr>"
+            "<tr><td>↳</td><td>Data Intern</td></tr></tbody></table>"
+        )
+        rows = parse_readme.extract(html, config).rows
+        self.assertEqual(len(rows), 2)
+        self.assertTrue(
+            all(row.key.startswith("Acme") for row in rows),
+            f"both rows belong to Acme, got {[r.key for r in rows]}",
+        )
+
+    def test_an_emoji_only_cell_keeps_its_row(self):
+        """Stripping must never empty a cell and drop the posting with it."""
+        self.assertEqual(parse_readme._key_text("🆕"), "🆕")
+        self.assertEqual(parse_readme._key_text("Société Générale"), "Société Générale")
+
     def test_a_named_qualifier_in_a_heading_is_not_a_tally(self):
         """The tally strip is anchored on a digit so real names survive it."""
         self.assertEqual(
@@ -682,6 +736,78 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
             closing_rows[0].value,
             "an OPEN -> CLOSING SOON transition is exactly what must be reported",
         )
+
+
+class RepoCollapseTests(_IsolatedState, unittest.TestCase):
+    """A README that restructures must not read as 500 opportunities.
+
+    `parse_ats` has collapsed an over-moving board since Phase 2; the READMEs had no
+    such guard, which is the only reason 2026-09-14 reached delivery. Two decorations
+    that churn independently of any posting had to be found and fixed by hand before
+    that morning's digest could be produced at all, and the *next* undocumented
+    decoration on the next repo would have done the same thing again. This is the part
+    that does not need to know what the decoration was.
+    """
+
+    CONFIG = parse_readme.RepoConfig(
+        table_format="markdown",
+        entity_columns=("Company",),
+        role_columns=("Role",),
+    )
+
+    def _readme(self, count: int, suffix: str = "") -> str:
+        rows = "\n".join(
+            f"| Firm {i} | Quant Intern{suffix} |" for i in range(count)
+        )
+        return f"## Summer 2027\n| Company | Role |\n| --- | --- |\n{rows}\n"
+
+    def _assess(self, before: str, after: str):
+        previous = parse_readme.render_snapshot(
+            parse_readme.extract(before, self.CONFIG)
+        )
+        fetched = types.SimpleNamespace(
+            text=after,
+            branch="main",
+            attempt=types.SimpleNamespace(ok=True, error="", size=len(after)),
+        )
+        return parse_readme.assess(
+            {"source_id": "test-repo", "url": "https://example.test/readme"},
+            self.CONFIG, fetched, previous,
+        )
+
+    def test_a_restructured_repo_collapses_into_one_item(self):
+        """Every row's key moving at once is a restructure, not 120 opportunities."""
+        result = self._assess(self._readme(60), self._readme(60, suffix=" 2027"))
+        self.assertTrue(result.ok, "a restructure is not a fetch failure")
+        self.assertEqual(len(result.changes), 1, "the digest gets one item, not 120")
+        self.assertIsNotNone(result.collapsed)
+        self.assertEqual(result.collapsed.total, 120)
+        self.assertIn("120 of 60 rows", result.changes[0].key)
+        self.assertTrue(
+            result.snapshot_text,
+            "the snapshot must still be re-baselined, or the storm repeats tomorrow",
+        )
+
+    def test_a_busy_morning_is_not_collapsed(self):
+        """30 real postings on a 600-row aggregator is news and must survive.
+
+        This is why the rule is proportional and not a flat count like the ATS boards':
+        simplify-2027 moved 38 of 625 rows on the morning zshah-2027 moved 480 of 514,
+        and every one of the 38 was a real posting.
+        """
+        result = self._assess(self._readme(600), self._readme(630))
+        self.assertIsNone(result.collapsed)
+        self.assertEqual(len(result.changes), 30)
+
+    def test_a_small_repo_is_not_collapsed_by_a_handful_of_rows(self):
+        """Half of a 12-row repo is 6 postings, which a reader wants to see.
+
+        The floor is what stops the ratio crying wolf on the small watchlists: NUFT
+        legitimately drains to near zero out of season.
+        """
+        result = self._assess(self._readme(12), self._readme(18))
+        self.assertIsNone(result.collapsed)
+        self.assertEqual(len(result.changes), 6)
 
 
 # --- 14.7 -----------------------------------------------------------------------

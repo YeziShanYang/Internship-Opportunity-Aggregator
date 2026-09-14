@@ -196,7 +196,28 @@ left no snapshot either. `parse_readme.stable_heading` strips a trailing parenth
 that begins with a digit, anchored on the digit so a heading whose name really does end
 in parentheses — `Quantitative Finance (Advanced)` — is left alone.
 
-`tests/test_acceptance.py::NoiseRegressionTests` locks all of these behaviours down.
+Enumerating a repo's decorations by hand is itself the weakness: zshah-2027 already had
+three markers configured and a fourth still churned 39 postings, because the list can
+only hold what somebody already noticed. So `_key_text` strips emoji and pictographs
+from **the key** generically, for every repo including ones not added yet, and never
+from the value — the value is the record of what the row said. Arrows are excluded
+deliberately (`↳` is the carry-forward marker and is resolved, not dropped), and the
+rule is written as character ranges rather than "non-ASCII" because `Société Générale`
+is identity, not decoration.
+
+Behind all of it is a guard that does not need to know what the decoration was. A repo
+that reports more than `MAX_CHANGE_RATIO` (25%) of its rows changed in one run, and at
+least `MIN_CHANGES_TO_COLLAPSE` (25) of them, has restructured rather than restocked:
+the changes collapse into a single item and the count goes to HEALTH. Both conditions
+are required, and the ratio is measured against the larger of the two snapshots so a
+repo that *empties* trips the same rule as one that doubles. It is proportional, unlike
+the flat count `parse_ats` uses, because an aggregator legitimately posts dozens of real
+rows on a busy morning — simplify-2027 moved 38 of 625 on the morning zshah-2027 moved
+480 of 514. A collapse still writes its snapshot, so the run re-baselines and tomorrow
+diffs against today rather than replaying the storm.
+
+`tests/test_acceptance.py::NoiseRegressionTests` and `RepoCollapseTests` lock all of
+these behaviours down.
 
 ### Reading the git log
 
