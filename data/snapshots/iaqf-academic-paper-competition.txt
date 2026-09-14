@@ -106,7 +106,7 @@ When
 &nbsp;
 6:00 PM
 Location
-Fordham University Lowenstein Building, South Lounge Atrium - 113 West 60th Street, New York, NY
+Fordham University Lowenstein Building, South Lounge - 113 West 60th Street, New York, NY
 Register
 Bridging Schrödinger and Bass for
 Generative Diffusion Modeling
@@ -116,9 +116,8 @@ Tuesday October 6, 2026
 7:30 PM Reception
 Hybrid Event
 Fordham University
-McNally Amphitheater
-140 West 62nd Street
-New York, NY 10023
+Lowenstein Building, South Lounge
+113 West 60th Street, New York, NY
 Free Registration!
 For Virtual Attendees: Please select virtual instead of member type upon registration.
 Abstract:
