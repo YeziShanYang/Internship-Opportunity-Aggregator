@@ -38,8 +38,29 @@ class FilterReportTests(unittest.TestCase):
         spec 10.1."""
         kept, reports = suppress.suppress([_change("a")], muted=set(), applied={})
         self.assertEqual(len(kept), 1)
-        self.assertEqual({r.filter_id for r in reports}, {suppress.MUTED, suppress.APPLIED})
+        self.assertEqual(
+            {r.filter_id for r in reports},
+            {suppress.DISAPPEARED, suppress.MUTED, suppress.APPLIED},
+        )
         self.assertTrue(all(r.removed == 0 for r in reports))
+
+    def test_a_removed_posting_is_dropped_and_counted(self):
+        """The owner cannot apply to a posting that has left the board.
+
+        Dropped in `process` rather than in the renderer so it never reaches `enrich`
+        or `classify`: on 2026-09-14 removals were 40 of 67 changes, and each one would
+        otherwise have cost a posting fetch and a model call to describe something that
+        is no longer there. The count still has to reach HEALTH -- a board shedding an
+        implausible number of rows is a format problem, not a hiring freeze.
+        """
+        gone = models.Change(source_id="s", kind="removed", key="gone", detail="d")
+        kept, reports = suppress.suppress(
+            [_change("here"), gone], muted=set(), applied={})
+        self.assertEqual([c.key for c in kept], ["here"])
+        self.assertEqual(suppress.removed_by(reports, suppress.DISAPPEARED), 1)
+        self.assertEqual(
+            sum(r.removed for r in reports), 1, "the drop must be counted exactly once"
+        )
 
     def test_every_report_accounts_for_exactly_what_it_dropped(self):
         changes = [_change("a", "Muted One"), _change("b", "Live One"), _change("c")]
