@@ -67,12 +67,6 @@ AZURE_DEFAULT_API_VERSION = "2024-12-01-preview"
 # 2026-09-15 digest is the test of it.
 CLASSIFY_REASONING_EFFORT = "minimal"
 
-# The weekly small-firm pass is a harder judgment -- is this employer small, is it
-# reachable from St. Louis or the Bay, does it hire first-years -- and it runs on a
-# fraction of the volume, so it can afford to think. The owner's instruction was
-# explicit that minimal here "is probably just going to give me a bunch of normal
-# results".
-SMALL_FIRM_REASONING_EFFORT = "medium"
 
 # Anthropic and Azure do not share an effort vocabulary; Anthropic has no "minimal".
 ANTHROPIC_EFFORT = {"minimal": "low", "low": "low", "medium": "medium", "high": "high"}

@@ -175,8 +175,6 @@ sparing. Three sources he adds are worth more than eighteen he skims past.
   - QUANTITATIVE FINANCE. A proprietary trading firm, market maker, hedge fund or quant
     research shop. This is his first field, and the one where he wants every posting a
     firm has rather than whichever ones an aggregator happened to list.
-  - THE ST. LOUIS REGION. His home is in the St. Louis area, so a firm with a Missouri
-    or Metro-East office is a viable summer with no housing to solve.
   - A LARGE AGGREGATOR. A repository with thousands of stars tracking maths, CS or quant
     internships. A small one only duplicates the five already watched.
   - YOU CANNOT TELL WHAT THE FIRM DOES. Not a licence to guess: if the material does not
@@ -188,7 +186,8 @@ Answer "low" for everything else. In particular:
   - ALREADY COVERED. The input says "already watched: <source>" when the board was mined
     out of an aggregator this tracker reads every morning, which means its postings
     already reach him in the digest. On its own that is enough for "low" -- overridden
-    only by quantitative finance or St. Louis, where whole-board coverage is the point.
+    only by quantitative finance, where whole-board coverage is the point rather than
+    whichever postings an aggregator happened to carry.
   - A generic software employer that runs an internship. Real, but one of thousands, and
     the aggregators list it already.
   - A business whose engineering is not software: aerospace, energy, hardware,
