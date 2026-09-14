@@ -24,6 +24,7 @@ import time
 import tempfile
 import types
 import unittest
+import unittest.mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
@@ -1434,6 +1435,105 @@ class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
         }])
         seen = {r["key"] for r in store.read_discovered()}
         self.assertIn("repo:seen/repo", seen)
+
+    def _stub_triage(self, answers):
+        """Drive `triage` without a provider. `answers` maps title -> parsed response."""
+        calls = []
+
+        def call_json(provider, client, deployment, *, system, user, schema,
+                      schema_name, effort=None):
+            calls.append(user)
+            for title, answer in answers.items():
+                if f"name: {title}" in user:
+                    return answer
+            return None, "no stub for this candidate"
+
+        self.enterContext(unittest.mock.patch.object(
+            classify, "select_provider", lambda: "azure"))
+        self.enterContext(unittest.mock.patch.object(
+            classify, "build_client", lambda provider: (object(), "stub-deployment")))
+        self.enterContext(unittest.mock.patch.object(classify, "call_json", call_json))
+        return calls
+
+    def test_a_low_priority_proposal_is_discarded_and_counted(self):
+        """The owner asked to see only what is worth looking at.
+
+        Discarded rows still reach data/discovered.csv, and the count still reaches the
+        digest: a triage that quietly ate a whole week's findings would be
+        indistinguishable from a quiet week, which is the one signal this tool exists to
+        make meaningful.
+        """
+        quant = discover.Candidate("greenhouse", "greenhouse:hrt", "Hudson River Trading",
+                                   "https://hrt.example", "slug on careers page")
+        retail = discover.Candidate("workday", "workday:grocer", "Big Grocer Co",
+                                    "https://grocer.example", "workday tenant found")
+        self._stub_triage({
+            "Hudson River Trading": (
+                {"priority": "high",
+                 "description": "A quantitative trading firm whose internships are "
+                                "squarely in his field."}, ""),
+            "Big Grocer Co": (
+                {"priority": "low",
+                 "description": "A supermarket chain with no quantitative or software "
+                                "programme."}, ""),
+        })
+
+        keep, discarded, notes = discover.triage([quant, retail])
+        self.assertEqual([c.title for c in keep], ["Hudson River Trading"])
+        self.assertEqual([c.title for c in discarded], ["Big Grocer Co"])
+        self.assertEqual(notes, [])
+
+        discover.record(keep, discarded)
+        rows = {r["key"]: r for r in store.read_discovered()}
+        self.assertEqual(rows["greenhouse:hrt"]["status"], "proposed")
+        self.assertEqual(rows["workday:grocer"]["status"], discover.DISCARDED)
+        self.assertIn("supermarket", rows["workday:grocer"]["description"])
+
+        block = "\n".join(discover.lines(keep, discarded=len(discarded)))
+        self.assertIn("quantitative trading firm", block)
+        self.assertNotIn("Big Grocer", block)
+        self.assertIn("1 further proposal(s) judged low priority", block)
+
+    def test_a_high_priority_proposal_is_described_not_evidenced(self):
+        """One sentence about the source, not the mechanics of finding it."""
+        candidate = discover.Candidate(
+            "greenhouse", "greenhouse:xtx", "XTX Markets", "https://xtx.example",
+            "grnhse_app embed script with ?for=xtx")
+        self._stub_triage({"XTX Markets": (
+            {"priority": "high",
+             "description": "An algorithmic trading firm that runs a quant research "
+                            "internship."}, "")})
+        keep, _, _ = discover.triage([candidate])
+        block = "\n".join(discover.lines(keep))
+        self.assertIn("algorithmic trading firm", block)
+        self.assertNotIn("grnhse_app", block, "the evidence string is not the description")
+
+    def test_without_a_key_nothing_is_discarded(self):
+        """Spec 8 rule 3, applied here: degraded mode surfaces more, not less.
+
+        A false low is permanent in effect, because `run` never re-proposes a key on
+        file. So the absence of a judgment can never stand in for a "low" one.
+        """
+        candidate = discover.Candidate("workday", "workday:x", "Some Firm", "u", "e")
+        with unittest.mock.patch.object(classify, "select_provider", lambda: None):
+            keep, discarded, notes = discover.triage([candidate])
+        self.assertEqual(keep, [candidate])
+        self.assertEqual(discarded, [])
+        self.assertIn("unjudged", " ".join(notes))
+        self.assertIn("unjudged", "\n".join(discover.lines(keep)))
+
+    def test_a_failed_or_malformed_judgment_keeps_the_candidate(self):
+        """Only an explicit "low" discards; anything else is not a verdict."""
+        failed = discover.Candidate("repo", "repo:a/b", "Failing Repo", "u", "e")
+        garbled = discover.Candidate("repo", "repo:c/d", "Garbled Repo", "u", "e")
+        self._stub_triage({
+            "Failing Repo": (None, "TimeoutError: too slow"),
+            "Garbled Repo": ({"priority": "maybe", "description": "who knows"}, ""),
+        })
+        keep, discarded, notes = discover.triage([failed, garbled])
+        self.assertEqual({c.title for c in keep}, {"Failing Repo", "Garbled Repo"})
+        self.assertEqual(discarded, [])
+        self.assertIn("could not be judged", " ".join(notes))
 
     def test_14_9q_discovery_only_runs_on_monday_or_after_a_missed_week(self):
         self.assertTrue(discover.due("2026-09-14"))   # a Monday

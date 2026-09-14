@@ -40,11 +40,12 @@ import html as html_module
 import re
 import time
 import urllib.parse
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import httpx
 
-from core import clock, paths
+import classify
+from core import clock, paths, profile
 from persist import store
 from gather import ats
 from process import parse_ats
@@ -138,6 +139,125 @@ class Candidate:
     title: str
     url: str
     evidence: str
+    # Filled by `triage`. "high" | "low", or "" when the judgment did not run at all --
+    # which is a third state and not a synonym for "low", because an unjudged candidate
+    # is surfaced rather than discarded.
+    priority: str = ""
+    # One sentence: what this source is, and why it is or is not worth watching. This is
+    # what the digest prints; `evidence` is the mechanical proof that it can be watched
+    # at all and stays in data/discovered.csv for whoever goes and looks.
+    description: str = ""
+
+
+PRIORITY_SYSTEM_PROMPT = f"""You triage newly discovered *sources* for an opportunity tracker.
+
+A source is a job board, a company careers page, or a GitHub repository that lists
+internships. It is watched every morning and its changes are reported. You are not
+judging a single posting -- you are judging whether watching this source at all is
+likely to surface opportunities this person can apply to.
+
+THE PERSON:
+{profile.OWNER_PROFILE}
+
+Answer two things.
+
+"priority": "high" or "low".
+  high -- a quantitative trading firm, hedge fund, market maker, or a technology or
+    finance employer that plausibly runs internships or early-career programmes this
+    person could apply to within the next two or three years; or a repository that
+    aggregates internships in maths, CS, quant or software.
+  low -- the employer's work is outside maths, CS, quant, software and finance; or it
+    hires only experienced staff and runs no student programme; or it recruits only
+    outside the United States; or the repository tracks a field this person is not in.
+
+"description": exactly one sentence, plain and specific, saying what the source is and
+  why it does or does not matter to this person. Name the firm's actual business rather
+  than restating its name. No preamble.
+
+When you are genuinely unsure, answer "high". The two mistakes are not symmetrical: a
+wrong "high" costs one line in a weekly list the owner skims, while a wrong "low"
+discards the source permanently and he never learns it existed."""
+
+
+PRIORITY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "priority": {"type": "string", "enum": ["high", "low"]},
+        "description": {"type": "string"},
+    },
+    "required": ["priority", "description"],
+    "additionalProperties": False,
+}
+
+# A weekly pass finds a handful; this is a ceiling against a search that suddenly
+# returns hundreds, not an expected volume. Anything past it is kept unjudged rather
+# than discarded, for the same reason the prompt breaks ties towards "high".
+MAX_PRIORITY_JUDGMENTS = 40
+
+
+def triage(candidates: list[Candidate]) -> tuple[list[Candidate], list[Candidate], list[str]]:
+    """Split into (keep, discard, notes). Never raises.
+
+    Degrades towards keeping. With no API key, with a provider that will not build, or
+    on a call that fails, every candidate is kept unjudged and the digest says so -- the
+    same rule the classifier follows on a change it could not read (spec 8 rule 3).
+    Discarding is permanent in effect, because `run` never re-proposes a key already on
+    file, so it may only ever happen on an answer the model actually gave.
+    """
+    if not candidates:
+        return [], [], []
+
+    provider = classify.select_provider()
+    if provider is None:
+        return list(candidates), [], [
+            f"discovery: no API key, so {len(candidates)} proposal(s) are listed "
+            "unjudged rather than filtered by priority."
+        ]
+    try:
+        client, deployment = classify.build_client(provider)
+    except Exception as exc:
+        return list(candidates), [], [
+            f"discovery: the priority triage could not start "
+            f"({type(exc).__name__}), so {len(candidates)} proposal(s) are unjudged."
+        ]
+
+    keep: list[Candidate] = []
+    discard: list[Candidate] = []
+    notes: list[str] = []
+    failures = 0
+    for candidate in candidates:
+        if len(keep) + len(discard) >= MAX_PRIORITY_JUDGMENTS:
+            keep.append(candidate)
+            continue
+        parsed, error = classify.call_json(
+            provider, client, deployment,
+            system=PRIORITY_SYSTEM_PROMPT,
+            user=(
+                f"kind: {candidate.kind}\n"
+                f"name: {candidate.title}\n"
+                f"url: {candidate.url}\n"
+                f"how it was found: {candidate.evidence}"
+            ),
+            schema=PRIORITY_SCHEMA,
+            schema_name="source_priority",
+        )
+        if parsed is None:
+            failures += 1
+            keep.append(candidate)
+            continue
+        priority = str(parsed.get("priority") or "").strip().lower()
+        description = " ".join(str(parsed.get("description") or "").split())
+        judged = replace(candidate, priority=priority, description=description)
+        # Only an explicit "low" discards. An answer that is neither is a malformed
+        # response, and a malformed response must not be read as a verdict.
+        (discard if priority == "low" else keep).append(judged)
+
+    if failures:
+        notes.append(
+            f"discovery: {failures} proposal(s) could not be judged for priority and "
+            "are listed unjudged."
+        )
+    return keep, discard, notes
 
 
 def due(today: str | None = None) -> bool:
@@ -418,13 +538,28 @@ def run(
     return fresh, notes
 
 
-def record(candidates: list[Candidate]) -> None:
-    """Append to data/discovered.csv. Never touches sources.csv."""
-    if not candidates:
+DISCARDED = "discarded-low-priority"
+
+
+def record(candidates: list[Candidate], discarded: list[Candidate] | None = None) -> None:
+    """Append to data/discovered.csv. Never touches sources.csv.
+
+    A discarded candidate is written too, and that is the whole of its recoverability:
+    `run` skips any key already on file, so the row is what stops it being re-proposed
+    every Monday, and it is also the only place its one-sentence description survives.
+    Setting its status back to `proposed` puts it in the next digest.
+
+    Its status is deliberately not `rejected`. That word means the owner looked at a
+    proposal and said no, and it is worth being able to tell the two apart later --
+    one is a judgment he made and the other is a judgment made on his behalf.
+    """
+    if not candidates and not discarded:
         return
     rows = store.read_discovered()
     today = clock.today_iso()
-    for candidate in candidates:
+    for candidate, status in (
+        [(c, "proposed") for c in candidates] + [(c, DISCARDED) for c in discarded or []]
+    ):
         rows.append(
             {
                 "first_proposed": today,
@@ -434,13 +569,23 @@ def record(candidates: list[Candidate]) -> None:
                 "title": candidate.title,
                 "url": candidate.url,
                 "evidence": candidate.evidence,
-                "status": "proposed",
+                "description": candidate.description,
+                "status": status,
             }
         )
     store.write_discovered(rows)
 
 
-def lines(candidates: list[Candidate], limit: int = 10) -> list[str]:
+def lines(
+    candidates: list[Candidate], limit: int = 10, discarded: int = 0
+) -> list[str]:
+    """The DISCOVERED block. High priority only, one sentence each.
+
+    The sentence replaces the mechanical evidence string that used to be printed here
+    ("greenhouse slug found on the careers page"), which answered "can we watch this"
+    when the only question the owner has is "is this worth watching". The evidence is
+    still on the row in data/discovered.csv.
+    """
     out = [
         "_Proposals only — nothing has been added. Accept one with the "
         "`/add-opportunity` skill; silence it for good by setting `status=rejected` "
@@ -448,7 +593,18 @@ def lines(candidates: list[Candidate], limit: int = 10) -> list[str]:
         "",
     ]
     for candidate in candidates[:limit]:
-        out.append(f"- **{candidate.kind}** `{candidate.title}` — {candidate.evidence} → {candidate.url}")
+        # An unjudged candidate has no sentence, so it falls back to the evidence rather
+        # than printing a bare title. It is here *because* it could not be judged.
+        note = candidate.description or f"unjudged — {candidate.evidence}"
+        out.append(f"- **{candidate.kind}** `{candidate.title}` — {note} → {candidate.url}")
     if len(candidates) > limit:
         out.append(f"- …and {len(candidates) - limit} more in `data/discovered.csv`.")
+    if discarded:
+        # Every filter reports what it removed. A triage that quietly ate the whole
+        # week's findings would look exactly like a quiet week for new sources, and an
+        # implausible count here is the cheapest signal that the prompt has drifted.
+        out.append(
+            f"- _{discarded} further proposal(s) judged low priority and discarded; "
+            "they are on file in `data/discovered.csv`._"
+        )
     return out
