@@ -218,5 +218,5 @@ quoting. Then tell the user, briefly:
 - Anything you marked `NO` and why
 - Anything you could not read on the page, stated plainly rather than filled in
 
-Do not run `check.py` afterwards. New tier-2/3 sources are inert until those phases
+Do not run `run.py all` afterwards. New tier-2/3 sources are inert until those phases
 exist, and the daily workflow will pick up the new rows on its own.
