@@ -380,13 +380,22 @@ def extract_reported(
             if entity_column:
                 # Write the resolved entity back so the value is position-independent.
                 cells = {**cells, entity_column: entity}
+            # Every part of the key gets the markers stripped, not just the entity.
+            # The key is the diff identity, so a marker anywhere in it churns the row:
+            # zshah-2027's "new this week" flag sits in the *Role* cell and turns over
+            # constantly, and on 2026-09-14 it re-added 39 postings whose only change
+            # was losing it. The row *value* was already stripped below, which is why
+            # this showed up as an added/removed pair rather than as a `changed` row.
             role = cells.get(role_column, "") if role_column else ""
+            role = _strip_markers(role, config.volatile_markers)
             entity, role = entity.strip(), role.strip()
             if not entity and not role:
                 continue
             key = f"{entity} / {role}" if role else entity
             for qualifier in config.qualifier_columns:
-                value_ = cells.get(qualifier, "").strip()
+                value_ = _strip_markers(
+                    cells.get(qualifier, ""), config.volatile_markers
+                ).strip()
                 if value_:
                     key = f"{key} @ {value_}"
             value_parts = [
