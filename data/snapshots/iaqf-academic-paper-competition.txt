@@ -100,6 +100,33 @@ Carlos Morales - &nbsp;is Head of Asset Allocation at MassMutual and has spent m
 Oriol Ripalta &nbsp; graduated with an MSc in Mathematical Finance from Boston University and holds a BSc in Computer Science and Business Administration. He has previously worked as a software engineer in a couple of roles, using a range of programming languages. He is currently a Quantitative Analyst at LSEG, where I work on the development of ORE.
 Sponsored By:
 Show details
+IAQF &amp; Thalesians Seminar Series: Bridging Schr&#246;dinger and Bass for Generative Diffusion Modeling. A Seminar by Nizar Touzi.
+When
+06 Oct 2026
+&nbsp;
+6:00 PM
+Location
+Fordham University Lowenstein Building, South Lounge Atrium - 113 West 60th Street, New York, NY
+Register
+Bridging Schrödinger and Bass for
+Generative Diffusion Modeling
+A Seminar by Nizar Touzi
+Tuesday October 6, 2026
+6:00 PM Seminar Begins
+7:30 PM Reception
+Hybrid Event
+Fordham University
+McNally Amphitheater
+140 West 62nd Street
+New York, NY 10023
+Free Registration!
+For Virtual Attendees: Please select virtual instead of member type upon registration.
+Abstract:
+Generative models aim to approximate an unknown probability distribution in a high dimensional space using a finite sample of independent draws. Motivated by variance-preserving score-based diffusion models, we introduce a new diffusion-based transport plan on path space that is optimal with respect to a criterion combining entropy minimization and stabilization of the quadratic variation. The resulting transport plan can be interpreted as an interpolation between the Schrödinger bridge and the Bass solution from martingale optimal transport. The proposed method has a computational complexity comparable to that of state-of-the-art approaches, while yielding a significant improvement in generation quality.
+Bio:
+Nizar Touzi is an applied mathematician with expertise in financial engineering and decision modeling. He is currently Professor at New York University, Tandon School of Engineering, Chair of the Department of Finance and Risk Engineering at the Tandon School of Engineering. He was previously Professor at the Department of Applied Mathematics of École Polytechnique in France from 2006 to 2023 where he acted as Chair from 2014 to 2017 and head of the doctoral school from 2020 to 2023.
+Nizar has contributed to financial mathematics, optimal control, martingale optimal transport and backward stochastic differential equations which serve as a major tool for the stochastic control of non-Markovian models, for stochastic differential games, and for various applications in risk management and decision models under agent interactions. He received the Louis Bachelier Natixis prize of the French Academy of Sciences in 2012, the Paris Europlace prize of Best Young Researcher in Finance in 2007, an ERC advanced grant 2012-2017, and has been an invited session speaker at the International Congress of Mathematicians in Hyderabad 2010.
+Show details
 For information about sponsoring one of our events&nbsp; click here &nbsp;or email&nbsp; info@iaqf.org &nbsp;for details.
 Subscribe to our mailing list
 © Copyright 2020 International Association for Quantitative Finance
