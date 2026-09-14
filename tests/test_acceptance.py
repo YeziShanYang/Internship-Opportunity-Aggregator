@@ -1535,6 +1535,48 @@ class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(discarded, [])
         self.assertIn("could not be judged", " ".join(notes))
 
+    def test_a_slug_is_marked_covered_only_when_mined_from_an_aggregator(self):
+        """Provenance decides redundancy, and only aggregators make a board redundant.
+
+        A board mined out of an aggregator the tracker already reads every morning adds
+        nothing: those postings are in the digest already. A slug found behind a watched
+        `page_text` row is the opposite case -- the 2026-09-12 audit found 13 of them
+        aimed at a marketing page above the real board -- so it must not be marked.
+        """
+        paths.SNAPSHOTS.mkdir(parents=True, exist_ok=True)
+        link = "https://boards-api.greenhouse.io/v1/boards/examplefirm/jobs"
+        (paths.SNAPSHOTS / "simplify-2027.tsv").write_text(link, encoding="utf-8")
+        (paths.SNAPSHOTS / "hrt-inside.txt").write_text(
+            link.replace("examplefirm", "behindapage"), encoding="utf-8")
+
+        found = {c.title: c for c in discover.mine_snapshots(set())}
+        self.assertEqual(found["examplefirm"].covered_by, "simplify-2027")
+        self.assertEqual(
+            found["behindapage"].covered_by, "",
+            "a page_text row is not coverage; finding its real board is an upgrade",
+        )
+
+    def test_the_triage_tells_the_model_which_source_already_covers_a_board(self):
+        """The redundancy signal is passed explicitly, not left in prose.
+
+        `evidence` already said "linked from simplify-2027.tsv", but a rule this
+        load-bearing should not depend on the model parsing a filename out of a
+        sentence written for a human.
+        """
+        covered = discover.Candidate(
+            "greenhouse", "greenhouse:generic", "Generic SaaS Co", "u", "e",
+            covered_by="simplify-2027")
+        plain = discover.Candidate("greenhouse", "greenhouse:other", "Other Co", "u", "e")
+        calls = self._stub_triage({
+            "Generic SaaS Co": ({"priority": "low", "description": "Already listed."}, ""),
+            "Other Co": ({"priority": "high", "description": "Not covered."}, ""),
+        })
+        keep, discarded, _ = discover.triage([covered, plain])
+        self.assertEqual([c.title for c in discarded], ["Generic SaaS Co"])
+        self.assertEqual([c.title for c in keep], ["Other Co"])
+        self.assertIn("already watched: simplify-2027", calls[0])
+        self.assertNotIn("already watched", calls[1])
+
     def test_14_9q_discovery_only_runs_on_monday_or_after_a_missed_week(self):
         self.assertTrue(discover.due("2026-09-14"))   # a Monday
         self.assertFalse(discover.due("2026-09-16"))  # a Wednesday, ran recently
