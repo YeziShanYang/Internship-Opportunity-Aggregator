@@ -15,7 +15,7 @@ renders the staleness nag, and neither may import the other.
 """
 from __future__ import annotations
 
-PROFILE_LAST_REVIEWED = "2026-09-11"
+PROFILE_LAST_REVIEWED = "2026-09-14"
 PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
 
 OWNER_PROFILE = (
@@ -23,8 +23,10 @@ OWNER_PROFILE = (
     "Does not meet the eligibility criteria for identity-restricted programmes "
     "-- those reserved for women, transgender or gender-expansive students, "
     "underrepresented racial minorities, or LGBTQIA+ students -- nor for \"barriers "
-    "to access and opportunity\" criteria. US citizen, US-based. "
-    "Regional St. Louis firms are viable summer options. "
+    "to access and opportunity\" criteria. US citizen, US-based. Willing to "
+    "relocate for a summer, so location is not a filter and no city or region is "
+    "preferred; only whether the role is in the United States matters, because he "
+    "cannot take one that recruits solely abroad. "
     "Interests, in order: quantitative finance and mathematics first, software "
     "engineering second. General finance roles are adjacent and acceptable."
 )
