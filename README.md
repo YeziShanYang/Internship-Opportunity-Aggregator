@@ -244,10 +244,10 @@ ambiguity: **silence now always means broken.** Notification fatigue is handled 
 content instead of by withholding mail — a quiet day is titled `(no changes)` and its body
 is just the calendar and health blocks, which you can triage without opening it.
 
-The **no more** half matters just as much. The morning schedule fires three ticks (see
-failure mode 3) and each one would otherwise open its own issue; two digests for one date
-is the same fatigue failure as an unread daily. So delivery is capped at one issue per
-date, and the cap is **absolute** — it suppresses real changes and failing sources too,
+The **no more** half matters just as much. A scheduled tick and a hand-dispatched run
+can overlap (see failure mode 3) and each would otherwise open its own issue; two digests
+for one date is the same fatigue failure as an unread daily. So delivery is capped at one
+issue per date, and the cap is **absolute** — it suppresses real changes and failing sources too,
 because a retry has nothing to tell you that the morning's issue did not already carry.
 Nothing is lost either way: the state commit and `data/proposals.log` still record
 everything the retry saw.
@@ -307,9 +307,15 @@ routes an opportunity to Manual Watch rather than being worked around.
    scheduled tick when it is busy, it silently drops it, and there is no run, no log and
    no notification to tell you so. This was observed live: the first two days of the
    schedule produced *zero* scheduled runs while `workflow_dispatch` worked perfectly.
-   **Mitigation: the schedule fires three times each morning (07:00 / 08:20 / 09:40 UTC)
-   and delivery is capped at one issue per date**, so all three ticks have to be dropped
-   to lose a day and a redundant tick costs one 30-second no-op run.
+   **Mitigation, 2026-09-07 to 2026-09-15: three ticks each morning (07:00 / 08:20 /
+   09:40 UTC) with delivery capped at one issue per date.** Cut back to a single 07:00
+   tick on 2026-09-15 once the history had an answer: across the eight days the retries
+   were live every tick fired, 24 of 24, and the first tick delivered on every one of
+   them, so the 16 retries delivered nothing. A retry only rescues a *dropped* tick; when
+   the first tick fails inside the code the retries fail with it, as on 2026-09-14 and
+   2026-09-15. The drop is still real, and what makes one tick acceptable is that a
+   missing digest is now unambiguous -- the cadence mails every day, so silence means
+   broken -- with `workflow_dispatch` to recover the morning by hand.
 
    The ticks GitHub *does* run, it runs badly late. Measured 2026-09-07/08: every tick
    ran 3h27m–4h48m behind its cron, because a private repo on a free personal account

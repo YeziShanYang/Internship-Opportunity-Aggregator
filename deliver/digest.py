@@ -17,11 +17,12 @@ diagnostic: no issue on a given morning means the job is broken, with no "maybe 
 changed" ambiguity to explain it away. The cost is that quiet days mail too, so a quiet
 day says so in the title ("(no changes)") and stays short enough to archive in a glance.
 
-The "no more" half is load-bearing in the other direction. The morning schedule fires
-three ticks so that a dropped cron tick is not a missed day, and every one of those
-ticks would otherwise be free to open its own issue. Two digests for the same date is
-the same notification-fatigue failure as a daily "0 changes" email, so delivery is
-capped -- see should_send and delivered_issue_exists.
+The "no more" half is load-bearing in the other direction. The schedule fires one tick
+now, but a manual `workflow_dispatch` can still run alongside it -- that happened on
+2026-09-14, when a late tick and a hand-dispatched run overlapped by twenty-one seconds
+-- and either would otherwise be free to open its own issue. Two digests for the same
+date is the same notification-fatigue failure as a daily "0 changes" email, so delivery
+is capped -- see should_send and delivered_issue_exists.
 """
 from __future__ import annotations
 

@@ -264,9 +264,9 @@ def run(args: argparse.Namespace) -> int:
     update_source_state(sources, results)
     update_program_state(programs, sources, results, judgments)
 
-    # Exactly one digest a day (spec section 9). The morning schedule fires three ticks
-    # so a dropped cron tick is not a missed day, so between one and three runs reach
-    # this line every morning and only the first may mail.
+    # Exactly one digest a day (spec section 9). One scheduled tick, but a manual
+    # dispatch can overlap it, so more than one run can still reach this line on a
+    # morning and only the first may mail.
     #
     # Ask GitHub first and treat the local marker as the fallback, not the other way
     # round: the marker comes from whatever commit this run checked out, and late ticks
