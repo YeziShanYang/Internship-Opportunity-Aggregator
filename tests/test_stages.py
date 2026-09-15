@@ -40,9 +40,78 @@ class FilterReportTests(unittest.TestCase):
         self.assertEqual(len(kept), 1)
         self.assertEqual(
             {r.filter_id for r in reports},
-            {suppress.DISAPPEARED, suppress.MUTED, suppress.APPLIED},
+            {suppress.DISAPPEARED, suppress.DUPLICATE, suppress.MUTED,
+             suppress.APPLIED},
         )
         self.assertTrue(all(r.removed == 0 for r in reports))
+
+    def test_one_posting_on_two_sources_is_listed_once(self):
+        """The same opportunity reported by several sources is one thing to go and do.
+
+        Matched on the employer's own posting link, because the text does not match: one
+        real PIMCO posting read "Software Engineering Intern - Technology Analyst" on
+        Simplify and "2027 Summer Intern - Technology Analyst, Software Engineering" on
+        zshah, and both carried requisition R106745.
+        """
+        apply_url = ("https://pimco.wd1.myworkdayjobs.com/pimco-careers/job/"
+                     "Austin-TX-USA/XMLNAME-2027-Summer-Intern_R106745")
+        on_simplify = models.Change(
+            source_id="simplify-2027", kind="added",
+            key="PIMCO / Software Engineering Intern - Technology Analyst @ Austin, TX",
+            detail=f"New row: Application={apply_url}")
+        # The employer's own board links the same requisition without the tenant path
+        # segment, which is exactly why the identity is the requisition and not the URL.
+        on_board = models.Change(
+            source_id="pimco-workday", kind="added",
+            key="2027 Summer Intern - Technology Analyst, Software Engineering",
+            detail=("New row: URL=https://pimco.wd1.myworkdayjobs.com/job/"
+                    "Austin-TX-USA/XMLNAME-2027-Summer-Intern_R106745"))
+
+        kept, reports = suppress.suppress(
+            [on_simplify, on_board], muted=set(), applied={},
+            aggregators=frozenset({"simplify-2027"}))
+
+        self.assertEqual([c.source_id for c in kept], ["pimco-workday"],
+                         "the employer's board outranks an aggregator's copy")
+        self.assertEqual(suppress.removed_by(reports, suppress.DUPLICATE), 1)
+
+    def test_two_postings_at_one_employer_are_not_merged(self):
+        """Only a posting link dedupes, never a company page.
+
+        A Simplify row carries `simplify.jobs/c/PIMCO` alongside its posting link, and
+        keying on the company page would collapse every PIMCO posting into one row.
+        """
+        first = models.Change(
+            source_id="simplify-2027", kind="added", key="PIMCO / SWE Intern",
+            detail=("New row: Company=[PIMCO](https://simplify.jobs/c/PIMCO); "
+                    "Application=[ ](https://simplify.jobs/p/"
+                    "5370153e-8623-4e1d-b4f6-986a7ab410a1)"))
+        second = models.Change(
+            source_id="simplify-2027", kind="added", key="PIMCO / Quant Intern",
+            detail=("New row: Company=[PIMCO](https://simplify.jobs/c/PIMCO); "
+                    "Application=[ ](https://simplify.jobs/p/"
+                    "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee)"))
+        kept, reports = suppress.suppress(
+            [first, second], muted=set(), applied={},
+            aggregators=frozenset({"simplify-2027"}))
+        self.assertEqual(len(kept), 2, "two different postings at one employer")
+        self.assertEqual(suppress.removed_by(reports, suppress.DUPLICATE), 0)
+
+    def test_a_change_with_no_posting_link_is_never_deduplicated(self):
+        """Absence of an identity is not evidence of sameness.
+
+        Page-text sources carry no posting id at all, and two of them reporting on the
+        same morning must both survive -- the conservative direction, since a wrong
+        merge hides an opportunity outright.
+        """
+        a = models.Change(source_id="hrt-inside", kind="changed", key="page updated",
+                          detail="text changed")
+        b = models.Change(source_id="janestreet-fttp", kind="changed",
+                          key="page updated", detail="text changed")
+        kept, reports = suppress.suppress(
+            [a, b], muted=set(), applied={}, aggregators=frozenset())
+        self.assertEqual(len(kept), 2)
+        self.assertEqual(suppress.removed_by(reports, suppress.DUPLICATE), 0)
 
     def test_a_removed_posting_is_dropped_and_counted(self):
         """The owner cannot apply to a posting that has left the board.

@@ -190,12 +190,21 @@ def _screen(
 
 
 def _suppress(
-    results: list[models.SourceResult], programs: list[dict[str, str]]
+    results: list[models.SourceResult],
+    programs: list[dict[str, str]],
+    sources: list[dict[str, str]] | None = None,
 ) -> tuple[list[models.Change], list[models.FilterReport]]:
     return suppress.suppress(
         [change for result in results for change in result.changes],
         muted=suppress.muted_programmes(programs),
         applied=store.read_applied(),
+        # Read off sources.csv rather than hardcoded: "which sources are aggregators"
+        # is a property of the watchlist, and this is what decides whether a duplicate
+        # keeps the employer's row or the aggregator's.
+        aggregators=frozenset(
+            source["source_id"] for source in (sources or [])
+            if (source.get("method") or "").strip() == "github_readme"
+        ),
     )
 
 
@@ -238,7 +247,7 @@ def run(args: argparse.Namespace) -> int:
         print("no sources matched; nothing to do", file=sys.stderr)
         return 2
 
-    changes, filters = _suppress(results, programs)
+    changes, filters = _suppress(results, programs, sources)
     suppressed_muted = suppress.removed_by(filters, suppress.MUTED)
     suppressed_applied = suppress.removed_by(filters, suppress.APPLIED)
     metrics = [models.SourceMetrics.of(result) for result in results]
@@ -397,7 +406,7 @@ def process_only(args: argparse.Namespace) -> int:
         print("data/sources.csv or data/programs.csv is empty or missing", file=sys.stderr)
         return 2
     results = build.build(sources, build.load_attempts())
-    changes, filters = _suppress(results, programs)
+    changes, filters = _suppress(results, programs, sources)
     metrics = [models.SourceMetrics.of(result) for result in results]
     _write_change_set(
         metrics, changes,
