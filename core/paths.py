@@ -76,6 +76,16 @@ USER_AGENT = "opportunity-tracker/1.0 (+mailto:jasonshi@stanford.edu)"
 REQUEST_DELAY_SECONDS = 1.0
 HTTP_TIMEOUT_SECONDS = 30.0
 
+# GitHub rejects an issue body over this with a 422 and opens nothing at all. Lives here
+# rather than in deliver.issue so that deliver.digest can respect it without importing
+# the module that does the POST -- the separation that lets a digest be rendered offline.
+#
+# It has cost two mornings. 2026-09-14 hit it on 469 changes that were a churn bug, and
+# 2026-09-15 hit it again on 146 that were real. The first was a defect to fix; the
+# second is the shape of a busy day, which is why `digest.render` now trims to fit and
+# says what it withheld instead of letting the whole digest be lost.
+MAX_ISSUE_BODY_CHARS = 65_536
+
 # Spec section 10.1: a source this broken is an emergency, not a footnote.
 FAILURE_ESCALATION_THRESHOLD = 3
 

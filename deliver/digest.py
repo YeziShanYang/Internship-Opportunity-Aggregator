@@ -30,7 +30,7 @@ import datetime
 import re
 
 import calendar_reminders
-from core import clock, models, profile
+from core import clock, models, paths, profile
 from deliver import health, urgency
 from enrich import bodies as enrich_bodies
 
@@ -279,21 +279,24 @@ def render(
 
     # One table rather than two sections, sorted so every ACT NOW row sits above every
     # WORTH A LOOK row. The urgency column carries the distinction the headings used to.
-    if escalated or act_now or worth_a_look:
-        body.append(
-            f"## ■ OPPORTUNITIES ({len(escalated) + len(act_now) + len(worth_a_look)})"
-        )
+    #
+    # Collected as a list rather than appended straight onto the body, because the table
+    # is the one block that can be trimmed if the whole digest will not fit. Built in
+    # priority order, so trimming from the end always drops the least urgent row.
+    table: list[str] = [
+        _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes))
+        for source_id, position, notes in escalated
+    ]
+    table += [_judgment_row(j, suppress_reason) for j in act_now]
+    table += [_judgment_row(j, suppress_reason) for j in worth_a_look]
+    table_index = None
+    if table:
+        body.append(f"## ■ OPPORTUNITIES ({len(table)})")
         body.append("")
         body.append("| Urgency | Company | Position | Notes |")
         body.append("|---|---|---|---|")
-        for source_id, position, notes in escalated:
-            body.append(
-                _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes))
-            )
-        for judgment in act_now:
-            body.append(_judgment_row(judgment, suppress_reason))
-        for judgment in worth_a_look:
-            body.append(_judgment_row(judgment, suppress_reason))
+        table_index = len(body)
+        body += table
         body.append("")
 
     if ruled_out:
@@ -374,4 +377,44 @@ def render(
             "classifier (see RULED OUT above)."
         )
 
-    return title, "\n".join(body)
+    return title, _fit(body, table, table_index, len(judgments))
+
+
+def _fit(
+    body: list[str], table: list[str], table_index: int | None, total: int
+) -> str:
+    """Join the body, trimming the table if GitHub would refuse the whole thing.
+
+    A 422 for an over-long body opens no issue at all, so without this a busy morning
+    loses the entire digest rather than its overflow -- the calendar, the health block
+    and every urgent row with it. That is the failure this project cares about most:
+    silence is supposed to mean broken, and it did, but the reader has no way to know
+    which morning it was or what it would have said.
+
+    Trimming is the last resort and not a strategy. The digest is short because the
+    screen and the classifier are selective; when it is still too long, the least urgent
+    rows go, the count says exactly how many, and the state commit has all of them. It
+    does nothing at all to a digest that already fits, so the byte-identical re-render
+    property is untouched on every normal day.
+    """
+    rendered = "\n".join(body)
+    if len(rendered) <= paths.MAX_ISSUE_BODY_CHARS or table_index is None:
+        return rendered
+
+    head, tail = body[:table_index], body[table_index + len(table):]
+    # Recomputed inside the loop: the note's own length is part of what has to fit, and
+    # its digits change as rows come off.
+    for keep in range(len(table) - 1, -1, -1):
+        note = (
+            f"- _{len(table) - keep} of {len(table)} rows did not fit GitHub's "
+            f"{paths.MAX_ISSUE_BODY_CHARS:,}-character issue body limit and were "
+            "withheld, least urgent first. All of them are in this morning's state "
+            "commit._"
+        )
+        candidate = "\n".join(head + table[:keep] + [""] + [note] + tail)
+        if len(candidate) <= paths.MAX_ISSUE_BODY_CHARS:
+            return candidate
+    # Every row removed and it still does not fit, so the overflow is not the table.
+    # Return the un-trimmed body rather than a silently mangled one: the delivery will
+    # fail loudly, which is the correct outcome for a bug this is not equipped to fix.
+    return rendered
