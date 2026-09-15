@@ -51,8 +51,8 @@ Student
 opportunities.
 Join a community guided by mathematical rigor, engineering excellence, and the belief that the best work can only be done together.
 Explore Openings
-Summer 2026
-Winter 2026
+Summer 2027
+Winter 2027
 Full-Time
 Early Talent
 FAQs
@@ -86,19 +86,19 @@ Summer 2027
 NYC, London &amp; Singapore
 Leverage your advanced research experience and expertise to apply academic research to impactful real world problems in trading across time horizons and machine learning strategies.
 ↳ Apply Here
-For 2028 Grad
+For 2028 Grads
 Hardware Engineer Internship
 Summer 2027
-NYC, London &amp; Singapore
+New York City
 Leverage your advanced research experience and expertise to apply academic research to impactful real world problems in trading across time horizons and machine learning strategies.
 ↳ Apply Here
 Winter Internships
 Our winter internships offer students a focused introduction to quantitative trading through hands-on projects, technical learning, and close mentorship. Designed for those early in their exploration of the field, these short-term programs provide a meaningful glimpse into life and work at HRT.
 Women in Trading & Technology Internship
-January 2026
+January 2027
 New York City
 A 2-4 week exploration into automated trading for second year students from underrepresented backgrounds in tech and finance. Interns will get an introduction to all technical facets of the algorithmic trading industry, learn about who we are and what we do, and participate in hands-on independent programming projects in Python and C++.
-Applications for January 2026 are now closed. Check back soon for January 2027 applications.
+↳ Apply Here
 For PhD Students
 PhD Winter Internship
 January 2026
@@ -118,7 +118,7 @@ Software Engineers create and maintain critical technology and infrastructure at
 Hardware Design Engineer
 New York City
 Hardware Design Engineers at HRT craft sophisticated digital logic solutions in FPGA and ASIC technologies with nanosecond precision. They push boundaries in trading performance using advanced low-level logic design, low-latency hardware architectures, and novel solutions for hardware-software interaction.
-Applications are currently closed. Check back soon for 2027 applications.
+↳ Apply Here
 Opportunities for Early Talent
 For students early in their academic careers and interested in quantitative finance, we offer programs ranging from one day to several weeks. Follow us on social media to be notified when applications open!
 Follow
