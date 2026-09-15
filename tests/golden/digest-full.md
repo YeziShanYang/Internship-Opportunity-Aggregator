@@ -10,7 +10,7 @@ Opportunity digest — 2026-09-12
 |---|---|---|---|
 | **ACT NOW** | aqr-internship-program | SOURCE BLIND — 4 failures running | not quiet, blind. Last success never. redirected to what looks like an error page: https://www.aqr.com/About-Us/Our-Internship-Program -> https://www.aqr.com/404. |
 | **ACT NOW** | crabel-careers | SOURCE BLIND — 5 failures running | not quiet, blind. Last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting |
-| **ACT NOW** | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | • **Deadline:** rolling — closes when full<br>• **Year:** all undergraduate years<br>• **Location:** New York, NY<br>• **Why:** Jane Street reviews on a rolling basis and this is a trading seat open to all undergraduate years<br>• **Next:** Apply this week |
+| **ACT NOW** | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | • **Deadline:** rolling — closes when full<br>• **Year:** all undergraduate years<br>• **Location:** New York, NY<br>• **Why:** Jane Street reviews on a rolling basis and this is a trading seat open to all undergraduate years |
 | **ACT NOW** | InfiniteQuant | [Quantitative Trader @ NYC](https://simplify.jobs/p/abc) | • **Deadline:** 2026-09-20<br>• **Year:** first- and second-year undergraduates<br>• **Location:** New York, NY<br>• **Why:** Explicitly open to first- and second-year undergraduates, which is an unusually good match |
 | Worth a look | Optiver FutureFocus | [page updated (3 added, 1 removed)](https://optiver.com/working-at-optiver/career-opportunities/?level=student) | • **Location:** Chicago, IL or Amsterdam, NL<br>• **Why:** The page added a 2027 FutureFocus date |
 | Worth a look | Millennium Campus | [2027 Quantitative Researcher Intern \| Austin](https://campusjobs.mlp.com/1) | • **Deadline:** 2027-03-31<br>• **Year:** Bachelor's, no year stated<br>• **Location:** Austin, TX<br>• **Why:** Campus board row with no class-year gate stated, so a first-year is eligible on the face of it and the note is long enough that it would have been clipped mid-clause under the old 96-character budget |
@@ -19,7 +19,7 @@ Opportunity digest — 2026-09-12
 
 <details><summary>■ RULED OUT (1)</summary>
 
-_Read and judged out of scope - usually a class-year gate on the posting, or a role outside quant/maths/software. Expand to audit; a wrong call here is the expensive kind, so the reasons are shown rather than hidden._
+_Read and judged out of scope. Expand to audit; a wrong call here is the expensive kind, so the reasons are shown rather than hidden. A row ruled out on **value** — it could be applied to, but the role is not worth a morning — carries its full reasoning, because that is a judgement and it has been wrong. A row ruled out on **eligibility** carries the phrase from the posting that did it, which is the whole of the evidence._
 
 - **Senior Platform Engineer @ Remote** — Posting requires junior standing or above; this owner is a rising sophomore for Summer 2027: "rising junior"
 

@@ -65,7 +65,17 @@ AZURE_DEFAULT_API_VERSION = "2024-12-01-preview"
 # does this posting name a graduation window or an identity gate this person fails.
 # "minimal" is the bet that this needs recognition rather than deliberation, and the
 # 2026-09-15 digest is the test of it.
-CLASSIFY_REASONING_EFFORT = "minimal"
+# Raised from "minimal" on 2026-09-15. Minimal was the right bet while every question
+# this prompt asked was a lookup -- does the posting state a graduation window, does it
+# name an identity gate -- and the comment below still describes that case. Rule 8 asks
+# something else: whether an employer has standing in software, which is recall and
+# judgement rather than recognition in the text. On minimal it got Figma, Robinhood and
+# Datadog wrong on the first morning it ran, each time by substituting the easier
+# question "is this firm quant?" for the one asked. Today's run cost $0.0967 across 136
+# calls at minimal, so there is room; if this proves expensive, the better fix is to ask
+# the employer question once per employer rather than once per posting, since Figma
+# appeared four times in one digest and the answer cannot differ between them.
+CLASSIFY_REASONING_EFFORT = "low"
 
 
 # Anthropic and Azure do not share an effort vocabulary; Anthropic has no "minimal".
@@ -133,18 +143,34 @@ Rules, in priority order:
    Keep, regardless of the employer's fame:
    * anything quantitative -- trading, quant research, quant development, systematic
      strategy, mathematics, statistics. This is his first field and the bar is low.
-   * software, data or ML at a firm of genuine standing in technology or finance: the
-     large technology companies, the major banks and asset managers, the well-known
-     product companies, the serious AI labs.
+   * software, data or ML at a firm of genuine standing in technology or finance. Read
+     this generously -- it is the clause that has been misread. It means any company
+     whose product or engineering a software engineer would recognise, not only the
+     giants and not only finance. Kept, as calibration: Google, Meta, Amazon, Microsoft,
+     Apple, Nvidia; OpenAI, Anthropic; Figma, Stripe, Databricks, Snowflake, Datadog,
+     Cloudflare, Robinhood, Coinbase, Airbnb, Uber, Lyft, DoorDash, Notion, Palantir,
+     Atlassian, Netflix, Roblox, Discord, Reddit, Plaid, Ramp; Goldman Sachs, Morgan
+     Stanley, BlackRock, Citadel, Bloomberg, Capital One. These are examples and not a
+     list to match against -- a comparable firm you recognise is also a keep.
+
+     Measured on 2026-09-15, the first morning this rule ran: it wrongly ruled out
+     Figma twice, Robinhood three times and Datadog once, each time reasoning that the
+     firm was "non-finance/quant" -- which is not the test. A well-known product company
+     is a keep on its own.
    * a role whose *substance* is notable even if the employer is not -- compilers,
      operating systems, distributed systems, cryptography, ML infrastructure, research.
    * anything at a firm the owner already tracks as a priority.
 
    Rule out: an unremarkable "Software Engineer Intern", "IT Intern", "Technology
    Intern" or "Web Developer Intern" at a company with no notable engineering
-   reputation. Name the employer and say it plainly in `why` -- "a small HR-software
-   vendor, and the role is a generic backend internship" -- so the call can be audited
-   and argued with.
+   reputation -- a regional insurer, an agricultural lender, a construction-equipment
+   dealer, a small HR-software vendor, a local IT consultancy. Name the employer and say
+   what it does plainly in `why`, so the call can be audited and argued with.
+
+   Ask it in this order, because reversing them is what produced the wrong answers:
+   first "do I recognise this company as a software or finance employer?" -- if yes,
+   keep, and stop. Only then "is this a generic role at a firm with no engineering
+   reputation?" Do not ask whether the firm is quant: most keeps are not.
 
    This is a judgement of value and not of eligibility, so it is the one rule where you
    should NOT err toward keeping. It is safe to be decisive because a ruled-out row is
@@ -173,8 +199,23 @@ an empty bullet is simply not shown, whereas a wrong one is read as fact:
   posting says it reviews on a rolling basis or closes when full; an ISO `YYYY-MM-DD`
   date when it states or clearly implies one; or the empty string when it states none.
   Do NOT invent a date, and do not put prose here -- a phrase like "apply early" goes
-  in `suggested_action`. `rolling` and a near date are what put a row in ACT NOW, so a
-  guess here costs the owner a wasted morning or a missed opening."""
+  in `why`. `rolling` and a near date are what put a row in ACT NOW, so a guess here
+  costs the owner a wasted morning or a missed opening.
+
+Do NOT suggest a next step, an action, or advice. The digest is a list of things to go
+and look at, not a plan; "consider applying; seek referrals" is a sentence the owner
+skips on every row, and as its own bullet it cost 231 characters a row on a morning when
+nine real opportunities were withheld for want of room.
+
+`ruled_out_by` says which kind of rule fired. It matters only when relevant is false:
+
+* `eligibility` -- rules 1, 2, 6 and 7. He cannot apply, or the role is not in his
+  field. These are checkable against the posting text and have proven reliable, so the
+  digest prints them compactly.
+* `value` -- rule 8 alone. He could apply and it is in his field, but the role is not
+  worth his morning. This is a judgement rather than a fact, it is the one that has been
+  wrong, and the digest prints these in full so they can be argued with.
+* the empty string when relevant is true."""
 
 RESULT_SCHEMA = {
     "type": "object",
@@ -184,8 +225,8 @@ RESULT_SCHEMA = {
         "new_status": {"type": "string", "enum": list(paths.PROGRAM_STATUSES)},
         "why": {"type": "string"},
         "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
-        "suggested_action": {"type": "string"},
         "eligible_proposal": {"type": "string"},
+        "ruled_out_by": {"type": "string", "enum": ["", "eligibility", "value"]},
         "class_year": {"type": "string"},
         "location": {"type": "string"},
         "deadline": {"type": "string"},
@@ -196,7 +237,7 @@ RESULT_SCHEMA = {
         "new_status",
         "why",
         "confidence",
-        "suggested_action",
+        "ruled_out_by",
         "class_year",
         "location",
         "deadline",
@@ -390,7 +431,7 @@ def _judgment_from_text(change: models.Change, text: str) -> Judgment:
         new_status=payload.get("new_status", "unknown"),
         why=payload.get("why", ""),
         confidence=payload.get("confidence", "low"),
-        suggested_action=payload.get("suggested_action", ""),
+        ruled_out_by=payload.get("ruled_out_by", ""),
         eligible_proposal=payload.get("eligible_proposal", ""),
         class_year=_clean(payload.get("class_year")),
         location=_clean(payload.get("location")),

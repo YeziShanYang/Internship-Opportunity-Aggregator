@@ -298,7 +298,11 @@ class Judgment:
     new_status: str = "unknown"
     why: str = ""
     confidence: str = "low"
-    suggested_action: str = ""
+    # Which kind of rule ruled this row out: "eligibility" (checkable against the
+    # posting, and reliable) or "value" (rule 8's judgement of whether a role he can
+    # apply to is worth his morning, which has been wrong and is printed in full so it
+    # can be argued with). Empty when the row is relevant.
+    ruled_out_by: str = ""
     eligible_proposal: str = ""
     error: str = ""
     # The three facts the owner actually decides on, read off the posting body rather

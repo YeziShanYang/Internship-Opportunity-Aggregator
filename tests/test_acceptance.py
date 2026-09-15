@@ -1686,20 +1686,25 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         """The column answers four separate questions -- deadline, class year,
         location, and why this reached him -- and they were crushed into one
         semicolon-joined sentence. Bullets, `<br>`-joined because GitHub renders a line
-        break inside a table cell and does not render a markdown list."""
+        break inside a table cell and does not render a markdown list.
+
+        A fifth bullet, "Next", was removed on 2026-09-15: it averaged 231 characters of
+        advice per row on a morning when nine real opportunities were withheld for want
+        of room, and the owner's objection was that he skips it."""
         judgment = models.Judgment(
             change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
             program_name="Some Firm", relevant=True, outcome=models.MODEL,
             confidence="high", why="Posting is open to any undergraduate",
             class_year="any undergraduate", location="New York, NY",
-            deadline="2026-10-15", suggested_action="Apply this week",
+            deadline="2026-10-15",
         )
         _, body = digest.render([judgment], [], {})
         row = next(line for line in body.splitlines() if "SWE Intern" in line)
         notes = row.split("|")[4].strip()
-        self.assertEqual(notes.count(digest.BULLET_JOIN), 4, notes)
-        for label in ("Deadline", "Year", "Location", "Why", "Next"):
+        self.assertEqual(notes.count(digest.BULLET_JOIN), 3, notes)
+        for label in ("Deadline", "Year", "Location", "Why"):
             self.assertIn(f"**{label}:**", notes)
+        self.assertNotIn("**Next:**", notes, "advice was removed, deliberately")
         # Deadline first: it is the only one of the four that changes what he does today.
         self.assertTrue(notes.startswith(f"{digest.BULLET}**Deadline:** 2026-10-15"), notes)
 
@@ -1745,7 +1750,7 @@ class ClassifierFieldContractTests(_IsolatedState, unittest.TestCase):
         judgment = classify._judgment_from_text(self.CHANGE, json.dumps({
             "relevant": True, "program_name": "P", "new_status": "OPEN",
             "why": "open to any undergraduate", "confidence": "high",
-            "suggested_action": "Apply", "class_year": "any undergraduate",
+            "ruled_out_by": "", "class_year": "any undergraduate",
             "location": "New York, NY", "deadline": "2026-10-01",
         }))
         self.assertEqual(judgment.class_year, "any undergraduate")
@@ -1759,7 +1764,7 @@ class ClassifierFieldContractTests(_IsolatedState, unittest.TestCase):
         for stated in ("", "N/A", "not specified", "  Unknown ", "None", "TBD"):
             judgment = classify._judgment_from_text(self.CHANGE, json.dumps({
                 "relevant": True, "program_name": "P", "new_status": "OPEN",
-                "why": "w", "confidence": "high", "suggested_action": "",
+                "why": "w", "confidence": "high", "ruled_out_by": "",
                 "class_year": stated, "location": stated, "deadline": stated,
             }))
             with self.subTest(stated):
@@ -1775,7 +1780,7 @@ class ClassifierFieldContractTests(_IsolatedState, unittest.TestCase):
         bullet is simply not rendered."""
         judgment = classify._judgment_from_text(self.CHANGE, json.dumps({
             "relevant": True, "program_name": "P", "new_status": "OPEN",
-            "why": "w", "confidence": "high", "suggested_action": "",
+            "why": "w", "confidence": "high", "ruled_out_by": "",
         }))
         self.assertTrue(judgment.classified)
         self.assertEqual((judgment.class_year, judgment.location, judgment.deadline),
@@ -2312,6 +2317,53 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
         self.assertIn("gts-careers", body)
         self.assertIn("SOURCE BLIND", body, "still escalated into the table")
         self.assertIn("source failing", title)
+
+
+class RuledOutBlockTests(_IsolatedState, unittest.TestCase):
+    """RULED OUT grew into 52% of the digest, so it is split by what it can be wrong about.
+
+    On 2026-09-15 the block held 123 rows and 33,797 characters -- larger than the
+    opportunities table -- and nine real opportunities were trimmed out of the table to
+    make room for it. 65 of those rows were eligibility calls, which quote a phrase from
+    the posting and have been reliable; 58 were rule 8's judgement of value, which got
+    Figma, Robinhood and Datadog wrong. The two deserve different amounts of space.
+    """
+
+    def _ruled(self, why, kind):
+        return models.Judgment(
+            change=models.Change(source_id="s", kind="added",
+                                 key="Acme / SWE Intern", detail="x"),
+            relevant=False, outcome=models.MODEL, why=why, ruled_out_by=kind)
+
+    WORDY = ('Posting states a graduation window this owner (class of 2030) cannot '
+             'meet: "graduating between December 2027 and August 2028"')
+
+    def test_an_eligibility_rule_out_keeps_only_the_quoted_phrase(self):
+        """The phrase from the posting is the whole of the evidence."""
+        line = digest._ruled_out_line(self._ruled(self.WORDY, digest.ELIGIBILITY))
+        self.assertIn("graduating between December 2027 and August 2028", line)
+        self.assertNotIn("class of 2030", line, "the wrapper sentence repeats the header")
+        self.assertLess(len(line), len(self.WORDY), "the point is that it is shorter")
+
+    def test_a_value_rule_out_keeps_its_full_reasoning(self):
+        """Rule 8 is a judgement and it has been wrong, so it stays arguable."""
+        why = ("Posting is a generic Software Engineer Intern at EquipmentShare, a "
+               "construction equipment firm with no notable software reputation")
+        line = digest._ruled_out_line(self._ruled(why, digest.VALUE))
+        self.assertIn(why, line)
+
+    def test_an_unlabelled_rule_out_is_printed_in_full(self):
+        """Conservative: an unlabelled row might be the arguable kind."""
+        line = digest._ruled_out_line(self._ruled(self.WORDY, ""))
+        self.assertIn("class of 2030", line)
+
+    def test_value_rule_outs_are_listed_first(self):
+        """Whoever opens the block is usually opening it to disagree with one."""
+        _, body = digest.render(
+            [self._ruled("eligibility reason: \"rising junior\"", digest.ELIGIBILITY),
+             self._ruled("a value judgement about the employer", digest.VALUE)], [], {})
+        lines = [l for l in body.splitlines() if l.startswith("- **")]
+        self.assertIn("value judgement", lines[0])
 
 
 class BodyLimitTests(_IsolatedState, unittest.TestCase):
