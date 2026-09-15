@@ -13,11 +13,12 @@ when it removed nothing. Reporting zero is the useful case: it is the difference
 """
 from __future__ import annotations
 
-from core import clock, models
+from core import clock, models, text
 
 MUTED = "muted-programme"
 APPLIED = "applied-tsv"
 DISAPPEARED = "removed-posting"
+DUPLICATE = "duplicate-posting"
 
 # Enough removed keys to audit a filter that has started over-matching, few enough that
 # the artifact stays readable.
@@ -43,6 +44,48 @@ def _all_muted(change: models.Change, muted: set[str]) -> bool:
     return bool(names) and all(name in muted for name in names)
 
 
+def _group_by_posting(changes: list[models.Change]) -> list[list[models.Change]]:
+    """Group changes that are demonstrably the same posting. Order is preserved.
+
+    Union-find over posting identities rather than a dict keyed on one of them, because
+    a single change can carry several -- a Simplify row holds the employer's apply link
+    *and* its own -- and two rows may agree on one identity while each also knows an
+    identity the other does not. Keying on "the first id" would split those.
+
+    A change with no identity is its own group. That is the conservative direction and
+    it is the point: two rows are only ever called the same posting on the evidence of a
+    shared link, never on a resemblance between their titles.
+    """
+    identities = [
+        text.posting_identities(change.detail, change.url, change.posting_url, change.key)
+        for change in changes
+    ]
+    parent = list(range(len(changes)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    seen: dict[str, int] = {}
+    for index, ids in enumerate(identities):
+        for identity in ids:
+            if identity in seen:
+                a, b = find(seen[identity]), find(index)
+                if a != b:
+                    parent[b] = a
+            else:
+                seen[identity] = index
+
+    grouped: dict[int, list[models.Change]] = {}
+    for index, change in enumerate(changes):
+        grouped.setdefault(find(index), []).append(change)
+    # Keyed on first appearance, so the surviving order matches the input order and a
+    # re-run over the same artifact produces the same bytes.
+    return [grouped[key] for key in dict.fromkeys(find(i) for i in range(len(changes)))]
+
+
 def _report(filter_id: str, considered: int, removed: list[models.Change], reason: str):
     return models.FilterReport(
         stage="process",
@@ -59,6 +102,7 @@ def suppress(
     *,
     muted: set[str],
     applied: dict[str, str],
+    aggregators: frozenset[str] | set[str] = frozenset(),
 ) -> tuple[list[models.Change], list[models.FilterReport]]:
     """Drop muted and already-actioned changes. Returns (kept, reports).
 
@@ -85,6 +129,38 @@ def suppress(
     reports.append(_report(
         DISAPPEARED, considered, dropped,
         "no longer on the source. A posting that has gone cannot be applied to",
+    ))
+
+    # One row per opportunity, not one row per source. The watchlist overlaps on
+    # purpose -- several aggregators plus ~70 employer boards -- so a new posting at a
+    # well-covered firm arrives as three or four changes on one morning, and to the
+    # reader that is one thing to go and do. Measured across the committed snapshots:
+    # 127 postings sit on more than one source, 152 rows.
+    #
+    # Before the mute filters so their counts mean "postings muted" rather than "rows",
+    # and before `enrich` and `classify` entirely, so a duplicate costs neither a
+    # posting fetch nor a model call.
+    considered = len(changes)
+    kept: list[models.Change] = []
+    dropped = []
+    for group in _group_by_posting(changes):
+        if len(group) == 1:
+            kept.append(group[0])
+            continue
+        # The employer's own board wins over an aggregator's copy of the same posting.
+        # The project's own framing of the two intake paths is the reason: an aggregator
+        # is "wide, late, and thin on detail" while the firm's board is the record. On a
+        # tie, first-seen, so the choice is deterministic and a re-render is byte-stable.
+        winner = next(
+            (c for c in group if c.source_id not in aggregators), group[0]
+        )
+        kept.append(winner)
+        dropped += [c for c in group if c is not winner]
+    changes = kept
+    reports.append(_report(
+        DUPLICATE, considered, dropped,
+        "the same posting already appears in this digest from another source, matched "
+        "on the employer's own posting link",
     ))
 
     considered = len(changes)
