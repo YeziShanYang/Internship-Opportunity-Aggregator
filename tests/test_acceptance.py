@@ -2314,6 +2314,58 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
         self.assertIn("source failing", title)
 
 
+class BodyLimitTests(_IsolatedState, unittest.TestCase):
+    """GitHub refuses an issue body over 65,536 characters with a 422 and opens nothing.
+
+    That cost two mornings. 2026-09-14 hit it on 469 changes produced by a churn bug,
+    and 2026-09-15 hit it again on 146 that were real -- and both times the whole digest
+    was lost, the calendar and the health block and every urgent row with it. Silence is
+    supposed to mean broken, and it did, but the reader cannot tell which morning it was
+    or what it would have said.
+    """
+
+    def _judgments(self, n: int, why: str):
+        return [
+            models.Judgment(
+                change=models.Change(
+                    source_id="simplify-2027", kind="added",
+                    key=f"[Firm {i}](https://simplify.jobs/c/Firm-{i}) / "
+                        f"Software Engineer Intern @ Somewhere, ST",
+                    detail="x", url=f"https://x.test/{i}"),
+                program_name="SimplifyJobs Summer 2027", relevant=True,
+                outcome=models.MODEL, confidence="high", why=why,
+                class_year="any undergraduate", location="Somewhere, ST",
+            )
+            for i in range(n)
+        ]
+
+    def test_an_over_long_digest_is_trimmed_rather_than_lost(self):
+        judgments = self._judgments(400, "A" * 300)
+        _, body = digest.render(judgments, [], {})
+        self.assertLessEqual(
+            len(body), paths.MAX_ISSUE_BODY_CHARS,
+            "the body must fit, or GitHub opens no issue at all",
+        )
+        self.assertIn("did not fit GitHub's", body, "the trim must announce itself")
+        self.assertIn("state commit", body, "and say where the rest is")
+
+    def test_the_trim_keeps_the_urgent_rows_and_the_footers(self):
+        """Trimming from the end is what makes it safe: the table is already sorted."""
+        judgments = self._judgments(400, "B" * 300)
+        judgments[0].deadline = "rolling"  # promotes it into ACT NOW, so it sorts first
+        _, body = digest.render(judgments, [], {})
+        self.assertIn("**ACT NOW**", body, "the urgent row must survive the trim")
+        self.assertIn("■ CALENDAR", body)
+        self.assertIn("■ HEALTH", body, "the health block is the blind-source alarm")
+
+    def test_a_digest_that_fits_is_untouched(self):
+        """The guard is inert on a normal morning, so re-rendering stays byte-stable."""
+        judgments = self._judgments(8, "short reason")
+        _, body = digest.render(judgments, [], {})
+        self.assertNotIn("did not fit", body)
+        self.assertIn("■ OPPORTUNITIES (8)", body)
+
+
 class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
     """An aggregator row names the real employer; the table must show that employer.
 

@@ -97,9 +97,12 @@ Rules, in priority order:
    Jane Street INSIGHT and WiSE; Jane Street JSIP, FOCUS and IN FOCUS; Bridgewater
    Rising Fellows; Two Sigma College Mentor Connect; D. E. Shaw Discovery, Latitude and
    Momentum; IMC WiT; Virtu Women's Winternship; SIG "for Women" Discovery Days.
-3. Bias toward false positives. Surfacing a borderline item is nearly free; missing a
-   real opening is expensive. When you are not sure, set relevant: true and say so in
-   `why`, with confidence "low".
+3. Bias toward false positives ON ELIGIBILITY. When the question is whether this person
+   *can* apply -- the class year, an identity gate, a requirement you cannot see because
+   the posting text is missing -- surfacing a borderline item is nearly free and missing
+   a real opening is expensive, so set relevant: true, say so in `why`, and use
+   confidence "low". This does not extend to rule 8, which is about whether a role he
+   can plainly apply to is worth his morning.
 4. Rolling deadlines are urgent. Jane Street, NVIDIA, D. E. Shaw and Point72 review on
    a rolling basis and close when full; Jane Street slots have reportedly filled by late
    October. Any change on one of those is high priority regardless of stated deadline.
@@ -118,9 +121,36 @@ Rules, in priority order:
    engineering, quantitative research, trading, mathematics, data/ML, and
    finance-adjacent work. Out of scope, as examples: public relations, human
    resources, marketing, recruiting, change management, IT document automation, and
-   general business operations. Only rule out what is plainly unrelated -- when a role
-   is technical at all, or you are unsure, keep it. Erring toward applying is correct;
-   this person can and does apply broadly.
+   general business operations. Also out of scope: engineering that is not software --
+   mechanical, electrical, civil, aerospace, chemical, manufacturing, firmware and
+   hardware -- because this person studies maths and CS.
+8. A generic software internship at an employer with no particular standing in software
+   is relevant: false. This rule exists because the aggregators supply most of the
+   volume and it is overwhelmingly this: measured on one morning, 80 of 146 changes were
+   ordinary "Software Engineer Intern" rows at firms the owner has no specific reason to
+   chase. A digest of 120 such rows is one he skims and acts on none of.
+
+   Keep, regardless of the employer's fame:
+   * anything quantitative -- trading, quant research, quant development, systematic
+     strategy, mathematics, statistics. This is his first field and the bar is low.
+   * software, data or ML at a firm of genuine standing in technology or finance: the
+     large technology companies, the major banks and asset managers, the well-known
+     product companies, the serious AI labs.
+   * a role whose *substance* is notable even if the employer is not -- compilers,
+     operating systems, distributed systems, cryptography, ML infrastructure, research.
+   * anything at a firm the owner already tracks as a priority.
+
+   Rule out: an unremarkable "Software Engineer Intern", "IT Intern", "Technology
+   Intern" or "Web Developer Intern" at a company with no notable engineering
+   reputation. Name the employer and say it plainly in `why` -- "a small HR-software
+   vendor, and the role is a generic backend internship" -- so the call can be audited
+   and argued with.
+
+   This is a judgement of value and not of eligibility, so it is the one rule where you
+   should NOT err toward keeping. It is safe to be decisive because a ruled-out row is
+   still printed, with this reason, in the digest's RULED OUT block: nothing is hidden,
+   it is moved out of the list of things to go and do. If you genuinely cannot tell what
+   the employer does, keep it.
 
 If the POSTING TEXT is missing or a fetch error is noted, you are judging on a job
 title alone. Say so in `why`, use confidence "low", and do NOT rule the item out on
