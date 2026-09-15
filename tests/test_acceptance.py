@@ -486,7 +486,11 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(issue.should_send([judgment], _metrics(healthy)), (True, False))
 
     def test_14_6b_a_schedule_retry_never_mails_a_second_time(self):
-        """The morning schedule fires three ticks; only the first may deliver.
+        """More than one run can reach delivery in a morning; only the first may mail.
+
+        The schedule is a single tick now, but a manual `workflow_dispatch` still
+        overlaps it -- which is how 2026-09-14 ended up with two runs delivering into
+        the same date twenty-one seconds apart.
 
         The lock is absolute -- unlike the old change-only cadence it suppresses real
         changes and failing sources too. A retry has nothing to tell the owner that the

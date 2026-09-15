@@ -18,15 +18,23 @@ on:
   # the digest is still labelled -- and still counted, for the one-a-day lock -- as the
   # day the owner wakes up into.
   #
-  # Three ticks, not one, because GitHub does not merely delay a tick under load, it
-  # drops it. Each later tick is a retry. Delivery is capped at one issue a day by
-  # digest.should_send, so a redundant tick costs one 30-second no-op run and cannot
-  # produce a second email. The retries sit off :00 and :30, the two most contended cron
-  # minutes.
+  # One tick. There were three -- 07:00, 08:20 and 09:40 -- added on 2026-09-07 after a
+  # tick was dropped outright with no run, no log and no notification. Removed
+  # 2026-09-15, asked for directly, and the run history is the argument: since the
+  # retries landed, all three ticks have fired on all eight days, 24 of 24, with nothing
+  # dropped. In every one of those days the *first* tick is the one that delivered, and
+  # the 16 retries have delivered zero digests between them. A retry only helps when the
+  # first tick is dropped; when the first tick fails for a reason in the code, the
+  # retries fail identically, which is exactly what happened on 2026-09-14 and again on
+  # 2026-09-15.
+  #
+  # The drop is still real and this is a real trade. What makes it acceptable is the
+  # cadence: exactly one digest a day, every day, so a missing morning is unambiguous
+  # rather than "maybe nothing changed" -- silence means broken and the owner sees it the
+  # same morning. `workflow_dispatch` recovers the day by hand. If drops resume, the fix
+  # is to put these two lines back, not to conclude the code is broken.
   schedule:
     - cron: "0 7 * * *" # 00:00 PDT / 23:00 PST -- midnight Pacific
-    - cron: "20 8 * * *" # retry
-    - cron: "40 9 * * *" # last retry
   workflow_dispatch:
 
 permissions:

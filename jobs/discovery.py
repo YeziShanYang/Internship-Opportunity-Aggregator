@@ -287,9 +287,10 @@ def triage(candidates: list[Candidate]) -> tuple[list[Candidate], list[Candidate
 def due(today: str | None = None) -> bool:
     """Monday, or any day when the last run was over a week ago.
 
-    The fallback matters: a Monday on which all three cron ticks are dropped -- which
-    this project has already seen happen -- would otherwise skip a whole week in
-    silence, and silence is the one signal this tool is built to make meaningful.
+    The fallback matters more since the schedule dropped to a single tick: a Monday on
+    which that tick is dropped -- which this project has already seen happen -- would
+    otherwise skip a whole week in silence, and silence is the one signal this tool is
+    built to make meaningful.
     """
     date = datetime.date.fromisoformat(today or clock.today_iso())
     if date.weekday() == 0:
