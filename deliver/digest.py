@@ -200,13 +200,39 @@ def _notes(judgment: models.Judgment, suppress_reason: bool = False) -> str:
         items.append(("Why", "row disappeared from the source"))
     elif change.kind == "changed":
         items.append(("Why", "row changed on the source"))
-    if judgment.suggested_action:
-        items.append(("Next", judgment.suggested_action))
     if not judgment.classified:
         items.append(("", "⚠ unverified — open the page"))
     elif judgment.confidence == "low":
         items.append(("", "low confidence, kept deliberately"))
     return _bullets(items)
+
+
+VALUE = "value"
+ELIGIBILITY = "eligibility"
+
+# The phrase a rule-out quoted from the posting. For an eligibility call that phrase is
+# the entire evidence -- "rising junior", a graduation window, a clearance requirement --
+# and the sentence wrapped around it repeats what the block header already says. Keeping
+# only the quote took the block from 274 characters a row to about 90 on the morning it
+# had grown to 123 rows and 52% of the whole digest, which is what pushed nine real
+# opportunities out of the table for want of room.
+_QUOTED = re.compile(r"[\"\u201c\u2018']([^\"\u201c\u201d\u2018\u2019']{3,140})[\"\u201d\u2019']")
+
+
+def _ruled_out_line(judgment: models.Judgment) -> str:
+    """One RULED OUT entry. Compact for eligibility, in full for a value judgement.
+
+    Anything that is not explicitly an eligibility call is printed in full, including a
+    row whose `ruled_out_by` is missing entirely. That is the conservative direction: an
+    unlabelled rule-out might be the arguable kind, and shortening it would hide exactly
+    the reasoning worth reading.
+    """
+    why = judgment.why or "not relevant"
+    if judgment.ruled_out_by == ELIGIBILITY:
+        quoted = _QUOTED.search(why)
+        if quoted:
+            why = f"\u201c{quoted.group(1).strip()}\u201d"
+    return f"- **{judgment.change.key}** — {why}"
 
 
 def _table_row(urgency: str, company: str, position: str, notes: str, url: str = "") -> str:
@@ -303,15 +329,18 @@ def render(
         body.append(f"<details><summary>■ RULED OUT ({len(ruled_out)})</summary>")
         body.append("")
         body.append(
-            "_Read and judged out of scope - usually a class-year gate on the posting, "
-            "or a role outside quant/maths/software. Expand to audit; a wrong call here "
-            "is the expensive kind, so the reasons are shown rather than hidden._"
+            "_Read and judged out of scope. Expand to audit; a wrong call here is the "
+            "expensive kind, so the reasons are shown rather than hidden. A row ruled "
+            "out on **value** — it could be applied to, but the role is not worth a "
+            "morning — carries its full reasoning, because that is a judgement and it "
+            "has been wrong. A row ruled out on **eligibility** carries the phrase from "
+            "the posting that did it, which is the whole of the evidence._"
         )
         body.append("")
-        for judgment in ruled_out:
-            body.append(
-                f"- **{judgment.change.key}** — {judgment.why or 'not relevant'}"
-            )
+        # Value first: they are the arguable ones, and the reader who opens this block
+        # is usually opening it to disagree with one.
+        for judgment in sorted(ruled_out, key=lambda j: j.ruled_out_by != VALUE):
+            body.append(_ruled_out_line(judgment))
         body.append("")
         body.append("</details>")
         body.append("")

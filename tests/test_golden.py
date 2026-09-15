@@ -128,7 +128,6 @@ def scenario_full() -> dict:
     judgments = [
         _judgment(rolling, why="Jane Street reviews on a rolling basis and this is a "
                                "trading seat open to all undergraduate years.",
-                  suggested_action="Apply this week.",
                   class_year="all undergraduate years", location="New York, NY",
                   deadline="rolling"),
         _judgment(first_year, why="Explicitly open to first- and second-year "
@@ -340,7 +339,7 @@ class GoldenDigestTests(_Pinned, unittest.TestCase):
                      # digest that quietly stopped rendering them.
                      "• **Deadline:** rolling — closes when full",
                      "• **Year:** first- and second-year undergraduates",
-                     "• **Location:** Austin, TX", "• **Next:** Apply this week"):
+                     "• **Location:** Austin, TX"):
             self.assertIn(line, body, line)
         self.assertNotIn("\u2026", body, "nothing in the digest is truncated any more")
 
