@@ -1,0 +1,125 @@
+Careers | GTS | Job Listings at GTS
+Please Enable Cookies to Continue
+Please enable cookies in your browser to experience all the personalized features of this site, including the ability to apply for a job.
+Welcome page
+Returning Candidate?
+Log back in!
+Job Listings
+Here are our current job openings. Please click on the job title for more information, and apply from that page if you are interested.
+Click column header to sort
+Search Results
+Page 1 of 1
+Sort By
+Sort By...
+Job Title (Ascending)
+Job Title (Descending)
+Job Location (Ascending)
+Job Location (Descending)
+Overview (Ascending)
+Overview (Descending)
+Job Title
+Software Developer - Java &ndash; Wholesale Market Making Team
+The GTS Wholesale Market Making Team is seeking an experienced Software Engineer specializing in Java to help build, enhance, and scale the order management systems that support our U.S. equities market-making business. This is a hands-on engineering role for someone with strong Java expertise and a practical understanding of electronic trading, order lifecycles, and production trading environments.
+&nbsp;
+The successful candidate will take ownership of meaningful...
+Job Location
+US-NY-New York
+Job Title
+Quantitative Researcher, International ETFs
+The International ETF team at GTS is seeking a Senior Quantitative Researcher to develop the pricing, forecasting, and risk models that power our global trading business.
+&nbsp;
+Our team makes markets and manages risk across equity products spanning dozens of countries, time zones, and currencies. Working closely with traders and quantitative developers, you will build models from first principles, deploy them into production, and measure their impact on live trading.
+&nbsp;
+Job Location
+US-NY-New York
+Job Title
+Entity Controller / Financial and Operations Principal
+GTS is seeking an experienced Entity Controller/Financial and Operations Principal to own financial reporting, regulatory compliance, and audit management for one or more of our registered broker-dealer entities. This role sits at the intersection of technical accounting, financial systems, and regulatory reporting, and serves as the primary point of contact for external auditors and regulators.
+&nbsp;
+The ideal candidate brings deep broker-dealer accounting expertise,...
+Job Location
+US-NY-New York
+Job Title
+Quantitative Trader - 2027 Graduates
+The ETF trading group at GTS is seeking applications to join our Quantitative Trader program for the May 2027 Graduates. The ultimate goal of the program is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidates will work closely with senior traders on projects across the quantitative trading space. They will see their work directly impact the group&rsquo;s activities and drive revenue. The role will offer deep insight into how the trading desk operates and how our traders evaluate trading opportunities. There is opportunity for the right candidate to get involved in...
+Job Location
+US-NY-New York
+Job Title
+FPGA Developer - Kitchener, Ontario, Canada
+We are looking to hire a senior hardware engineer to join a small and growing FPGA team developing key components of a high-performance FPGA platform. This role offers broad technical scope and exposure across multiple layers of computing technology, from RTL and verification to high-speed interfaces and system integration.
+Successful candidates will work on full-stack FPGA systems in a highly collaborative environment, contributing to architecture, implementation, verification, performance optimization, and tooling/CI improvements.
+Job Location
+CA-ON-Kitchener
+Job Title
+Quantitative Trader &ndash; Overnight Session / Asia Trading, ETF Team
+The ETF trading group at GTS is seeking applications for Quantitative Trader role with a focus on our overnight / Asian trading strategies. The hours for this role will be approximately 7pm ET to 5am ET.
+&nbsp;
+The ultimate goal is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidate will work closely with senior traders on multiple strategies across the quantitative trading space. They will see their work and decisions directly...
+Job Location
+US-NY-New York
+Additional Locations
+US | US-WA | US-AZ | US-CA | US-HI | US-WA
+Job Title
+Operations Analyst
+GTS Asset Management is seeking an Operations Analyst to support the day-to-day operational activities of multiple fund-of-funds vehicles. The role sits within the operations function and works closely with portfolio management, fund administrators, counterparties, and internal control teams to ensure accurate, timely, and well-controlled execution of operational processes. This position is well-suited to a detail-oriented individual with strong organisational skills and a foundational understanding of fund operations and financial processes.
+&nbsp;
+GTS is a...
+Job Location
+UY-Montevideo
+Additional Locations
+AR
+Job Title
+Senior Software Engineer C++
+Senior Software Engineer &ndash; C++
+&nbsp;
+GTS is currently seeking a talented Senior Software Engineer to join our Trading Systems Development Team to drive the expansion of our platform and trading teams into new capabilities, markets and asset types. This role requires a strong interest in financial markets and the technology that supports it. &nbsp;&nbsp;A qualified candidate would have excellent communication skills, both written and verbal. You will...
+Job Location
+US-NY-New York
+Additional Locations
+US-IL-Chicago
+Job Title
+FPGA Developer - Poland
+We are looking to hire a senior hardware engineer to join a small and growing FPGA team developing key components of a high-performance FPGA platform. This role offers broad technical scope and exposure across multiple layers of computing technology, from RTL and verification to high-speed interfaces and system integration.
+Successful candidates will work on full-stack FPGA systems in a highly collaborative environment, contributing to architecture, implementation, verification, performance optimization, and tooling/CI improvements.
+Job Location
+PL-Warsaw
+Job Title
+Quantitative Trader/Researcher - Futures
+Designing, developing and managing profitable systematic trading strategies in US Cash Treasury and Futures FI, FX, Equity and Commodities markets. The candidate is expected to perform its own trading strategy design and research. As such, the role requires high level development in C++ and Python. We expect the candidate to collaborate with the team&rsquo;s technology and trading experts for production implementation.
+&nbsp;
+The strategist will have the opportunity to deploy its trading strategy with limited infrastructure build time by leveraging an existing...
+Job Location
+US-NY-New York
+Job Title
+Quantitative Trader, ETF Team - Fixed Income
+The ETF trading group at GTS is seeking applications to join our Quantitative Trader covering the ETF Fixed Income Team. In this role the Quantitative Trader will work on existing srategies and ultimate goal of the program is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidates will work on projects across the quantitative trading space within the Fixed Income ETF Space. They will work closely with senior traders on strategies. They will gain insight into how the trading desk operates and how our traders evaluate trading opportunities. They will see their work directly impact the...
+Job Location
+US-NY-New York
+Job Title
+Sales Representative
+GTS is a collection of financial services companies spanning a wide array of asset classes and investment approaches, all powered by the combination of market expertise with innovative, proprietary technology.&nbsp; With roots as a quantitative trading firm continually building for the future, the GTS family of companies are able to leverage the latest in artificial intelligence systems and sophisticated pricing models to bring consistency, efficiency, and transparency to today&rsquo;s financial markets. GTS&rsquo;s electronic market maker GTS Securities accounts for 3-5% of daily cash...
+Job Location
+US-NY-New York
+Additional Locations
+US-FL-Miami
+Job Title
+Quantitative Trader
+The ETF trading group at GTS is seeking applications to join our Quantitative Trader program. The ultimate goal of the program is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidates will work closely with senior traders on projects across the quantitative trading space. They will see their work directly impact the group&rsquo;s activities and drive revenue. The role will offer deep insight into how the trading desk operates and how our traders evaluate trading opportunities. There is opportunity for the right candidate to get involved in trading decisions very...
+Job Location
+US-NY-New York
+Job Title
+Quantitative Trader/ Portfolio Manager - Futures &amp; FX
+Quantitative Trader / Portfolio Manager will be responsible in designing, developing and managing profitable systematic trading strategies in Futures and Foreign Exchange (FX) The candidate is expected to perform its own trading strategy design and research. As such, the role requires high level development in C++ and Python. We expect the candidate to collaborate with the team&rsquo;s technology and trading experts for production implementation.
+&nbsp;
+The strategist...
+Job Location
+UK-London
+Job Title
+Quantitative Trader/ Portfolio Manager - Futures &amp; FX
+Quantitative Trader / Portfolio Manager will be responsible in designing, developing and managing profitable systematic trading strategies in Futures and Foreign Exchange (FX) The candidate is expected to perform its own trading strategy design and research. As such, the role requires high level development in C++ and Python. We expect the candidate to collaborate with the team&rsquo;s technology and trading experts for production implementation.
+&nbsp;
+The strategist...
+Job Location
+US-IL-Chicago
+Additional Locations
+US-IL-Chicago | US-FL-Miami
