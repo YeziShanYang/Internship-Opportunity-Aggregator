@@ -69,37 +69,6 @@ Student FAQ
 Log in
 Events /&nbsp; Upcoming
 Switch to Calendar View
-How I Became a Quant - Boston
-When
-16 Sep 2026
-&nbsp;
-5:00 PM
-Location
-Boston University Questrom School of Business 595 Commonwealth Ave Boston, MA 02215
-Register
-How I Became a Quant: Boston
-This annual event is a Panel Discussion on Careers in Quantitative Finance, as industry veterans will discuss their experiences, the current economic climate, and career paths in finance and data science.
-Wednesday September 16, 2026
-5:00 PM Program Begins: Panel Discussion
-6:30 PM Reception
-Location:
-Boston University Questrom School of Business
-595 Commonwealth Ave
-Boston, MA 02215
-Moderator: &nbsp;
-Dan&nbsp; diBartolomeo,&nbsp;President and founder of Northfield Information Services, Inc
-Panelists:
-Bin Shi,&nbsp;Senior Vice President and Portfolio Manager at Acadian Asset Management
-Carlos Morales, Head of Asset Allocation &amp; Investment Management at Mass Mutual
-Oriol Ripalta I Maso, Quantitative Analyst at LSEG
-Panelist Biographies
-Moderator - Dan diBartolomeo &nbsp;is President and founder of Northfield Information Services, Inc. Based in Boston since 1986, Northfield develops quantitative models of financial markets. He sits on boards of numerous industry organizations include IAQF and CQA. He is a director and past president of the Boston Economic Club. His publication record includes more than sixty books, book chapters, and research journal articles. In addition, Dan spent several years as a Visiting Professor at Brunel University and has been admitted as an expert witness in litigation matters regarding investment management and derivatives in both US federal and state courts. He became editor in chief of the Journal of Asset Management at the start of 2019.&nbsp;
-Bin Shi, PhD, CFA, is a Senior Vice President and Portfolio Manager at Acadian Asset Management, specializing in systematic equity research and portfolio management across developed and emerging markets. With more than 20 years of experience, he combines quantitative analysis, machine learning, and artificial intelligence to develop data-driven investment strategies and research processes.
-Before joining Acadian in 2006, Bin worked at MathWorks, where he contributed to the development of machine learning algorithms for MATLAB’s financial and statistical toolboxes. He holds a PhD in Industrial and Systems Engineering from the Georgia Institute of Technology and a bachelor’s degree from Southeast University in China. Bin also teaches at Boston University’s Questrom School of Business.
-Carlos Morales - &nbsp;is Head of Asset Allocation at MassMutual and has spent more than two decades building a career at the intersection of mathematics, statistics, and investing. Originally trained as a statistician and university professor, he began his quantitative finance career modeling energy derivatives before moving into asset management, where he worked across credit, equities, derivatives, risk management, and asset allocation. His career has included quantitative roles at State Street, Wellington Management, GMO, and Sentinel Investments, followed by leadership positions at Liberty Mutual, New York Life, and MassMutual. Today, he oversees portfolio strategy and asset allocation decisions supported by quantitative models, data analytics, and market research. His experience reflects how quantitative skills can be applied across industries and asset classes, and how a strong analytical foundation can open unexpected opportunities throughout a career in finance. &nbsp;
-Oriol Ripalta &nbsp; graduated with an MSc in Mathematical Finance from Boston University and holds a BSc in Computer Science and Business Administration. He has previously worked as a software engineer in a couple of roles, using a range of programming languages. He is currently a Quantitative Analyst at LSEG, where I work on the development of ORE.
-Sponsored By:
-Show details
 IAQF &amp; Thalesians Seminar Series: Bridging Schr&#246;dinger and Bass for Generative Diffusion Modeling. A Seminar by Nizar Touzi.
 When
 06 Oct 2026
