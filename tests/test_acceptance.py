@@ -1668,19 +1668,62 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
 
     def test_14_9v_a_long_reason_is_kept_whole_and_never_ellipsised(self):
         """Notes are not truncated. Asked for directly after the 2026-09-13 digest,
-        where every cell ended in an ellipsis two lines in -- and because `why` is one
-        sentence leading with the posting's requirement, the clause that got cut was
-        reliably the decisive one."""
+        where every cell ended in an ellipsis two lines in.
+
+        Measured on `class_year`, which is a field the cell still renders. The property
+        used to be tested on `why`, and `why` was removed from the cell on 2026-09-17 --
+        but "nothing in this table is clipped" is a rule about the table and not about
+        that one field, so it keeps a test.
+        """
         judgment = models.Judgment(
             change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
             program_name="Some Firm", relevant=True, outcome=models.MODEL,
-            confidence="high", why="word " * 100,
+            confidence="high", class_year="word " * 100,
         )
         _, body = digest.render([judgment], [], {})
         row = next(line for line in body.splitlines() if "SWE Intern" in line)
         notes = row.split("|")[4].strip()
         self.assertNotIn("\u2026", notes, "the note was clipped")
         self.assertEqual(notes.count("word"), 100, "the note lost words")
+
+    def test_the_notes_cell_does_not_justify_the_row(self):
+        """`why` is not in the table. Asked for directly 2026-09-17.
+
+        A row in the table has already been judged relevant, so a bullet explaining
+        that it is worth looking at repeats what its presence in the digest said. It
+        stays on the Judgment, in the artifacts, and in RULED OUT -- where the row's
+        presence proves the opposite and the reasoning is the whole point.
+        """
+        judgment = models.Judgment(
+            change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
+            program_name="Some Firm", relevant=True, outcome=models.MODEL,
+            confidence="high", why="UNIQUEJUSTIFICATION for surfacing this row",
+            class_year="any undergraduate",
+        )
+        _, body = digest.render([judgment], [], {})
+        row = next(line for line in body.splitlines() if "SWE Intern" in line)
+        self.assertNotIn("UNIQUEJUSTIFICATION", row)
+        self.assertNotIn("**Why:**", row)
+        self.assertIn("any undergraduate", row, "the stated facts still render")
+
+    def test_a_row_with_nothing_stated_still_fills_its_cell(self):
+        """An empty table cell reads as a bug, and a page diff can produce one.
+
+        A watched page moving is not a posting appearing, so there is no deadline or
+        class year to report -- and `why` used to be the bullet that guaranteed the cell
+        had content.
+        """
+        judgment = models.Judgment(
+            change=models.Change(source_id="p", kind="changed", key="page updated",
+                                 detail="x"),
+            program_name="Some Page", relevant=True, outcome=models.MODEL,
+            confidence="high", why="the page gained a 2027 date",
+        )
+        _, body = digest.render([judgment], [], {})
+        row = next(line for line in body.splitlines() if "page updated" in line)
+        notes = row.split("|")[4].strip()
+        self.assertTrue(notes, "the cell must not be empty")
+        self.assertNotIn("2027 date", notes, "and must not fall back to `why`")
 
     def test_14_9w_the_notes_cell_is_bullets_not_one_run_on_clause(self):
         """The column answers four separate questions -- deadline, class year,
@@ -1701,10 +1744,11 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         _, body = digest.render([judgment], [], {})
         row = next(line for line in body.splitlines() if "SWE Intern" in line)
         notes = row.split("|")[4].strip()
-        self.assertEqual(notes.count(digest.BULLET_JOIN), 3, notes)
-        for label in ("Deadline", "Year", "Location", "Why"):
+        self.assertEqual(notes.count(digest.BULLET_JOIN), 2, notes)
+        for label in ("Deadline", "Year", "Location"):
             self.assertIn(f"**{label}:**", notes)
-        self.assertNotIn("**Next:**", notes, "advice was removed, deliberately")
+        for gone in ("**Next:**", "**Why:**"):
+            self.assertNotIn(gone, notes, f"{gone} was removed, deliberately")
         # Deadline first: it is the only one of the four that changes what he does today.
         self.assertTrue(notes.startswith(f"{digest.BULLET}**Deadline:** 2026-10-15"), notes)
 
@@ -2385,8 +2429,11 @@ class BodyLimitTests(_IsolatedState, unittest.TestCase):
                         f"Software Engineer Intern @ Somewhere, ST",
                     detail="x", url=f"https://x.test/{i}"),
                 program_name="SimplifyJobs Summer 2027", relevant=True,
-                outcome=models.MODEL, confidence="high", why=why,
-                class_year="any undergraduate", location="Somewhere, ST",
+                outcome=models.MODEL, confidence="high",
+                # Bulk lives in a field the cell actually renders. It used to be `why`,
+                # which stopped reaching the table on 2026-09-17, and the guard can only
+                # be exercised by a body that is genuinely too long.
+                class_year=why, location="Somewhere, ST",
             )
             for i in range(n)
         ]

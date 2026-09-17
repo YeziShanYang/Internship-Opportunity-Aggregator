@@ -10,11 +10,11 @@ Opportunity digest — 2026-09-12
 |---|---|---|---|
 | **ACT NOW** | aqr-internship-program | SOURCE BLIND — 4 failures running | not quiet, blind. Last success never. redirected to what looks like an error page: https://www.aqr.com/About-Us/Our-Internship-Program -> https://www.aqr.com/404. |
 | **ACT NOW** | crabel-careers | SOURCE BLIND — 5 failures running | not quiet, blind. Last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting |
-| **ACT NOW** | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | • **Deadline:** rolling — closes when full<br>• **Year:** all undergraduate years<br>• **Location:** New York, NY<br>• **Why:** Jane Street reviews on a rolling basis and this is a trading seat open to all undergraduate years |
-| **ACT NOW** | InfiniteQuant | [Quantitative Trader @ NYC](https://simplify.jobs/p/abc) | • **Deadline:** 2026-09-20<br>• **Year:** first- and second-year undergraduates<br>• **Location:** New York, NY<br>• **Why:** Explicitly open to first- and second-year undergraduates, which is an unusually good match |
-| Worth a look | Optiver FutureFocus | [page updated (3 added, 1 removed)](https://optiver.com/working-at-optiver/career-opportunities/?level=student) | • **Location:** Chicago, IL or Amsterdam, NL<br>• **Why:** The page added a 2027 FutureFocus date |
-| Worth a look | Millennium Campus | [2027 Quantitative Researcher Intern \| Austin](https://campusjobs.mlp.com/1) | • **Deadline:** 2027-03-31<br>• **Year:** Bachelor's, no year stated<br>• **Location:** Austin, TX<br>• **Why:** Campus board row with no class-year gate stated, so a first-year is eligible on the face of it and the note is long enough that it would have been clipped mid-clause under the old 96-character budget |
-| Worth a look | Millennium Campus | 2027 Applied AI Engineer Intern, New York | • **Why:** Row disappeared from the board<br>• low confidence, kept deliberately |
+| **ACT NOW** | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | • **Deadline:** rolling — closes when full<br>• **Year:** all undergraduate years<br>• **Location:** New York, NY |
+| **ACT NOW** | InfiniteQuant | [Quantitative Trader @ NYC](https://simplify.jobs/p/abc) | • **Deadline:** 2026-09-20<br>• **Year:** first- and second-year undergraduates<br>• **Location:** New York, NY |
+| Worth a look | Optiver FutureFocus | [page updated (3 added, 1 removed)](https://optiver.com/working-at-optiver/career-opportunities/?level=student) | • **Location:** Chicago, IL or Amsterdam, NL |
+| Worth a look | Millennium Campus | [2027 Quantitative Researcher Intern \| Austin](https://campusjobs.mlp.com/1) | • **Deadline:** 2027-03-31<br>• **Year:** Bachelor's, no year stated<br>• **Location:** Austin, TX |
+| Worth a look | Millennium Campus | 2027 Applied AI Engineer Intern, New York | • low confidence, kept deliberately |
 | Worth a look | Millennium Campus | 2027 Data Engineer Intern, Miami | • ⚠ unverified — open the page |
 
 <details><summary>■ RULED OUT (1)</summary>

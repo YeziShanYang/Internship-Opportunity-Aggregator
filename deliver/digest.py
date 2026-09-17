@@ -174,37 +174,50 @@ def _deadline_note(judgment: models.Judgment) -> str:
     return judgment.deadline
 
 
-def _notes(judgment: models.Judgment, suppress_reason: bool = False) -> str:
-    """The Notes cell: four labelled facts, then the caveats.
+def _notes(judgment: models.Judgment) -> str:
+    """The Notes cell: three labelled facts, then the caveats.
 
-    Bullets rather than one run-on clause, because this column answers four separate
+    Bullets rather than one run-on clause, because this column answers separate
     questions and the owner reads them in this order: how long do I have (Deadline),
-    can I even apply (Year), where is it (Location), and why did this reach me (Why).
-    All four used to be crushed into a single semicolon-joined sentence, which is what
-    made the truncation so costly -- the class year and the location were inside the
-    model's one prose sentence, so they were both only ever present by luck.
+    can I even apply (Year), and where is it (Location). They used to be crushed into a
+    single semicolon-joined sentence, which is what made the old truncation so costly --
+    the class year and the location were inside the model's one prose sentence, so they
+    were both only ever present by luck.
+
+    **`why` is deliberately not here.** It was a fourth bullet justifying the row's
+    presence, and the owner's objection on 2026-09-17 was that the justification is
+    redundant: a row in the table has already been judged relevant, so explaining that
+    it is worth looking at tells him what its appearance in the digest already told him.
+    It was also the longest bullet by a wide margin. `why` is still requested, still
+    stored on the Judgment, still in the artifacts and the state commit, and still
+    printed in full in RULED OUT -- where the row's presence proves the opposite and the
+    reasoning is the entire point.
 
     Ordered most-decision-relevant first. A rolling deadline changes what the owner
     does today; a confidence caveat only changes how much he trusts a row he is already
     reading, so it goes last.
     """
-    change = judgment.change
     items: list[tuple[str, str]] = [
         ("Deadline", _deadline_note(judgment)),
         ("Year", judgment.class_year),
         ("Location", judgment.location),
     ]
-    if judgment.why and not (suppress_reason and not judgment.classified):
-        items.append(("Why", judgment.why))
-    elif change.kind == "removed":
-        items.append(("Why", "row disappeared from the source"))
-    elif change.kind == "changed":
-        items.append(("Why", "row changed on the source"))
     if not judgment.classified:
         items.append(("", "⚠ unverified — open the page"))
     elif judgment.confidence == "low":
         items.append(("", "low confidence, kept deliberately"))
-    return _bullets(items)
+    cell = _bullets(items)
+    if cell:
+        return cell
+    # Nothing the posting stated and no caveat, which a page diff can produce: the
+    # change is that a watched page moved, not that a posting appeared, so there is no
+    # deadline or class year to report. An empty table cell reads as a bug, so fall back
+    # to naming the kind of change. `why` is not used even here -- it is the one thing
+    # this cell is no longer for.
+    return {
+        "removed": f"{BULLET}row disappeared from the source",
+        "changed": f"{BULLET}page changed on the source",
+    }.get(judgment.change.kind, f"{BULLET}no details stated on the posting")
 
 
 VALUE = "value"
@@ -247,13 +260,13 @@ def _table_row(urgency: str, company: str, position: str, notes: str, url: str =
     return f"| {urgency} | {company} | {position} | {notes} |"
 
 
-def _judgment_row(judgment: models.Judgment, suppress_reason: bool = False) -> str:
+def _judgment_row(judgment: models.Judgment) -> str:
     company, position = _company_and_position(judgment)
     return _table_row(
         URGENCY_ACT_NOW if urgency.is_urgent(judgment) else URGENCY_WORTH_A_LOOK,
         company,
         position,
-        _notes(judgment, suppress_reason),
+        _notes(judgment),
         judgment.change.url,
     )
 
@@ -295,11 +308,13 @@ def render(
 
     body: list[str] = [f"Opportunity digest — {today}", ""]
 
-    # If every unclassified item shares one reason, say it once rather than on every
-    # line. Repeating a 90-character disclaimer per row buries the actual content.
+    # Degraded mode announces itself once, at the top. When every unclassified item
+    # shares one reason -- almost always "no classifier credentials are configured" --
+    # that reason is a fact about the whole run rather than about any row, and the rows
+    # carry "unverified - open the page" individually anyway. This used to also suppress
+    # a per-row `why` bullet; the bullet is gone, so all that remains is the notice.
     reasons = {j.why for j in judgments if not j.classified and j.why}
-    suppress_reason = len(reasons) == 1
-    if suppress_reason:
+    if len(reasons) == 1:
         body.append(f"> Note: {reasons.pop()}")
         body.append("")
 
@@ -313,8 +328,8 @@ def render(
         _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes))
         for source_id, position, notes in escalated
     ]
-    table += [_judgment_row(j, suppress_reason) for j in act_now]
-    table += [_judgment_row(j, suppress_reason) for j in worth_a_look]
+    table += [_judgment_row(j) for j in act_now]
+    table += [_judgment_row(j) for j in worth_a_look]
     table_index = None
     if table:
         body.append(f"## ■ OPPORTUNITIES ({len(table)})")
