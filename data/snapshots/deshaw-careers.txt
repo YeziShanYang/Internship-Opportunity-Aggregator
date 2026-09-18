@@ -48,6 +48,7 @@ Financial Operations
 Financial Research
 Human Capital
 Investment Analysis
+Investor Relations
 Legal &amp; Compliance
 Quantitative Strategies
 Software Development
@@ -138,6 +139,9 @@ New York
 Learning & Development Specialist : The D.&nbsp;E.&nbsp;Shaw group seeks a versatile specialist with a keen interest in artificial intelligence (AI) to join its Learning & Development (L&D) team. This team develops&hellip;
 Human Capital
 New York
+Product Manager – Data Warehouse : The D.&nbsp;E.&nbsp;Shaw group seeks a product manager to join its Human Capital Products team to support the ongoing development of data infrastructure that enables people analytics. This&hellip;
+Human Capital
+New York
 Professional and Technical Writing Coach (Full-time) : The D.&nbsp;E.&nbsp;Shaw group seeks a skilled writing coach to join its Learning & Development (L&D) team, which helps the firm’s talent excel through customized learning offerings. The&hellip;
 Human Capital
 New York
@@ -151,9 +155,9 @@ Senior AI Engineer – Human Capital : The D.&nbsp;E.&nbsp;Shaw group seeks a se
 Investment Analysis
 New York
 DESIM Technical Strategist Associate : The D.&nbsp;E.&nbsp;Shaw group seeks an analytically and technically oriented individual to join the D.&nbsp;E.&nbsp;Shaw Investment Management (DESIM) group as a technical strategist&hellip;
-Investment Analysis
+Investor Relations
 New York
-Risk Manager : The D.&nbsp;E.&nbsp;Shaw group seeks an experienced market risk manager to join its firmwide risk analysis and management team. This individual will engage in firmwide activities relating&hellip;
+Sales and Relationship Management Associate (New York) : The D.&nbsp;E.&nbsp;Shaw group seeks a detail-oriented sales and relationship management associate to join its Investor Relations team. The team partners with stakeholders across the firm&hellip;
 Legal &amp; Compliance
 New York
 Compliance Analyst : The D.&nbsp;E.&nbsp;Shaw group seeks an analyst to work closely with a team of attorneys and compliance professionals to help ensure the firm’s business activities are conducted in strict&hellip;
