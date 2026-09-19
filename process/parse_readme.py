@@ -594,6 +594,7 @@ def assess(
                 source_id=source_id,
                 kind="changed",
                 change_id=clock.change_id(source_id, "repo-restructure"),
+                structural=True,
                 key=(
                     f"{source_id}: {collapsed.total} of {scale} rows changed at once"
                 ),

@@ -114,6 +114,14 @@ def write_discovered(rows: list[dict[str, str]]) -> None:
     write_csv(paths.DISCOVERED_CSV, paths.DISCOVERED_COLUMNS, rows)
 
 
+def read_standing() -> list[dict[str, str]]:
+    return read_csv(paths.STANDING_CSV, paths.STANDING_COLUMNS)
+
+
+def write_standing(rows: list[dict[str, str]]) -> None:
+    write_csv(paths.STANDING_CSV, paths.STANDING_COLUMNS, rows)
+
+
 def read_last_discovery() -> str:
     path = paths.LAST_DISCOVERY
     return path.read_text(encoding="utf-8").strip() if path.exists() else ""

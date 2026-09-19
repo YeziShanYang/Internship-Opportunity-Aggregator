@@ -38,6 +38,13 @@ class Change:
     program_name: str = ""  # filled from sources.csv program_names
     is_discovery_candidate: bool = False
     rolling: bool = False
+    # Not a posting: a collapse notice, or "a section appeared". These carry the
+    # source's own prose in `key`, so anything that reads the key as a job title will
+    # be wrong about them -- `underclassmen-cruz: 78 of 107 rows changed at once`
+    # matched the underclassman rule and pinned a board restructure into ACT NOW as
+    # though it were an opportunity. Flagged rather than pattern-matched downstream,
+    # because only the producer knows.
+    structural: bool = False
     # Some sources hand back the full posting body in the same response that lists it
     # -- Greenhouse `content=true`, Lever and Ashby `descriptionPlain`. Carrying it
     # here lets the classifier judge real requirements without a second HTTP request,
@@ -370,8 +377,42 @@ class Judgment:
 
 
 @dataclass
+class PinnedRow:
+    """An underclassman-targeted posting that stays in ACT NOW while it is still up.
+
+    Asked for directly on 2026-09-18: "all positions targeted towards freshmen and
+    sophomores or both or underclassmen in general are put on ACT now and are there as
+    long as the job posting is still up". Every other ACT NOW test is a *dated* reason
+    that fires on the morning a row moves; this one is a standing fact about who the
+    posting is for, so it has to survive the day its change scrolls past.
+
+    A flattened row rather than a `Judgment`, and that is the point: what is pinned is
+    the handful of facts the owner decides on, carried forward without re-asking the
+    model. Re-classifying a pinned row every morning would bill a token a day per row
+    to re-derive an answer that cannot have changed.
+    """
+
+    change_id: str
+    source_id: str
+    company: str
+    position: str
+    url: str = ""
+    deadline: str = ""
+    class_year: str = ""
+    location: str = ""
+    # The morning it first earned the pin, printed so a row that has sat there for
+    # three weeks says so rather than reading as today's news.
+    first_pinned: str = ""
+    last_seen: str = ""
+
+
+@dataclass
 class JudgedSet:
     """The `.run/judged.json` payload: the verdicts, and what they cost."""
 
     judgments: list[Judgment] = field(default_factory=list)
     usage: Usage = field(default_factory=Usage)
+    # Resolved here rather than at render time so that `run.py render` reproduces the
+    # digest byte-for-byte without re-reading the snapshots -- the same reason the
+    # screen tally and the spend are values on the artifacts.
+    pinned: list[PinnedRow] = field(default_factory=list)

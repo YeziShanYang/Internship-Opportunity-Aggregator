@@ -21,13 +21,13 @@ import argparse
 import sys
 
 import classify
-from deliver import digest, health, issue
+from deliver import digest, health, issue, urgency
 from jobs import discovery as discover
 from core import clock, models, paths
 from enrich import bodies as enrich_bodies
 from gather import clients, collect
 from persist import artifacts, store
-from process import build, parse_ats, suppress
+from process import build, parse_ats, snapshot as snap, suppress
 import screen
 
 
@@ -225,6 +225,35 @@ def _write_change_set(
         changes=changes, metrics=metrics, filters=filters))
 
 
+def _previous_live_ids(sources: list[dict[str, str]]) -> dict[str, set[str]]:
+    """Every row on every board as of the snapshots on disk.
+
+    Read here rather than inside `urgency` because this is disk I/O and `deliver` has
+    no business doing it. The snapshots are yesterday's -- this run writes its own only
+    after the digest is rendered -- which is exactly the basis `urgency.live_change_ids`
+    expects: yesterday's rows plus today's diff *is* today's board.
+    """
+    out: dict[str, set[str]] = {}
+    for source in sources:
+        source_id = source["source_id"]
+        text = store.read_snapshot(source_id, ext="tsv") or store.read_snapshot(source_id)
+        if not text:
+            continue
+        parsed = snap.parse_snapshot(text)
+        out[source_id] = {
+            clock.change_id(source_id, row.identity) for row in parsed.rows
+        }
+    return out
+
+
+def _pin_to_row(pin: models.PinnedRow) -> dict[str, str]:
+    return {column: getattr(pin, column) for column in paths.STANDING_COLUMNS}
+
+
+def _row_to_pin(row: dict[str, str]) -> models.PinnedRow:
+    return models.PinnedRow(**{column: row.get(column, "") for column in paths.STANDING_COLUMNS})
+
+
 def run(args: argparse.Namespace) -> int:
     """The whole morning, over already-parsed arguments from `run.py`."""
     sources = store.read_sources()
@@ -268,6 +297,20 @@ def run(args: argparse.Namespace) -> int:
         else classify.classify(changes, by_id, bodies, verdicts)
     )
     judgments = judged.judgments
+
+    # Underclassman postings stay in ACT NOW until they leave their board (asked for
+    # directly 2026-09-18). Only sources that were *checked and healthy* this run may
+    # retire a pin: a failing, quarantined or --only-skipped source keeps every one of
+    # its pins, because "we have stopped looking" must never render as "it closed".
+    checked = {result.source_id for result in results if result.ok}
+    judged.pinned = urgency.refresh_pins(
+        judgments,
+        [_row_to_pin(row) for row in store.read_standing()],
+        urgency.live_change_ids(_previous_live_ids(sources), changes, checked),
+        checked,
+        clock.today_iso(),
+        digest.company_and_position,
+    )
     artifacts.write(artifacts.JUDGED, "judged", judged)
 
     update_source_state(sources, results)
@@ -328,6 +371,7 @@ def run(args: argparse.Namespace) -> int:
         suppressed_muted=suppressed_muted,
         discovery_lines=discovery_lines, status_only=status_only,
         enriched=bodies, filters=filters, usage=judged.usage,
+        pinned=judged.pinned,
     )
     for note in discovery_notes:
         body += f"\n- ⚠ {note}"
@@ -361,6 +405,7 @@ def run(args: argparse.Namespace) -> int:
             )
     store.write_sources(sources)
     store.write_programs(programs)
+    store.write_standing([_pin_to_row(pin) for pin in judged.pinned])
 
     if send:
         print(issue.deliver(title, body))
@@ -475,6 +520,10 @@ def render_only(args: argparse.Namespace) -> int:
         suppressed_muted=suppress.removed_by(change_set.filters, suppress.MUTED),
         status_only=status_only, enriched=bodies,
         filters=change_set.filters, usage=judged.usage,
+        # Off the artifact, never recomputed: `refresh_pins` reads the snapshots and
+        # the standing file, and a re-render must not depend on whether the state
+        # commit has landed since. This is what keeps the byte-identical property.
+        pinned=judged.pinned,
     )
     artifacts.write_text(artifacts.DIGEST, body)
     artifacts.write_text(artifacts.DIGEST_TITLE, title + "\n")
@@ -498,6 +547,21 @@ def classify_only(args: argparse.Namespace) -> int:
         artifacts.SCREENED, "screened", dict[str, screen.Verdict])
     by_id = {s["source_id"]: s for s in store.read_sources()}
     judged = classify.classify(change_set.changes, by_id, bodies, verdicts)
+    # The pins belong to judged.json, so the stage that writes it resolves them --
+    # otherwise `run.py classify` then `run.py render` would drop every carried row.
+    # Every source in the change set was checked to produce it, so all of them may
+    # retire a pin.
+    sources = list(by_id.values())
+    checked = {m.source_id for m in change_set.metrics if m.ok}
+    judged.pinned = urgency.refresh_pins(
+        judged.judgments,
+        [_row_to_pin(row) for row in store.read_standing()],
+        urgency.live_change_ids(
+            _previous_live_ids(sources), change_set.changes, checked),
+        checked,
+        clock.today_iso(),
+        digest.company_and_position,
+    )
     artifacts.write(artifacts.JUDGED, "judged", judged)
     spend = health.usage_line(judged.usage)
     print(f"{len(judged.judgments)} judged" + (f"; {spend}" if spend else ""))

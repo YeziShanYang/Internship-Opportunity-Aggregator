@@ -260,6 +260,29 @@ def _table_row(urgency: str, company: str, position: str, notes: str, url: str =
     return f"| {urgency} | {company} | {position} | {notes} |"
 
 
+def company_and_position(judgment: models.Judgment) -> tuple[str, str]:
+    """Public alias. `jobs.daily` needs the same employer/position split the table uses
+    when it records a pin, so the pinned row reads identically to the row it came from
+    -- and so the two cannot drift into disagreeing about who the employer is."""
+    return _company_and_position(judgment)
+
+
+def _pinned_row(pin: models.PinnedRow, today: str) -> str:
+    """A carried-over pin, deliberately compact.
+
+    A pin is in the table because it is still open, not because anything happened to
+    it, so it costs one line of facts rather than the full bullet cell: the owner has
+    already read the cell on the morning the row arrived, and repeating it every day
+    until the posting comes down is what would make a standing block unreadable -- and,
+    at 577 bytes a full row, undeliverable. "pinned <date>" is there so a row that has
+    sat open for three weeks says so instead of reading as today's news.
+    """
+    facts = [bit for bit in (pin.deadline, pin.class_year, pin.location) if bit.strip()]
+    facts.append(f"pinned {pin.first_pinned}" if pin.first_pinned != today else "pinned today")
+    return _table_row(URGENCY_ACT_NOW, pin.company, pin.position,
+                      _cell(" · ".join(facts)), pin.url)
+
+
 def _judgment_row(judgment: models.Judgment) -> str:
     company, position = _company_and_position(judgment)
     return _table_row(
@@ -282,6 +305,7 @@ def render(
     enriched: dict[str, enrich_bodies.PostingBody] | None = None,
     filters: list[models.FilterReport] | None = None,
     usage: models.Usage | None = None,
+    pinned: list[models.PinnedRow] | None = None,
 ) -> tuple[str, str]:
     """Return (issue title, issue body).
 
@@ -329,6 +353,11 @@ def render(
         for source_id, position, notes in escalated
     ]
     table += [_judgment_row(j) for j in act_now]
+    # Pins whose row did not move today. The ones that did are already in `act_now`
+    # above with their full cell, so they are excluded here rather than printed twice.
+    moved = {j.change.change_id for j in judgments}
+    table += [_pinned_row(pin, today) for pin in (pinned or [])
+              if pin.change_id not in moved]
     table += [_judgment_row(j) for j in worth_a_look]
     table_index = None
     if table:
@@ -400,6 +429,17 @@ def render(
     spend = health.usage_line(usage or models.Usage())
     if spend:
         body.append(f"- {spend}")
+    if pinned:
+        # A standing block is the one part of the digest that can grow without anyone
+        # deciding to grow it, so its size is stated rather than left to be counted.
+        # Carried rows print no reasoning, so without this line a reader could not tell
+        # a block that is working from one that has quietly filled up with stale pins.
+        carried = sum(1 for pin in pinned if pin.change_id not in moved)
+        body.append(
+            f"- {len(pinned)} underclassman posting(s) pinned to ACT NOW while they "
+            f"stay on their boards; {carried} carried over from an earlier morning. "
+            "A pin is retired only when its source is checked and no longer lists it."
+        )
     if suppressed_applied:
         body.append(
             f"- {suppressed_applied} item(s) are muted in data/applied.tsv and were "
