@@ -44,6 +44,16 @@ DISCOVERED_COLUMNS = [
     # record was "discarded" would say nothing about what was thrown away.
     "description", "status",
 ]
+# Underclassman-targeted postings pinned into ACT NOW until they leave their board.
+# Committed, because the pin has to outlive the run that created it -- that is the
+# whole feature. Rows are dropped only when the source that carries them was checked
+# successfully and no longer lists them; a failing or quarantined source keeps its
+# pins, because "we stopped looking" must never read as "it closed".
+STANDING_CSV = DATA / "standing.csv"
+STANDING_COLUMNS = [
+    "change_id", "source_id", "company", "position", "url",
+    "deadline", "class_year", "location", "first_pinned", "last_seen",
+]
 LAST_DISCOVERY = DATA / "last_discovery.txt"
 # The date of the last digest actually delivered. The schedule fires several times
 # each morning so that a dropped cron tick is not a missed day (see daily.yml), and the

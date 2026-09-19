@@ -550,6 +550,7 @@ def assess(
                 source_id=source_id,
                 kind="changed",
                 change_id=clock.change_id(source_id, "board-restructure"),
+                structural=True,
                 key=f"{slug}: {collapsed.total} rows changed at once",
                 detail=(
                     f"{collapsed.total} rows moved in a single run, which reads as a "

@@ -156,6 +156,7 @@ def diff_snapshots(source_id: str, old: Snapshot, new: Snapshot) -> list[models.
                     kind="added",
                     change_id=clock.change_id(source_id, f"section :: {section}"),
                     key=f"new section: {section}",
+                    structural=True,
                     detail=f'A section that was not in the previous snapshot: "{section}".',
                     is_discovery_candidate=True,
                     rolling=bool(ROLLING_PATTERN.search(section)),
