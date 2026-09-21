@@ -18,12 +18,20 @@ from __future__ import annotations
 PROFILE_LAST_REVIEWED = "2026-09-14"
 PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
 
+# The identity-gate sentence is deliberately general rather than an enumeration of
+# demographic attributes. This repository is public, and a profile that itemised the
+# owner's gender, race, orientation and financial-aid status would publish all of it to
+# anyone who opened the file -- for no gain, because the classifier prompt's rule 2
+# already names the specific programmes the gate has to catch. The rule the model needs
+# is "he does not clear these criteria, so rule those programmes out", and that is what
+# is stated. See classify.SYSTEM_PROMPT rule 2 for the list it works against.
 OWNER_PROFILE = (
     "First-year undergraduate at Stanford, class of 2030, studying math and/or CS. "
-    "Does not meet the eligibility criteria for identity-restricted programmes "
-    "-- those reserved for women, transgender or gender-expansive students, "
-    "underrepresented racial minorities, or LGBTQIA+ students -- nor for \"barriers "
-    "to access and opportunity\" criteria. US citizen, US-based. Willing to "
+    "US citizen, US-based. Does not meet the eligibility criteria for "
+    "identity-restricted programmes -- those reserved for women, transgender or "
+    "gender-expansive students, underrepresented racial minorities, or LGBTQIA+ "
+    "students -- nor for \"barriers to access and opportunity\" criteria, so "
+    "programmes gated on any of those are not relevant to him. Willing to "
     "relocate for a summer, so location is not a filter and no city or region is "
     "preferred; only whether the role is in the United States matters, because he "
     "cannot take one that recruits solely abroad. "
