@@ -131,8 +131,8 @@ Serialise probes with a beat between them. Be a good citizen (spec section 11).
 
 ## 5. Set eligibility conservatively
 
-The owner is a Stanford first-year, class of 2030, math/CS, a US citizen based in the US
-— and **not** eligible for identity- or hardship-targeted programs.
+The owner is a Stanford first-year, class of 2030, math/CS, a US citizen based in
+the US — and **not** eligible for identity- or hardship-targeted programs.
 
 - Default to **`CHECK`**. The helper script rejects `eligible: "YES"` outright; asserting
   verified eligibility is the owner's call, not yours.
