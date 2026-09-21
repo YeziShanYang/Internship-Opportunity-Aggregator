@@ -3,7 +3,7 @@
 A daily job that watches **147 job boards and programme pages** for quant, math and CS
 internships, reads the postings that changed overnight, throws out the ones I can't
 apply to, and mails me what's left as a single table. It has run every morning since
-2026-09-05 and costs about **a cent a day**.
+2026-09-05 and costs about **6-7 cents a day**.
 
 There is no server and no mailing list. The job runs on GitHub Actions and delivers by
 opening a GitHub Issue, which means GitHub's own notification email is the delivery
@@ -34,6 +34,9 @@ Opportunity digest — 2026-09-20
 - · job boards: 4117 postings were not student roles and 394 were outside the US
 - classifier: 6 calls · 14,972 in · 2,950 out · ~$0.0071 est. (gpt-5-mini, effort=low)
 ```
+
+That was a quiet Sunday — 5 opportunities and 6 classifier calls. A typical weekday is
+35-65 calls and around 6-7 cents; see [Results](#results).
 
 ## Table of Contents
 - [Overview](#overview)
@@ -135,7 +138,7 @@ process   →  parse and diff against yesterday        0.7s, no network at all
 enrich    →  fetch the posting body behind each      O(changes), not O(postings)
              row that actually moved
 screen    →  rule out what a quoted phrase settles   deterministic, no model
-classify  →  one model call per surviving change     ~$0.007 on a normal day
+classify  →  one model call per surviving change     ~$0.065 on a normal day
 render    →  build the digest bytes
 deliver   →  open the Issue, subject to one-a-day
 ```
@@ -203,7 +206,7 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
 | Programmes in the database | **189** |
 | Digests delivered | **16 of 16**, one a day since 2026-09-05 |
-| Cost | **~$0.007/day** typical; $0.34 on the worst day ever recorded |
+| Cost | **~$0.065/day** median, ~$24/yr; range $0.007-$0.084 over the six days at the current settings; $0.34 on the worst day ever recorded |
 | Tests | **273 passing** (6 skip without an API key) |
 | Code | ~8,960 lines across 46 modules, plus ~4,640 lines of tests |
 | Runtime | ~4 min, almost all of it `gather` |
