@@ -12,10 +12,10 @@ Runs on GitHub Actions, so it does not care whether your laptop is awake. State 
 this repo as CSVs, which makes **git the database**: `git log` answers "which page
 changed on which morning" forever, for free.
 
-**Status: Phases 1 and 2 shipped.** 151 sources — six GitHub repo trackers, 79 ATS
-boards (Greenhouse 53, Workday 17, Ashby 5, Lever 2, Phenom 1, Eightfold 1), 62 watched
+**Status: Phases 1 and 2 shipped.** 148 sources — six GitHub repo trackers, 79 ATS
+boards (Greenhouse 53, Workday 17, Ashby 5, Lever 2, Phenom 1, Eightfold 1), 59 watched
 pages and 4 `manual` rows — with Issue delivery, one digest a day and a weekly
-source-discovery pass. 147 of the 151 are fetched; the `manual` four are sites that
+source-discovery pass. 144 of the 148 are fetched; the `manual` four are sites that
 block automation and surface as calendar reminders instead.
 
 Sources divide by *intake path*, not by tier: aggregator lists that someone else
