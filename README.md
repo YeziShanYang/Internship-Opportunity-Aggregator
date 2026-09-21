@@ -30,8 +30,7 @@ Opportunity digest — 2026-09-20
 </details>
 
 ## ■ HEALTH
-- 147 sources checked · 144 healthy · 3 FAILING
-- ⚠ morganstanley-campus-p1: 2 consecutive failures. page returned only 350 characters
+- 144 sources checked · 144 healthy
 - · job boards: 4117 postings were not student roles and 394 were outside the US
 - classifier: 6 calls · 14,972 in · 2,950 out · ~$0.0071 est. (gpt-5-mini, effort=low)
 ```
@@ -95,7 +94,7 @@ The files that matter most, roughly in the order I'd read them:
    that prompt enforces.
 5. **[`deliver/urgency.py`](deliver/urgency.py)** — what gets to be urgent, which I have
    now been wrong about in both directions.
-6. **[`data/`](data/)** — the database: 189 programmes, 151 sources, and 144 snapshot
+6. **[`data/`](data/)** — the database: 189 programmes, 148 sources, and 144 snapshot
    files, all committed on every run.
 7. **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the long version: every failure
    mode, what it cost, and why the fix is shaped the way it is.
@@ -199,8 +198,8 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 
 | | |
 |:---|:---|
-| Sources watched | **151** (147 fetched, 4 blocked and handled by hand) |
-| Breakdown | 79 ATS boards · 62 watched pages · 6 aggregator repos · 4 manual |
+| Sources watched | **148** (144 fetched, 4 blocked and handled by hand) |
+| Breakdown | 79 ATS boards · 59 watched pages · 6 aggregator repos · 4 manual |
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
 | Programmes in the database | **189** |
 | Digests delivered | **16 of 16**, one a day since 2026-09-05 |
