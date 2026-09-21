@@ -1,4 +1,8 @@
-# opportunity-tracker
+# Architecture and engineering notes
+
+> This is the deep document: how the pipeline is put together, which failure modes it
+> was built against, and what each of them cost before it was fixed. For what the
+> project *is* and how to run it, start at the [README](../README.md).
 
 A daily job that watches a fixed list of sources for quant / math / CS opportunities
 relevant to one specific person — a Stanford first-year, class of 2030 — and emails a
@@ -8,9 +12,11 @@ Runs on GitHub Actions, so it does not care whether your laptop is awake. State 
 this repo as CSVs, which makes **git the database**: `git log` answers "which page
 changed on which morning" forever, for free.
 
-**Status: Phases 1 and 2 shipped.** 120 sources — five GitHub repo trackers, 60 ATS
-boards (Greenhouse/Workday/Ashby/Lever/Phenom), 52 watched pages and three `manual`
-rows — with Issue delivery, one digest a day and a weekly source-discovery pass.
+**Status: Phases 1 and 2 shipped.** 151 sources — six GitHub repo trackers, 79 ATS
+boards (Greenhouse 53, Workday 17, Ashby 5, Lever 2, Phenom 1, Eightfold 1), 62 watched
+pages and 4 `manual` rows — with Issue delivery, one digest a day and a weekly
+source-discovery pass. 147 of the 151 are fetched; the `manual` four are sites that
+block automation and surface as calendar reminders instead.
 
 Sources divide by *intake path*, not by tier: aggregator lists that someone else
 curates, and named employers. For a named employer the watcher points either at the
@@ -21,7 +27,9 @@ posting, since those URLs expire inside the year.
 
 ## Setup (once)
 
-1. Create a **private** GitHub repo and push this code.
+1. Create a GitHub repo and push this code. It works the same public or private;
+   note that a **private** repo on a free account sits in the lowest Actions scheduler
+   priority tier, which is the source of the lateness described in failure mode 3.
 2. Add repo secrets (Settings → Secrets and variables → Actions):
    - `GH_PAT` — a fine-grained PAT, **read-only, public repositories**. Lifts the GitHub
      API limit from 60 requests/hour to 5,000. Optional but recommended.
@@ -60,7 +68,7 @@ stage is also runnable on its own, reading the previous stage's artifact out of 
 instead of recomputing it:
 
 ```bash
-.venv/bin/python run.py gather     # fetch all 153 sources into .run/raw/. The only slow one
+.venv/bin/python run.py gather     # fetch all 147 sources into .run/raw/. The only slow one
 .venv/bin/python run.py process    # parse and diff .run/raw/. No network at all
 .venv/bin/python run.py enrich     # fetch the posting behind each changed row
 .venv/bin/python run.py screen     # rule out what a quoted phrase settles. No model
@@ -170,7 +178,7 @@ the README itself. A newly posted role is then exactly **one added line** in `gi
 instead of a 700KB blob reflowing. It also means the diff is keyed on company + role, so
 badge churn and emoji edits cannot produce a false positive.
 
-Each repo needs its own parser config, because the five READMEs share almost nothing:
+Each repo needs its own parser config, because the six READMEs share almost nothing:
 NUFT puts the company in the `##` heading above a two-column table; Cruz-Lopez has seven
 different header layouts; Simplify uses HTML `<table>` and a **relative** `Age` column
 (`1d`, `2mo`) that is excluded from the diff, because diffing it would report all 490
@@ -338,16 +346,17 @@ anything.
 
 ## The two manual sheets
 
-`out/programs.xlsx` has four sheets. Two of them exist because automation cannot cover
-everything, and pretending otherwise is how you miss a deadline:
+`out/programs.xlsx` has five sheets — Check By Hand, Manual Watch, Priority, Legend and
+Left Out. Two of them exist because automation cannot cover everything, and pretending
+otherwise is how you miss a deadline:
 
-- **Manual Watch** (23 rows) — things this tool provably cannot alert you about, each
+- **Manual Watch** (31 rows) — things this tool provably cannot alert you about, each
   with the reason, how to check, and when. Three groups: sites that return 403 to every
   automated client (all of Citadel, IAS/PCMI, MAA/Putnam), competitions announced on
   Instagram and listservs *before* the website changes (Cornell CTC, UChicago UTC,
   Traders@MIT, Berkeley), and pages with nothing to diff (The Deck Game yields ~28
   characters of text).
-- **Priority** (30 rows) — a ranked shortlist to keep an eye on yourself in case this
+- **Priority** (36 rows) — a ranked shortlist to keep an eye on yourself in case this
   repo breaks. Band A is high value with real selection risk (Jane Street FTTP first);
   Band B is Stanford-internal, where your odds are genuinely best (CURIS, SURIM, VPUE
   grants, Directed Reading, Section Leading); Band C is open entry, where showing up is
@@ -357,7 +366,10 @@ everything, and pretending otherwise is how you miss a deadline:
 
 ## Verified source facts (probed 2026-09-05)
 
-Worth knowing before extending this, because several came out differently than expected:
+Worth knowing before extending this, because several came out differently than expected.
+**Read this as a dated record, not as current state** — corrections are appended below
+rather than rewritten in place, because the useful thing to know is not just the right
+answer but that the old answer was wrong and when that was found out:
 
 - **All of Citadel blocks automation** — `citadel.com`, `citadelsecurities.com` and the
   datathon page return 403 to a bot user-agent *and* a browser user-agent. Discover
@@ -379,13 +391,49 @@ Worth knowing before extending this, because several came out differently than e
 - **MIT Pokerbots** is pollable over plain HTTP, but the sheet already marks it `NO`: the
   competition server requires a teammate with MIT certificates.
 
+**Corrections since (2026-09-12 to 2026-09-17).** Three of the findings above did not
+survive contact:
+
+- **SIG is not unreachable.** Its careers page really does yield 221 characters from
+  402KB of HTML, but that is a Phenom/iCIMS front end, and `careers.sig.com/api/jobs`
+  answers the tracker's own User-Agent with 263 postings, descriptions and a recruiting
+  category. It is now `method=phenom`, not `manual`. The general lesson —
+  **a JavaScript shell is a reason to look for the JSON behind it, not a reason to give
+  up** — is now automated: `jobs.discovery.mine_pages` fingerprints every watched page
+  against vendor *domains* weekly and proposes what it finds.
+- **Thirteen `page_text` rows were marketing pages a click above the real board**, each
+  one carrying a note asserting the firm was on no public ATS. That claim was false for
+  all thirteen. Two were worse than wrong — they were *succeeding* off the wrong page.
+  `aqr-internship-program` 302'd to `aqr.com/404` and reported success every run off the
+  error page's own prose, 4,683 characters past both content floors. This is why
+  `process.redirect.verdict` exists: **where a fetch landed is part of whether it
+  succeeded**, and the two content floors only ask whether a page has *enough text*, so
+  they catch a JS shell and are blind to a prose-filled page with no listings.
+- **Nine pages returned 403 from the Actions runner and 200 from a laptop** under the
+  identical User-Agent — the runner's datacenter IP range was refused, not its identity.
+  All nine are resolved. The diagnostic that did it is worth reusing: `dig +short CNAME`
+  on the host. Every 403 was a firm's own marketing site behind a WAF (`gtsx.com` and
+  `www.twosigma.com` are both `wp.wpenginepowered.com`), while every vendor-hosted ATS
+  host in the watchlist answers the runner fine. A 403 from CI is a signal to go and find
+  the vendor host behind the marketing page, not a dead end.
+
+Citadel is the one that has not moved, and it is the sharpest case in the project. It is
+**not** unreachable: `citadel.com/careers/students/` returns 403 to this tool's
+User-Agent and HTTP 200 with 129KB to a spoofed Chrome string. The reason it stays
+unfixed is that the only route through is to misrepresent who the client is, and this
+project fetches under an honest User-Agent. So a page that reads fine in a
+browser-presenting fetcher is not evidence the tracker can read it — re-measure with the
+tracker's own client before moving a row off `manual`.
+
 ## Acceptance tests
 
 Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHub client.
+The two rows marked *verified in production* are not asserted by the suite — they are
+properties of the live repo, and the digest history and `git log` are the evidence.
 
 | # | What it checks | Status |
 |---|---|---|
-| 14.1 | `workflow_dispatch` completes and opens an Issue | needs the repo to exist |
+| 14.1 | `workflow_dispatch` completes and opens an Issue | verified in production |
 | 14.2 | Hand-edited snapshot → reported in ACT NOW | passing |
 | 14.3 | A 404 → HEALTH, not a change; `consecutive_failures` increments | passing |
 | 14.4 | A new "Freshman Insight Program" row → discovery candidate | passing |
@@ -395,22 +443,29 @@ Spec section 14. `tests/test_acceptance.py` runs offline against a stubbed GitHu
 | 14.6b | A same-day retry mails nothing, even when it finds changes or a failure | passing |
 | 14.6c | "Cannot ask GitHub" answers `None`, never "not yet delivered" | passing |
 | 14.7 | `build_xlsx.py` matches the seed formatting | passing |
-| 14.8 | `git log --follow data/programs.csv` is line-level readable | needs the repo to exist |
+| 14.8 | `git log --follow data/programs.csv` is line-level readable | verified in production |
 
 ## What is not built yet
 
-- **Playwright for JS-shell pages.** Ten Tier 3 pages were measured returning real text
-  to a plain GET, so no browser ships. SIG's careers page is a shell (402KB of HTML,
-  221 characters of text) and is `method=manual` as a result. Adding a browser would
-  reach it and a handful like it, at ~3–6 min per run.
-- **The rest of the spec's ~45 watch URLs.** Several are stale — Berkeley 404s, D. E.
-  Shaw's `/fellowships` path is gone, DRW's URL 308-redirects — so extending the list
-  is URL archaeology before it is code.
-- **Cross-source dedupe.** Eight of ten Greenhouse boards are firms the NUFT repo also
-  lists, so the same opportunity can arrive twice under two names. Left alone on
-  purpose: the two are not really duplicates, since Tier 2 carries the full title,
-  location and description while NUFT carries a role code, and tick-to-dismiss handles
-  any genuine double-sighting.
-- **Classifier tuning** — the spec's Phase 4.
+- **Playwright for JS-shell pages.** Still no browser ships, and the case for one is
+  weaker than it looks: the pages that first motivated it turned out to have JSON
+  endpoints behind them, which `jobs.discovery.mine_pages` now finds automatically. What
+  a browser would actually buy is the residue — Stanford CURIS (5 characters of text),
+  SLAC (4), The Deck Game (~28) — at roughly 3–6 minutes added to every run.
+- **First-class `icims` and `avature` methods.** GTS is on iCIMS and Two Sigma on
+  Avature; both are watched as plain `page_text`, which works but diffs prose rather than
+  rows. They sit in `jobs.discovery._UNSUPPORTED_VENDORS` so the weekly probe correctly
+  declines to propose them. On GTS the `in_iframe=1` query parameter is load-bearing:
+  without it the response is the WordPress wrapper at 2,877 characters and ratio 0.017,
+  under the content floor; with it, 10,156 characters at 0.241.
+- **Asking the employer question once per employer.** Rule 8 — is this a generic software
+  internship at an unremarkable firm — is asked once per *posting*, and Figma appeared
+  four times in one digest when the answer cannot differ between them. This is the right
+  fix if classification cost ever becomes the constraint.
+- **Folding the four non-stage scripts into the stage model.** `build_xlsx.py`,
+  `add_opportunity.py`, `seed_programs.py` and `calendar_reminders.py` sit outside it on
+  purpose and are named in the layering test's exception list with a reason each.
 
-Tiers 1 and 2 should work unchanged for years. Tier 3 is the fragile one.
+Cross-source dedupe *was* on this list and is now built: `process.suppress` groups rows
+on `core.text.posting_identities` and keeps one. See the README for why the identity has
+to come from the link rather than the title.
