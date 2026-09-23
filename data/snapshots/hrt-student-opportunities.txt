@@ -101,10 +101,10 @@ A 2-4 week exploration into automated trading for second year students from unde
 ↳ Apply Here
 For PhD Students
 PhD Winter Internship
-January 2026
+January 2027
 New York City
-A 2-4 week exploration into automated trading for PhD students. Interns will get an introduction to all technical facets of the algorithmic trading industry, learn about who we are and what we do, and participate in hands-on independent programming projects in Python and C++.
-Applications for January 2026 are now closed. Check back soon for January 2027 applications.
+A 3 week exploration into automated trading for PhD students. Interns will get an introduction to quantitative research, learn about who we are and what we do, and participate in hands-on projects.
+↳ Apply Here
 Full-time Roles for Graduating Students
 If you’re graduating from a bachelor’s, master’s, or PhD program in 2027, consider one of our full-time roles. New hires are immersed in a robust training program that lets them hit the ground running on their new team.
 Algorithm Developer
