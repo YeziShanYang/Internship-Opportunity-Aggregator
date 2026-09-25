@@ -64,6 +64,7 @@ New York
 Denver
 India
 London
+Off-site
 Singapore
 offices.
 Viewing 4 of
@@ -276,6 +277,12 @@ All Positions in Systems : Are you looking for new challenges and collaborative 
 Technology
 New York
 Full-Stack Software Engineer: Application Engineering : The D.&nbsp;E.&nbsp;Shaw group seeks a full-stack software engineer to join its Application Engineering (AppEng) team in the Systems group. The AppEng team builds and supports a variety of&hellip;
+Various
+Off-site
+Chief Executive Officer, AI-Native Healthcare RCM Platform : The D.&nbsp;E.&nbsp;Shaw group seeks an accomplished and hands-on chief executive officer to lead Cove’s new AI-native healthcare revenue cycle management (RCM) platform. Cove, the firm’s&hellip;
+Various
+New York
+Head of Engineering & AI, Healthcare RCM Platform : The D.&nbsp;E.&nbsp;Shaw group seeks an accomplished and hands-on head of engineering & AI to join Cove’s new healthcare revenue cycle management (RCM) platform. Cove, the firm’s&hellip;
 Various
 New York To apply for this job, please email
 your resume and the job title to recruitment-nyc@world.deshaw.com .
