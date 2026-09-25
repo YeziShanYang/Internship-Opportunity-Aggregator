@@ -45,21 +45,6 @@ The ETF trading group at GTS is seeking applications to join our Quantitative Tr
 Job Location
 US-NY-New York
 Job Title
-FPGA Developer - Kitchener, Ontario, Canada
-We are looking to hire a senior hardware engineer to join a small and growing FPGA team developing key components of a high-performance FPGA platform. This role offers broad technical scope and exposure across multiple layers of computing technology, from RTL and verification to high-speed interfaces and system integration.
-Successful candidates will work on full-stack FPGA systems in a highly collaborative environment, contributing to architecture, implementation, verification, performance optimization, and tooling/CI improvements.
-Job Location
-CA-ON-Kitchener
-Job Title
-Quantitative Trader &ndash; Overnight Session / Asia Trading, ETF Team
-The ETF trading group at GTS is seeking applications for Quantitative Trader role with a focus on our overnight / Asian trading strategies. The hours for this role will be approximately 7pm ET to 5am ET.
-&nbsp;
-The ultimate goal is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidate will work closely with senior traders on multiple strategies across the quantitative trading space. They will see their work and decisions directly...
-Job Location
-US-NY-New York
-Additional Locations
-US | US-WA | US-AZ | US-CA | US-HI | US-WA
-Job Title
 Operations Analyst
 GTS Asset Management is seeking an Operations Analyst to support the day-to-day operational activities of multiple fund-of-funds vehicles. The role sits within the operations function and works closely with portfolio management, fund administrators, counterparties, and internal control teams to ensure accurate, timely, and well-controlled execution of operational processes. This position is well-suited to a detail-oriented individual with strong organisational skills and a foundational understanding of fund operations and financial processes.
 &nbsp;
