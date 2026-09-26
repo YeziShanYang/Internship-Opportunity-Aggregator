@@ -97,7 +97,7 @@ The files that matter most, roughly in the order I'd read them:
    that prompt enforces.
 5. **[`deliver/urgency.py`](deliver/urgency.py)** — what gets to be urgent, which I have
    now been wrong about in both directions.
-6. **[`data/`](data/)** — the database: 189 programmes, 148 sources, and 144 snapshot
+6. **[`data/`](data/)** — the database: 212 programmes, 191 sources, and 144 snapshot
    files, all committed on every run.
 7. **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the long version: every failure
    mode, what it cost, and why the fix is shaped the way it is.
@@ -201,13 +201,13 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 
 | | |
 |:---|:---|
-| Sources watched | **148** (144 fetched, 4 blocked and handled by hand) |
-| Breakdown | 79 ATS boards · 59 watched pages · 6 aggregator repos · 4 manual |
+| Sources watched | **191** (187 fetched, 4 blocked and handled by hand) |
+| Breakdown | 87 ATS boards · 92 watched pages · 8 aggregator repos · 4 manual |
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
-| Programmes in the database | **189** |
+| Programmes in the database | **212** |
 | Digests delivered | **16 of 16**, one a day since 2026-09-05 |
 | Cost | **~$0.065/day** median, ~$24/yr; range $0.007-$0.084 over the six days at the current settings; $0.34 on the worst day ever recorded |
-| Tests | **273 passing** (6 skip without an API key) |
+| Tests | **292 passing** (6 skip without an API key) |
 | Code | ~8,960 lines across 46 modules, plus ~4,640 lines of tests |
 | Runtime | ~4 min, almost all of it `gather` |
 
@@ -325,11 +325,13 @@ positive costs a glance.
 1. **Some sites just won't be read.** Citadel returns 403 to my User-Agent and HTTP 200
    to a browser string. I could spoof it in one line. I don't, because the only route
    through is to lie about who the client is, and this tool fetches under an honest
-   User-Agent with a real mailto in it. Those sources are marked `manual` and surface as
-   monthly calendar reminders instead — which means Discover Citadel, a programme I'm
-   actually eligible for, is a structural blind spot. That's a real cost of the choice.
-2. **A handful of pages render entirely in JavaScript** and yield almost no text. Adding
-   a headless browser would reach them at ~3–6 minutes per run. Not built.
+   User-Agent. Those sources are marked `manual` and surface as monthly calendar
+   reminders instead. Citadel's internship postings now arrive through the speedyapply
+   Quant lists, but Discover Citadel, a programme I'm actually eligible for, is still a
+   blind spot. That's a real cost of the choice.
+2. **Some pages render entirely in JavaScript** and yield almost no text. Those are now
+   read in headless Chromium — five watched pages marked `render_js=true`, and any
+   posting page that comes back as a shell — under the same honest User-Agent.
 3. **GitHub silently drops scheduled cron ticks** — not delays, *drops*, with no run and
    no log. And the ticks it does run, it ran 3h27m–4h48m late every time I measured. I
    schedule at midnight Pacific purely as headroom, which is why the code doesn't assume
