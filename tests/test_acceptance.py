@@ -2522,6 +2522,96 @@ class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
         self.assertIn("Applied Scientist Intern / Co-op @ Seattle", row)
 
 
+class BrowserFallbackTests(_IsolatedState, unittest.TestCase):
+    """A JavaScript posting page is re-read in a browser; nothing else is.
+
+    Until 2026-09-26 no zshah-2027 row was ever fetched -- enrich knew only Simplify's
+    link shape -- and the employer pages those rows link to are often shells: Workday
+    returned 0 characters to a plain GET and 7,457 rendered. The browser is stubbed
+    here so the suite never launches Chromium.
+    """
+
+    WORKDAY = ("https://acme.wd5.myworkdayjobs.com/Acme/job/Kansas-City/"
+               "Data-Intern_JR111596")
+    RENDERED = "Data Intern. Open to sophomores and juniors. " * 30
+
+    def _client(self, status=200, html="<html><body></body></html>"):
+        import httpx
+        return httpx.Client(transport=httpx.MockTransport(
+            lambda request: httpx.Response(status, text=html)))
+
+    def _fetch(self, client, rendered=None):
+        from enrich import browser, postings
+        calls = []
+
+        def fake(urls, deadline):
+            calls.extend(urls)
+            return {u: (rendered if rendered is not None else self.RENDERED, "")
+                    for u in urls}
+
+        with unittest.mock.patch.object(browser, "render_many", fake):
+            return postings.fetch_many([self.WORKDAY], client), calls
+
+    def test_a_zshah_row_yields_its_employer_posting_link(self):
+        from enrich import bodies
+        change = models.Change(
+            source_id="zshah-2027", kind="added", key="Acme / Data Intern @ KC",
+            detail=f"New row: Company=Acme; Role=Data Intern; Apply=[Apply]({self.WORKDAY})",
+            url=self.WORKDAY)
+        self.assertEqual(bodies.needs_fetch(change), self.WORKDAY)
+
+    def test_a_company_page_is_never_taken_for_a_posting(self):
+        from enrich import postings
+        self.assertEqual(postings.posting_link(
+            "Company=[PIMCO](https://simplify.jobs/c/PIMCO)"), "")
+
+    def test_a_removed_row_is_not_opened_in_a_browser(self):
+        from enrich import bodies
+        change = models.Change(source_id="zshah-2027", kind="removed", key="Acme / X",
+                               detail=f"Row disappeared: {self.WORKDAY}", url=self.WORKDAY)
+        self.assertEqual(bodies.needs_fetch(change), "")
+
+    def test_a_javascript_shell_is_rendered_and_the_text_used(self):
+        results, calls = self._fetch(self._client())
+        self.assertEqual(calls, [self.WORKDAY])
+        self.assertEqual(results[self.WORKDAY], (self.RENDERED, ""))
+
+    def test_a_refusal_is_never_retried_in_the_browser(self):
+        """A 403 means the site said no to this client. Rendering it in Chromium is the
+        first step toward pretending to be someone else."""
+        results, calls = self._fetch(self._client(status=403))
+        self.assertEqual(calls, [])
+        self.assertIn("403", results[self.WORKDAY][1])
+
+    def test_a_page_that_is_still_empty_after_rendering_stays_an_error(self):
+        results, _ = self._fetch(self._client(), rendered="too short")
+        text, error = results[self.WORKDAY]
+        self.assertEqual(text, "")
+        self.assertIn("rendered page had only", error)
+
+    def test_no_playwright_degrades_to_an_error_not_to_empty_text(self):
+        import builtins
+        from enrich import browser
+        real = builtins.__import__
+
+        def no_playwright(name, *args, **kwargs):
+            if name.startswith("playwright"):
+                raise ImportError(name)
+            return real(name, *args, **kwargs)
+
+        with unittest.mock.patch.object(builtins, "__import__", no_playwright):
+            results = browser.render_many([self.WORKDAY], deadline=float("inf"))
+        self.assertEqual(results[self.WORKDAY][0], "")
+        self.assertIn("playwright is not installed", results[self.WORKDAY][1])
+
+    def test_the_browser_announces_the_tracker_and_nobody_in_particular(self):
+        """Honest about what is asking, silent about who (2026-09-26)."""
+        self.assertNotIn("@", paths.USER_AGENT)
+        self.assertNotIn("mailto", paths.USER_AGENT)
+        self.assertNotIn("github", paths.USER_AGENT.lower())
+        self.assertNotIn("Mozilla", paths.USER_AGENT, "never a browser string")
+
+
 class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
     """Where we landed is part of whether the fetch succeeded.
 

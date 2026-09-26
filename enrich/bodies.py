@@ -64,15 +64,25 @@ def _inline(change: models.Change) -> PostingBody:
 def needs_fetch(change: models.Change) -> str:
     """The URL to fetch for this change, or "" if there is nothing to fetch.
 
-    Falls back to the regex recovery only for a row read back out of a committed
-    snapshot, where the typed `posting_url` was never stored because the TSV format is
-    frozen. In practice that is a `removed` row, whose posting has usually gone anyway.
+    Falls back to the regex recovery for a row read back out of a committed snapshot,
+    where the typed `posting_url` was never stored because the TSV format is frozen. In
+    practice that is a `removed` row, whose posting has usually gone anyway.
+
+    Then, for a live row with no Simplify page, to the first link in the row that names
+    one posting -- the employer's own Workday, Ashby or Rippling page on a zshah-2027
+    row. Those are often JavaScript shells, which `postings.fetch_many` hands on to the
+    browser.
     """
     if change.posting_text:
         return ""
     if change.posting_url:
         return change.posting_url
-    return postings.recover_posting_url(change.detail, change.key)
+    recovered = postings.recover_posting_url(change.detail, change.key)
+    if recovered or change.kind == "removed" or change.structural:
+        # A removed posting has usually gone, and the digest omits it anyway; opening
+        # it in a browser would cost seconds to read a 404.
+        return recovered
+    return postings.posting_link(change.url, change.detail)
 
 
 def collect(

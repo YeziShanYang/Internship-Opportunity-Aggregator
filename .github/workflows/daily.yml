@@ -61,6 +61,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # Headless Chromium for posting pages that render in JavaScript (Workday, Ashby).
+      # Allowed to fail: without it those rows are judged on the row alone and HEALTH
+      # counts them, which is worse but never worth losing the morning's digest over.
+      - name: Install headless browser
+        continue-on-error: true
+        run: python -m playwright install --with-deps --only-shell chromium
+
       - name: Check sources and deliver the digest
         env:
           # Fine-grained, read-only, public repos. Lifts the GitHub API limit from 60
