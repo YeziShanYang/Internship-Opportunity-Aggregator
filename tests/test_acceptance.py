@@ -1346,6 +1346,29 @@ class Phase2JobBoardTests(_IsolatedState, unittest.TestCase):
                     title)
 
 
+    def test_14_9q_discovery_programme_titles_are_student_roles(self):
+        """Citi's Early Careers board, 2026-09-26: every posting is a discovery event
+        with none of the internship words, and both title screens removed all 22."""
+        for title in ("Career Insights: Meet the Business – Technology (NAM Session)",
+                      "Freshman Discovery Program 2027",
+                      "Sophomore Summit - Technology",
+                      "First-Year Insight Day: Markets",
+                      "Early Insight Week - Investment Banking",
+                      "Early ID Program - Markets"):
+            with self.subTest(title=title):
+                posting = models.Posting(title, "New York", "x", "", "u", "")
+                self.assertTrue(parse_ats.is_student_posting(posting), title)
+                self.assertTrue(parse_ats.wants_workday_detail(
+                    {"title": title, "locationsText": "New York New York United States"}))
+
+    def test_14_9r_insight_and_discovery_jobs_are_not_discovery_programmes(self):
+        """The programme noun anchors the match, not the bare word."""
+        for title in ("Consumer Insights Manager", "Drug Discovery Scientist",
+                      "eDiscovery Analyst", "Senior Data Insights Engineer"):
+            with self.subTest(title=title):
+                self.assertFalse(parse_ats.is_student_posting(
+                    models.Posting(title, "New York", "x", "", "u", "")), title)
+
 class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
     PAGE = "<html><body>" + "<p>Registration for the 2027 contest is open.</p>" * 40 + "</body></html>"
 

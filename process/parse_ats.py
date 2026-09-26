@@ -61,6 +61,20 @@ STUDENT_TITLE = re.compile(
 )
 STUDENT_TYPE = re.compile(r"\bintern(?!a)|co.?op", re.IGNORECASE)
 
+# Discovery programmes, which carry none of the internship words above. Citi's Early
+# Careers board (2026-09-26) posts "Career Insights: Meet the Business - Technology (NAM
+# Session)" and nothing else, and both title screens removed all 22 of its rows -- the
+# first- and second-year events that are the most valuable thing this project watches.
+# Anchored on the programme noun, never the bare word: "Consumer Insights Manager" and
+# "Drug Discovery Scientist" are full-time jobs on boards this project already watches.
+DISCOVERY_TITLE = re.compile(
+    r"\b(sophomore|freshman|freshmen|first.year|underclass\w*)\b"
+    r"|career insights?|early insights?|\binsight\s+(day|week|program|programme|series|event|session)"
+    r"|\bdiscovery\s+(day|week|program|programme|series|fellowship|event)"
+    r"|\bearly id\b|externship",
+    re.IGNORECASE,
+)
+
 # Jobs *about* early-career hiring are not early-career jobs. "Campus Recruiter",
 # "Campus Relations & Events Associate" and "Campus Recruiting Coordinator" all match
 # the widened screen above and are all full-time staff roles. Checked before the
@@ -171,6 +185,7 @@ def is_student_posting(posting: models.Posting) -> bool:
         return False
     return bool(
         STUDENT_TITLE.search(posting.title)
+        or DISCOVERY_TITLE.search(posting.title)
         or STUDENT_TYPE.search(posting.employment_type or "")
     )
 
@@ -188,7 +203,7 @@ def wants_workday_detail(job: dict) -> bool:
     """
     title = job.get("title") or ""
     return bool(
-        STUDENT_TITLE_WORKDAY.search(title)
+        (STUDENT_TITLE_WORKDAY.search(title) or DISCOVERY_TITLE.search(title))
         and not NOT_A_STUDENT_ROLE.search(title)
         and not NON_US_LOCATION.search(job.get("locationsText") or "")
     )
