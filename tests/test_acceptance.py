@@ -2668,6 +2668,58 @@ class BrowserFallbackTests(_IsolatedState, unittest.TestCase):
         self.assertNotIn("Mozilla", paths.USER_AGENT, "never a browser string")
 
 
+class SpeedyapplyTests(_IsolatedState, unittest.TestCase):
+    """speedyapply's Quant section, added 2026-09-26 as the honest route to Citadel."""
+
+    README = """## 2027 USA AI Internships
+
+### FAANG+
+
+<!-- TABLE_FAANG_START -->
+| Company | Position | Location | Salary | Posting | Age |
+|---|---|---|---|---|---|
+| <a href="https://www.nvidia.com"><strong>NVIDIA</strong></a> | AI Intern | Santa Clara, CA | $62/hr | <a href="https://nvidia.wd5.myworkdayjobs.com/x/job/y_JR1"><img src="i.png" alt="Apply"/></a> | 3d |
+
+### Quant
+
+<!-- TABLE_QUANT_START -->
+| Company | Position | Location | Salary | Posting | Age |
+|---|---|---|---|---|---|
+| <a href="https://www.hudsonrivertrading.com"><strong>Hudson River Trading</strong></a> | Data Scientist Intern - 2027 | New York City, NY | $145/hr | <a href="https://www.hudsonrivertrading.com/careers/job/?gh_jid=8222414"><img src="i.png" alt="Apply"/></a> | 3d |
+| <a href="https://www.citadel.com/careers"><strong>Citadel</strong></a> | Software Engineer - Intern - US | Houston, TX +2 | $125/hr | <a href="https://www.citadel.com/careers/details/software-engineer-intern-us/"><img src="i.png" alt="Apply"/></a> | 10d |
+"""
+
+    def test_only_the_quant_section_is_read(self):
+        snap = parse_readme.extract(self.README, parse_readme.REPO_CONFIGS["speedyapply-ai-2027"])
+        self.assertEqual(len(snap.rows), 2)
+        self.assertFalse(any("NVIDIA" in r.key for r in snap.rows))
+
+    def test_age_is_not_part_of_the_row(self):
+        """A relative age turns over every row every day."""
+        a = parse_readme.extract(self.README, parse_readme.REPO_CONFIGS["speedyapply-ai-2027"])
+        b = parse_readme.extract(self.README.replace("| 3d |", "| 4d |").replace("| 10d |", "| 11d |"),
+                                 parse_readme.REPO_CONFIGS["speedyapply-ai-2027"])
+        self.assertEqual([(r.key, r.value) for r in a.rows], [(r.key, r.value) for r in b.rows])
+
+    def test_the_company_column_is_the_bare_employer(self):
+        snap = parse_readme.extract(self.README, parse_readme.REPO_CONFIGS["speedyapply-ai-2027"])
+        row = next(r for r in snap.rows if "Citadel" in r.key)
+        j = models.Judgment(
+            change=models.Change(source_id="speedyapply-ai-2027", kind="added", key=row.key,
+                                 detail="x", url="https://x.test/1"),
+            program_name="speedyapply 2027 AI College Jobs (Quant)", relevant=True,
+            outcome=models.MODEL, confidence="high")
+        _, body = digest.render([j], [], {})
+        self.assertIn("| Citadel |", body)
+
+    def test_a_gh_jid_link_is_the_same_posting_as_the_greenhouse_board(self):
+        """HRT links its own domain with ?gh_jid=; the board links greenhouse.io."""
+        from core import text
+        self.assertEqual(
+            text.posting_identities("https://www.hudsonrivertrading.com/careers/job/?gh_jid=8222414"),
+            text.posting_identities("https://job-boards.greenhouse.io/wehrtyou/jobs/8222414"))
+
+
 class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
     """Where we landed is part of whether the fetch succeeded.
 

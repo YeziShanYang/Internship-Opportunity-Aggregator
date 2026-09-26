@@ -56,6 +56,12 @@ _UUID = re.compile(
 # own board and an aggregator's copy of the link.
 _REQUISITION = re.compile(r"_(R-?\d{3,})\b", re.IGNORECASE)
 _NUMERIC_ID = re.compile(r"^\d{5,}$")
+# Greenhouse's embed puts the job id in a query parameter on the employer's own domain:
+# HRT links "hudsonrivertrading.com/careers/job/?gh_jid=8222414", which is job 8222414
+# on its Greenhouse board. The id is Greenhouse's and global across boards, so it keys
+# to the same identity as the board's own link -- until 2026-09-26 it keyed to nothing,
+# and the same posting arrived twice.
+_GH_JID = re.compile(r"[?&]gh_jid=(\d{5,})")
 
 
 def _host_key(host: str) -> str:
@@ -89,6 +95,10 @@ def posting_identities(*texts: str) -> frozenset[str]:
             if not match:
                 continue
             host, path = _host_key(match.group(1)), match.group(2) or ""
+            gh_jid = _GH_JID.search(path)
+            if gh_jid:
+                found.add(f"greenhouse.io:{gh_jid.group(1)}")
+                continue
             uuid = _UUID.search(path)
             if uuid:
                 found.add(f"{host}:{uuid.group(0).lower()}")
