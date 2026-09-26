@@ -33,6 +33,7 @@ import calendar_reminders
 from core import clock, models, paths, profile
 from deliver import health, urgency
 from enrich import bodies as enrich_bodies
+from process import parse_readme
 
 def _stale_profile_line() -> str | None:
     """Nag when the owner profile has not been reviewed in a while.
@@ -117,7 +118,14 @@ def _bullets(items: list[tuple[str, str]]) -> str:
 # Matching the link shape rather than splitting every key on " / " is deliberate: a
 # job-board key is "Title @ Location", and a title containing a slash ("Software
 # Engineer / Backend") would otherwise be read as a company called "Software Engineer".
+#
+# The link is not the only shape, though: zshah-2027's Company cell is plain text, so its
+# keys are "ABB / AI Robotics Intern @ Milpitas" and every one of them printed the list's
+# own name as the company (2026-09-26, 14 rows). `parse_readme` builds every aggregator
+# key as f"{entity} / {role}", so for those sources -- and only those -- the first " / "
+# is the employer boundary by construction, linked or not.
 _LINKED_ENTITY = re.compile(r"^\[([^\]]+)\]\([^)]*\)\s*/\s*(.+)$")
+_PLAIN_ENTITY = re.compile(r"^(.+?)\s+/\s+(.+)$")
 _MD_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 
 
@@ -147,7 +155,11 @@ def _company_and_position(judgment: models.Judgment) -> tuple[str, str]:
     # Prefer the employer named in the row over the aggregator that carried it. For a
     # Simplify or zshah row, `program_names` is the list's own name, which is the same
     # useless string on every one of its 500+ rows.
+    # This also has to win over `judgment.program_name`: the prompt names the
+    # aggregator as the "tracked program", and the model hands that name straight back.
     linked = _LINKED_ENTITY.match(position)
+    if not linked and change.source_id in parse_readme.REPO_CONFIGS and not change.structural:
+        linked = _PLAIN_ENTITY.match(position)
     if linked:
         return _unlink(linked.group(1)), _unlink(linked.group(2))
 
