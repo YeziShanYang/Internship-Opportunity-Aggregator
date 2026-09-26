@@ -196,7 +196,11 @@ def assess(
                 "(renders in JavaScript, or was blocked)"
             ),
         )
-    if ratio < MIN_TEXT_HTML_RATIO:
+    # The ratio exists to catch a JavaScript shell, and a rendered page is by
+    # construction not one -- Wix's rendered DOM is still 0.001 text. The absolute floor
+    # above still applies, so a render that produced nothing still fails.
+    rendered = (source.get("render_js") or "").strip().lower() == "true"
+    if ratio < MIN_TEXT_HTML_RATIO and not rendered:
         return models.SourceResult(
             source_id=source_id,
             ok=False,

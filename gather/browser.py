@@ -1,6 +1,13 @@
-"""Render a posting page in headless Chromium when a plain fetch gets a JavaScript shell.
+"""Render a page in headless Chromium, for the pages a plain GET cannot read.
 
-The fallback half of `enrich.postings.fetch_many`, and only ever the fallback: most
+Two callers. `enrich.postings.fetch_many` uses `render_many` as the fallback for a
+posting page that came back as a JavaScript shell, and `gather.page` uses
+`render_page` for a watched `page_text` row marked `render_js=true` -- a Wix or React
+site whose text only exists after scripts run (Duke's trading competition measured 942
+characters at ratio 0.001 on every page of its site, 2026-09-26). It lives in `gather`
+because it is network I/O; `enrich` may import down to it.
+
+For postings it is only ever the fallback: most
 posting pages answer a plain GET with their full text, and a browser costs a second or
 two a page where httpx costs milliseconds. Measured 2026-09-26 on five zshah-2027
 postings from that morning's digest:
@@ -61,11 +68,7 @@ def render_many(urls: list[str], deadline: float) -> dict[str, tuple[str, str]]:
         with sync_playwright() as p:
             browser = p.chromium.launch()
             try:
-                context = browser.new_context(
-                    user_agent=paths.USER_AGENT, locale="en-US", timezone_id="UTC")
-                context.route("**/*", lambda route: route.abort()
-                              if route.request.resource_type in _SKIPPED_RESOURCES
-                              else route.continue_())
+                context = _context(browser)
                 for url in urls:
                     if time.monotonic() > deadline:
                         results[url] = ("", "skipped: the run's total fetch budget was exhausted")
@@ -77,6 +80,48 @@ def render_many(urls: list[str], deadline: float) -> dict[str, tuple[str, str]]:
         for url in urls:
             results.setdefault(url, ("", f"browser unavailable: {type(exc).__name__}: {exc}"))
     return results
+
+
+def render_page(url: str) -> tuple[str, str, int, str]:
+    """(rendered_html, final_url, status, error) for one watched page. Never raises.
+
+    Same honest, anonymous context as `render_many`. HTML rather than text, because the
+    page pipeline normalises and diffs the markup itself, and `final_url` because where
+    a fetch landed is part of whether it worked (`process.redirect`).
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return "", url, 0, "render_js=true, but playwright is not installed"
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            try:
+                context = _context(browser)
+                page = context.new_page()
+                response = page.goto(url, wait_until="domcontentloaded",
+                                     timeout=PAGE_TIMEOUT_MS)
+                status = response.status if response is not None else 0
+                if status >= 400:
+                    return "", page.url, status, f"browser: HTTP {status}"
+                try:
+                    page.wait_for_load_state("networkidle", timeout=SETTLE_TIMEOUT_MS)
+                except Exception:
+                    pass
+                return page.content(), page.url, status or 200, ""
+            finally:
+                browser.close()
+    except Exception as exc:
+        return "", url, 0, f"browser: {type(exc).__name__}: {exc}"
+
+
+def _context(browser):
+    context = browser.new_context(
+        user_agent=paths.USER_AGENT, locale="en-US", timezone_id="UTC")
+    context.route("**/*", lambda route: route.abort()
+                  if route.request.resource_type in _SKIPPED_RESOURCES
+                  else route.continue_())
+    return context
 
 
 def _render(context, url: str) -> tuple[str, str]:
