@@ -57,9 +57,14 @@ BY_MONTH: dict[int, list[str]] = {
         "20 places per cohort, travel and hotel covered. Watched by voloridge-greenhouse.",
         "Jane Street FTTP is rolling and slots have reportedly filled by late October. "
         "If you have not applied, this is the week.",
+        "Putnam: register through Stanford's local supervisor - the exam is the first "
+        "Saturday of December. maa.org refuses this tool, so this reminder is the only "
+        "coverage.",
     ],
     11: [
         "UChicago UTC applications open this month.",
+        "Putnam registration closes before the early-December exam - last call through "
+        "Stanford's local supervisor.",
         "Google Student Researcher closes Nov 27.",
     ],
     12: [
@@ -74,9 +79,10 @@ BY_MONTH: dict[int, list[str]] = {
 # Printed every month: sources that are verified un-pollable, so the only thing that
 # will ever surface them is the owner opening the page.
 ALWAYS: list[str] = [
-    "Citadel and Citadel Securities (including Discover Citadel) block automated "
-    "access entirely - 403 to every client. Open the programs-and-events pages by hand "
-    "this month; Discover Citadel is freshman-eligible and this tool cannot see it.",
+    "Citadel and Citadel Securities refuse this tool's client, so their own pages are "
+    "never read. Their internship postings now arrive through the speedyapply Quant "
+    "lists, but Discover Citadel does not - it is freshman-eligible, so open the "
+    "programs-and-events pages by hand this month.",
     "IAS/PCMI also blocks automation. Check it by hand if you are considering it.",
     "Kaggle competitions are always open and rolling - browse kaggle.com/competitions "
     "when you want a project, not on a deadline.",
