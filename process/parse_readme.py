@@ -72,7 +72,23 @@ class RepoConfig:
     min_sections: int = 0
 
 
+# speedyapply's two lists, Quant section only (added 2026-09-26). Their FAANG+ and
+# Other sections are mostly Simplify and zshah again -- 300 of 577 and 414 of 735 rows
+# share a posting id with them -- but the Quant section is the one honest route to
+# Citadel and Citadel Securities, whose own site refuses this client's User-Agent.
+# The Company cell is an HTML anchor around <strong>, and Age is relative ("3d").
+_SPEEDYAPPLY = dict(
+    table_format="markdown",
+    entity_columns=("Company",),
+    role_columns=("Position",),
+    qualifier_columns=("Location",),
+    ignore_columns=("Age",),
+    section_include=re.compile(r"^quant\b", re.I),
+)
+
 REPO_CONFIGS: dict[str, RepoConfig] = {
+    "speedyapply-ai-2027": RepoConfig(**_SPEEDYAPPLY, min_rows=15),
+    "speedyapply-swe-2027": RepoConfig(**_SPEEDYAPPLY, min_rows=5),
     "nuft-2027": RepoConfig(
         table_format="markdown",
         role_columns=("Role",),

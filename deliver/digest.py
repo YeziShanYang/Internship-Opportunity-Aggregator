@@ -161,7 +161,8 @@ def _company_and_position(judgment: models.Judgment) -> tuple[str, str]:
     if not linked and change.source_id in parse_readme.REPO_CONFIGS and not change.structural:
         linked = _PLAIN_ENTITY.match(position)
     if linked:
-        return _unlink(linked.group(1)), _unlink(linked.group(2))
+        # .strip(): speedyapply's anchor wraps <strong>, which leaves "[ HRT ](url)".
+        return _unlink(linked.group(1)).strip(), _unlink(linked.group(2)).strip()
 
     position = _unlink(position)
     if company and position.lower().startswith(company.lower()):
