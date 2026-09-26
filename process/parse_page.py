@@ -99,8 +99,18 @@ def normalise(raw_html: str) -> list[str]:
     for line in text.split("\n"):
         collapsed = " ".join(line.split())
         if collapsed:
+            if lines and _COUNTDOWN_UNIT.match(lines[-1]) and _COUNTDOWN_VALUE.match(collapsed):
+                collapsed = "<n>"
             lines.append(collapsed)
     return lines
+
+
+# A live countdown renders one unit per line -- "Days", "69", "Hours", "03", "Minutes",
+# "07", "Seconds", "57" on the SMART Scholarship page (2026-09-26) -- so it would read as
+# a changed page on every run. Only a bare number directly after a bare unit is masked:
+# "Applications close in 5 days" keeps its number, because that is the news.
+_COUNTDOWN_UNIT = re.compile(r"^(days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)$", re.I)
+_COUNTDOWN_VALUE = re.compile(r"^\d{1,3}$")
 
 
 def diff_pages(
