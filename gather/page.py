@@ -9,9 +9,10 @@ throws that away cannot be repaired downstream.
 
 Measured before this tier was built: all ten seeded `page_text` sources returned real
 text to a plain httpx GET -- 837 to 10,418 characters, zero JavaScript shells, zero
-failures. That is why the project ships no browser, and it is a property of those ten
-pages rather than a general claim, which is why `render_js=true` is refused loudly here
-instead of being attempted.
+failures. That was a property of those ten pages rather than a general claim: by
+2026-09-26 the watchlist wanted Wix and React pages whose text only exists after scripts
+run. A row marked `render_js=true` is rendered by `gather.browser` instead, and a
+missing browser fails the source loudly rather than reading as a quiet day.
 
 Network only. The content floors, the redirect verdict and the diff are
 `process.parse_page`'s job.
@@ -25,6 +26,11 @@ from dataclasses import dataclass
 import httpx
 
 from core import models
+from gather import browser
+
+
+def renders_js(source: dict[str, str]) -> bool:
+    return (source.get("render_js") or "").strip().lower() == "true"
 
 
 @dataclass
@@ -47,11 +53,6 @@ def unsupported(source: dict[str, str]) -> str:
     same class of bug as skipping an unknown method: the row looks watched, and is not
     watched as configured.
     """
-    if (source.get("render_js") or "").strip().lower() == "true":
-        return (
-            "render_js=true is not supported (Phase 2 ships no browser); move this "
-            "row to method=manual or accept that it is blind"
-        )
     if (source.get("selector") or "").strip():
         return (
             "a CSS selector is configured but page_watch does not implement one; "
@@ -70,6 +71,22 @@ def fetch(source: dict[str, str], client: httpx.Client) -> PageFetch:
         return PageFetch(attempt=_attempt(source_id, url, ok=False, error=refusal))
 
     started = time.monotonic()
+    if renders_js(source):
+        html, final_url, status, error = browser.render_page(url)
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        if error:
+            return PageFetch(attempt=_attempt(
+                source_id, url, ok=False, error=error, status=status,
+                elapsed_ms=elapsed_ms))
+        return PageFetch(
+            attempt=_attempt(
+                source_id, url, ok=True, status=status, final_url=final_url,
+                size=len(html),
+                sha256=hashlib.sha256(html.encode("utf-8", "replace")).hexdigest(),
+                elapsed_ms=elapsed_ms,
+            ),
+            html=html,
+        )
     try:
         response = client.get(url)
         response.raise_for_status()

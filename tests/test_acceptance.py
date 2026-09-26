@@ -1378,10 +1378,42 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         base.update(kw)
         return base
 
-    def test_14_9j_render_js_true_is_refused_loudly(self):
-        r = _check_page(self._src(render_js="true"), FakeHTMLClient(self.PAGE))
+    # A Wix page as rendered: real text, but a DOM so heavy the ratio reads as a shell.
+    WIX = ("<html><body>" + "<div class='x'></div>" * 40000
+           + "<p>Duke Trading Competition. Applications due January 25.</p>" * 12
+           + "</body></html>")
+
+    def _rendered(self, html="", error="", status=200, final=None):
+        from gather import browser
+        return unittest.mock.patch.object(
+            browser, "render_page",
+            lambda url: (html, final or url, status, error))
+
+    def test_14_9j_a_render_js_row_is_read_through_the_browser(self):
+        """It used to be refused ("Phase 2 ships no browser"). The plain client must
+        not be asked at all: its answer is the JavaScript shell."""
+        with self._rendered(self.WIX):
+            r = _check_page(self._src(render_js="true"), FakeHTMLClient("<html></html>"))
+        self.assertTrue(r.ok, r.error)
+
+    def test_14_9j2_a_rendered_page_is_exempt_from_the_ratio_but_not_the_floor(self):
+        with self._rendered(self.WIX):
+            self.assertTrue(_check_page(self._src(render_js="true"),
+                                        FakeHTMLClient("")).ok)
+        # The same markup fetched plainly is still a shell.
+        self.assertFalse(_check_page(self._src(), FakeHTMLClient(self.WIX)).ok)
+        # And a render that produced nothing still fails.
+        with self._rendered("<html><body>loading</body></html>"):
+            r = _check_page(self._src(render_js="true"), FakeHTMLClient(""))
         self.assertFalse(r.ok)
-        self.assertIn("render_js=true", r.error)
+
+    def test_14_9j3_no_browser_fails_the_source_loudly(self):
+        """Blind, never quiet: a render_js row without Chromium is a failing source."""
+        with self._rendered(error="render_js=true, but playwright is not installed",
+                            status=0):
+            r = _check_page(self._src(render_js="true"), FakeHTMLClient(self.PAGE))
+        self.assertFalse(r.ok)
+        self.assertIn("playwright", r.error)
 
     def test_14_9k_a_configured_selector_is_refused_rather_than_ignored(self):
         r = _check_page(self._src(selector=".main"), FakeHTMLClient(self.PAGE))
@@ -2564,7 +2596,8 @@ class BrowserFallbackTests(_IsolatedState, unittest.TestCase):
             lambda request: httpx.Response(status, text=html)))
 
     def _fetch(self, client, rendered=None):
-        from enrich import browser, postings
+        from enrich import postings
+        from gather import browser
         calls = []
 
         def fake(urls, deadline):
@@ -2614,7 +2647,7 @@ class BrowserFallbackTests(_IsolatedState, unittest.TestCase):
 
     def test_no_playwright_degrades_to_an_error_not_to_empty_text(self):
         import builtins
-        from enrich import browser
+        from gather import browser
         real = builtins.__import__
 
         def no_playwright(name, *args, **kwargs):

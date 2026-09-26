@@ -39,7 +39,7 @@ import time
 import httpx
 
 from core import paths, text as coretext
-from enrich import browser
+from gather import browser
 from gather import clients
 from persist import cache
 
