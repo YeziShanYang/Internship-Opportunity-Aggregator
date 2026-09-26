@@ -308,7 +308,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertTrue(any(urgency.is_urgent(j) for j in judgments), "rolling change must be urgent")
         _, body = digest.render(judgments, _metrics(result), {"nuft-2027": self.source})
         self.assertIn("ACT NOW", body)
-        self.assertIn("Jane Street / QT", body)
+        self.assertIn("| Jane Street | [QT]", body)
 
     # --- 14.3 -------------------------------------------------------------------
     def test_14_3_a_404_is_health_not_a_change(self):
@@ -2473,9 +2473,10 @@ class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
     it came from the same place. The employer is in the row key, as a markdown link.
     """
 
-    def _row(self, key, program="SimplifyJobs Summer 2027", url="https://x.test/1"):
+    def _row(self, key, program="SimplifyJobs Summer 2027", url="https://x.test/1",
+             source_id="simplify-2027"):
         j = models.Judgment(
-            change=models.Change(source_id="simplify-2027", kind="added", key=key,
+            change=models.Change(source_id=source_id, kind="added", key=key,
                                 detail="x", url=url),
             program_name=program, relevant=True, outcome=models.MODEL, confidence="high",
         )
@@ -2498,9 +2499,27 @@ class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
     def test_a_slash_in_a_job_title_is_not_read_as_an_employer(self):
         """Job-board keys are "Title @ Location". Splitting every key on " / " would
         turn "Software Engineer / Backend Intern" into a company."""
-        row = self._row("Software Engineer / Backend Intern @ NYC", program="Jane Street")
+        row = self._row("Software Engineer / Backend Intern @ NYC", program="Jane Street",
+                        source_id="janestreet-greenhouse")
         self.assertIn("| Jane Street |", row)
         self.assertIn("Software Engineer / Backend Intern", row)
+
+    def test_a_plain_text_employer_on_an_aggregator_becomes_the_company_column(self):
+        """zshah-2027's Company cell is not a link. On 2026-09-26 every one of its rows
+        printed "zshah Summer 2027 / Fall 2026 Tech Internships" as the company."""
+        row = self._row("ABB / AI Robotics UI/UX Intern - Fall 2026 @ Milpitas, CA",
+                        program="zshah Summer 2027 / Fall 2026 Tech Internships",
+                        source_id="zshah-2027")
+        self.assertIn("| ABB |", row)
+        self.assertIn("AI Robotics UI/UX Intern - Fall 2026 @ Milpitas, CA", row)
+        self.assertNotIn("zshah", row)
+
+    def test_only_the_first_slash_on_an_aggregator_row_is_the_employer_boundary(self):
+        row = self._row("Amazon / Applied Scientist Intern / Co-op @ Seattle",
+                        program="zshah Summer 2027 / Fall 2026 Tech Internships",
+                        source_id="zshah-2027")
+        self.assertIn("| Amazon |", row)
+        self.assertIn("Applied Scientist Intern / Co-op @ Seattle", row)
 
 
 class RedirectDetectionTests(_IsolatedState, unittest.TestCase):
