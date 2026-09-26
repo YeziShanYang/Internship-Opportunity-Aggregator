@@ -13,11 +13,14 @@ that could only ever be guessed at into one that can be decided.
 
 Three findings that shape this module:
 
-* **Only Simplify's own page is usable.** Rows carry two links: the employer's ATS
-  (Workday, iCIMS, Greenhouse, Oracle HCM) and `simplify.jobs/p/{uuid}`. The ATS links
-  are dead ends for a text fetch -- Workday returns literally zero characters, because
-  the posting renders entirely in JavaScript. Simplify's page returns 13K-34K characters
-  of real text including the requirements block.
+* **Prefer Simplify's own page when a row has one.** Simplify rows carry two links:
+  the employer's ATS (Workday, iCIMS, Greenhouse, Oracle HCM) and
+  `simplify.jobs/p/{uuid}`. The ATS link is often a dead end for a plain fetch --
+  Workday returns literally zero characters, because the posting renders entirely in
+  JavaScript -- while Simplify's page returns 13K-34K characters including the
+  requirements block. A row with *only* an employer link (every zshah-2027 row) is no
+  longer skipped: a page that comes back as a shell is re-read in headless Chromium by
+  `enrich.browser`, which turned Workday's 0 characters into 7,457 (2026-09-26).
 * **The honest User-Agent works.** `paths.USER_AGENT` and a browser string return byte
   identical responses (140,325 bytes on the page tested), so there is no reason to
   pretend to be a browser. `robots.txt` allows `/p/` (`Allow: /`, and `/p` is absent
@@ -36,6 +39,7 @@ import time
 import httpx
 
 from core import paths, text as coretext
+from enrich import browser
 from gather import clients
 from persist import cache
 
@@ -60,6 +64,35 @@ PER_REQUEST_DELAY_SECONDS = 0.2
 # expires is reported as a fetch failure, which degrades to unclassified rather than
 # to a relevance decision.
 TOTAL_BUDGET_SECONDS = 240.0
+
+# A link to one posting rather than to an employer. `core.text.posting_identities` is the
+# strict test and is kept strict because deduplication rests on it; this adds the path
+# shapes that plainly name one job without carrying an id that test recognises, such as
+# Workday's `_JR111596` and `_REQ-48457` requisitions.
+_ANY_URL = re.compile(r"https?://[^\s)\]<>]+")
+_JOB_PATH = re.compile(r"/(?:job|jobs|posting|postings|careers/job)/[^/?#]+", re.I)
+# Never a posting, whatever its path looks like: an aggregator's company page, and the
+# aggregator repos themselves.
+_NOT_A_POSTING = re.compile(r"simplify\.jobs/c/|github\.com/", re.I)
+
+
+def posting_link(*haystacks: str) -> str:
+    """The first link in `haystacks` that points at one specific posting, or "".
+
+    For an aggregator row that is not Simplify -- zshah-2027 links the employer's own
+    Workday, Ashby, Rippling or SmartRecruiters page directly, and until 2026-09-26
+    `recover_posting_url` knew only Simplify's pattern, so none of those rows was ever
+    fetched and the model judged every one of them on its title.
+    """
+    for haystack in haystacks:
+        for raw in _ANY_URL.findall(haystack or ""):
+            url = raw.rstrip(".,;:)]}\"'")
+            if _NOT_A_POSTING.search(url):
+                continue
+            if coretext.posting_identities(url) or _JOB_PATH.search(url):
+                return url
+    return ""
+
 
 def recover_posting_url(*haystacks: str) -> str:
     """Best-effort: find a fetchable posting link in already-rendered row text.
@@ -103,7 +136,7 @@ def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
     text = extract_text(response.text)
     if len(text) < MIN_USEFUL_CHARS:
         return "", (
-            f"page returned only {len(text)} characters of text "
+            f"{SHORT_PAGE}: page returned only {len(text)} characters of text "
             "(renders in JavaScript, or was blocked)"
         )
 
@@ -111,11 +144,31 @@ def fetch_text(client: httpx.Client, url: str) -> tuple[str, str]:
     return text, ""
 
 
+# The one error a browser can fix. A 403 or a 404 is not retried there: a site that
+# refused this client has said no, and rendering it in Chromium would be the first step
+# toward pretending to be someone else.
+SHORT_PAGE = "short page"
+
+
+def _render_shells(results: dict[str, tuple[str, str]], deadline: float) -> None:
+    """Re-read every JavaScript shell in `results` through the browser, in place."""
+    shells = [u for u, (_, error) in results.items() if error.startswith(SHORT_PAGE)]
+    for url, (text, error) in browser.render_many(shells, deadline).items():
+        if error:
+            results[url] = ("", f"{results[url][1]}; {error}")
+        elif len(text) < MIN_USEFUL_CHARS:
+            results[url] = ("", f"{results[url][1]}; rendered page had only "
+                                f"{len(text)} characters too")
+        else:
+            cache.write_posting(url, text)
+            results[url] = (text, "")
+
+
 build_client = clients.build_web_client
 
 
 def fetch_many(
-    urls: list[str], client: httpx.Client | None = None
+    urls: list[str], client: httpx.Client | None = None, *, render: bool = True
 ) -> dict[str, tuple[str, str]]:
     """Fetch every URL concurrently. Returns {url: (text, error)}.
 
@@ -145,4 +198,6 @@ def fetch_many(
     finally:
         if owned:
             client.close()
+    if render:
+        _render_shells(results, deadline)
     return results
