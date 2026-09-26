@@ -595,6 +595,18 @@ class NoiseRegressionTests(_IsolatedState, unittest.TestCase):
 
     CONFIG = parse_readme.REPO_CONFIGS["simplify-2027"]
 
+    def test_a_live_countdown_does_not_change_the_page(self):
+        """SMART Scholarship, 2026-09-26: a per-second countdown, one unit per line.
+        Two fetches two minutes apart differed on the Seconds and Minutes values."""
+        page = ("<div>Application Closes in:</div><div>Days</div><div>{d}</div>"
+                "<div>Hours</div><div>{h}</div><div>Seconds</div><div>{s}</div>"
+                "<p>Applications close in 5 days.</p>")
+        self.assertEqual(parse_page.normalise(page.format(d=69, h=3, s=57)),
+                         parse_page.normalise(page.format(d=68, h=11, s=2)))
+        self.assertIn("Applications close in 5 days.",
+                      parse_page.normalise(page.format(d=1, h=1, s=1)),
+                      "a number inside a sentence is news and is kept")
+
     def _rows(self, body: str):
         html = f"""## 💻 Software Engineering Internship Roles
 <table><thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Age</th></tr></thead>
