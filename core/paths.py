@@ -81,8 +81,12 @@ RUN_DIR = ROOT / ".run"
 OUT_XLSX = ROOT / "out" / "programs.xlsx"
 OUT_TRACKED_XLSX = ROOT / "out" / "tracked.xlsx"
 
-# Spec section 11: identify ourselves, with a contact address.
-USER_AGENT = "opportunity-tracker/1.0 (+mailto:jasonshi@stanford.edu)"
+# Honest about *what* is asking -- an automated tracker, never a browser string -- and
+# silent about *who*. This used to carry the owner's email as a contact address, which
+# put his identity in front of ~144 employer sites every morning. Nothing personal goes
+# here: no email, no name, and no repo URL either, because the repo is public and leads
+# straight back to him. Changed 2026-09-26, asked for directly.
+USER_AGENT = "opportunity-tracker/1.0"
 REQUEST_DELAY_SECONDS = 1.0
 HTTP_TIMEOUT_SECONDS = 30.0
 
