@@ -1,0 +1,175 @@
+Futureforce Tech Launchpad 2026
+Skip to content
+Learners &amp; Early Career
+Show submenu for Learners &amp; Early Career
+EARLY CAREER AND ALUMNI
+Claude Corps
+Community Champions
+FOR NEW STUDENTS
+Courses
+Application Portal
+Events
+FOR CURRENT STUDENTS ONLY
+Log In
+Career Services
+For Higher Education
+Show submenu for For Higher Education
+CodePath for your Institution
+Partner with us
+For Companies
+Show submenu for For Companies
+CodePath for your Company
+Partner with us
+About
+Show submenu for About
+Impact
+Team
+Careers
+Contact Us
+Research &amp; News
+Learners &amp; Early Career
+Show submenu for Learners &amp; Early Career
+EARLY CAREER AND ALUMNI
+Claude Corps
+Community Champions
+FOR NEW STUDENTS
+Courses
+Application Portal
+Events
+FOR CURRENT STUDENTS ONLY
+Log In
+Career Services
+For Higher Education
+Show submenu for For Higher Education
+CodePath for your Institution
+Partner with us
+For Companies
+Show submenu for For Companies
+CodePath for your Company
+Partner with us
+About
+Show submenu for About
+Impact
+Team
+Careers
+Contact Us
+Research &amp; News
+FUTUREFORCE TECH LAUNCHPAD
+Define Your Future.
+Get ready for Futureforce Tech Launchpad, a transformative pre-internship at Salesforce powered by CodePath. During this 10-week program, participants experience an innovative full-stack web development curriculum and 1:1 mentorship.
+This immersive program takes place in the culture-rich city of San Francisco at the Salesforce Tower, with exposure to the world's #1 AI CRM and how they're transforming businesses with Agentforce.
+Join Waitlist
+PROGRAM DETAILS
+Program Duration
+10 weeks
+Skill Level
+Intermediate
+Program Dates
+June 1 - August 7, 2026
+Compensation
+Relocation stipend and paid learning experience&nbsp;
+Info Session
+Join us on Jan 22, 2026 at 4:30 PM PT / 7:30 PM ET
+Application Deadline
+February 22, 2026
+Location
+Salesforce HQ,
+415 Mission Street,
+San Francisco, CA 94105
+Hours
+9:00 a.m. - 5:00 p.m. PT, Monday-Friday
+&nbsp;
+&nbsp;
+About Salesforce&nbsp;
+Founded in 1999, Salesforce pioneered the revolutionary idea of replacing traditional desktop customer relationship management (CRM) with software in the cloud, making it accessible from anywhere. Today, Salesforce is the world’s #1 AI CRM — where innovation is a constant and humans and agents drive customer success together.&nbsp;
+The company is guided by core values — Trust, Customer Success, Innovation, Equality, and Sustainability — to bring out the best in one another and inspire the industry.&nbsp;
+Salesforce's University Recruiting strategy is dedicated to cultivating the next generation of talent. Futureforce interns and new grads work on real projects, build a skillset and global network, &nbsp;to propel their careers.
+Eligibility
+Age 18+
+Bachelor's graduation year: 2028
+Major: Computer Science or Computer Engineering
+Completed CS 1-type class (Intro to Programming) with proficiency in core programming concepts (functions, conditionals, loops, variables, primitive data types, and arrays)
+Professionalism:
+Timely application submission
+Clear written communication
+Collaborative attitude
+Resourcefulness
+Growth mindset
+Unique/inclusive problem-solving approach
+Application Process
+There are two stages in the application process. All applicants are reviewed and eligibility is determined for the next stage. Those who successfully pass to the second and final stage must complete two tasks.
+Stage 1: Application
+Fill out a 15-minute form covering your computer science background, interest in tech, and personal information.
+Submit a short answer response.
+Requires a free GitHub account.
+Stage 2: Technical Task + Interview Task
+Complete a project using basic HTML and CSS (3-5 hours).
+Respond to interview prompts and submit a 10-minute recording of your answers (1-2 hours)
+A Program that Upskills
+Cutting-edge technologies and skills, including:
+React.js, Node.js, Express.js, PostgreSQL and Render
+Leveraging AI tools, including GitHub Copilot, ChatGPT as part of development workflow
+Soft skills and collaboration supported by:
+A professional mentor from Salesforce
+CodePath instructors and teaching assistants
+Peers in the program
+FAQs
+What is a pre-internship?
+Futureforce Tech Launchpad provides pre-interns with the technical skillset and workplace experience to successfully apply and succeed as senior college interns. Pre-interns are taught a rigorous Web Development curriculum within a 9 to 5 workplace setting, and walk away with a functioning app that applies their knowledge of full stack web tools.&nbsp;
+What is the Futureforce Tech Launchpad program?
+Futureforce Tech Launchpad is a full-time 10-week paid summer pre-internship launched by Salesforce and CodePath for rising college juniors. This immersive program offers students a deep understanding of web development, relevant technical work experience, and an opportunity to connect with tech leaders.
+During the program, participants will be hired by Salesforce and expected to participate onsite from&nbsp; 9:00 a.m. - 5:00 p.m. PT, June 1 - August 7, 2026. The day-to-day experience includes team meetings and daily stand-ups, workshops, and mentorship from software engineering professionals at Salesforce.
+This program takes place in person at Salesforce's San Francisco office.
+How do I apply to Futureforce Tech Launchpad?
+Fill out an application sharing your background in computer science, your interest in a career in tech, and character testimonial. Those who successfully pass the application and make it to the final stage must complete two tasks: a project using basic HTML and CSS, along with a 10-minute recording of your responses to a series of questions.&nbsp;
+Who can apply for Futureforce Tech Launchpad?
+Students who will complete their sophomore year in Spring 2026 and have plans to major in computer science/engineering&nbsp;at a US college or university are encouraged to apply. Students should also have completed an introductory course in computer science and have familiarity with functions, conditionals, loops, variables, primitive data types, and arrays.
+Why should I apply to this program?
+The collaboration between Salesforce and CodePath brings students high-quality learning, work experience, and mentorship that will help them shape their education and plan for a career in the tech industry. Students who successfully complete this program may qualify for a Salesforce internship the following summer.
+CodePath is a non-profit with years of experience training software engineers at some of the top companies in the tech industry, including Airbnb, Meta, Netflix, and others.
+What are the pre-internship dates?
+The program runs from June 1 - August 7, 2026.&nbsp;
+How can I get more information about this program?
+Email admissions@codepath.org with any questions.
+To learn more about the Futureforce program, visit salesforce.com/futureforce
+&nbsp;
+Don’t see your questions here? Please email us at admissions@codepath.org
+Redefine your summer.
+Join Waitlist
+Pathways
+Foundations of AI Engineering (AI110)
+Applications of AI Engineering (AI201)
+AI Open Source Capstone (AI301)
+Technical Interview Prep (TIP101, TIP102, TIP103)
+Salesforce Futureforce Tech Launchpad
+Claude Corps
+Intro to Web Development (WEB101)
+Intermediate Web Development (WEB102)
+Advanced Web Development (WEB103)
+Intro to Cybersecurity (CYB101)
+Intermediate Cybersecurity (CYB102)
+Intro to Android Development (AND101)
+Intermediate Android Development (AND102)
+Intro to iOS Development (IOS101)
+Intermediate iOS Development (IOS102)
+Partner
+Higher Education
+Companies
+Volunteer
+Donate
+About
+Our Mission
+Impact
+Team
+News &amp; Research
+Careers
+Resources
+Financials
+Contact Us
+Legal
+Privacy policy
+Terms of Service
+Social
+© 2026 CodePath.org · A 501(c)(3) nonprofit
+2021 Fillmore Street, PMB #1154, San Francisco, CA 94115-2708
+EIN: 81-5338932

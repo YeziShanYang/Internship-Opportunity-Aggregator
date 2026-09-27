@@ -1,0 +1,16 @@
+CURIS
+My Profile My Applications Faculty Portal Admin Portal Contact
+Computer Science Research
+This site lists research opportunities for undergraduate and masters students in computer science or which apply computer science in other fields. It also organizes the CURIS Summer Internship research program.
+Getting Started in Research
+Interested in getting started in research but don't know where to start?&nbsp; Use this guide to learn more about getting started with CS Research.
+CURIS: Summer CS Internships
+Learn more about CURIS, the CS summer paid internship in which undergraduate students work with a CS faculty member and their group, towards an identifiable research result.
+CURIS Summer Projects
+View the 2026 CURIS Summer Project listings. The CURIS student application period is open from January 27 - February 10.
+Year-round CS Projects
+View listings for CS department projects seeking undergraduate and master's students during the academic year (for research units, hourly pay, or RA).
+PURE: Paid Undergraduate Research Experience
+Learn about the PURE program, which offers paid research opportunities for FLI students throughout the academic year.
+Stanford Home CS Department Home Help Ticket
+© 2020 Stanford University, Stanford, California 94305

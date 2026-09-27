@@ -1,0 +1,117 @@
+ICERM - Home
+Home Programs
+Your Visit
+Videos
+About
+Support ICERM Search
+Loading...
+ICERM
+121 South Main Street, Box E
+11th Floor
+Providence, RI 02903
+info@icerm.brown.edu
++1 (401) 863-5030
+Summer@ICERM
+Program
+Overview
+Program
+Details
+2026
+Program
+Past
+Programs
+Publications
+The Summer@ICERM program at Brown University is an eight-week residential program designed for a select group of 18-22 undergraduate scholars.
+Every year, faculty organizers develop a variety of topical research projects that are interdisciplinary in nature. They begin the program with brief introductory talks about each project. Throughout the eight-week program, students work on their assigned projects in groups of two-to-four, mentored by faculty advisors and teaching assistants. Students meet daily, give regular talks about their findings, attend mini-courses and guest talks, and participate in professional development seminars.
+Students learn how to collaborate mathematically while attending Summer@ICERM, and they work closely with their teammates to write up their research into a poster and/or paper by the end of the program.
+ICERM provides an excellent research environment; students and their faculty and TA mentors have access to shared offices and collaborative space throughout the institute. They also have access to ICERM&#x27;s computer facilities and specialized software. ICERM staff provide logistical support for students and help build community through fun activities and events.
+Program Details
+Funding Includes $4,800 stipend
+Dormitory housing
+Meal plan
+Travel support within U.S.
+Applicants must be matriculating undergraduate students at the time of the Summer@ICERM program.
+Funding is available for a very small number of students who are not US citizens or permanent residents.
+Upcoming Summer@ICERM programs are posted in the fall of each year.
+Deadline Mid-February
+Visit the event page for full details on the program.
+Summer@ICERM Past Programs
+Summer@ICERM 2026: Pure and Applied Mathematical Models
+Jun 8 - Jul 31, 2026
+Summer@ICERM
+Summer@ICERM 2025: Building Useful Insights from Local Data
+Jun 9 - Jul 25, 2025
+Summer@ICERM
+Summer@ICERM 2024: Mathematical Models to Predict, Prepare, and Prev...
+Jun 10 - Aug 2, 2024
+Summer@ICERM
+Summer@ICERM 2023: Mathematical Modeling of DNA Self-Assembly
+Jun 12 - Aug 4, 2023
+Summer@ICERM
+Summer@ICERM 2022: Computational Combinatorics
+Jun 13 - Aug 5, 2022
+Summer@ICERM
+Summer@ICERM 2021: Computational Polygonal Billiards
+Jun 14 - Aug 6, 2021
+Summer@ICERM
+Summer@ICERM 2020: Fast Learning Algorithms for Numerical Computatio...
+Jun 8 - Jul 31, 2020
+Summer@ICERM
+Summer@ICERM 2019: Computational Arithmetic Dynamics
+Jun 10 - Aug 2, 2019
+Summer@ICERM
+Summer@ICERM 2018: Low Dimensional Topology and Geometry
+Jun 11 - Aug 3, 2018
+Summer@ICERM
+Summer@ICERM 2017: Topological Data Analysis
+Jun 19 - Aug 11, 2017
+Summer@ICERM
+Summer@ICERM 2016: Dynamics and Stochastics
+Jun 20 - Aug 12, 2016
+Summer@ICERM
+Summer@ICERM 2015: Computational Dynamics and Topology
+Jun 15 - Aug 7, 2015
+Summer@ICERM
+Summer@ICERM 2014: Polygons and Polynomials
+Jun 16 - Aug 8, 2014
+Summer@ICERM
+Summer@ICERM 2013: Geometry and Dynamics
+Jun 17 - Aug 9, 2013
+Summer@ICERM
+Summer@ICERM 2012: Geometry and Dynamics
+Jun 18 - Aug 10, 2012
+Summer@ICERM
+Publications
+Zoë Bell, Jasmine Camero, Karina Cho, Trevor Hyde, Chieh-Mi Lu, Bianca Thompson, Eric Zhu, Density of periodic points for Latt\`es maps over finite
+field, J. Number Theory 238 (2022), 951-966.
+Joshua Brown, Yutong Bu, Zachary Cheesman, Benjamin Orman, Iris Horng, Samuel Thomas, Amanda Harsy, Adam Schultze, Predictive Modeling of Lower-Level English Club Soccer Using Crowd-Sourced Player Valuations, Mathematics and Sports 7 (2025) no. 1.
+Priscilla Doran, Natsuka Hayashida, Kristen Joyner, Grace Moberg, Austin Kind, Matthew Senese, Brittany Stephenson, Cara Jill Sulyok, A mathematical model of &lt;i&gt;Clostridioides difficile&lt;/i&gt; transmission in long-term care facilities, Mathematical Biosciences and Engineering 22 (2025) no. 12, 3201-3235.
+Mia Adler, Ford McDill, Tiffanie Ng, Will Paz, Iris Horng, Samuel Thomas, Amanda Harsy, Adam Schultze, Money Bull: Analyzing the Application of Ranking Methods to Rodeo, Maths and Sports 7 (2025).
+Grace Bielefeldt, Iris Horng, Holly Luebsen, Mitchell VonEschen, Leyda Almodovar Velazquez, Amanda Harsy Ramsay, Cory Johnson, Jessica Sorrells, Algorithmic Generation of DNA Self-Assembly Graphs, vol. 8, 2025, pp. 141–172.
+Julia Cai, Benjamin Hutz, Leo Mayer, Max Weinreich, Automorphism Groups of Endomorphisms of $\mathbbP^1 (\bar\mathbbF_p)$, arXiv:2003.12113, 2022.
+Melissa R. McGuirl and
+Katherine M. Kinnaird and
+Claire Savard and
+Erin H. Bugbee, SE and SNL diagrams: Flexible data structures for MIR, Proceedings of the 19th International Society for Music Information
+Retrieval Conference, 2018, pp. 341-347.
+Boyan Xu, Christopher J. Tralie, Alice Antia, Michael Lin, Jose A. Perea, Twisty Takens: A geometric characterization of good observations on dense trajectories, Journal of Applied and Computational Topology 3 (2019) no. 4, 285-313.
+Brandon Gontmacher, Benjamin Hutz, Grayson Jorgenson, Srinjoy Srimani, Simon Xu, Automorphism loci for degree 3 and degree 4 endomorphisms of the projective line, arXiv:2007.15483, 2021.
+Heidi Benham, Alexander Galarraga, Benjamin Hutz, Joey Lupo, Wayne Peng, Adam Towsley, New Normal Forms For Degree Three Polynomials and Rational Functions, arXiv:2001.06164, 2022.
+Anna Chlopecki, Juliano Levier-Gomes, Wayne Peng, Alex Shearer, Adam Towsley, Permutation polynomials: iteration of shift and inversion maps over finite fields, arXiv:1910.12928, 2021.
+Talia Blum, John R. Doyle, Trevor Hyde, Colby Kelln, Henry Talbott, Max Weinreich, Dynamical moduli spaces and polynomial endomorphisms of configurations, arXiv:2108.10777, 2021.
+Charles Daly, Jonah Gaster, Max Lahn, Aisha Mechery, Simran Nayak, Algebraic k-systems of curves, daly2020algebraic:1911.08469, 2020.
+Jonah Gaster, Miguel Lopez, Emily Rexer, Zoë Riell, Yang Xiao, Combinatorics of \textdollark\textdollar-Farey graphs, Rocky Mountain Journal of Mathematics 50 (2020) no. 1.
+Shuchi Agrawal, Tarik Aougab, Yassin Chandran, Marissa Loving, J. Robert Oakley, Roberta Shapiro, Yang Xiao, Automorphisms of the k-curve graph, agrawal2023automorphisms:1912.07666, 2023.
+Henry Adams, Samir Chowdhury, Adam Quinn Jaffe, Bonginkosi Sibanda, Vietoris-Rips Complexes of Regular Polygons, adams2018vietorisrips:1807.10971, 2018.
+Samir Chowdhury, Nathaniel Clause, Facundo Memoli, Jose Angel Sanchez, Zoe Wellner, New families of simplicial filtration functors, chowdhury2017new:1712.00696, 2017.
+Jennifer Elder, Pamela E. Harris, Zoe Markman, Izah Tahir, Amanda Verga, On Flattened Parking Functions, elder2023flattened:2210.14206, 2023.
+Douglas Chen, Pamela Harris, J. Carlos Martinez Mori, Eric J. Pabon-Cancel, Gabriel Sargent, Permutation invariant parking assortments, Enumerative Combinatorics and Applications 4 (2023) no. 1, Article #S2R4.
+Lucas Chaves Meyles, Pamela E. Harris, Richter Jordaan, Gordon Rojas Kirby, Sam Sehayek, Ethan Spingarn, Unit-Interval Parking Functions and the Permutohedron, meyles2023unitinterval:2305.15554, 2023.
+Cara Bennett, Lucy Martinez, Ava Mock, Gordon Rojas Kirby, Roshni Thangavelu Truax, Repetitions of Pak-Stanley Labels in $G$-Shi Arrangements, bennett2022repetitions:2210.13613, 2022.
+Rishi Advani, Sean O&#x27;Hagan, Efficient Algorithms for Constructing an Interpolative Decomposition, advani2022efficient:2105.07076, 2022.
+Heidi Benham, Alexander Galarraga, Benjamin Hutz, Joey Lupo, Wayne Peng, Adam Towsley, Integrality and Thurston Rigidity for Bicritical PCF Polynomials, arXiv:2212.02558, 2022.
+Zawad Chowdhury, Samuel Everett, Samuel Freedman, Destine Lee, Computing Periodic Points on Veech Surfaces, 2021.
+Samuel Everett, Vanessa Lin, Aidan Mager, Long and Short Periodic Billiard Trajectories in the Regular Pentagon, 2021.
+Jennifer Zheng, Media Processing and A Modified Watermarking Scheme Based on the Singular Value Decomposition, SIAM Undergraduate Research Online 14 (2021).
+Mei Rose Connor, Diana Davis, Paige Helms, Samuel Lelièvre, Michael Kielstra, Zachary L. Steinberg, Chenyang Sun, Hyperbolic Staircases: Periodic Paths on 2g+1-gons, 2021.
+Rishi Advani, Madison Crim, Se C. O’Hagan, Random Projections and Dimension Reduction, ArXiv abs/2008.04552 (2020).

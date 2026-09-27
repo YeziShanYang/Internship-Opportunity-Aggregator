@@ -1,0 +1,105 @@
+IMC Prosperity 4 - A trading challenge of cosmic proportions | IMC Prosperity 4
+Prosperity 4 finished
+A trading challenge
+of cosmic proportions
+Prosperity is a one-of-a-kind deep-space trading challenge designed for university students from around the world. During Prosperity 4, 18,803 teams joined us to trade, code, strategize, and optimize their way to prosperity.
+Prosperity 4 was developed by IMC, with a lot of love, collaboration and dedication. IMC is a global research-driven quantitative trading firm. Since 1989, we&#x27;ve been a stabilizing force in financial markets, providing essential liquidity upon which market participants depend. If you want to stay up to date with the latest IMC news or career opportunities, we invite you to explore further on imc.com
+Visit imc.com Linkedin
+Meet the minds behind prosperity 4
+Prosperity by Design
+How Prosperity makes trading accessible
+Skills to Compete
+How Prosperity is a learning-by-playing challenge
+True or False (Prosperity edition)
+The experts separate fact from fiction
+Maximize Your Edge
+Tips &amp; tricks from the experts
+Collective Intelligence
+How team effort is the core of Prosperity
+About Prosperity 4
+IMC&#x27;s flagship online trading challenge
+Prosperity is a five-round trading challenge in which students from around the world combine algorithmic and manual trading strategies to maximize profit, grow their trading outpost, and compete to claim the top spot on the leaderboard.
+Learn more
+Glory, growth, and grand prizes await
+Prosperity 4 is where you and other ambitious STEM students compete for a share of $50,000 USD, to grow your trading skills, and take your first step towards a professional trading career. Join a hands-on learning opportunity with an engaged community driven by collaboration and competition.
+Learn more
+Expectations and rules for playing prosperity
+Prosperity 4 is open to all students willing to commit an hour or two a day. The more teams invest in their trading algorithm and manual challenges, the higher they tend to climb on the leaderboard. Check the rules and your eligibility for prizes and recognition.
+Learn more
+Prosperity through the eyes of the community
+Prosperity lives beyond the leaderboard. The active community at the heart of Prosperity is a true reflection of what this experience stands for. From engineers and developers to successful alumni, discover the stories and perspectives of people within the community.
+Learn how Mick, Software Engineer at IMC, used his experience with building Prosperity 2 and 3 to help craft an entirely new experience for Prosperity 4.
+Read article
+Learn how Lorenzo, a Prosperity 2 top-100 finisher, started his IMC trading career participating in Prosperity.
+Read article
+Learn how Jacek, Java Developer for Prosperity, builds the simulation to crunch the numbers of thousands of participating teams.
+Read article
+Learn how Samrudh, Electrical Engineering student at IIT Delhi, turned his Prosperity 3 performance into an IMC internship.
+Read article
+Frequently Asked Questions
+What is Prosperity? Prosperity 4 is IMC&#x27;s online trading challenge designed for university students. The challenge takes players on a journey through deep space, where it&#x27;s up to them to develop a trading strategy in a virtual simulated market.
+Throughout 5 rounds consisting of 1 algorithmic challenge and 1 manual challenge, players are presented with unique trading opportunities that require skill, adaptability, and drive to succeed. With more success comes more XIRECs (the currency in Prosperity), a growing outpost, and the opportunity to climb to the top of the leaderboard. Prosperity is your chance to see how your skills stack up against other students across the globe while learning more about trading in a gamified environment that is competitive, collaborative, and fun.
+When does Prosperity take place? The official Prosperity challenge takes place between April 14 th — April 30 th . The schedule is:
+Tutorial Round (available to participants immediately after signing up): March 16 th - April 13 th
+Round 1: April 14 - 17
+Round 2: April 17 - 20
+Intermission: April 20 - 24
+Round 3: April 24 - 26
+Round 4: April 26- 28
+Round 5: April 28 - 30
+How do I get started?
+Sign up and create your account
+Join a team or start your own — there can be up to 5 players per team.
+Connect with the Prosperity community on Discord
+Brush up on your trading terminology &amp; Python skills with our e-learning center via the Prosperity Wiki
+Use the tutorial round to practice programming your first Python program
+Start counting down to Round 1 on April 14 th !
+What skills do I need to participate? There are no hard pre-requisites for coding or trading knowledge to participate. Basic Python &amp; trading knowledge will help a lot, but you can find lots of resources to get started in our Wiki. This includes concepts such as: what bid/ask prices mean, how order books work, basic market making concepts, and position management. The competition rewards both technical implementation and trading intuition.
+Come in with a positive &amp; curious mindset (a bit of a competitive edge doesn&#x27;t hurt!), and you&#x27;ll still have a good time and learn a lot in the process.
+Who is eligible to participate in Prosperity? While Prosperity is designed for university students, the platform is open to anyone to sign up and participate for learning purposes. However, eligibility for leaderboard ranking, prizes, and recognition is subject to the following conditions:
+Top 25 Teams must meet the following requirements:
+Proof that they were enrolled at a university at the time of registration, and are at least 18 years of age, upon request.
+Teams that include any participant who placed in the Top 10 of a previous edition of IMC Prosperity will be removed from the rankings.
+If any member of a team fails to meet the eligibility requirements, the entire team may be disqualified at IMC&#x27;s sole discretion.
+Top 5 Teams and the Manual Trading Winner must additionally:
+Make themselves available for a verification call with IMC to confirm their genuine and active participation in the challenge.
+Eligibility for prizes, and recognition is limited to participants resident in EMEA, North America, South America, India, Australia, or Hong Kong at the time of registration. Participants resident outside these regions may participate in the challenge and appear on the leaderboard, but are not eligible to receive prizes
+Team composition is open to changes during the first two rounds. After Round 2, team composition is locked and participants should therefore ensure all team members meet the eligibility requirements before this point.
+The following are grounds for disqualification from Prosperity entirely:
+Ineligible affiliation: including current or accepted employment at IMC, its affiliates, or competitor firms engaged in similar trading activities.
+Multiple team participation: a participant may not be a member of more than one team.
+Legal, reputational, or compliance concerns: including submission of false documentation, exploitation of platform bugs, plagiarism of another participant&#x27;s code or algorithms, or any conduct that may violate applicable laws or harm IMC&#x27;s reputation.
+All participants are required to review and accept the full Terms &amp; Conditions prior to registering for Prosperity.
+What are the prizes? Overall top scores across both algorithmic &amp; manual challenges:
+1 st place: $25,000 USD
+2 nd place: $10,000 USD
+3 rd place: $5,000 USD
+4 th place: $3,500 USD
+5 th place: $1,500 USD
+Top score on manual challenge only:
+1 st place: $5,000 USD
+While Prosperity is designed for university students, the platform is open to anyone to sign up and participate for learning purposes. However, eligibility for leaderboard ranking, prizes, and recognition is subject to the following conditions:
+Top 25 Teams must meet the following requirements:
+Proof that they were enrolled at a university at the time of registration, and are at least 18 years of age, upon request.
+Teams that include any participant who placed in the Top 10 of a previous edition of IMC Prosperity will be removed from the rankings.
+If any member of a team fails to meet the eligibility requirements, the entire team may be disqualified at IMC&#x27;s sole discretion.
+Top 5 Teams and the Manual Trading Winner must additionally:
+Make themselves available for a verification call with IMC to confirm their genuine and active participation in the challenge.
+Eligibility for prizes, and recognition is limited to participants resident in EMEA, North America, South America, India, Australia, or Hong Kong at the time of registration. Participants resident outside these regions may participate in the challenge and appear on the leaderboard, but are not eligible to receive prizes.
+Team composition is open to changes during the first two rounds. After Round 2, team composition is locked and participants should therefore ensure all team members meet the eligibility requirements before this point.
+The following are grounds for disqualification from Prosperity entirely:
+Ineligible affiliation: including current or accepted employment at IMC, its affiliates, or competitor firms engaged in similar trading activities.
+Multiple team participation: a participant may not be a member of more than one team.
+Legal, reputational, or compliance concerns: including submission of false documentation, exploitation of platform bugs, plagiarism of another participant&#x27;s code or algorithms, or any conduct that may violate applicable laws or harm IMC&#x27;s reputation.
+All participants are required to review and accept the full Terms &amp; Conditions prior to registering for Prosperity.
+How does Prosperity work? Prosperity is a team-based virtual trading simulation made up of 5 trading rounds. Each trading round consists of 1 algorithmic challenge where each team must upload a Python program and 1 manual challenge where each team submits their answers directly into the platform. All round submissions are evaluated by a trading engine at the end of each round. The algorithmic results do not influence the manual results and vice versa; they are independent of each other. The results of each team&#x27;s PnL after each round are then recorded in the leaderboard so each team can observe their position.
+Who is IMC? IMC is a global research-driven quantitative trading firm. Since 1989, we&#x27;ve been a stabilizing force in financial markets, providing essential liquidity upon which market participants depend. Across our offices in the US, Europe, and Asia Pacific, our talented quant researchers, engineers, traders, and business operations professionals are united by our uniquely collaborative, high-performance culture, and our commitment to giving back. From entering dynamic new markets to embracing disruptive technologies, and from developing an innovative research environment to diversifying our trading strategies, we dare to continuously innovate and collaborate to succeed.
+How much time does it take to participate? You can put as much or as little time into Prosperity as you&#x27;d like. The winning teams will invest hours each day to Prosperity to secure their top spot on the leaderboard.
+Who can I contact for additional questions? If the website doesn&#x27;t answer your question, you can check the Prosperity Discord server or reach out to prosperity@imc.com .
+More about IMC
+Career opportunities
+Contact
+Terms and conditions
+Change cookie preference
+Privacy policy
+Challenge rules
