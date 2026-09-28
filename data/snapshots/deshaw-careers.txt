@@ -50,6 +50,8 @@ Human Capital
 Investment Analysis
 Investor Relations
 Legal &amp; Compliance
+Private Equity Platform
+Professional Services
 Quantitative Strategies
 Software Development
 Strategy and Business Development
@@ -128,6 +130,9 @@ Financial Operations
 New York
 Senior Associate, Management Reporting : The D.&nbsp;E.&nbsp;Shaw group seeks a senior associate with exceptional commercial and analytical skills to join its Management Reporting team within Financial Operations. The team is&hellip;
 Financial Research
+New York
+Firmwide Market Data Specialist : The D.&nbsp;E.&nbsp;Shaw group seeks a driven specialist to join its Firmwide Data team. This high-impact team manages the full life cycle of data at the firm, including sourcing, vendor&hellip;
+Financial Research
 Denver
 Fundamental Equities – AI Product Analyst (Denver) : The D.&nbsp;E.&nbsp;Shaw group seeks an AI product analyst to join its Fundamental Equities team. This team conducts fundamental, data-driven analysis across a broad array of industries to&hellip;
 Financial Research
@@ -168,6 +173,9 @@ New York
 DESIM Technical Strategist Associate : The D.&nbsp;E.&nbsp;Shaw group seeks an analytically and technically oriented individual to join the D.&nbsp;E.&nbsp;Shaw Investment Management (DESIM) group as a technical strategist&hellip;
 Investor Relations
 New York
+Chief of Staff Associate – Investor Relations : The D.&nbsp;E.&nbsp;Shaw group seeks an analytical, detail-oriented, and proactive individual with an impressive record of achievement to work with the Investor Relations (IR) chief of&hellip;
+Investor Relations
+New York
 Sales and Relationship Management Associate (New York) : The D.&nbsp;E.&nbsp;Shaw group seeks a detail-oriented sales and relationship management associate to join its Investor Relations team. The team partners with stakeholders across the firm&hellip;
 Legal &amp; Compliance
 New York
@@ -190,6 +198,12 @@ Legal Analyst and Contract Negotiator (London) : The D.&nbsp;E.&nbsp;Shaw group 
 Legal &amp; Compliance
 New York
 All Positions in Legal & Compliance : Are you looking for new challenges and collaborative problem-solving opportunities at the firm, but finding that the perfect role for you might not be currently available? If you’d like&hellip;
+Private Equity Platform
+New York
+Cove Private Equity Deal Origination Specialist : The D.&nbsp;E.&nbsp;Shaw group seeks a motivated professional to join its Cove private equity team as a deal origination specialist. Cove is focused on acquiring and growing small- and&hellip;
+Professional Services
+Denver
+Ventures Platform Associate : The D.&nbsp;E.&nbsp;Shaw group seeks a ventures platform associate to join its expanding platform team. This is a ground-floor opportunity on a fast-growing platform, where the associate&hellip;
 Quantitative Strategies / Technology
 New York
 Applied AI Engineer : The D.&nbsp;E.&nbsp;Shaw group seeks exceptional software engineers with expertise in applied AI, AI agents, and agentic systems to join the firm. This role offers the chance to work&hellip;
@@ -280,6 +294,11 @@ Full-Stack Software Engineer: Application Engineering : The D.&nbsp;E.&nbsp;Shaw
 Various
 Off-site
 Chief Executive Officer, AI-Native Healthcare RCM Platform : The D.&nbsp;E.&nbsp;Shaw group seeks an accomplished and hands-on chief executive officer to lead Cove’s new AI-native healthcare revenue cycle management (RCM) platform. Cove, the firm’s&hellip;
+Various
+New York To apply for this job, please email
+your resume and the job title to recruitment-nyc@world.deshaw.com .
+Compliance Senior Associate : Join our D.&nbsp;E.&nbsp;Shaw group in New York
+The D.&nbsp;E.&nbsp;Shaw group seeks senior associate level individuals to work closely with a team of attorneys and compliance&hellip;
 Various
 New York
 Head of Engineering & AI, Healthcare RCM Platform : The D.&nbsp;E.&nbsp;Shaw group seeks an accomplished and hands-on head of engineering & AI to join Cove’s new healthcare revenue cycle management (RCM) platform. Cove, the firm’s&hellip;

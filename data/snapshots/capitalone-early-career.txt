@@ -89,26 +89,26 @@ Who we&rsquo;re looking for : First-year students or sophomores pursuing a quant
 For more info:&nbsp; Analyst Early Experiences - AnalystEE@capitalone.com &nbsp;
 Check out the Students &amp; Grads event page to find info sessions on the programs and connect with the recruiting teams.
 ALL JOBS
-R1002121
-Data Engineer 4 (Python, AWS, Spark, Kafka, SQL, Snowflake, Databricks, GenAI)
-R1002122
-Data Engineer 4 (Python, AWS, Spark, Kafka, SQL, Snowflake, Databricks, GenAI)
-R1002206
-Full-stack Engineer 5 (AI Platform &amp; Knowledge Library) (Enterprise Platforms Technology)
-R1001956
-Senior Director, Tax Accounting (Remote- Eligible)
-R999281
-Lead Software Engineer, Full Stack (Java, GO)
-R249264
-Principal Data Analyst - Office of the Chief Data Officer, Central Analytics and Reporting
-R249937
-Manager, Compensation
-R248117
-Lead AI Engineer
-R246549
-Manager, Product Management, CCSI
-R247129
-Principal Auditor - Risk Management
+R236894
+Sr. Operations Representative
+R218487
+Sr. Associate, Associate Relations
+R1001972
+Full-stack Engineer 4 (Manager IC)
+R1001256
+Full-stack Engineer 4 (Manager IC)
+R1002287
+Data Engineer 4 - Intelligent Foundations and Experiences (IFX)
+R1001253
+Full-stack Engineer 4 (Manager IC)
+R1002288
+AI Engineer 5 (Gen AI Platform Services)
+R1001255
+Full-stack Engineer 4 (Manager IC)
+R1001283
+Distinguished Engineer
+R999362
+Lead Software Engineer
 View all of our available opportunities
 Related Content
 Explore Capital One Internships
