@@ -2,18 +2,18 @@ https://evercore.tal.net/vx/mobile-0/appcentre-1/brand-6/candidate/jobboard/vaca
 Students and Graduates
 Evercore
 <timestamp>
+https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3348-Private-Capital-Advisory-Credit-Advisory-Off-Cycle-Internship-Jan-June-2027/en-GB
+Private Capital Advisory - Credit Advisory Off-Cycle Internship (Jan - June 2027)
+<timestamp>
+<timestamp>
+Title:Private Capital Advisory - Credit Advisory Off-Cycle Internship (Jan - June 2027)
+Application Deadline:12 Oct 2026 04:55 AM BST
 https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3342-2028-Capital-Markets-Advisory-Structured-Capital-Solutions-Summer-Analyst-Program-New-York/en-GB
 2028 Capital Markets Advisory: Structured Capital Solutions Summer Analyst Program – New York
 <timestamp>
 <timestamp>
 Title:2028 Capital Markets Advisory: Structured Capital Solutions Summer Analyst Program – New York
 Application Deadline:15 Nov 2026 11:55 PM EST
-https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3333-2028-Summer-Analyst-Evercore-Networking-Reception-University-of-Southern-California/en-GB
-2028 Summer Analyst Evercore Networking Reception- University of Southern California
-<timestamp>
-<timestamp>
-Title:2028 Summer Analyst Evercore Networking Reception- University of Southern California
-Application Deadline:29 Oct 2026 11:55 PM PDT
 https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3293-Milan-Off-Cycle-Internship-Generalist-Team-January-June-2027/en-GB
 Milan Off-Cycle Internship – Generalist Team (January - June 2027)
 <timestamp>
@@ -170,12 +170,6 @@ https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/
 <timestamp>
 Title:2028 Equities: Equity Research Summer Intern Program – New York
 Application Deadline:15 Nov 2026 11:55 PM EST
-https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3263-2028-Summer-Analyst-Program-Global-Technology-New-York/en-GB
-2028 Summer Analyst Program: Global Technology – New York
-<timestamp>
-<timestamp>
-Title:2028 Summer Analyst Program: Global Technology – New York
-Application Deadline:15 Nov 2026 11:55 PM EST
 https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3264-2028-Private-Capital-Advisory-Fundraising-Private-Capital-Advisory-Summer-Analyst-Program-Dallas/en-GB
 2028 Private Capital Advisory &amp; Fundraising: Private Capital Advisory Summer Analyst Program – Dallas
 <timestamp>
@@ -193,12 +187,6 @@ https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/
 <timestamp>
 <timestamp>
 Title:2028 Strategic Advisory: Mergers &amp; Acquisitions Summer Analyst Program – Menlo Park / San Francisco Technology
-Application Deadline:15 Nov 2026 11:55 PM EST
-https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3322-2028-Evercore-Summer-Analyst-Chicago-Industrials-Coffee-Chats/en-GB
-2028 Evercore Summer Analyst Chicago - Industrials Coffee Chats
-<timestamp>
-<timestamp>
-Title:2028 Evercore Summer Analyst Chicago - Industrials Coffee Chats
 Application Deadline:15 Nov 2026 11:55 PM EST
 https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3290-Q4-2027-Internship-Programme-Frankfurt/en-GB
 Q4 2027 Internship Programme (Frankfurt)

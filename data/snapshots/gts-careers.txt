@@ -45,24 +45,6 @@ The ETF trading group at GTS is seeking applications to join our Quantitative Tr
 Job Location
 US-NY-New York
 Job Title
-Operations Analyst
-GTS Asset Management is seeking an Operations Analyst to support the day-to-day operational activities of multiple fund-of-funds vehicles. The role sits within the operations function and works closely with portfolio management, fund administrators, counterparties, and internal control teams to ensure accurate, timely, and well-controlled execution of operational processes. This position is well-suited to a detail-oriented individual with strong organisational skills and a foundational understanding of fund operations and financial processes.
-&nbsp;
-GTS is a...
-Job Location
-UY-Montevideo
-Additional Locations
-AR
-Job Title
-Senior Software Engineer C++
-Senior Software Engineer &ndash; C++
-&nbsp;
-GTS is currently seeking a talented Senior Software Engineer to join our Trading Systems Development Team to drive the expansion of our platform and trading teams into new capabilities, markets and asset types. This role requires a strong interest in financial markets and the technology that supports it. &nbsp;&nbsp;A qualified candidate would have excellent communication skills, both written and verbal. You will...
-Job Location
-US-NY-New York
-Additional Locations
-US-IL-Chicago
-Job Title
 FPGA Developer - Poland
 We are looking to hire a senior hardware engineer to join a small and growing FPGA team developing key components of a high-performance FPGA platform. This role offers broad technical scope and exposure across multiple layers of computing technology, from RTL and verification to high-speed interfaces and system integration.
 Successful candidates will work on full-stack FPGA systems in a highly collaborative environment, contributing to architecture, implementation, verification, performance optimization, and tooling/CI improvements.
