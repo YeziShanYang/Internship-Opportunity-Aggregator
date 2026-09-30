@@ -22,6 +22,7 @@ Pure. No network, no disk: `previous` arrives as an argument, which is what lift
 from __future__ import annotations
 
 import difflib
+import json
 import re
 
 from core import clock, models
@@ -104,6 +105,25 @@ def normalise(raw_html: str) -> list[str]:
             lines.append(collapsed)
     return lines
 
+
+
+def _same_feed(previous: str, text: str) -> bool:
+    """True when both texts are the same vendor JSON feed, so a shrink is postings closing.
+
+    The shrink guard exists for an HTML page that lost its body to a redesign, a block or
+    a partial render. A feed cannot partially render, and a block page is not JSON with
+    the feed's own keys, so when both versions parse to the same shape the smaller one is
+    simply fewer postings. Lynx's Teamtailor feed went from two items to one on
+    2026-09-30 when its hackathon closed, and without this the source would have failed
+    every morning from then on, because a failed fetch never replaces its baseline.
+    """
+    try:
+        old, new = json.loads(previous), json.loads(text)
+    except ValueError:
+        return False
+    if isinstance(old, dict) and isinstance(new, dict):
+        return old.keys() == new.keys()
+    return isinstance(old, list) and isinstance(new, list)
 
 # A live countdown renders one unit per line -- "Days", "69", "Hours", "03", "Minutes",
 # "07", "Seconds", "57" on the SMART Scholarship page (2026-09-26) -- so it would read as
@@ -221,7 +241,11 @@ def assess(
                 "JavaScript shell, not a page with little on it"
             ),
         )
-    if previous is not None and len(text) < SHRINK_RATIO * len(previous):
+    if (
+        previous is not None
+        and len(text) < SHRINK_RATIO * len(previous)
+        and not _same_feed(previous, text)
+    ):
         return models.SourceResult(
             source_id=source_id,
             ok=False,

@@ -1447,6 +1447,24 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         self.assertFalse(second.ok)
         self.assertIn("shrank", second.error)
 
+    def test_14_9m2_a_json_feed_that_loses_postings_is_not_a_failure(self):
+        def feed(n):
+            items = ",".join(
+                '{"id":"%d","title":"Posting %d","content_text":"%s"}' % (i, i, "x" * 600)
+                for i in range(n)
+            )
+            return '{"version":"1.1","title":"Firm","items":[%s]}' % items
+        r = _check_page(self._src(source_id="feed"), FakeHTMLClient(feed(5)))
+        store.write_snapshot("feed", r.snapshot_text, ext="txt")
+        second = _check_page(self._src(source_id="feed"), FakeHTMLClient(feed(1)))
+        self.assertTrue(second.ok, second.error)
+        # A block page in place of the feed is still a shrink and still fails.
+        blocked = _check_page(
+            self._src(source_id="feed"),
+            FakeHTMLClient("<html><body>" + "<p>Access denied for this client.</p>" * 20 + "</body></html>"),
+        )
+        self.assertFalse(blocked.ok)
+
     def test_14_9n_one_change_per_page_and_discovery_reads_added_text_only(self):
         r = _check_page(self._src(source_id="one"), FakeHTMLClient(self.PAGE))
         store.write_snapshot("one", r.snapshot_text, ext="txt")

@@ -84,6 +84,9 @@ ALWAYS: list[str] = [
     "lists, but Discover Citadel does not - it is freshman-eligible, so open the "
     "programs-and-events pages by hand this month.",
     "IAS/PCMI also blocks automation. Check it by hand if you are considering it.",
+    "Stanford Pre-Collegiate Studies (SUMaC RC/TA) refuses the Actions runner. Its "
+    "residential page offers an interest form for the Summer 2027 cycle - fill it in once "
+    "and SPCS emails you when hiring opens: spcs.stanford.edu/residential-program-positions",
     "Kaggle competitions are always open and rolling - browse kaggle.com/competitions "
     "when you want a project, not on a deadline.",
 ]
