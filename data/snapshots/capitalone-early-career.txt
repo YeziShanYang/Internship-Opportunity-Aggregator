@@ -89,26 +89,26 @@ Who we&rsquo;re looking for : First-year students or sophomores pursuing a quant
 For more info:&nbsp; Analyst Early Experiences - AnalystEE@capitalone.com &nbsp;
 Check out the Students &amp; Grads event page to find info sessions on the programs and connect with the recruiting teams.
 ALL JOBS
+R249073
+Dealer Success Manager Coach
+R249060
+Principal Project Manager - Card Partnerships Acquisitions Team&quot;
 R246423
 Senior Associate, Product Manager-Small Business Bank
 R246759
 Manager, Product Manager-Small Business Bank Digital Servicing
+R244469
+Compliance Privacy Advisor, Manager
+R243587
+Director, Chief of Staff
 R236894
 Sr. Operations Representative
-R1002412
-Full-stack Engineer 4 (Cyber)
-R248377
-Senior Manager, Product Manager, Multi-User Experiences
-R1001986
-Principal Associate, Risk Management
-R1002442
-Data Engineer 4
-R1001599
-Full-Stack Engineer 4 (Nodejs, Angularjs, Java)
-R1002413
-Full-stack Engineer 5 (Cyber)
-R1002444
-Data Engineer 5
+R1001388
+Director, Technical Program Manager - Card Tech
+R1001390
+Director, Technical Program Manager - Card Tech
+R1002514
+AI Engineer 4 (LLM Gateway, FM Hosting)
 View all of our available opportunities
 Related Content
 Explore Capital One Internships

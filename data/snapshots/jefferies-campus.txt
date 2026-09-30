@@ -2,6 +2,12 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-1/brand-4/candidate/jobboard/vac
 Campus Opportunities
 Jefferies
 <timestamp>
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1890-2027-Jefferies-Finance-Summer-Analyst-New-York-Data-Analytics/en-GB
+2027 Jefferies Finance Summer Analyst - New York, Data Analytics
+<timestamp>
+<timestamp>
+ID:1890
+Title:2027 Jefferies Finance Summer Analyst - New York, Data Analytics
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1997-2027-Equities-Sales-Trading-Summer-Analyst-Program-Cash-Trading-Hong-Kong/en-GB
 2027 Equities Sales &amp; Trading Summer Analyst Program - Cash Trading - Hong Kong
 <timestamp>
@@ -14,12 +20,6 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1995
 Title:2027 Jefferies Finance Summer Analyst - New York, Financial Planning &amp; Accounting
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1890-2027-Jefferies-Finance-Analyst-New-York-Data-Analytics/en-GB
-2027 Jefferies Finance Analyst - New York, Data Analytics
-<timestamp>
-<timestamp>
-ID:1890
-Title:2027 Jefferies Finance Analyst - New York, Data Analytics
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1994-2027-Investment-Banking-Off-Cycle-Internship-Benelux-Team-Amsterdam-Q2-April-June/en-GB
 2027 Investment Banking Off-Cycle Internship - Benelux Team, Amsterdam (Q2 - April - June)
 <timestamp>
