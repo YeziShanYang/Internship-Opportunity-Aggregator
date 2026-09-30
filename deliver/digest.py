@@ -214,6 +214,7 @@ def _notes(judgment: models.Judgment) -> str:
         ("Deadline", _deadline_note(judgment)),
         ("Year", judgment.class_year),
         ("Location", judgment.location),
+        ("Size", "small firm" if judgment.employer_size == "small" else ""),
     ]
     if not judgment.classified:
         items.append(("", "⚠ unverified — open the page"))
@@ -329,9 +330,16 @@ def render(
     today = clock.today_iso()
     health_lines, escalated = health.source_lines(results, sources)
 
-    act_now = [j for j in judgments if urgency.is_urgent(j)]
-    worth_a_look = [j for j in judgments
-                    if j.relevant and not urgency.is_urgent(j)]
+    # Small firms first within each tier, asked for on 2026-09-30: large employers hire
+    # juniors and seniors, so the rows a first-year can realistically land go on top.
+    # A stable sort, so the order within each group is unchanged and trimming from the
+    # end still drops the least interesting row.
+    def by_size(rows: list[models.Judgment]) -> list[models.Judgment]:
+        return sorted(rows, key=lambda j: j.employer_size != "small")
+
+    act_now = by_size([j for j in judgments if urgency.is_urgent(j)])
+    worth_a_look = by_size([j for j in judgments
+                            if j.relevant and not urgency.is_urgent(j)])
     ruled_out = [j for j in judgments if not j.relevant]
 
     if escalated:

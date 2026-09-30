@@ -98,10 +98,13 @@ The person:
 
 Rules, in priority order:
 
-1. Class-year gates are the primary filter. A posting requiring graduation between
-   Dec 2027 and Aug 2028 is a junior window and is NOT relevant. Graduation-window
-   phrasing shifts every cycle, so read the actual dates rather than pattern-matching a
-   job title. This person graduates in 2030 and is looking at Summer 2027 and beyond.
+1. Class-year gates are the primary filter. This person is a freshman graduating in
+   June 2030. A posting whose graduation window does not include June 2030 is NOT
+   relevant: "Dec 2027 to Aug 2028" is a junior window, "winter 2028 or spring 2029" is a
+   sophomore window, and "graduating by December 2029" ends too early. A window that is
+   open-ended upward ("December 2027 or later") or that names 2030 includes him.
+   Graduation-window phrasing shifts every cycle, so read the actual dates rather than
+   pattern-matching a job title or a programme label.
 2. Identity gates disqualify. Programs for women, underrepresented minorities, LGBTQIA+
    students, or students with barriers to access are relevant: false. Specifically:
    Jane Street INSIGHT and WiSE; Jane Street JSIP, FOCUS and IN FOCUS; Bridgewater
@@ -121,8 +124,9 @@ Rules, in priority order:
 
 6. Class-year gates stated on the posting are decisive. When the POSTING TEXT below
    states a requirement this person cannot meet -- "rising junior", "rising senior",
-   "penultimate year", "third or fourth year", "junior or senior standing", a Master's
-   or PhD program, or a graduation window in 2027 or 2028 -- set relevant: false and
+   "penultimate year", "third or fourth year", "junior or senior standing", "completed
+   sophomore year", a Master's or PhD program, or a graduation window that closes before
+   June 2030 (2027, 2028 or 2029) -- set relevant: false and
    quote the exact phrase in `why`. Measured: about a third of these postings carry
    such a gate, so this is the filter that does the most work.
    Absence of a gate is NOT a reason to rule out. "Currently enrolled in a Bachelor's
@@ -134,49 +138,40 @@ Rules, in priority order:
    general business operations. Also out of scope: engineering that is not software --
    mechanical, electrical, civil, aerospace, chemical, manufacturing, firmware and
    hardware -- because this person studies maths and CS.
-8. A generic software internship at an employer with no particular standing in software
-   is relevant: false. This rule exists because the aggregators supply most of the
-   volume and it is overwhelmingly this: measured on one morning, 80 of 146 changes were
-   ordinary "Software Engineer Intern" rows at firms the owner has no specific reason to
-   chase. A digest of 120 such rows is one he skims and acts on none of.
+8. Weigh the employer by his odds, not its fame. Large, established employers
+   overwhelmingly fill internships with juniors and seniors, so for this first-year the
+   most worthwhile rows are startups, small and mid-size companies, and small trading
+   firms -- places where a freshman is a realistic hire -- plus any programme aimed at
+   first- and second-year students. Revised 2026-09-30 at the owner's request; this
+   rule used to do the opposite, keeping famous firms and ruling out small ones.
 
-   Keep, regardless of the employer's fame:
+   Keep:
    * anything quantitative -- trading, quant research, quant development, systematic
      strategy, mathematics, statistics. This is his first field and the bar is low.
-   * software, data or ML at a firm of genuine standing in technology or finance. Read
-     this generously -- it is the clause that has been misread. It means any company
-     whose product or engineering a software engineer would recognise, not only the
-     giants and not only finance. Kept, as calibration: Google, Meta, Amazon, Microsoft,
-     Apple, Nvidia; OpenAI, Anthropic; Figma, Stripe, Databricks, Snowflake, Datadog,
-     Cloudflare, Robinhood, Coinbase, Airbnb, Uber, Lyft, DoorDash, Notion, Palantir,
-     Atlassian, Netflix, Roblox, Discord, Reddit, Plaid, Ramp; Goldman Sachs, Morgan
-     Stanley, BlackRock, Citadel, Bloomberg, Capital One. These are examples and not a
-     list to match against -- a comparable firm you recognise is also a keep.
-
-     Measured on 2026-09-15, the first morning this rule ran: it wrongly ruled out
-     Figma twice, Robinhood three times and Datadog once, each time reasoning that the
-     firm was "non-finance/quant" -- which is not the test. A well-known product company
-     is a keep on its own.
-   * a role whose *substance* is notable even if the employer is not -- compilers,
+   * software, data or ML at a startup or a small or mid-size company, whether or not
+     you have heard of it. An unfamiliar name is a reason to keep, not to rule out.
+   * any role or programme that says it is for first- or second-year students, or open
+     to all undergraduate years, at an employer of any size.
+   * software, data or ML at a technology company of genuine standing -- Google, Meta,
+     Nvidia, OpenAI, Anthropic, Figma, Stripe, Databricks, Datadog, Robinhood, Palantir
+     and comparable firms. Do not reason that such a firm is "not quant"; that is not
+     the test.
+   * a role whose substance is notable even if the employer is not -- compilers,
      operating systems, distributed systems, cryptography, ML infrastructure, research.
    * anything at a firm the owner already tracks as a priority.
 
-   Rule out: an unremarkable "Software Engineer Intern", "IT Intern", "Technology
-   Intern" or "Web Developer Intern" at a company with no notable engineering
-   reputation -- a regional insurer, an agricultural lender, a construction-equipment
-   dealer, a small HR-software vendor, a local IT consultancy. Name the employer and say
-   what it does plainly in `why`, so the call can be audited and argued with.
-
-   Ask it in this order, because reversing them is what produced the wrong answers:
-   first "do I recognise this company as a software or finance employer?" -- if yes,
-   keep, and stop. Only then "is this a generic role at a firm with no engineering
-   reputation?" Do not ask whether the firm is quant: most keeps are not.
+   Rule out: a generic "Software Engineer Intern", "IT Intern", "Technology Intern",
+   "Co-op" or "Web Developer Intern" at a LARGE non-technology enterprise -- a defence
+   contractor, an aerospace or industrial conglomerate, a utility, an insurer, a
+   government-services contractor, a retail or manufacturing corporation -- when the
+   posting does not say it is open to first- or second-years. Those programmes run
+   through junior-year recruiting pipelines. Name the employer and say what it does in
+   `why`, so the call can be audited and argued with.
 
    This is a judgement of value and not of eligibility, so it is the one rule where you
    should NOT err toward keeping. It is safe to be decisive because a ruled-out row is
-   still printed, with this reason, in the digest's RULED OUT block: nothing is hidden,
-   it is moved out of the list of things to go and do. If you genuinely cannot tell what
-   the employer does, keep it.
+   still printed, with this reason, in the digest's RULED OUT block. If you genuinely
+   cannot tell how large the employer is, keep it.
 
 If the POSTING TEXT is missing or a fetch error is noted, you are judging on a job
 title alone. Say so in `why`, use confidence "low", and do NOT rule the item out on
@@ -185,7 +180,7 @@ class-year grounds -- you have not seen the requirements.
 `why` must be one sentence and must name the specific reason -- the class year, the
 identity gate, the deadline -- not a generic statement of interest.
 
-Three more fields are read straight off the POSTING TEXT and rendered as their own
+The fields below are read straight off the POSTING TEXT and rendered as their own
 bullets in the digest, so each must stand alone without `why` for context. Report what
 the posting says, never what you infer, and leave a field empty rather than guessing --
 an empty bullet is simply not shown, whereas a wrong one is read as fact:
@@ -195,6 +190,10 @@ an empty bullet is simply not shown, whereas a wrong one is read as fact:
   "Bachelor's, no year stated". This is the field the owner scans first.
 * `location` -- where the role sits, as written: "New York, NY", "London, UK",
   "remote", "Chicago or NYC". Several locations is fine; list them.
+* `employer_size` -- `small` for a startup, a small or mid-size company, or a small
+  trading firm (roughly under a couple of thousand employees); `large` for a big
+  established employer; the empty string when you cannot tell. The digest sorts
+  `small` rows first, so do not guess.
 * `deadline` -- when applications close. Exactly one of: the word `rolling` when the
   posting says it reviews on a rolling basis or closes when full; an ISO `YYYY-MM-DD`
   date when it states or clearly implies one; or the empty string when it states none.
@@ -212,8 +211,8 @@ nine real opportunities were withheld for want of room.
 * `eligibility` -- rules 1, 2, 6 and 7. He cannot apply, or the role is not in his
   field. These are checkable against the posting text and have proven reliable, so the
   digest prints them compactly.
-* `value` -- rule 8 alone. He could apply and it is in his field, but the role is not
-  worth his morning. This is a judgement rather than a fact, it is the one that has been
+* `value` -- rule 8 alone. He could apply and it is in his field, but the employer is
+  a large enterprise whose internship he is unlikely to land as a first-year. This is a judgement rather than a fact, it is the one that has been
   wrong, and the digest prints these in full so they can be argued with.
 * the empty string when relevant is true."""
 
@@ -230,6 +229,7 @@ RESULT_SCHEMA = {
         "class_year": {"type": "string"},
         "location": {"type": "string"},
         "deadline": {"type": "string"},
+        "employer_size": {"type": "string", "enum": ["", "small", "large"]},
     },
     "required": [
         "relevant",
@@ -241,6 +241,7 @@ RESULT_SCHEMA = {
         "class_year",
         "location",
         "deadline",
+        "employer_size",
     ],
     "additionalProperties": False,
 }
@@ -417,6 +418,12 @@ def _clean(value) -> str:
     return "" if text.lower().strip(" .") in _UNSTATED else text
 
 
+def _size(value) -> str:
+    """`small`, `large` or empty. Anything else is treated as unknown rather than guessed."""
+    value = _clean(value).lower()
+    return value if value in ("small", "large") else ""
+
+
 def _judgment_from_text(change: models.Change, text: str) -> Judgment:
     """Parse a provider's JSON body into a Judgment. Shared by both backends."""
     try:
@@ -436,6 +443,7 @@ def _judgment_from_text(change: models.Change, text: str) -> Judgment:
         class_year=_clean(payload.get("class_year")),
         location=_clean(payload.get("location")),
         deadline=_clean(payload.get("deadline")),
+        employer_size=_size(payload.get("employer_size")),
     )
 
 

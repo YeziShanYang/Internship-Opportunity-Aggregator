@@ -326,6 +326,10 @@ class Judgment:
     class_year: str = ""
     location: str = ""
     deadline: str = ""
+    # "small", "large" or "". Added 2026-09-30, when the owner asked for startups and
+    # small firms to be weighted up because large employers hire juniors and seniors.
+    # The digest sorts "small" first within each urgency tier; it never filters.
+    employer_size: str = ""
     # Set when the deterministic screen settled this instead of the model. Carried so
     # RULED OUT can say which rule fired, and so a digest can be read back later to
     # tell which rule set produced it.

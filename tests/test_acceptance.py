@@ -2237,6 +2237,20 @@ class DeterministicScreenTests(_IsolatedState, unittest.TestCase):
         )
         self.assertIn("2027", v.why, "the reason must quote the evidence")
 
+    def test_a_sophomore_window_ending_in_2029_is_ruled_out(self):
+        """Asked for directly on 2026-09-30: a window that leaves out June 2030 does not
+        fit him. SIG's Discovery Programs are the real case -- a sophomore band that a
+        first-year label once made look inclusive."""
+        v = self.assertRuledOut(
+            "Open to students planning to graduate in the winter of 2028 or the spring of 2029.",
+            "graduation-window",
+        )
+        self.assertIn("June 2030", v.why)
+
+    def test_a_window_that_reaches_2030_is_not_ruled_out(self):
+        self.assertDeferred("Expected graduation between December 2029 and June 2030.")
+        self.assertDeferred("Graduating in 2029 or later.")
+
     def test_a_december_2027_to_summer_2028_window(self):
         self.assertRuledOut(
             "with a graduation date between December 2027 and Summer 2028",
@@ -2330,7 +2344,7 @@ class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
         self.assertIn("advanced-standing", report.reason)
         _, body = digest.render([], [], {}, filters=[report])
         self.assertIn("advanced-standing", body, "HEALTH must carry it")
-        self.assertIn("screen-v1", body, "and the rule-set version it came from")
+        self.assertIn(f"screen-v{screen.VERSION}", body, "and the rule-set version it came from")
 
     def test_the_screen_has_no_opinion_rather_than_a_negative_one(self):
         """A change absent from the table is one no rule settled. An entry saying

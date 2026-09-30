@@ -22,9 +22,16 @@ Three properties are load-bearing, in this order:
    rule-out -- the same instruction the prompt gives the model when a fetch failed.
    A gate the employer did not state cannot be inferred from silence.
 
-The owner is a Stanford first-year, class of 2030. For a Summer 2027 internship he is a
+The owner is a Stanford freshman, graduating June 2030. For a Summer 2027 internship he is a
 rising sophomore, so "rising sophomore" is a *match* and only junior-and-above standing
 excludes him. That asymmetry is why every standing rule carries a sophomore guard.
+
+A graduation window counts against him when it closes before June 2030, which since
+2026-09-30 includes 2029, asked for directly: "if there's anything there that says
+graduation date between blank and blank and doesn't include June 2030, then please take
+it off the list." A 2029 window is the sophomore band (SIG's Discovery Programs, "winter
+2028 or spring 2029"), which is exactly the label-versus-window trap that made 2029 look
+inclusive before.
 """
 from __future__ import annotations
 
@@ -33,12 +40,12 @@ from dataclasses import dataclass
 
 # Bump when a rule changes. Stored on each verdict, so a rule fix re-screens the
 # backlog instead of applying only to changes seen afterwards.
-VERSION = 1
+VERSION = 2
 
 # The graduation years that exclude this owner, and the ones that include him. A window
 # naming both ("graduating between 2027 and 2030") includes him and must not rule out.
-EXCLUDING_YEARS = ("2027", "2028")
-INCLUDING_YEARS = ("2029", "2030", "2031", "2032")
+EXCLUDING_YEARS = ("2027", "2028", "2029")
+INCLUDING_YEARS = ("2030", "2031", "2032")
 
 # Anchors that mark a year as a *graduation* year rather than the internship's own
 # season. This distinction is the whole game: a "Software Engineer Intern - Summer 2027"
@@ -204,8 +211,8 @@ def screen_posting(text: str) -> Verdict | None:
     hit = _excluded_by(_GRAD_YEAR, text, guards=(_OPEN_ENDED, _INCLUDING_YEAR))
     if hit:
         return Verdict(
-            why=f'Posting states a graduation window this owner (class of 2030) cannot '
-                f'meet: "{_quote(hit)}"',
+            why=f'Posting states a graduation window that closes before June 2030: '
+                f'"{_quote(hit)}"',
             rule="graduation-window",
         )
 

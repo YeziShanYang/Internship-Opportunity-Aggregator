@@ -15,7 +15,7 @@ renders the staleness nag, and neither may import the other.
 """
 from __future__ import annotations
 
-PROFILE_LAST_REVIEWED = "2026-09-14"
+PROFILE_LAST_REVIEWED = "2026-09-30"
 PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
 
 # The identity-gate sentence is deliberately general rather than an enumeration of
@@ -26,7 +26,11 @@ PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
 # is "he does not clear these criteria, so rule those programmes out", and that is what
 # is stated. See classify.SYSTEM_PROMPT rule 2 for the list it works against.
 OWNER_PROFILE = (
-    "First-year undergraduate at Stanford, class of 2030, studying math and/or CS. "
+    "Freshman (first-year) undergraduate at Stanford in the 2026-27 academic year, "
+    "expected graduation June 2030, studying math and/or CS. He is not a sophomore: "
+    "for a Summer 2027 role he will have finished only his first year, so a posting "
+    "that needs a graduation date before June 2030, current sophomore-or-higher "
+    "standing, or more than one completed year of college does not fit him. "
     "US citizen, US-based. Does not meet the eligibility criteria for "
     "identity-restricted programmes -- those reserved for women, transgender or "
     "gender-expansive students, underrepresented racial minorities, or LGBTQIA+ "
@@ -36,5 +40,9 @@ OWNER_PROFILE = (
     "preferred; only whether the role is in the United States matters, because he "
     "cannot take one that recruits solely abroad. "
     "Interests, in order: quantitative finance and mathematics first, software "
-    "engineering second. General finance roles are adjacent and acceptable."
+    "engineering second. General finance roles are adjacent and acceptable. "
+    "Because large employers overwhelmingly hire juniors and seniors, his best odds "
+    "and highest priority are (a) programmes aimed at first- and second-year "
+    "students, and (b) internships at startups and small or mid-size firms, "
+    "including small trading shops, where a first-year has a real chance."
 )

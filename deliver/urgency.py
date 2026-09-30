@@ -34,6 +34,38 @@ UNDERCLASSMAN = re.compile(
 )
 
 
+# A class-year phrase that names first- or second-years but is not *aimed* at them. Added
+# 2026-09-30, asked for directly: the pins had filled with rows like GE Healthcare's "at
+# least sophomore standing" and Gilead's "freshman, sophomore, junior, or senior", which
+# mention the word while being a floor or an open door. The owner wants a posting told
+# once when it appears, and pinned only when it is a real match -- a programme for
+# first- and second-years. A floor ("at least", "minimum", "completed") and an
+# enumeration that runs on to juniors or seniors are both general postings.
+NOT_TARGETED = re.compile(
+    r"at\s+least|minimum|\bmin\.?\s|or\s+(?:higher|above|beyond)|and\s+(?:up|above)"
+    r"|complet\w*|\+|junior|senior|third|fourth|3rd|4th|all\s+(?:class\s+)?years"
+    r"|any\s+(?:class\s+)?year|graduate\s+student",
+    re.IGNORECASE,
+)
+
+
+def _aimed_at_underclassmen(class_year: str, title: str) -> bool:
+    """The shared test for a live judgment and a carried pin.
+
+    The title is decisive on its own ("Sophomore Intern", "First-Year Insight"): an
+    employer that names the year in the job title has built the role for it. The
+    class-year phrase has to both name the year and not be a floor or a wider list.
+    """
+    if UNDERCLASSMAN.search(title):
+        return True
+    return bool(UNDERCLASSMAN.search(class_year)) and not NOT_TARGETED.search(class_year)
+
+
+def _deadline_passed(deadline: str) -> bool:
+    days = clock.days_until(deadline)
+    return days is not None and days < 0
+
+
 def targets_underclassmen(judgment: models.Judgment) -> bool:
     """Whether this posting is aimed at first- or second-years.
 
@@ -57,9 +89,7 @@ def targets_underclassmen(judgment: models.Judgment) -> bool:
         # this rule and pinned a board restructure into ACT NOW, where it would have sat
         # until someone noticed. Measured on a forced re-baseline, 2026-09-18.
         return False
-    if UNDERCLASSMAN.search(judgment.class_year):
-        return True
-    return bool(UNDERCLASSMAN.search(judgment.change.key))
+    return _aimed_at_underclassmen(judgment.class_year, judgment.change.key)
 
 
 def is_rolling(judgment: models.Judgment) -> bool:
@@ -188,6 +218,14 @@ def refresh_pins(
 
     kept = []
     for row in by_id.values():
+        # Re-asked of every carried pin, not just new ones, so a rule change retires the
+        # pins the old rule made instead of leaving them until their postings close.
+        if not _aimed_at_underclassmen(row.class_year, row.position):
+            continue
+        # A stated close date that has passed ends the pin even while the page is up:
+        # Jane Street's Bridge sat pinned three days past its 2026-09-27 deadline.
+        if _deadline_passed(row.deadline):
+            continue
         if row.source_id in checked:
             if row.change_id not in live.get(row.source_id, set()):
                 continue  # checked, and the board no longer lists it

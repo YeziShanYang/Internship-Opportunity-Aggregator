@@ -86,6 +86,36 @@ class UnderclassmanDetectionTests(unittest.TestCase):
         self.assertFalse(urgency.targets_underclassmen(
             _judgment("Acme / Junior Summer Analyst", class_year="rising seniors")))
 
+    def test_a_floor_or_an_open_door_is_not_a_target(self):
+        """Asked for directly on 2026-09-30. The pins had filled with postings that
+        mention the word without being aimed at the year: a floor, or a list that runs
+        on to seniors. Those are told once, on the morning they appear, and not pinned."""
+        for phrase in ('"At least sophomore standing"; "Sophomore year minimum"',
+                       "current academic standing of at least Sophomore level",
+                       "undergraduate (freshman, sophomore, junior, or senior)",
+                       "Sophomore+"):
+            self.assertFalse(urgency.targets_underclassmen(
+                _judgment("Acme / Software Engineer Intern", class_year=phrase)), phrase)
+        self.assertTrue(urgency.targets_underclassmen(
+            _judgment("Acme / Bridge", class_year="First- & Second-Year Undergrads")))
+
+    def test_a_carried_pin_the_rule_no_longer_accepts_is_retired(self):
+        stale = models.PinnedRow(change_id="s:x", source_id="s", company="Acme",
+                                 position="Software Engineer Intern",
+                                 class_year="At least sophomore standing",
+                                 first_pinned=YESTERDAY, last_seen=YESTERDAY)
+        pins = urgency.refresh_pins([], [stale], {"s": {"s:x"}}, {"s"}, TODAY,
+                                    digest.company_and_position)
+        self.assertEqual(pins, [])
+
+    def test_a_pin_past_its_deadline_is_retired_while_the_page_is_up(self):
+        """Jane Street Bridge sat pinned three days past its 2026-09-27 deadline."""
+        pin = _pin()
+        pin.deadline = "2000-01-01"
+        pins = urgency.refresh_pins([], [pin], {"s": {pin.change_id}}, {"s"}, TODAY,
+                                    digest.company_and_position)
+        self.assertEqual(pins, [])
+
     def test_an_underclassman_row_is_urgent(self):
         self.assertTrue(urgency.is_urgent(_judgment("Acme / Sophomore Analyst")))
 
