@@ -178,7 +178,15 @@ PRE_SCREENED = {
     ats.PHENOM: ("ats-phenom-category",
                  "the site's own recruiting category is not a student, campus, "
                  "co-op, new-graduate or discovery one"),
+    ats.NSF: ("nsf-not-in-field-reu-site",
+              "the award is not an REU Site, or is funded outside the computing (CISE) "
+              "and mathematics (DMS) divisions"),
 }
+
+# NSF divisions whose REU Sites are in the target fields: the four CISE divisions and
+# Mathematical Sciences. Measured 2026-10-01: 150 of 694 active REU awards.
+NSF_IN_FIELD_DIVISIONS = {"CCF", "CNS", "IIS", "OAC", "DMS"}
+NSF_AWARD_PAGE = "https://www.nsf.gov/awardsearch/showAward?AWD_ID={id}"
 
 
 def is_student_posting(posting: models.Posting) -> bool:
@@ -389,6 +397,39 @@ def parse_eightfold(fetched: ats.AtsFetch) -> list[models.Posting]:
     return out
 
 
+def parse_nsf(fetched: ats.AtsFetch) -> list[models.Posting]:
+    """REU Site awards in the target fields, one Posting per site.
+
+    The abstract is the posting text. That is deliberate rather than convenient:
+    `enrich` skips any change that already carries text, and the award page
+    (`www.nsf.gov/awardsearch/*`) is disallowed by robots.txt, so the link is for a
+    person to click and is never fetched by the tracker. Collaborative awards that
+    share one title and institution collapse into one row through the usual "#2"
+    ordinal, which keeps them visible rather than merged away.
+    """
+    out = []
+    for payload in fetched.pages:
+        for award in (payload.get("response") or {}).get("award") or []:
+            title = (award.get("title") or "").strip()
+            division = (award.get("divAbbr") or "").strip().upper()
+            if not title.upper().startswith("REU SITE") or division not in NSF_IN_FIELD_DIVISIONS:
+                continue
+            place = ", ".join(x for x in (
+                (award.get("awardeeName") or "").strip(),
+                (award.get("awardeeCity") or "").strip(),
+                (award.get("awardeeStateCode") or "").strip()) if x)
+            out.append(models.Posting(
+                title=title,
+                location=place,
+                department=division,
+                employment_type="REU",
+                url=NSF_AWARD_PAGE.format(id=award.get("id", "")),
+                text=_clean(award.get("abstractText") or "")
+                + f" Award funded through {award.get('expDate', 'unknown')}.",
+            ))
+    return out
+
+
 def parse(fetched: ats.AtsFetch, method: str, slug: str) -> list[models.Posting]:
     """Payloads to Postings, before any screen this layer applies."""
     if method == ats.WORKDAY:
@@ -397,6 +438,8 @@ def parse(fetched: ats.AtsFetch, method: str, slug: str) -> list[models.Posting]
         return parse_phenom(fetched)
     if method == ats.EIGHTFOLD:
         return parse_eightfold(fetched)
+    if method == ats.NSF:
+        return parse_nsf(fetched)
     payload = fetched.pages[0] if fetched.pages else None
     if method == ats.GREENHOUSE:
         return parse_greenhouse(payload)
@@ -487,11 +530,11 @@ def assess(
         return models.SourceResult(
             source_id=source_id, ok=False, error=f"{type(exc).__name__}: {exc}")
 
-    # Workday screens on the title and Phenom on the recruiting category, both while
-    # parsing, so re-running the shared title/type screen here would drop rows those
+    # Workday screens on the title, Phenom on the recruiting category and NSF on the
+    # award's division, all while parsing, so re-running the shared title/type screen here would drop rows those
     # methods deliberately kept -- "Discovery Program: Quantitative Trading" contains
     # no "intern" at all.
-    if method in (ats.WORKDAY, ats.PHENOM):
+    if method in (ats.WORKDAY, ats.PHENOM, ats.NSF):
         students = parsed
     else:
         students = [p for p in parsed if is_student_posting(p)]

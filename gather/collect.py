@@ -44,6 +44,7 @@ CLIENT_FOR = {
     "workday": WEB_CLIENT,
     "phenom": WEB_CLIENT,
     "eightfold": WEB_CLIENT,
+    "nsf_awards": WEB_CLIENT,
     "page_text": WEB_CLIENT,
 }
 

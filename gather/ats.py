@@ -28,6 +28,7 @@ answer it.
 """
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import time
@@ -38,8 +39,8 @@ import httpx
 
 from core import models
 
-GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM, EIGHTFOLD = (
-    "greenhouse", "lever", "ashby", "workday", "phenom", "eightfold",
+GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM, EIGHTFOLD, NSF = (
+    "greenhouse", "lever", "ashby", "workday", "phenom", "eightfold", "nsf_awards",
 )
 
 ENDPOINTS = {
@@ -54,10 +55,14 @@ ENDPOINTS = {
     # Eightfold likewise: the tenant host varies per employer
     # (campusjobs.mlp.com, mlp.eightfold.ai, career.mlp.com all front the same board).
     EIGHTFOLD: "{slug}",
+    # NSF's public Award Search API; the slug is the keyword phrase. Not a job board,
+    # but the same shape: a paged list of things that appear and disappear. A new REU
+    # Site award is a new summer research programme.
+    NSF: "https://api.nsf.gov/services/v1/awards.json",
 }
 
 SINGLE_SHOT = (GREENHOUSE, LEVER, ASHBY)
-PAGED = (WORKDAY, PHENOM, EIGHTFOLD)
+PAGED = (WORKDAY, PHENOM, EIGHTFOLD, NSF)
 
 # Workday rejects a limit above 20 (50 and 100 return an empty list), and it keeps
 # serving rows past the end rather than stopping -- a naive "fetch until empty" loop
@@ -82,6 +87,23 @@ PHENOM_MAX_PAGES = 30
 # clear of Millennium's 59.
 EIGHTFOLD_PAGE = 10
 EIGHTFOLD_MAX_PAGES = 40
+
+
+# NSF serves at most 25 awards a page, and its paging is NOT stable: four passes over
+# the same 447 REU awards on 2026-10-01 each repeated 6-11 awards in place of others,
+# and only 425 appeared in all four, which would report phantom removals every morning.
+# A single page is deterministic, so the query is split by award start date until each
+# slice fits on one page; a single day that still overflows is paged repeatedly until
+# the union reaches the stated total. `offset` is zero-based: `offset=1` silently drops
+# each page's first award.
+NSF_PAGE = 25
+NSF_MAX_PASSES = 8
+NSF_MAX_REQUESTS = 250
+NSF_EARLIEST_START = datetime.date(2010, 1, 1)
+NSF_FIELDS = (
+    "id,title,awardeeName,awardeeCity,awardeeStateCode,expDate,startDate,"
+    "dirAbbr,divAbbr,fundProgramName,abstractText"
+)
 
 
 class MalformedPayload(RuntimeError):
@@ -335,6 +357,87 @@ def _fetch_eightfold(client: httpx.Client, endpoint: str) -> AtsFetch:
     )
 
 
+def nsf_window_start(today: datetime.date) -> str:
+    """Awards still funded on 1 August of the coming summer, as NSF's mm/dd/yyyy.
+
+    An award that ends before then cannot fund a site that summer, so including it
+    would announce programmes that are not running.
+    """
+    year = today.year + 1 if today.month >= 8 else today.year
+    return f"08/01/{year}"
+
+
+def _fetch_nsf(client: httpx.Client, endpoint: str, keyword: str) -> AtsFetch:
+    """Every award matching an exact keyword phrase, complete and in a stable set.
+
+    `api.nsf.gov` publishes no robots.txt, while `www.nsf.gov/awardsearch/*` is
+    disallowed, so this reads the API only. The abstract travels with each award and
+    becomes the posting text, which is what stops `enrich` ever fetching an award page.
+    """
+    fmt = "%m/%d/%Y"
+    today = datetime.date.today()
+    window = nsf_window_start(today)
+    pages: list[Any] = []
+    requests = 0
+
+    def page(first: datetime.date, last: datetime.date, offset: int = 0) -> dict:
+        nonlocal requests
+        if requests >= NSF_MAX_REQUESTS:
+            raise MalformedPayload(f"NSF needed more than {NSF_MAX_REQUESTS} requests")
+        response = client.get(endpoint, params={
+            "keyword": f'"{keyword}"', "expDateStart": window,
+            "startDateStart": first.strftime(fmt), "startDateEnd": last.strftime(fmt),
+            "printFields": NSF_FIELDS, "rpp": NSF_PAGE, "offset": offset,
+        }, headers={"Accept": "application/json"})
+        requests += 1
+        response.raise_for_status()
+        payload = response.json()
+        root = payload.get("response") if isinstance(payload, dict) else None
+        if not isinstance(root, dict) or root.get("serviceNotification"):
+            raise MalformedPayload(f"NSF returned no award list: {str(payload)[:200]!r}")
+        if not isinstance(root.get("award", []), list):
+            raise MalformedPayload("NSF 'award' is not a list")
+        return payload
+
+    def total(payload: dict) -> int:
+        return int((payload["response"].get("metadata") or {}).get("totalCount") or 0)
+
+    def exhaust(day: datetime.date, expected: int) -> None:
+        # More than a page of awards starts on one day (1 September above all), so
+        # this slice has to page, and paging is unstable. Each pass misses a few, but
+        # their union converges on the full set; stop when it matches the stated total.
+        seen: dict[str, dict] = {}
+        for _ in range(NSF_MAX_PASSES):
+            for offset in range(0, expected, NSF_PAGE):
+                for award in page(day, day, offset)["response"].get("award", []):
+                    seen[str(award.get("id"))] = award
+            if len(seen) >= expected:
+                pages.append({"response": {"award": list(seen.values())}})
+                return
+        raise MalformedPayload(
+            f"NSF paging for {day:%Y-%m-%d} found {len(seen)} of {expected} awards "
+            f"after {NSF_MAX_PASSES} passes")
+
+    def walk(first: datetime.date, last: datetime.date) -> None:
+        payload = page(first, last)
+        if total(payload) <= NSF_PAGE:
+            pages.append(payload)
+            return
+        if first >= last:
+            exhaust(first, total(payload))
+            return
+        middle = first + (last - first) // 2
+        walk(first, middle)
+        walk(middle + datetime.timedelta(days=1), last)
+
+    walk(NSF_EARLIEST_START, datetime.date(today.year + 2, 12, 31))
+    listed = sum(len(p["response"].get("award", [])) for p in pages)
+    return AtsFetch(
+        attempt=models.FetchAttempt(source_id="", ok=True, status=200, requests=requests),
+        pages=pages, listed=listed, planned=listed,
+    )
+
+
 def fetch(
     source: dict[str, str],
     client: httpx.Client,
@@ -370,6 +473,8 @@ def fetch(
             result = _fetch_phenom(client, slug.rstrip("/"))
         elif method == EIGHTFOLD:
             result = _fetch_eightfold(client, slug.rstrip("/"))
+        elif method == NSF:
+            result = _fetch_nsf(client, ENDPOINTS[NSF], slug)
         else:
             response = client.get(url)
             response.raise_for_status()

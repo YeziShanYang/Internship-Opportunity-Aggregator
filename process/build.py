@@ -22,7 +22,7 @@ from process import parse_ats, parse_page, parse_readme
 # and never fetched, and `tests/test_stages.py` asserts they agree.
 ASSESSORS = (
     "github_readme", "greenhouse", "lever", "ashby", "workday", "phenom",
-    "eightfold", "page_text",
+    "eightfold", "nsf_awards", "page_text",
 )
 
 # Which snapshot extension each method stores. Tier 1 and 2 keep canonical TSV rows;
