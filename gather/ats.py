@@ -37,7 +37,8 @@ from typing import Any, Callable
 
 import httpx
 
-from core import models
+from core import models, paths
+from persist import store
 
 GREENHOUSE, LEVER, ASHBY, WORKDAY, PHENOM, EIGHTFOLD, NSF = (
     "greenhouse", "lever", "ashby", "workday", "phenom", "eightfold", "nsf_awards",
@@ -60,6 +61,18 @@ ENDPOINTS = {
     # Site award is a new summer research programme.
     NSF: "https://api.nsf.gov/services/v1/awards.json",
 }
+
+# Bulk sources: one sources.csv row standing for a list of small employers' boards on
+# the same vendor, so several hundred boards do not each need a row, a snapshot file and
+# a HEALTH line. Greenhouse is read without `content=true`: descriptions are fetched by
+# `enrich` for the few rows that change, rather than for every posting every day.
+BULK = {
+    "greenhouse_bulk": (GREENHOUSE, "https://boards-api.greenhouse.io/v1/boards/{slug}/jobs"),
+    "ashby_bulk": (ASHBY, ENDPOINTS[ASHBY]),
+    "lever_bulk": (LEVER, ENDPOINTS[LEVER]),
+}
+# Lever's robots.txt asks for a one-second crawl delay; the others publish none.
+BULK_DELAY_SECONDS = {GREENHOUSE: 0.25, ASHBY: 0.25, LEVER: 1.0}
 
 SINGLE_SHOT = (GREENHOUSE, LEVER, ASHBY)
 PAGED = (WORKDAY, PHENOM, EIGHTFOLD, NSF)
@@ -436,6 +449,45 @@ def _fetch_nsf(client: httpx.Client, endpoint: str, keyword: str) -> AtsFetch:
         attempt=models.FetchAttempt(source_id="", ok=True, status=200, requests=requests),
         pages=pages, listed=listed, planned=listed,
     )
+
+
+def fetch_bulk(source: dict[str, str], client: httpx.Client) -> AtsFetch:
+    """Fetch every board in a bulk source's slug list. Never raises.
+
+    One board failing is recorded on its page and is not a failure of the source:
+    `process` carries that board's rows forward from yesterday, so a board that could
+    not be read never reports its postings as removed. The source as a whole fails
+    only if its list is missing or empty.
+    """
+    source_id = source["source_id"]
+    method = (source.get("method") or "").strip()
+    vendor, endpoint = BULK[method]
+    started = time.monotonic()
+    slugs = store.read_board_list((source.get("url") or "").strip())
+    if not slugs:
+        return AtsFetch(attempt=models.FetchAttempt(
+            source_id=source_id, ok=False, requested_url=source.get("url", ""),
+            error=f"board list {source.get('url')!r} is missing or empty"))
+    pages: list[Any] = []
+    for slug in slugs:
+        try:
+            response = client.get(endpoint.format(slug=slug))
+            response.raise_for_status()
+            pages.append({"slug": slug, "payload": response.json()})
+        except Exception as exc:
+            pages.append({"slug": slug, "error": f"{type(exc).__name__}: {exc}"[:200]})
+        time.sleep(BULK_DELAY_SECONDS[vendor])
+    body = json.dumps(pages, sort_keys=True, default=str)
+    return AtsFetch(
+        attempt=models.FetchAttempt(
+            source_id=source_id, ok=True, status=200,
+            requested_url=f"{len(slugs)} {vendor} boards from {source.get('url')}",
+            size=len(body),
+            sha256=hashlib.sha256(body.encode("utf-8", "replace")).hexdigest(),
+            elapsed_ms=int((time.monotonic() - started) * 1000),
+            requests=len(slugs),
+            meta={"listed": str(len(slugs)), "planned": str(len(slugs))}),
+        pages=pages, listed=len(slugs), planned=len(slugs))
 
 
 def fetch(

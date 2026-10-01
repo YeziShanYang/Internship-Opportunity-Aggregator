@@ -11,6 +11,7 @@ import httpx
 
 from core import clock, paths
 from persist import store
+from gather import ats
 from process import coverage, parse_readme
 
 
@@ -28,8 +29,9 @@ def run(web: httpx.Client, todays_snapshots: dict[str, str]) -> list[coverage.Sc
         raise ValueError("Simplify listings.json was not a non-empty list")
     snapshots = {**store.read_snapshots("tsv"), **todays_snapshots}
     aggregators = set(parse_readme.REPO_CONFIGS)
+    bulk = frozenset(s["source_id"] for s in store.read_sources() if s["method"] in ats.BULK)
     return coverage.measure(
-        coverage.from_snapshots(snapshots, aggregators),
+        coverage.from_snapshots(snapshots, aggregators, bulk),
         coverage.from_reference(listings),
         aggregators,
     )

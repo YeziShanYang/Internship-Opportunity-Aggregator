@@ -48,6 +48,12 @@ def usage_line(usage: models.Usage) -> str | None:
     return line
 
 
+# Most filters count rows; a bulk source's unreadable-board report counts boards, and
+# nothing was removed -- the rows were carried forward.
+FILTER_UNITS = {"bulk-board-unreadable": "boards unreadable"}
+NAME_SAMPLES = {"bulk-board-unreadable"}
+
+
 def filter_lines(reports: list[models.FilterReport]) -> list[str]:
     """One line per filter that actually removed something.
 
@@ -82,9 +88,15 @@ def filter_lines(reports: list[models.FilterReport]) -> list[str]:
             # The count, not a truncated list: an arbitrary first six reads as if the
             # filter only touched those, which is worse than saying how many.
             where = f" (across {len(sources)} sources)"
+        what = FILTER_UNITS.get(filter_id, "rows removed")
+        named = ""
+        if filter_id in NAME_SAMPLES:
+            # Which boards, not just how many: a board that stays unreadable for weeks
+            # is carrying stale rows, and only its name says which list to fix.
+            named = " Boards: " + "; ".join(s for r in group for s in r.samples) + "."
         lines.append(
-            f"· {filter_id}: {removed} of {considered} rows removed{where}"
-            f" — {group[0].reason}."
+            f"· {filter_id}: {removed} of {considered} {what}{where}"
+            f" — {group[0].reason}.{named}"
         )
     return lines
 

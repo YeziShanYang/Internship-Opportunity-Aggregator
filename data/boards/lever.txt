@@ -1,0 +1,45 @@
+# Lever boards of small and mid-size employers, watched together by smallco-lever.
+# Selected 2026-10-01: probed with the tracker's own client, and kept only if the board
+# listed at least one US undergraduate internship in the target fields that day.
+# Candidates came from employer boards linked by VC portfolio job boards and from a
+# Common Crawl-derived list of Greenhouse, Ashby and Lever boards. One slug per line.
+CesiumAstro
+acceldata
+acronaviation
+advancedagrilytics
+ae-2
+anavationllc
+azul
+bisnow
+certik
+crestoperations
+cscgeneration-2
+dadavidson
+diversified-automation
+drivetrain
+dynamiccatholic
+ekimetrics
+hermeus
+hightechhigh
+ifm-us
+immuta
+kitware
+layup
+masterborn-2
+musixmatch
+neighbor
+oneimpression
+palantir
+quantco-
+rigetti
+rivr
+sep
+shieldai
+solopulseco
+standtogether
+tri
+tutorintelligence
+veeva
+whiterabbit
+wintermute-trading
+xcimer

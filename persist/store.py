@@ -132,6 +132,15 @@ def read_snapshots(ext: str = "tsv") -> dict[str, str]:
     }
 
 
+def read_board_list(name: str) -> list[str]:
+    """One slug per line from data/boards/<name>; blank lines and # comments skipped."""
+    path = paths.BOARD_LISTS / name
+    if not path.exists():
+        return []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [line.strip() for line in lines if line.strip() and not line.startswith("#")]
+
+
 def read_coverage() -> list[dict[str, str]]:
     return read_csv(paths.COVERAGE_CSV, paths.COVERAGE_COLUMNS)
 

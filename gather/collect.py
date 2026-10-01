@@ -45,6 +45,9 @@ CLIENT_FOR = {
     "phenom": WEB_CLIENT,
     "eightfold": WEB_CLIENT,
     "nsf_awards": WEB_CLIENT,
+    "greenhouse_bulk": WEB_CLIENT,
+    "ashby_bulk": WEB_CLIENT,
+    "lever_bulk": WEB_CLIENT,
     "page_text": WEB_CLIENT,
 }
 
@@ -57,7 +60,7 @@ def _encode_body(method: str, fetched) -> bytes:
     JSON for the ATS feeds, because their "one fetch" is a list of documents plus a map
     of Workday detail documents, and a faithful replay needs both. Text otherwise.
     """
-    if method in ats.ENDPOINTS:
+    if method in ats.ENDPOINTS or method in ats.BULK:
         return json.dumps(
             {"pages": fetched.pages, "details": fetched.details},
             ensure_ascii=False, default=str,
@@ -82,6 +85,8 @@ def fetch_one(
         fetched = page.fetch(source, client)
     elif method == "github_readme":
         fetched = github_readme.fetch(source, client)
+    elif method in ats.BULK:
+        fetched = ats.fetch_bulk(source, client)
     else:
         fetched = ats.fetch(source, client, wants_detail=wants_detail)
 

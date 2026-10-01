@@ -23,6 +23,7 @@ from process import parse_ats, parse_page, parse_readme
 ASSESSORS = (
     "github_readme", "greenhouse", "lever", "ashby", "workday", "phenom",
     "eightfold", "nsf_awards", "page_text",
+    "greenhouse_bulk", "ashby_bulk", "lever_bulk",
 )
 
 # Which snapshot extension each method stores. Tier 1 and 2 keep canonical TSV rows;
@@ -84,6 +85,8 @@ def assess_one(
     if method == "github_readme":
         return parse_readme.assess(
             source, parse_readme.REPO_CONFIGS.get(source_id), fetched, previous)
+    if method in ats.BULK:
+        return parse_ats.assess_bulk(source, fetched, previous)
     return parse_ats.assess(source, fetched, previous)
 
 

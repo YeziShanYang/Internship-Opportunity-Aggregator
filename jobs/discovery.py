@@ -313,6 +313,10 @@ def _known(sources: list[dict[str, str]]) -> set[str]:
             known.add(f"repo:{url.lower()}")
         elif method in ats.SINGLE_SHOT:
             known.add(f"{method}:{url.lower()}")
+        elif method in ats.BULK:
+            # Every board in a bulk source's list is watched, though none has a row.
+            vendor = ats.BULK[method][0]
+            known |= {f"{vendor}:{slug.lower()}" for slug in store.read_board_list(url)}
     return known
 
 

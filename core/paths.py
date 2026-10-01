@@ -55,6 +55,9 @@ STANDING_COLUMNS = [
     "deadline", "class_year", "location", "first_pinned", "last_seen",
 ]
 LAST_DISCOVERY = DATA / "last_discovery.txt"
+# Slug lists for the bulk board sources (`greenhouse_bulk`, `ashby_bulk`, `lever_bulk`):
+# one employer board per line, each watched without a sources.csv row of its own.
+BOARD_LISTS = DATA / "boards"
 # One row per weekly coverage measurement (process.coverage): how many postings in the
 # target fields the tracker sees against Simplify's whole list. Committed, because the
 # trend is the claim worth making and a single week is an anecdote.

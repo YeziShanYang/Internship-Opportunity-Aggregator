@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import html
 import re
+from dataclasses import replace
 
 from core import clock, models
 from gather import ats
@@ -646,3 +647,150 @@ def assess(
         filters=filters,
         collapsed=collapsed,
     )
+
+
+BULK_UNREADABLE = "bulk-board-unreadable"
+# A bulk source fails outright when more than this share of its boards cannot be read:
+# past that point the carried-forward rows are most of the snapshot, and reporting the
+# source as healthy would be the blind-not-quiet failure in a new shape.
+BULK_MAX_FAILED_SHARE = 0.5
+_BULK_PARSERS = {
+    ats.GREENHOUSE: parse_greenhouse,
+    ats.ASHBY: parse_ashby,
+    ats.LEVER: parse_lever,
+}
+
+
+def _bulk_employer(vendor: str, slug: str, payload) -> str:
+    """The employer's own name where the vendor gives one, else the board slug."""
+    if vendor == ats.GREENHOUSE and isinstance(payload, dict):
+        for job in payload.get("jobs") or []:
+            name = (job.get("company_name") or "").strip()
+            if name:
+                return name
+    return slug
+
+
+def assess_bulk(
+    source: dict[str, str], fetched: ats.AtsFetch, previous: str | None
+) -> models.SourceResult:
+    """Many small employers' boards on one vendor, read as one source. Pure.
+
+    Each board is its own section, so every row identity is board-qualified and two
+    employers' "Software Engineer Intern" never collide. Three properties carry over
+    from the single-board path and one is new:
+
+    * The student and US screens are the same functions and report the same way.
+    * The collapse guard applies per board, so one employer restructuring its board is
+      one structural line, not a flood, and does not hide the other boards' news.
+    * A board that could not be read keeps yesterday's rows. Without that, a transient
+      404 on one board would report each of its postings as removed.
+    * The digest's Company column comes from each change's `program_name`, which is set
+      per row from that board's employer rather than from the source's own name.
+    """
+    source_id = source["source_id"]
+    method = (source.get("method") or "").strip()
+    vendor, _ = ats.BULK[method]
+
+    if not fetched.attempt.ok:
+        return models.SourceResult(source_id=source_id, ok=False, error=fetched.attempt.error)
+
+    previous_snapshot = snapshot.parse_snapshot(previous) if previous else None
+    parsed: list[models.Posting] = []
+    failed: list[tuple[str, str]] = []
+    employers: dict[str, str] = {}
+    for page in fetched.pages:
+        slug = page.get("slug", "")
+        if "error" in page:
+            failed.append((slug, page["error"]))
+            continue
+        try:
+            postings = _BULK_PARSERS[vendor](page.get("payload"))
+        except Exception as exc:
+            failed.append((slug, f"{type(exc).__name__}: {exc}"[:200]))
+            continue
+        employers[slug] = _bulk_employer(vendor, slug, page.get("payload"))
+        parsed += [replace(p, department=slug) for p in postings]
+
+    boards = len(fetched.pages)
+    filters = [_report(BULK_UNREADABLE, source_id, boards, len(failed),
+                       "board could not be read this run; its rows were carried forward "
+                       "from the last good read rather than reported as removed",
+                       tuple(f"{slug}: {error}" for slug, error in failed[:5]))]
+    if boards and len(failed) / boards > BULK_MAX_FAILED_SHARE:
+        return models.SourceResult(
+            source_id=source_id, ok=False, filters=filters,
+            error=f"{len(failed)} of {boards} boards could not be read")
+
+    students = [p for p in parsed if is_student_posting(p)]
+    kept = [p for p in students if is_us(p)]
+    not_student = [p for p in parsed if p not in students]
+    not_us = [p for p in students if p not in kept]
+    filters += [
+        _report(NOT_STUDENT, source_id, len(parsed), len(not_student),
+                "title and employment type give no sign of a student or new-graduate "
+                "role, or the role is about early-career hiring rather than being one",
+                tuple(p.title for p in not_student[:5])),
+        _report(NOT_US, source_id, len(students), len(not_us),
+                "location names a country other than the United States; an "
+                "unrecognised location is kept rather than dropped",
+                tuple(f"{p.title} @ {p.location}" for p in not_us[:5])),
+    ]
+
+    current, by_identity = to_snapshot(kept)
+    unreadable = {slug for slug, _ in failed}
+    if previous_snapshot is not None:
+        carried = [row for row in previous_snapshot.rows if row.section in unreadable]
+        current.rows += carried
+        current.sections += [row.section for row in carried]
+    text = snapshot.render_snapshot(current)
+    extra = {
+        "rows": len(current.rows),
+        "postings": len(parsed),
+        "boards": boards,
+        "boards_unreadable": len(failed),
+        "suppressed_not_student": len(not_student),
+        "suppressed_not_us": len(not_us),
+    }
+    if previous_snapshot is None:
+        return models.SourceResult(
+            source_id=source_id, ok=True, baseline=True, snapshot_text=text,
+            content_length=len(text), extra=extra, filters=filters)
+
+    # Re-parse what was rendered, so the diff sees exactly what is committed.
+    current = snapshot.parse_snapshot(text)
+    changes = snapshot.diff_snapshots(source_id, previous_snapshot, current)
+    board_of = {
+        clock.change_id(source_id, row.identity): row.section
+        for row in previous_snapshot.rows + current.rows
+    }
+    texts = {clock.change_id(source_id, i): p.text for i, p in by_identity.items()}
+    by_board: dict[str, list[models.Change]] = {}
+    for change in changes:
+        by_board.setdefault(board_of.get(change.change_id, ""), []).append(change)
+
+    out: list[models.Change] = []
+    collapsed_total = 0
+    for slug, board_changes in sorted(by_board.items()):
+        employer = employers.get(slug, slug)
+        if len(board_changes) > MAX_CHANGES_PER_BOARD:
+            collapsed_total += len(board_changes)
+            samples = [f"{c.kind}: {c.key}" for c in board_changes[:MAX_COLLAPSE_SAMPLES]]
+            out.append(models.Change(
+                source_id=source_id, kind="changed", structural=True,
+                change_id=clock.change_id(source_id, f"board-restructure:{slug}"),
+                key=f"{employer}: {len(board_changes)} rows changed at once",
+                detail=(f"{len(board_changes)} rows on {slug} moved in a single run, which "
+                        "reads as a board restructure rather than news. First "
+                        f"{len(samples)}:\n" + "\n".join(f"- {s}" for s in samples)),
+                program_name=employer))
+            continue
+        for change in board_changes:
+            change.posting_text = texts.get(change.change_id, "")
+            change.program_name = employer
+            out.append(change)
+    if collapsed_total:
+        extra["collapsed"] = collapsed_total
+    return models.SourceResult(
+        source_id=source_id, ok=True, changes=out, snapshot_text=text,
+        content_length=len(text), extra=extra, filters=filters)

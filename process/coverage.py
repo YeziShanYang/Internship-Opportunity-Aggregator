@@ -98,8 +98,13 @@ def _is_us(location: str) -> bool:
     return bool(US_LOCATION.search(location)) or not NON_US_LOCATION.search(location)
 
 
-def from_snapshots(snapshots: dict[str, str], aggregators: set[str]) -> list[Posting]:
-    """Postings out of the stored `.tsv` snapshots, one per qualifying row."""
+def from_snapshots(snapshots: dict[str, str], aggregators: set[str],
+                   bulk: frozenset[str] = frozenset()) -> list[Posting]:
+    """Postings out of the stored `.tsv` snapshots, one per qualifying row.
+
+    `bulk` names the sources that watch many employers' boards at once; their rows take
+    the employer from the section (the board slug) rather than from the source id.
+    """
     out = []
     for source_id, text in sorted(snapshots.items()):
         for line in text.splitlines():
@@ -111,6 +116,8 @@ def from_snapshots(snapshots: dict[str, str], aggregators: set[str]) -> list[Pos
             if source_id in aggregators:
                 match = _AGGREGATOR_HEAD.match(head)
                 company, title = (match.group(1), match.group(2)) if match else ("", head)
+            elif source_id in bulk:
+                company, title = line.split("\t")[0], head
             else:
                 # An ATS board's rows carry no company; the source id names the firm.
                 company, title = source_id.rsplit("-", 1)[0], head
