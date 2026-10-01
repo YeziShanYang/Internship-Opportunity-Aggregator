@@ -21,7 +21,7 @@ from deliver import digest, health
 import run
 from core import models, paths
 from persist import artifacts
-from process import suppress
+from process import parse_ats, suppress
 
 
 def _change(key: str, program_name: str = "") -> models.Change:
@@ -168,6 +168,28 @@ class FilterReportTests(unittest.TestCase):
         one of the 187 programmes must not silence a board that names none of them."""
         kept, _ = suppress.suppress([_change("a")], muted={"Anything"}, applied={})
         self.assertEqual(len(kept), 1)
+
+
+class LocationScreenTests(unittest.TestCase):
+    """An unrecognised location is kept; only a clearly foreign one drops a row.
+
+    Measured 2026-09-30: the code had been keeping only recognised US locations, and
+    silently dropped Kleiner Perkins' 2027 Engineering Fellow at "Bay Area Offices".
+    """
+
+    def _us(self, location):
+        return parse_ats.is_us(models.Posting(
+            title="Intern", location=location, department="", employment_type="",
+            url="", text=""))
+
+    def test_unrecognised_us_places_are_kept(self):
+        for place in ("Bay Area Offices", "Des Moines", "Berkeley", "London, NYC",
+                      "New London, CT", ""):
+            self.assertTrue(self._us(place), place)
+
+    def test_clearly_foreign_places_are_dropped(self):
+        for place in ("London", "Beijing OR Shanghai", "Europe", "APAC", "Toronto, Ontario"):
+            self.assertFalse(self._us(place), place)
 
 
 class FilterLineTests(unittest.TestCase):

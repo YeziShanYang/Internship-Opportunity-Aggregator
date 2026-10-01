@@ -95,7 +95,7 @@ STUDENT_TITLE_WORKDAY = re.compile(
 # unrecognised location is kept, because dropping a real US role to tidy the digest is
 # the expensive error and the suppressed count is reported in HEALTH either way.
 US_LOCATION = re.compile(
-    r"united states|\bu\.?s\.?a?\b|remote"
+    r"united states|\bu\.?s\.?a?\b|remote|\bnyc\b|bay area|silicon valley"
     r"|new york|chicago|austin|boston|san francisco|seattle|houston|miami|atlanta"
     r"|philadelphia|dallas|denver|minneapolis|charlotte|washington|los angeles"
     r"|,\s*(NY|CA|IL|TX|NJ|MA|WA|PA|FL|CT|MO|GA|MN|CO|OH|AZ|UT|NC|VA|MD|WI|IA|DC)\b"
@@ -128,7 +128,7 @@ NON_US_LOCATION = re.compile(
     r"\b(canada|ontario|quebec|alberta|manitoba|saskatchewan|british columbia"
     r"|nova scotia|new brunswick|newfoundland"
     r"|toronto|montr[eé]al|vancouver|calgary|ottawa|halifax|winnipeg|edmonton"
-    r"|united kingdom|england|scotland|ireland|london, (uk|england)|dublin|edinburgh|glasgow"
+    r"|united kingdom|england|scotland|ireland|london|bristol|dublin|edinburgh|glasgow"
     r"|india|bengaluru|bangalore|mumbai|hyderabad|chennai|pune|gurgaon|gurugram|noida"
     r"|china|hong kong|singapore|japan|tokyo|australia|sydney|melbourne"
     r"|germany|frankfurt|munich|berlin|france|paris|netherlands|amsterdam"
@@ -139,7 +139,8 @@ NON_US_LOCATION = re.compile(
     r"|israel|tel aviv|dubai|abu dhabi|united arab emirates|saudi arabia|qatar"
     r"|south africa|johannesburg|kenya|nigeria|egypt|turkey|istanbul"
     r"|malaysia|kuala lumpur|indonesia|jakarta|philippines|manila|thailand|bangkok"
-    r"|vietnam|korea|seoul|taiwan|taipei|new zealand|auckland)\b",
+    r"|vietnam|hanoi|korea|seoul|taiwan|taipei|new zealand|auckland"
+    r"|beijing|shanghai|shenzhen|bulgaria|sofia|gift city|europe|emea|apac|asia)\b",
     re.IGNORECASE,
 )
 
@@ -191,7 +192,22 @@ def is_student_posting(posting: models.Posting) -> bool:
 
 
 def is_us(posting: models.Posting) -> bool:
-    return not posting.location or bool(US_LOCATION.search(posting.location))
+    """Keep a recognised US location, drop a clearly foreign one, keep the rest.
+
+    The comment on US_LOCATION always said an unrecognised location was kept, and HEALTH
+    says so every morning, but until 2026-09-30 the code kept only a *recognised* US
+    one. Measured that day across the Greenhouse, Ashby and Lever boards, 76 student
+    rows were dropped as unrecognised; most were genuinely foreign ("London",
+    "Shanghai"), which is why those names are now in NON_US_LOCATION, and the rest were
+    US roles lost silently: Kleiner Perkins' 2027 Engineering Fellow at "Bay Area
+    Offices", KKR in "Des Moines" and "Wayne", Point72 in "Berkeley", Talos in
+    "London, NYC". A US match wins over a foreign one, so "London, NYC" and
+    "New London, CT" stay.
+    """
+    location = posting.location
+    if not location or US_LOCATION.search(location):
+        return True
+    return not NON_US_LOCATION.search(location)
 
 
 def wants_workday_detail(job: dict) -> bool:

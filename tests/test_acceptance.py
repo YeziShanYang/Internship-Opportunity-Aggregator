@@ -1465,6 +1465,15 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         )
         self.assertFalse(blocked.ok)
 
+    def test_14_9m3_a_job_lists_relative_age_is_not_a_change(self):
+        """The VC portfolio boards added 2026-09-30 print an age on every row."""
+        from process import parse_page
+        a = parse_page.normalise("<p>Acme · Posted: 20 days</p><p>Beta · Posted 8 hours ago</p>")
+        b = parse_page.normalise("<p>Acme · Posted: 21 days</p><p>Beta · Posted a day ago</p>")
+        self.assertEqual(a, b)
+        self.assertIn("Today, OpenGov announced", "\n".join(
+            parse_page.normalise("<p>Today, OpenGov announced</p>")))
+
     def test_14_9n_one_change_per_page_and_discovery_reads_added_text_only(self):
         r = _check_page(self._src(source_id="one"), FakeHTMLClient(self.PAGE))
         store.write_snapshot("one", r.snapshot_text, ext="txt")

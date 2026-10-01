@@ -102,7 +102,10 @@ Rules, in priority order:
    June 2030. A posting whose graduation window does not include June 2030 is NOT
    relevant: "Dec 2027 to Aug 2028" is a junior window, "winter 2028 or spring 2029" is a
    sophomore window, and "graduating by December 2029" ends too early. A window that is
-   open-ended upward ("December 2027 or later") or that names 2030 includes him.
+   open-ended upward ("December 2027 or later") or that reaches spring 2030 includes
+   him. Most US schools graduate in May and Stanford in June, so "May 2030", "Spring
+   2030" and "class of 2030" all mean his graduation: never rule a posting out for
+   saying May rather than June.
    Graduation-window phrasing shifts every cycle, so read the actual dates rather than
    pattern-matching a job title or a programme label.
 2. Identity gates disqualify. Programs for women, underrepresented minorities, LGBTQIA+

@@ -73,6 +73,13 @@ _NOISE = (
     (re.compile(r"[?&](v|ver|t|ts|cb|nocache|_)=[^\s&\"'<>]+"), ""),
     (re.compile(r"\b\d{4}-\d{2}-\d{2}T[\d:.+Z-]+"), "<timestamp>"),
     (re.compile(r"(?i)\bcsrf[-_]?token\S*"), "<csrf>"),
+    # A job list's relative age -- "Posted: 20 days" on the Getro boards, "Posted 8 hours
+    # ago" on a16z's -- rewrites every row every day. Anchored on "Posted" so that a
+    # sentence like "Today, OpenGov announced" keeps its word.
+    (re.compile(
+        r"(?i)\bposted:?\s+(?:today|yesterday|anytime|just\s+now"
+        r"|(?:an?|\d+)\s+(?:minute|hour|day|week|month|year)s?(?:\s+ago)?)\b"),
+     "Posted <age>"),
 )
 
 
