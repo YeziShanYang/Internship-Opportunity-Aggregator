@@ -1,5 +1,11 @@
 # Opportunity Tracker
 
+## Introduction
+
+<!-- Introduction: to be written by the owner -->
+
+## Overview
+
 A daily job that watches **195 job boards and programme pages** for quant, math and CS
 internships, reads the postings that changed overnight, throws out the ones I can't
 apply to, and mails me what's left as a single table. It has run every morning since
