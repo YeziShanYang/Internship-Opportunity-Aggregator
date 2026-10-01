@@ -48,7 +48,10 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Runs took 11-13 minutes before the bulk board sources and the NSF watcher, which
+    # add about six minutes of fetching. A run killed at the limit loses its state
+    # commit as well as the digest, so the headroom is deliberate.
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
