@@ -129,6 +129,20 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         volatile_markers=("\U0001f195", "\u2713", "\U0001f6c2"),
         min_rows=200,
     ),
+    # Added 2026-09-30 from the discovery proposal of 2026-09-14, asked for directly.
+    # One markdown table: Company | Role | Location | Application/Link | Date Posted.
+    # "Date Posted" is absolute ("Aug 21"), so it is stable per row; the flags (🛂 🇺🇸
+    # 🔒) come off the key generically and stay in the value, where 🔒 -- closed -- is
+    # real news. Its value over Simplify is the early-stage tail (Exa, Modal, Etched,
+    # Dedalus Labs, many workatastartup.com links). Last committed to on 2026-08-23, so
+    # it may be dormant; a dormant repo costs one fetch a day and reports nothing.
+    "vanshb03-2027": RepoConfig(
+        table_format="markdown",
+        entity_columns=("Company",),
+        role_columns=("Role",),
+        qualifier_columns=("Location",),
+        min_rows=150,
+    ),
     "simplify-2027": RepoConfig(
         table_format="html",
         entity_columns=("Company",),

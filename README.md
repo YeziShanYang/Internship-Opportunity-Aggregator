@@ -97,7 +97,7 @@ The files that matter most, roughly in the order I'd read them:
    that prompt enforces.
 5. **[`deliver/urgency.py`](deliver/urgency.py)** — what gets to be urgent, which I have
    now been wrong about in both directions.
-6. **[`data/`](data/)** — the database: 227 programmes, 194 sources, and 144 snapshot
+6. **[`data/`](data/)** — the database: 227 programmes, 195 sources, and 144 snapshot
    files, all committed on every run.
 7. **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the long version: every failure
    mode, what it cost, and why the fix is shaped the way it is.
@@ -201,7 +201,7 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 
 | | |
 |:---|:---|
-| Sources watched | **194** (189 fetched, 5 blocked and handled by hand) |
+| Sources watched | **195** (190 fetched, 5 blocked and handled by hand) |
 | Breakdown | 87 ATS boards · 92 watched pages · 8 aggregator repos · 4 manual |
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
 | Programmes in the database | **212** |
