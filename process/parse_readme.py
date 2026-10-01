@@ -147,8 +147,12 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         table_format="html",
         entity_columns=("Company",),
         role_columns=("Role",),
-        # Spec section 5: low signal overall, so keep only the sections that matter.
-        section_include=re.compile(r"software engineering|quantitative finance", re.I),
+        # Keep the sections in the target fields. Data Science/AI/ML was added
+        # 2026-10-01: reading only SWE and Quant missed 446 in-field Simplify postings,
+        # which made Simplify a larger list than the tracker rather than a subset of it.
+        # Product and Hardware stay out.
+        section_include=re.compile(
+            r"software engineering|quantitative finance|data science", re.I),
         # "Age" is a relative timestamp ("1d", "2mo"). Diffing it would report every
         # row as changed every single day.
         ignore_columns=("Age",),
