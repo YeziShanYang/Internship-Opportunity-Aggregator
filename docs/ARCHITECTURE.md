@@ -69,7 +69,7 @@ stage is also runnable on its own, reading the previous stage's artifact out of 
 instead of recomputing it:
 
 ```bash
-.venv/bin/python run.py gather     # fetch all 195 sources into .run/raw/. The only slow one
+.venv/bin/python run.py gather     # fetch all 213 sources into .run/raw/. The only slow one
 .venv/bin/python run.py process    # parse and diff .run/raw/. No network at all
 .venv/bin/python run.py enrich     # fetch the posting behind each changed row
 .venv/bin/python run.py screen     # rule out what a quoted phrase settles. No model

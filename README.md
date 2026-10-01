@@ -6,7 +6,7 @@
 
 ## Overview
 
-A daily job that watches **195 job boards and programme pages** for quant, math and CS
+A daily job that watches **218 sources, covering about 550 job boards and programme pages,** for quant, math and CS
 internships, reads the postings that changed overnight, throws out the ones I can't
 apply to, and mails me what's left as a single table. It has run every morning since
 2026-09-05 and costs about **6-7 cents a day**.
@@ -103,8 +103,9 @@ The files that matter most, roughly in the order I'd read them:
    that prompt enforces.
 5. **[`deliver/urgency.py`](deliver/urgency.py)** — what gets to be urgent, which I have
    now been wrong about in both directions.
-6. **[`data/`](data/)** — the database: 227 programmes, 195 sources, and 144 snapshot
-   files, all committed on every run.
+6. **[`data/`](data/)** — the database: 322 programmes, 218 sources, the slug lists
+   behind the three bulk board sources, and one snapshot file per source, all committed on
+   every run.
 7. **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the long version: every failure
    mode, what it cost, and why the fix is shaped the way it is.
 
@@ -139,7 +140,7 @@ Eight stages in a fixed order. Each one writes an artifact that the next one rea
 any stage can be re-run on its own without redoing the one before it.
 
 ```
-gather    →  fetch 195 sources                       ~4 min, the only slow stage
+gather    →  fetch 213 sources                      ~11 min, the only slow stage
 process   →  parse and diff against yesterday        0.7s, no network at all
 enrich    →  fetch the posting body behind each      O(changes), not O(postings)
              row that actually moved
@@ -207,7 +208,7 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 
 | | |
 |:---|:---|
-| Sources watched | **195** (190 fetched, 5 blocked and handled by hand) |
+| Sources watched | **218** (213 fetched, 5 blocked and handled by hand); three of them read 343 small employers' job boards in bulk |
 | Breakdown | 87 ATS boards · 92 watched pages · 8 aggregator repos · 4 manual |
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
 | Programmes in the database | **212** |
