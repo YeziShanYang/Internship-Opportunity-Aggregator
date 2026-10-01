@@ -1,6 +1,6 @@
 # Opportunity Tracker
 
-A daily job that watches **147 job boards and programme pages** for quant, math and CS
+A daily job that watches **195 job boards and programme pages** for quant, math and CS
 internships, reads the postings that changed overnight, throws out the ones I can't
 apply to, and mails me what's left as a single table. It has run every morning since
 2026-09-05 and costs about **6-7 cents a day**.
@@ -133,7 +133,7 @@ Eight stages in a fixed order. Each one writes an artifact that the next one rea
 any stage can be re-run on its own without redoing the one before it.
 
 ```
-gather    →  fetch 147 sources                       ~4 min, the only slow stage
+gather    →  fetch 195 sources                       ~4 min, the only slow stage
 process   →  parse and diff against yesterday        0.7s, no network at all
 enrich    →  fetch the posting body behind each      O(changes), not O(postings)
              row that actually moved
