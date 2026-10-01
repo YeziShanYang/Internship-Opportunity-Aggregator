@@ -114,7 +114,7 @@ class FilterReportTests(unittest.TestCase):
         self.assertEqual(suppress.removed_by(reports, suppress.DUPLICATE), 0)
 
     def test_a_removed_posting_is_dropped_and_counted(self):
-        """The owner cannot apply to a posting that has left the board.
+        """Nobody can apply to a posting that has left the board.
 
         Dropped in `process` rather than in the renderer so it never reaches `enrich`
         or `classify`: on 2026-09-14 removals were 40 of 67 changes, and each one would

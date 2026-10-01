@@ -44,7 +44,7 @@ FIELD = re.compile(
 QUANT = re.compile(
     r"quant|\btrad(er|ing)\b|fpga|low.latency|derivativ|\boptions\b|portfolio|systematic|"
     r"\[quant\]", re.I)
-# A posting he cannot apply to is not reach, on either side of the comparison.
+# A posting the owner cannot apply to is not reach, on either side of the comparison.
 GRADUATE_ONLY = re.compile(r"\bph\.?d\b|\bmba\b|master'?s\b|\bms\b(?! office)|graduate intern|postdoc", re.I)
 _STOP = {"intern", "internship", "internships", "summer", "the", "and", "for", "with",
          "2027", "2026", "program", "programme", "co-op", "coop"}

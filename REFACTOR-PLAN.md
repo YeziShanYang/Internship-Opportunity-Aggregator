@@ -70,7 +70,7 @@ their shape but to port specific mechanisms and decline others.
 5. **Hand-verified research is protected.** `eligible` and `notes` are never
    rewritten by the tool. They have no concept of a human-owned column.
 6. **The owner's file excludes what a watcher already covers.** `covered_by`
-   exists so `programs.xlsx` only lists what he must chase himself. They have no
+   exists so `programs.xlsx` only lists what must be chased by hand. They have no
    equivalent, because they have no second surface to be covered by.
 
 ### Phases 1-3 — SHIPPED

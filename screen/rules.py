@@ -22,14 +22,13 @@ Three properties are load-bearing, in this order:
    rule-out -- the same instruction the prompt gives the model when a fetch failed.
    A gate the employer did not state cannot be inferred from silence.
 
-The owner is a Stanford freshman, graduating June 2030. For a Summer 2027 internship he is a
-rising sophomore, so "rising sophomore" is a *match* and only junior-and-above standing
-excludes him. That asymmetry is why every standing rule carries a sophomore guard.
+The owner is a Stanford freshman, graduating June 2030. For a Summer 2027 internship that
+makes a rising sophomore, so "rising sophomore" is a *match* and only junior-and-above
+standing excludes. That asymmetry is why every standing rule carries a sophomore guard.
 
-A graduation window counts against him when it closes before June 2030, which since
-2026-09-30 includes 2029, asked for directly: "if there's anything there that says
-graduation date between blank and blank and doesn't include June 2030, then please take
-it off the list." A 2029 window is the sophomore band (SIG's Discovery Programs, "winter
+A graduation window counts against the owner when it closes before June 2030, which since
+2026-09-30 includes 2029: any stated graduation range that does not include June 2030
+rules the posting out. A 2029 window is the sophomore band (SIG's Discovery Programs, "winter
 2028 or spring 2029"), which is exactly the label-versus-window trap that made 2029 look
 inclusive before.
 """
@@ -42,8 +41,8 @@ from dataclasses import dataclass
 # backlog instead of applying only to changes seen afterwards.
 VERSION = 2
 
-# The graduation years that exclude this owner, and the ones that include him. A window
-# naming both ("graduating between 2027 and 2030") includes him and must not rule out.
+# The graduation years that exclude this owner, and the ones that include them. A window
+# naming both ("graduating between 2027 and 2030") is inclusive and must not rule out.
 EXCLUDING_YEARS = ("2027", "2028", "2029")
 INCLUDING_YEARS = ("2030", "2031", "2032")
 

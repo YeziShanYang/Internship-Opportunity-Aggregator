@@ -23,26 +23,26 @@ PROFILE_REVIEW_AFTER_DAYS = 183  # ~6 months
 # owner's gender, race, orientation and financial-aid status would publish all of it to
 # anyone who opened the file -- for no gain, because the classifier prompt's rule 2
 # already names the specific programmes the gate has to catch. The rule the model needs
-# is "he does not clear these criteria, so rule those programmes out", and that is what
-# is stated. See classify.SYSTEM_PROMPT rule 2 for the list it works against.
+# is "the student does not clear these criteria, so rule those programmes out", and that
+# is what is stated. See classify.SYSTEM_PROMPT rule 2 for the list it works against.
 OWNER_PROFILE = (
     "Freshman (first-year) undergraduate at Stanford in the 2026-27 academic year, "
-    "expected graduation June 2030, studying math and/or CS. He is not a sophomore: "
-    "for a Summer 2027 role he will have finished only his first year, so a posting "
-    "that needs graduation before spring 2030 (May or June 2030 both match him), "
+    "expected graduation June 2030, studying math and/or CS. Not a sophomore: "
+    "for a Summer 2027 role the student will have finished only the first year, so a posting "
+    "that needs graduation before spring 2030 (May or June 2030 both match this student), "
     "current sophomore-or-higher "
-    "standing, or more than one completed year of college does not fit him. "
+    "standing, or more than one completed year of college does not fit. "
     "US citizen, US-based. Does not meet the eligibility criteria for "
     "identity-restricted programmes -- those reserved for women, transgender or "
     "gender-expansive students, underrepresented racial minorities, or LGBTQIA+ "
     "students -- nor for \"barriers to access and opportunity\" criteria, so "
-    "programmes gated on any of those are not relevant to him. Willing to "
+    "programmes gated on any of those are not relevant. Willing to "
     "relocate for a summer, so location is not a filter and no city or region is "
-    "preferred; only whether the role is in the United States matters, because he "
+    "preferred; only whether the role is in the United States matters, because the student "
     "cannot take one that recruits solely abroad. "
     "Interests, in order: quantitative finance and mathematics first, software "
     "engineering second. General finance roles are adjacent and acceptable. "
-    "Because large employers overwhelmingly hire juniors and seniors, his best odds "
+    "Because large employers overwhelmingly hire juniors and seniors, the best odds "
     "and highest priority are (a) programmes aimed at first- and second-year "
     "students, and (b) internships at startups and small or mid-size firms, "
     "including small trading shops, where a first-year has a real chance."

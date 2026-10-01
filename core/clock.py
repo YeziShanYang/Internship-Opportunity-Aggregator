@@ -79,7 +79,7 @@ def days_until(date: str, today: str | None = None) -> int | None:
     that rather than being handed a number that silently reads as "no time left" or as
     "plenty". The value comes from a language model, so unparseable is a normal case
     and not an error: `deliver.urgency` treats it as "not urgent" and the digest still
-    prints the raw text so the owner can read it himself.
+    prints the raw text so the reader can judge it.
 
     Negative is returned rather than clamped. A deadline that has already passed is a
     different fact from one closing today, and squashing the two would let a stale

@@ -1554,7 +1554,7 @@ class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
         return calls
 
     def test_a_low_priority_proposal_is_discarded_and_counted(self):
-        """The owner asked to see only what is worth looking at.
+        """Only what is worth looking at is shown.
 
         Discarded rows still reach data/discovered.csv, and the count still reaches the
         digest: a triage that quietly ate a whole week's findings would be
@@ -1569,7 +1569,7 @@ class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
             "Hudson River Trading": (
                 {"priority": "high",
                  "description": "A quantitative trading firm whose internships are "
-                                "squarely in his field."}, ""),
+                                "squarely in the user's field."}, ""),
             "Big Grocer Co": (
                 {"priority": "low",
                  "description": "A supermarket chain with no quantitative or software "
@@ -1713,7 +1713,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(clock.recruiting_cycle("2027-07-01"), 2028)
 
     def test_14_9t_the_digest_is_one_table_with_act_now_rows_first(self):
-        """The owner asked for a table, not two prose sections.
+        """The digest is a table, not two prose sections.
 
         Urgency became a column rather than a heading, so the ordering guarantee moved
         from the document structure into the row order and needs asserting: every ACT
@@ -1761,8 +1761,8 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertIn(r"SWE \| Intern", row)
 
     def test_14_9v_a_long_reason_is_kept_whole_and_never_ellipsised(self):
-        """Notes are not truncated. Asked for directly after the 2026-09-13 digest,
-        where every cell ended in an ellipsis two lines in.
+        """Notes are not truncated. Changed after the 2026-09-13 digest, where every cell
+        ended in an ellipsis two lines in.
 
         Measured on `class_year`, which is a field the cell still renders. The property
         used to be tested on `why`, and `why` was removed from the cell on 2026-09-17 --
@@ -1781,7 +1781,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(notes.count("word"), 100, "the note lost words")
 
     def test_the_notes_cell_does_not_justify_the_row(self):
-        """`why` is not in the table. Asked for directly 2026-09-17.
+        """`why` is not in the table. Removed 2026-09-17.
 
         A row in the table has already been judged relevant, so a bullet explaining
         that it is worth looking at repeats what its presence in the digest said. It
@@ -1821,13 +1821,13 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
 
     def test_14_9w_the_notes_cell_is_bullets_not_one_run_on_clause(self):
         """The column answers four separate questions -- deadline, class year,
-        location, and why this reached him -- and they were crushed into one
+        location, and why this row was surfaced -- and they were crushed into one
         semicolon-joined sentence. Bullets, `<br>`-joined because GitHub renders a line
         break inside a table cell and does not render a markdown list.
 
         A fifth bullet, "Next", was removed on 2026-09-15: it averaged 231 characters of
         advice per row on a morning when nine real opportunities were withheld for want
-        of room, and the owner's objection was that he skips it."""
+        of room, and advice in the cell went unread."""
         judgment = models.Judgment(
             change=models.Change(source_id="b", kind="added", key="SWE Intern", detail="x"),
             program_name="Some Firm", relevant=True, outcome=models.MODEL,
@@ -1843,7 +1843,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
             self.assertIn(f"**{label}:**", notes)
         for gone in ("**Next:**", "**Why:**"):
             self.assertNotIn(gone, notes, f"{gone} was removed, deliberately")
-        # Deadline first: it is the only one of the four that changes what he does today.
+        # Deadline first: it is the only one of the four that changes what to do today.
         self.assertTrue(notes.startswith(f"{digest.BULLET}**Deadline:** 2026-10-15"), notes)
 
     def test_14_9x_a_field_the_posting_did_not_state_prints_no_bullet(self):
@@ -1926,11 +1926,11 @@ class ClassifierFieldContractTests(_IsolatedState, unittest.TestCase):
 
 
 class OwnerWorkbookTests(_IsolatedState, unittest.TestCase):
-    """out/programs.xlsx is the owner's file: only what he must chase himself.
+    """out/programs.xlsx is the owner's file: only what must be chased by hand.
 
-    Asked for directly -- it had become a dump of all 187 programmes, which is useless
-    for deciding what to go and check. Two classes of row are bloat there: things he
-    cannot apply to, and things a watched source already reports in the daily digest.
+    It had become a dump of all 187 programmes, which is useless for deciding what to
+    go and check. Two classes of row are bloat there: things the owner cannot apply
+    to, and things a watched source already reports in the daily digest.
     """
 
     SOURCES = {
@@ -1982,7 +1982,7 @@ class OwnerWorkbookTests(_IsolatedState, unittest.TestCase):
         owner's list."""
         orphan = self._program(name="Optiver FutureFocus", source_id="gone-away")
         keep, left_out, warnings = build_xlsx.partition([orphan], self.SOURCES)
-        self.assertEqual(len(keep), 1, "the row must stay on his list")
+        self.assertEqual(len(keep), 1, "the row must stay on the owner's list")
         self.assertFalse(left_out)
         self.assertTrue(any("gone-away" in w for w in warnings), warnings)
 
@@ -2247,8 +2247,8 @@ class DeterministicScreenTests(_IsolatedState, unittest.TestCase):
         self.assertIn("2027", v.why, "the reason must quote the evidence")
 
     def test_a_sophomore_window_ending_in_2029_is_ruled_out(self):
-        """Asked for directly on 2026-09-30: a window that leaves out June 2030 does not
-        fit him. SIG's Discovery Programs are the real case -- a sophomore band that a
+        """Added 2026-09-30: a window that leaves out June 2030 does not fit a class of
+        2030 student. SIG's Discovery Programs are the real case -- a sophomore band that a
         first-year label once made look inclusive."""
         v = self.assertRuledOut(
             "Open to students planning to graduate in the winter of 2028 or the spring of 2029.",
@@ -3095,7 +3095,7 @@ class AtsProbeTests(_IsolatedState, unittest.TestCase):
         self.assertEqual([c.key for c in found], ["greenhouse:grahamcapitalmanagement"])
 
     def test_it_follows_one_hop_to_an_all_jobs_page(self):
-        """The owner's actual description: "click a couple more buttons". Probing only
+        """The manual audit found the real board a click or two below the page. Probing only
         the watched page found 8 of 11; this is what recovered the other three."""
         found, _, client = self._mine({
             self.PAGE: '<a href="/all-jobs/">See all jobs</a>',

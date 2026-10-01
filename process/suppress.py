@@ -113,7 +113,7 @@ def suppress(
     reports: list[models.FilterReport] = []
 
     # A posting that has left the board is not an opportunity: the owner cannot apply to
-    # it, so it costs him a line and offers nothing to do with it. Dropped first because
+    # it, so it costs a line and offers nothing to do with it. Dropped first because
     # it is the most fundamental of the three statements -- the other two say "you are
     # not being shown this", this one says "there is nothing there".
     #

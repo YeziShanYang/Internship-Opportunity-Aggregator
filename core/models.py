@@ -306,8 +306,8 @@ class Judgment:
     why: str = ""
     confidence: str = "low"
     # Which kind of rule ruled this row out: "eligibility" (checkable against the
-    # posting, and reliable) or "value" (rule 8's judgement of whether a role he can
-    # apply to is worth his morning, which has been wrong and is printed in full so it
+    # posting, and reliable) or "value" (rule 8's judgement of whether a role the user can
+    # apply to is worth their morning, which has been wrong and is printed in full so it
     # can be argued with). Empty when the row is relevant.
     ruled_out_by: str = ""
     eligible_proposal: str = ""
@@ -326,8 +326,8 @@ class Judgment:
     class_year: str = ""
     location: str = ""
     deadline: str = ""
-    # "small", "large" or "". Added 2026-09-30, when the owner asked for startups and
-    # small firms to be weighted up because large employers hire juniors and seniors.
+    # "small", "large" or "". Added 2026-09-30, when startups and small firms were
+    # weighted up because large employers hire juniors and seniors.
     # The digest sorts "small" first within each urgency tier; it never filters.
     employer_size: str = ""
     # Set when the deterministic screen settled this instead of the model. Carried so
@@ -384,9 +384,9 @@ class Judgment:
 class PinnedRow:
     """An underclassman-targeted posting that stays in ACT NOW while it is still up.
 
-    Asked for directly on 2026-09-18: "all positions targeted towards freshmen and
-    sophomores or both or underclassmen in general are put on ACT now and are there as
-    long as the job posting is still up". Every other ACT NOW test is a *dated* reason
+    Added 2026-09-18: a posting aimed at freshmen, sophomores or underclassmen in
+    general goes in ACT NOW and stays there for as long as the posting is still up.
+    Every other ACT NOW test is a *dated* reason
     that fires on the morning a row moves; this one is a standing fact about who the
     posting is for, so it has to survive the day its change scrolls past.
 

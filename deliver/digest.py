@@ -11,9 +11,8 @@ The checkboxes went with it: a GitHub task list only renders as a tickable box i
 item, never inside a table cell, so the table and tick-to-dismiss were mutually
 exclusive. `data/applied.tsv` survives as a hand-editable mute list.
 
-Cadence is exactly one digest a day, every day -- no more and no less. The owner asked
-for a reminder they can rely on, and a fixed daily arrival is what makes silence
-diagnostic: no issue on a given morning means the job is broken, with no "maybe nothing
+Cadence is exactly one digest a day, every day -- no more and no less. A reminder has
+to be reliable, and a fixed daily arrival is what makes silence diagnostic: no issue on a given morning means the job is broken, with no "maybe nothing
 changed" ambiguity to explain it away. The cost is that quiet days mail too, so a quiet
 day says so in the title ("(no changes)") and stays short enough to archive in a glance.
 
@@ -63,8 +62,8 @@ def _stale_profile_line() -> str | None:
 # 70 on Position, on the theory that GitHub wraps a long cell rather than scrolling it
 # and an unbounded `why` turns four tidy rows into a wall of text.
 #
-# That traded the wrong thing away. The owner's objection, on the 2026-09-13 digest,
-# was that every Notes cell ended in an ellipsis two lines in -- and because the model
+# That traded the wrong thing away. On the 2026-09-13 digest every Notes cell ended in
+# an ellipsis two lines in -- and because the model
 # writes `why` as one sentence beginning with the posting's requirement, the clause
 # that got cut was reliably the decisive one ("...and is a Summer 2027 role, so a
 # first-year" — then nothing). A clipped sentence is worse than a tall cell: it ends
@@ -179,8 +178,8 @@ def _deadline_note(judgment: models.Judgment) -> str:
 
     A value the model returned that is neither `rolling` nor an ISO date is still
     shown, verbatim. It just never counts as urgent -- see `deliver.urgency`. Showing
-    it is the point: a deadline the code could not parse is exactly the one the owner
-    needs to read for himself.
+    it is the point: a deadline the code could not parse is exactly the one a
+    human needs to read.
     """
     if judgment.change.rolling or urgency.is_rolling(judgment):
         return ROLLING_NOTE
@@ -191,24 +190,24 @@ def _notes(judgment: models.Judgment) -> str:
     """The Notes cell: three labelled facts, then the caveats.
 
     Bullets rather than one run-on clause, because this column answers separate
-    questions and the owner reads them in this order: how long do I have (Deadline),
-    can I even apply (Year), and where is it (Location). They used to be crushed into a
+    questions, read in this order: how long is left (Deadline), is the posting open to
+    this applicant at all (Year), and where is it (Location). They used to be crushed into a
     single semicolon-joined sentence, which is what made the old truncation so costly --
     the class year and the location were inside the model's one prose sentence, so they
     were both only ever present by luck.
 
     **`why` is deliberately not here.** It was a fourth bullet justifying the row's
-    presence, and the owner's objection on 2026-09-17 was that the justification is
-    redundant: a row in the table has already been judged relevant, so explaining that
-    it is worth looking at tells him what its appearance in the digest already told him.
+    presence, and it was removed on 2026-09-17 because the justification is redundant: a
+    row in the table has already been judged relevant, so explaining that it is worth
+    looking at repeats what its appearance in the digest already says.
     It was also the longest bullet by a wide margin. `why` is still requested, still
     stored on the Judgment, still in the artifacts and the state commit, and still
     printed in full in RULED OUT -- where the row's presence proves the opposite and the
     reasoning is the entire point.
 
     Ordered most-decision-relevant first. A rolling deadline changes what the owner
-    does today; a confidence caveat only changes how much he trusts a row he is already
-    reading, so it goes last.
+    does today; a confidence caveat only changes how far to trust a row already being
+    read, so it goes last.
     """
     items: list[tuple[str, str]] = [
         ("Deadline", _deadline_note(judgment)),
@@ -331,7 +330,7 @@ def render(
     today = clock.today_iso()
     health_lines, escalated = health.source_lines(results, sources)
 
-    # Small firms first within each tier, asked for on 2026-09-30: large employers hire
+    # Small firms first within each tier, since 2026-09-30: large employers hire
     # juniors and seniors, so the rows a first-year can realistically land go on top.
     # A stable sort, so the order within each group is unchanged and trimming from the
     # end still drops the least interesting row.

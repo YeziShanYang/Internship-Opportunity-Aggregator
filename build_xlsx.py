@@ -6,26 +6,25 @@ whole file changed and destroy the audit trail. The CSVs are canonical; this scr
 renders them, preserving the seed file's formatting: Arial, a colour-coded eligibility
 column, autofilter, frozen panes and a Legend sheet.
 
-**Two workbooks, split by audience.** This split was asked for directly: programs.xlsx
-had grown into a dump of all 187 tracked programmes, which made it useless as the thing
+**Two workbooks, split by audience.** programs.xlsx had grown into a dump of all 187 tracked programmes, which made it useless as the thing
 the owner actually opens to decide what to go and check. Two categories of row are pure
 bloat *for that purpose*, even though both are worth keeping as data:
 
-  * things he cannot apply to (`eligible` NO or STALE), and
-  * things the tracker already watches for him, which will arrive in the daily digest
-    whether or not he ever opens a spreadsheet.
+  * things the owner cannot apply to (`eligible` NO or STALE), and
+  * things the tracker already watches, which will arrive in the daily digest
+    whether or not anyone ever opens a spreadsheet.
 
 So:
 
-  out/programs.xlsx   HIS file. Only what he must chase himself.
+  out/programs.xlsx   the OWNER's file. Only what must be chased by hand.
                       Check By Hand / Manual Watch / Priority / Legend / Left Out
-  out/tracked.xlsx    the TOOL's bookkeeping, moved out of his way.
+  out/tracked.xlsx    the TOOL's bookkeeping, moved out of the owner's way.
                       All Programs / Sources / Applied / Discovered
 
 The Left Out sheet is not decoration. This project's standing rule is that every filter
 reports what it removed, because a filter that hides silently is how a source goes blind
 without anyone noticing -- it has happened twice here. Left Out names every excluded
-programme and the exact reason, so the narrowing of his file is auditable rather than
+programme and the exact reason, so the narrowing of the owner's file is auditable rather than
 a matter of trust.
 """
 from __future__ import annotations
@@ -70,7 +69,7 @@ ELIGIBLE_STYLES = {
     "VIA CLUB": BLUE,
 }
 
-# Cannot be applied to at all, now or later. These leave his file entirely.
+# Cannot be applied to at all, now or later. These leave the owner's file entirely.
 CANNOT_APPLY = {"NO", "STALE"}
 
 # Sort order for the hand-check sheet: what to do something about first. Everything
@@ -331,8 +330,8 @@ def covered_by(program: dict[str, str], sources: dict[str, dict[str, str]]) -> s
     called "Jane Street Puzzles (monthly)" and "Jane Street SF Puzzle City" covered
     because janestreet.com appears in the watchlist, when the watchers are pointed at
     FTTP, INSIGHT and the programmes index. Those puzzle pages are exactly the kind of
-    thing the owner has to check himself, and folding them away would have hidden them
-    from the only file that was going to tell him.
+    thing the owner has to check by hand, and folding them away would have hidden them
+    from the only file that was going to surface them.
 
     So the bar is an explicit `source_id`, or a watched page whose URL is the programme's
     URL (or a parent of it). Wrongly keeping a row costs a glance; wrongly dropping one
@@ -421,7 +420,7 @@ def _write_legend(workbook) -> None:
 def build_owner_workbook(
     keep: list[dict[str, str]], left_out: list[dict[str, str]]
 ) -> pathlib.Path:
-    """out/programs.xlsx -- only what the owner has to chase himself."""
+    """out/programs.xlsx -- only what the owner has to chase by hand."""
     workbook = Workbook()
     _write_sheet(
         workbook.active, HAND_CHECK_HEADERS, keep, hyperlink_columns={"website"}

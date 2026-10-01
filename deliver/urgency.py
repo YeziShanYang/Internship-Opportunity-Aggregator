@@ -35,10 +35,10 @@ UNDERCLASSMAN = re.compile(
 
 
 # A class-year phrase that names first- or second-years but is not *aimed* at them. Added
-# 2026-09-30, asked for directly: the pins had filled with rows like GE Healthcare's "at
+# 2026-09-30: the pins had filled with rows like GE Healthcare's "at
 # least sophomore standing" and Gilead's "freshman, sophomore, junior, or senior", which
-# mention the word while being a floor or an open door. The owner wants a posting told
-# once when it appears, and pinned only when it is a real match -- a programme for
+# mention the word while being a floor or an open door. A posting is told once when it
+# appears, and pinned only when it is a real match -- a programme for
 # first- and second-years. A floor ("at least", "minimum", "completed") and an
 # enumeration that runs on to juniors or seniors are both general postings.
 NOT_TARGETED = re.compile(
@@ -70,8 +70,8 @@ def targets_underclassmen(judgment: models.Judgment) -> bool:
     """Whether this posting is aimed at first- or second-years.
 
     Read off `Judgment.class_year` and the row's own title -- never off the section
-    heading the row sits under. That distinction was asked for directly on 2026-09-18
-    and it is the difference between a usable block and an undeliverable one: three of
+    heading the row sits under. That distinction dates from 2026-09-18 and it is the
+    difference between a usable block and an undeliverable one: three of
     the watched repos (`luisae`, `underclassmen-cruz`, `underclassmen-zapply`) are
     underclassman trackers end to end, so their section headings carry the word on
     every row. `Row.identity` is section-qualified, so matching the whole snapshot line
@@ -123,7 +123,7 @@ def is_urgent(judgment: models.Judgment) -> bool:
     and every test here is a *dated* reason rather than a quality judgment.
 
     A deadline the codec could not parse never promotes a row. It is still printed in
-    the Notes cell, so the case degrades to the owner reading the date himself rather
+    the Notes cell, so the case degrades to the owner reading the date by hand rather
     than to a row quietly going missing. (Failing sources are escalated into the same
     block separately, by the renderer.)
     """

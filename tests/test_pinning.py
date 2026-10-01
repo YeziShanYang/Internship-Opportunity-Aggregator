@@ -1,6 +1,6 @@
 """Underclassman postings stay in ACT NOW until they leave their board.
 
-Asked for directly on 2026-09-18. Every other ACT NOW test is a *dated* reason that
+Added 2026-09-18. Every other ACT NOW test is a *dated* reason that
 fires on the morning a row moves; this one is a standing fact about who the posting is
 for, so the interesting cases are all about time and about silence: a pin survives the
 day nothing happens to it, and a pin is never retired by a source that failed.
@@ -87,7 +87,7 @@ class UnderclassmanDetectionTests(unittest.TestCase):
             _judgment("Acme / Junior Summer Analyst", class_year="rising seniors")))
 
     def test_a_floor_or_an_open_door_is_not_a_target(self):
-        """Asked for directly on 2026-09-30. The pins had filled with postings that
+        """Narrowed 2026-09-30. The pins had filled with postings that
         mention the word without being aimed at the year: a floor, or a list that runs
         on to seniors. Those are told once, on the morning they appear, and not pinned."""
         for phrase in ('"At least sophomore standing"; "Sophomore year minimum"',

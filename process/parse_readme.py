@@ -129,7 +129,7 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         volatile_markers=("\U0001f195", "\u2713", "\U0001f6c2"),
         min_rows=200,
     ),
-    # Added 2026-09-30 from the discovery proposal of 2026-09-14, asked for directly.
+    # Added 2026-09-30 from the discovery proposal of 2026-09-14.
     # One markdown table: Company | Role | Location | Application/Link | Date Posted.
     # "Date Posted" is absolute ("Aug 21"), so it is stable per row; the flags (🛂 🇺🇸
     # 🔒) come off the key generically and stay in the value, where 🔒 -- closed -- is

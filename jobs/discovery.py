@@ -96,8 +96,8 @@ _FINGERPRINTS = (
 # Slugs that are never a board. `embed`, `job_board` and friends appear in the path of
 # the very URLs the patterns above match, so without this the probe proposes a board
 # called "embed" on every Greenhouse-embedding page in the watchlist.
-# Links worth following one hop from a watched careers page. The owner's description of
-# the bug was literally "you just need to click a couple more buttons", and measured:
+# Links worth following one hop from a watched careers page. The bug, as found by hand,
+# was that the real board sat a couple of clicks below the watched page, and measured:
 # probing only the watched page rediscovered 8 of the 11 boards the hand audit found.
 # Eclipse's and Verition's slugs appear nowhere on their careers pages -- they are on
 # an "all jobs" / "open positions" page one link deeper, inside a Greenhouse embed.
@@ -168,13 +168,13 @@ THE PERSON:
 The watchlist already holds about 150 sources: five internship aggregators, and the
 boards of some seventy named firms. So the question is never "is this a real internship
 source". It is "does this carry something the owner would not otherwise see". Be
-sparing. Three sources he adds are worth more than eighteen he skims past.
+sparing. Three sources the owner adds are worth more than eighteen skimmed past.
 
 "priority": answer "high" only if at least one of these is true.
 
   - QUANTITATIVE FINANCE. A proprietary trading firm, market maker, hedge fund or quant
-    research shop. This is his first field, and the one where he wants every posting a
-    firm has rather than whichever ones an aggregator happened to list.
+    research shop. This is this person's first field, and the one where the goal is every
+    posting a firm has rather than whichever ones an aggregator happened to list.
   - A LARGE AGGREGATOR. A repository with thousands of stars tracking maths, CS or quant
     internships. A small one only duplicates the five already watched.
   - YOU CANNOT TELL WHAT THE FIRM DOES. Not a licence to guess: if the material does not
@@ -185,7 +185,7 @@ Answer "low" for everything else. In particular:
 
   - ALREADY COVERED. The input says "already watched: <source>" when the board was mined
     out of an aggregator this tracker reads every morning, which means its postings
-    already reach him in the digest. On its own that is enough for "low" -- overridden
+    already reach the owner in the digest. On its own that is enough for "low" -- overridden
     only by quantitative finance, where whole-board coverage is the point rather than
     whichever postings an aggregator happened to carry.
   - A generic software employer that runs an internship. Real, but one of thousands, and
@@ -197,7 +197,7 @@ Answer "low" for everything else. In particular:
   - A test or staging duplicate of a board already proposed.
 
 "description": exactly one sentence, plain and specific, saying what the source is and
-  why it does or does not matter to him. Name the firm's actual business rather than
+  why it does or does not matter to this person. Name the firm's actual business rather than
   restating its name. No preamble."""
 
 
@@ -441,9 +441,9 @@ def mine_pages(
     This exists because of a specific, repeated failure. A `page_text` row is supposed
     to be the fallback for a firm on no public ATS, and the decision that a firm has no
     public ATS was a documented *manual* step -- so roughly fifty rows were added
-    without anyone running the check. The owner found it by hand: "you just need to
-    click a couple more buttons and it brought you to some sort of Greenhouse site with
-    the actual job board postings on it." The subsequent audit found thirteen such rows,
+    without anyone running the check. A manual check found the real board a couple of
+    clicks below the watched page, on a Greenhouse site with the actual job board
+    postings on it. The subsequent audit found thirteen such rows,
     every one carrying a note asserting the firm was on no public ATS.
 
     A rule that lives only in a document is a rule that gets skipped, so the probe now
@@ -583,7 +583,8 @@ def record(candidates: list[Candidate], discarded: list[Candidate] | None = None
 
     Its status is deliberately not `rejected`. That word means the owner looked at a
     proposal and said no, and it is worth being able to tell the two apart later --
-    one is a judgment he made and the other is a judgment made on his behalf.
+    one is a judgment the owner made and the other is a judgment made on the owner's
+    behalf.
     """
     if not candidates and not discarded:
         return

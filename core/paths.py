@@ -86,9 +86,9 @@ POSTINGS_CACHE = DATA / "postings_cache"
 # data/postings_cache/: re-fetchable data that would otherwise bury the CSV history that
 # `git log` exists to answer.
 RUN_DIR = ROOT / ".run"
-# Two workbooks, with a deliberate split of audience (asked for by the owner
-# 2026-09-11). programs.xlsx is *his* file: only the opportunities he has to chase
-# himself. Anything he cannot apply to, and anything the tracker already watches, is
+# Two workbooks, with a deliberate split of audience (2026-09-11). programs.xlsx is the
+# owner's file: only the opportunities that have to be chased by hand. Anything the
+# owner cannot apply to, and anything the tracker already watches, is
 # bloat there and belongs in the other file. tracked.xlsx is the tool's own bookkeeping
 # -- the full programme list plus the source, applied and discovery tables.
 OUT_XLSX = ROOT / "out" / "programs.xlsx"
@@ -96,9 +96,9 @@ OUT_TRACKED_XLSX = ROOT / "out" / "tracked.xlsx"
 
 # Honest about *what* is asking -- an automated tracker, never a browser string -- and
 # silent about *who*. This used to carry the owner's email as a contact address, which
-# put his identity in front of ~144 employer sites every morning. Nothing personal goes
+# put the owner's identity in front of ~144 employer sites every morning. Nothing personal goes
 # here: no email, no name, and no repo URL either, because the repo is public and leads
-# straight back to him. Changed 2026-09-26, asked for directly.
+# straight back to the owner. Changed 2026-09-26.
 USER_AGENT = "opportunity-tracker/1.0"
 REQUEST_DELAY_SECONDS = 1.0
 HTTP_TIMEOUT_SECONDS = 30.0

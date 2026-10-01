@@ -20,7 +20,7 @@ on:
   #
   # One tick. There were three -- 07:00, 08:20 and 09:40 -- added on 2026-09-07 after a
   # tick was dropped outright with no run, no log and no notification. Removed
-  # 2026-09-15, asked for directly, and the run history is the argument: since the
+  # 2026-09-15, and the run history is the argument: since the
   # retries landed, all three ticks have fired on all eight days, 24 of 24, with nothing
   # dropped. In every one of those days the *first* tick is the one that delivered, and
   # the 16 retries have delivered zero digests between them. A retry only helps when the

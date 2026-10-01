@@ -2,7 +2,7 @@
 
 One model call per change that survives triage. The owner profile is passed verbatim
 because the class-year and identity gates are the whole point: most of what these
-sources surface is aimed at juniors or at groups this owner is not part of, and reading
+sources surface is aimed at juniors or at groups this user is not part of, and reading
 that off a posting is exactly what an LLM is good at and a regex is not.
 
 Two providers are supported, and the prompt, the schema and the `Judgment` contract are
@@ -103,8 +103,8 @@ Rules, in priority order:
    relevant: "Dec 2027 to Aug 2028" is a junior window, "winter 2028 or spring 2029" is a
    sophomore window, and "graduating by December 2029" ends too early. A window that is
    open-ended upward ("December 2027 or later") or that reaches spring 2030 includes
-   him. Most US schools graduate in May and Stanford in June, so "May 2030", "Spring
-   2030" and "class of 2030" all mean his graduation: never rule a posting out for
+   this person. Most US schools graduate in May and Stanford in June, so "May 2030", "Spring
+   2030" and "class of 2030" all mean this person's graduation: never rule a posting out for
    saying May rather than June.
    Graduation-window phrasing shifts every cycle, so read the actual dates rather than
    pattern-matching a job title or a programme label.
@@ -117,8 +117,8 @@ Rules, in priority order:
    *can* apply -- the class year, an identity gate, a requirement you cannot see because
    the posting text is missing -- surfacing a borderline item is nearly free and missing
    a real opening is expensive, so set relevant: true, say so in `why`, and use
-   confidence "low". This does not extend to rule 8, which is about whether a role he
-   can plainly apply to is worth his morning.
+   confidence "low". This does not extend to rule 8, which is about whether a role this person
+   can plainly apply to is worth their morning.
 4. Rolling deadlines are urgent. Jane Street, NVIDIA, D. E. Shaw and Point72 review on
    a rolling basis and close when full; Jane Street slots have reportedly filled by late
    October. Any change on one of those is high priority regardless of stated deadline.
@@ -141,16 +141,16 @@ Rules, in priority order:
    general business operations. Also out of scope: engineering that is not software --
    mechanical, electrical, civil, aerospace, chemical, manufacturing, firmware and
    hardware -- because this person studies maths and CS.
-8. Weigh the employer by his odds, not its fame. Large, established employers
+8. Weigh the employer by this person's odds, not its fame. Large, established employers
    overwhelmingly fill internships with juniors and seniors, so for this first-year the
    most worthwhile rows are startups, small and mid-size companies, and small trading
    firms -- places where a freshman is a realistic hire -- plus any programme aimed at
-   first- and second-year students. Revised 2026-09-30 at the owner's request; this
+   first- and second-year students. Revised 2026-09-30; this
    rule used to do the opposite, keeping famous firms and ruling out small ones.
 
    Keep:
    * anything quantitative -- trading, quant research, quant development, systematic
-     strategy, mathematics, statistics. This is his first field and the bar is low.
+     strategy, mathematics, statistics. This is this person's first field and the bar is low.
    * software, data or ML at a startup or a small or mid-size company, whether or not
      you have heard of it. An unfamiliar name is a reason to keep, not to rule out.
    * any role or programme that says it is for first- or second-year students, or open
@@ -205,17 +205,17 @@ an empty bullet is simply not shown, whereas a wrong one is read as fact:
   costs the owner a wasted morning or a missed opening.
 
 Do NOT suggest a next step, an action, or advice. The digest is a list of things to go
-and look at, not a plan; "consider applying; seek referrals" is a sentence the owner
-skips on every row, and as its own bullet it cost 231 characters a row on a morning when
+and look at, not a plan; "consider applying; seek referrals" is a sentence that
+changes nothing on any row, and as its own bullet it cost 231 characters a row on a morning when
 nine real opportunities were withheld for want of room.
 
 `ruled_out_by` says which kind of rule fired. It matters only when relevant is false:
 
-* `eligibility` -- rules 1, 2, 6 and 7. He cannot apply, or the role is not in his
-  field. These are checkable against the posting text and have proven reliable, so the
+* `eligibility` -- rules 1, 2, 6 and 7. This person cannot apply, or the role is not
+  in their field. These are checkable against the posting text and have proven reliable, so the
   digest prints them compactly.
-* `value` -- rule 8 alone. He could apply and it is in his field, but the employer is
-  a large enterprise whose internship he is unlikely to land as a first-year. This is a judgement rather than a fact, it is the one that has been
+* `value` -- rule 8 alone. This person could apply and it is in their field, but the
+  employer is a large enterprise whose internship a first-year is unlikely to land. This is a judgement rather than a fact, it is the one that has been
   wrong, and the digest prints these in full so they can be argued with.
 * the empty string when relevant is true."""
 
@@ -405,7 +405,7 @@ def build_client(provider: str):
 
 # Values the model uses to mean "the posting does not say". Left out of the digest
 # rather than printed, because "Deadline: not specified" is a bullet that costs a line
-# and tells the owner nothing he did not already know from its absence.
+# and tells the reader nothing its absence did not already say.
 _UNSTATED = {"", "-", "n/a", "na", "none", "null", "unknown", "not specified",
              "not stated", "unspecified", "not listed", "tbd"}
 
