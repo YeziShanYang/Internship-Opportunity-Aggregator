@@ -862,3 +862,6 @@
 2026-10-01T17:54:58+00:00	add-opportunity	Purdue Summer Research Opportunities Program (SROP)	added from a supplied article	eligible=CHECK (agent-set; confirm by hand)
 2026-10-01T17:54:58+00:00	add-opportunity	IPAM RIPS (UCLA)	added from a supplied article	eligible=CHECK (agent-set; confirm by hand)
 2026-10-01T17:54:58+00:00	add-opportunity	Ai2 internships (Allen Institute for AI)	added from a supplied article	eligible=CHECK (agent-set; confirm by hand)
+2026-10-01T18:17:36+00:00	add-opportunity	Built In software engineering internships	added from a supplied article	eligible=USE (agent-set; confirm by hand)
+2026-10-01T18:17:36+00:00	add-opportunity	Built In data and analytics internships	added from a supplied article	eligible=USE (agent-set; confirm by hand)
+2026-10-01T18:17:36+00:00	add-opportunity	Built In finance internships	added from a supplied article	eligible=USE (agent-set; confirm by hand)

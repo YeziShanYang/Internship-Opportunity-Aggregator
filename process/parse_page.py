@@ -80,6 +80,13 @@ _NOISE = (
         r"(?i)\bposted:?\s+(?:today|yesterday|anytime|just\s+now"
         r"|(?:an?|\d+)\s+(?:minute|hour|day|week|month|year)s?(?:\s+ago)?)\b"),
      "Posted <age>"),
+    # Built In's job cards print a bare age before the card's "Saved" control --
+    # "11 Hours Ago Saved", "Reposted Yesterday Saved". Anchored on that control so a
+    # sentence containing "yesterday" keeps its word.
+    (re.compile(
+        r"(?i)\b(?:reposted\s+)?(?:today|yesterday|just\s+now"
+        r"|(?:an?|\d+)\s+(?:minute|hour|day|week|month|year)s?\s+ago)(?=\s+saved\b)"),
+     "<age>"),
 )
 
 
