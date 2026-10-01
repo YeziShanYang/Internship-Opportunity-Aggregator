@@ -80,8 +80,13 @@ class Scope:
         return self.tracker_only / self.reference if self.reference else 0.0
 
 
+_MD_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+
+
 def _words(text: str) -> set[str]:
-    return set(re.findall(r"[a-z0-9]{2,}", text.lower().replace(" [quant]", ""))) - _STOP
+    # A role cell can be a markdown link; its URL is not part of the title.
+    text = _MD_LINK.sub(r"\1", text).lower().replace(" [quant]", "")
+    return set(re.findall(r"[a-z0-9]{2,}", text)) - _STOP
 
 
 def _company_key(name: str) -> str:

@@ -136,6 +136,37 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
     # real news. Its value over Simplify is the early-stage tail (Exa, Modal, Etched,
     # Dedalus Labs, many workatastartup.com links). Last committed to on 2026-08-23, so
     # it may be dormant; a dormant repo costs one fetch a day and reports nothing.
+    # Added 2026-10-01 for coverage beyond Simplify: each was measured against
+    # Simplify's full list and the existing watchlist before being added. All four link
+    # to the employer's own posting, which is what lets process.suppress dedupe them.
+    "dreamworkhq-2027": RepoConfig(
+        table_format="markdown",
+        entity_columns=("Company",),
+        role_columns=("Role",),
+        qualifier_columns=("Location",),
+        # "Added" is relative ("0d", "1mo") and "Pay" is re-estimated; both would churn.
+        ignore_columns=("Added", "Pay"),
+        section_include=re.compile(r"^(engineering|data science|security)\b", re.I),
+        min_rows=300,
+    ),
+    "aprameyak-2027": RepoConfig(
+        table_format="markdown",
+        entity_columns=("Company",),
+        role_columns=("Role",),
+        qualifier_columns=("Location",),
+        ignore_columns=("Date Added",),
+        section_include=re.compile(r"summer 2027 internships", re.I),
+        min_rows=40,
+    ),
+    "mehek-2027": RepoConfig(
+        table_format="markdown",
+        entity_columns=("Company",),
+        role_columns=("Role",),
+        qualifier_columns=("Location",),
+        ignore_columns=("Posted", "Pay"),
+        section_include=re.compile(r"^(quant|software engineering|data science)", re.I),
+        min_rows=40,
+    ),
     "vanshb03-2027": RepoConfig(
         table_format="markdown",
         entity_columns=("Company",),
