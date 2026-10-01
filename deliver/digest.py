@@ -320,6 +320,7 @@ def render(
     filters: list[models.FilterReport] | None = None,
     usage: models.Usage | None = None,
     pinned: list[models.PinnedRow] | None = None,
+    coverage_line: str | None = None,
 ) -> tuple[str, str]:
     """Return (issue title, issue body).
 
@@ -429,6 +430,9 @@ def render(
     body.append("## ■ HEALTH")
     for line in health_lines:
         body.append(f"- {line}")
+    # Weekly, with discovery. Off the artifacts for the same reason DISCOVERED is.
+    if coverage_line:
+        body.append(f"- {coverage_line}")
     # What the run cost, in the run's own report. A cost that only appears on a billing
     # page a day later is a cost nobody notices drifting upward.
     # Before the spend line, because it explains part of it: a change the screen

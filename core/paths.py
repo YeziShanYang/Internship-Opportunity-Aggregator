@@ -55,6 +55,19 @@ STANDING_COLUMNS = [
     "deadline", "class_year", "location", "first_pinned", "last_seen",
 ]
 LAST_DISCOVERY = DATA / "last_discovery.txt"
+# One row per weekly coverage measurement (process.coverage): how many postings in the
+# target fields the tracker sees against Simplify's whole list. Committed, because the
+# trend is the claim worth making and a single week is an anecdote.
+COVERAGE_CSV = DATA / "coverage.csv"
+COVERAGE_COLUMNS = [
+    "date", "scope", "tracker", "simplify", "tracker_only", "employer_only", "lead_pct",
+]
+# Simplify's own data file, of which the README is a rendering. The reference for
+# coverage: every active posting, not just the README sections we parse.
+SIMPLIFY_LISTINGS_URL = (
+    "https://raw.githubusercontent.com/SimplifyJobs/Summer2027-Internships/dev/"
+    ".github/scripts/listings.json"
+)
 # The date of the last digest actually delivered. The schedule fires several times
 # each morning so that a dropped cron tick is not a missed day (see daily.yml), and the
 # cadence is exactly one digest a day, so something has to stop ticks two and three from

@@ -122,6 +122,24 @@ def write_standing(rows: list[dict[str, str]]) -> None:
     write_csv(paths.STANDING_CSV, paths.STANDING_COLUMNS, rows)
 
 
+def read_snapshots(ext: str = "tsv") -> dict[str, str]:
+    """Every stored snapshot of one kind, keyed by source_id."""
+    if not paths.SNAPSHOTS.exists():
+        return {}
+    return {
+        path.stem: path.read_text(encoding="utf-8")
+        for path in sorted(paths.SNAPSHOTS.glob(f"*.{ext}"))
+    }
+
+
+def read_coverage() -> list[dict[str, str]]:
+    return read_csv(paths.COVERAGE_CSV, paths.COVERAGE_COLUMNS)
+
+
+def write_coverage(rows: list[dict[str, str]]) -> None:
+    write_csv(paths.COVERAGE_CSV, paths.COVERAGE_COLUMNS, rows)
+
+
 def read_last_discovery() -> str:
     path = paths.LAST_DISCOVERY
     return path.read_text(encoding="utf-8").strip() if path.exists() else ""

@@ -22,6 +22,7 @@ import sys
 
 import classify
 from deliver import digest, health, issue, urgency
+from jobs import coverage as cover
 from jobs import discovery as discover
 from core import clock, models, paths
 from enrich import bodies as enrich_bodies
@@ -366,12 +367,30 @@ def run(args: argparse.Namespace) -> int:
                 f"the weekly discovery pass failed: {type(exc).__name__}: {exc}"
             ]
 
+    # Coverage rides the same gate as discovery: weekly, in the run that mails. It is
+    # measured after discovery so a failure in either cannot take the other with it.
+    coverage_line = None
+    if (send and not args.dry_run and discover.due()) or args.force_discovery:
+        try:
+            todays = {
+                r.source_id: r.snapshot_text for r in results
+                if r.ok and r.snapshot_text is not None and r.snapshot_ext == "tsv"
+            }
+            with clients.build_web_client() as web:
+                scopes = cover.run(web, todays)
+            if not args.dry_run:
+                cover.record(scopes)
+            coverage_line = cover.line(scopes)
+        except Exception as exc:  # the digest must never be lost because this broke
+            discovery_notes.append(
+                f"the weekly coverage measurement failed: {type(exc).__name__}: {exc}")
+
     title, body = digest.render(
         judgments, metrics, by_id, suppressed_applied=suppressed_applied,
         suppressed_muted=suppressed_muted,
         discovery_lines=discovery_lines, status_only=status_only,
         enriched=bodies, filters=filters, usage=judged.usage,
-        pinned=judged.pinned,
+        pinned=judged.pinned, coverage_line=coverage_line,
     )
     for note in discovery_notes:
         body += f"\n- ⚠ {note}"
@@ -503,7 +522,7 @@ def render_only(args: argparse.Namespace) -> int:
     rather than live results, and why the screen tally and the spend are values on the
     artifacts rather than module globals.
 
-    One thing it cannot reproduce: the DISCOVERED section. The weekly pass is a
+    Two things it cannot reproduce: the DISCOVERED section and the weekly coverage line. The weekly pass is a
     separate job with its own network budget and it rides along in whichever run
     actually mails, so it is not in any artifact. Said here rather than left as a
     surprising absence.
