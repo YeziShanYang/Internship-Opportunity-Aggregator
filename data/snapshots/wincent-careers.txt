@@ -70,18 +70,18 @@ Ship fast. Ship often.
 A strategy can go from paper to production in a day or two. Speed is the system.
 How we work
 You own your work end to end. No micromanagement. You figure it out. We support you.
-It is OK to
+You can
 ✓ Move forward with imperfect information.
 ✓ Disagree with the CEO. He will think about it.
 ✓ Take risks. You are paid to.
-✓ Work remotely.
+✓ Work remotely in select roles and seniorities.
 ✓ Ask any colleague how anything works. Nothing is siloed.
-It is not OK to
-✕ Wait days for feedback.
+We don’t
+✕ Play politics.
 ✕ Hide behind process.
-✕ Protect turf or play politics.
+✕ Wait days for feedback.
 ✕ Make the same avoidable mistake twice.
-✕ Coast. The bar rises every quarter.
+✕ Settle for good enough. The bar rises every quarter.
 Compensation is public
 Every salary, every bonus, and every PnL number is visible internally.
 compensation.internal.sheet

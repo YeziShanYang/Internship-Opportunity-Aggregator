@@ -185,9 +185,6 @@ New York
 Executive Compensation and Employee Benefits Attorney : The D.&nbsp;E.&nbsp;Shaw group seeks a talented attorney to join its Legal & Compliance team to counsel the firm on a variety of legal matters primarily related to executive compensation&hellip;
 Legal &amp; Compliance
 New York
-Investment Management Legal Analyst : The D.&nbsp;E.&nbsp;Shaw group seeks an analyst to work closely with its team of attorneys who support the firm's investor facing activities and ensure those activities are conducted in&hellip;
-Legal &amp; Compliance
-New York
 Legal Analyst : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, detail-oriented legal analyst to join its Legal & Compliance team. This individual will collaborate closely with attorneys, contributing&hellip;
 Legal &amp; Compliance
 London
@@ -200,7 +197,7 @@ New York
 Cove Private Equity Deal Origination Specialist : The D.&nbsp;E.&nbsp;Shaw group seeks a motivated professional to join its Cove private equity team as a deal origination specialist. Cove is focused on acquiring and growing small- and&hellip;
 Professional Services
 Denver
-Ventures Platform Associate : The D.&nbsp;E.&nbsp;Shaw group seeks a ventures platform associate to join its expanding platform team. This is a ground-floor opportunity on a fast-growing platform, where the associate&hellip;
+Ventures Platform Associate (Denver) : The D.&nbsp;E.&nbsp;Shaw group seeks a ventures platform associate to join its expanding platform team. This is a ground-floor opportunity on a fast-growing platform, where the associate&hellip;
 Quantitative Strategies / Technology
 New York
 Applied AI Engineer : The D.&nbsp;E.&nbsp;Shaw group seeks exceptional software engineers with expertise in applied AI, AI agents, and agentic systems to join the firm. This role offers the chance to work&hellip;
@@ -228,6 +225,9 @@ Technical Product Manager - Macro : The D.&nbsp;E.&nbsp;Shaw group seeks a produ
 Quantitative Strategies
 New York
 All Positions in Quantitative Strategies : Are you looking for new challenges and collaborative problem-solving opportunities at the firm, but finding that the perfect role for you might not be currently available? If you’d like&hellip;
+Software Development / Technology
+New York
+Full-Stack Software Engineer : The D.&nbsp;E.&nbsp;Shaw group seeks a full stack engineer to join our Generative AI (GAI) Services team. This team develops and supports platforms and applications that enable GAI&hellip;
 Software Development / Technology
 New York
 Software Developer: Developer Experience : The D.&nbsp;E.&nbsp;Shaw group seeks talented software developers to join our Developer Experience team. This team is responsible for empowering software developers across the firm by&hellip;
@@ -299,6 +299,11 @@ The D.&nbsp;E.&nbsp;Shaw group seeks senior associate level individuals to work 
 Various
 New York
 Head of Engineering & AI, Healthcare RCM Platform : The D.&nbsp;E.&nbsp;Shaw group seeks an accomplished and hands-on head of engineering & AI to join Cove’s new healthcare revenue cycle management (RCM) platform. Cove, the firm’s&hellip;
+Various
+New York To apply for this job, please email
+your resume and the job title to recruitment-nyc@world.deshaw.com .
+Software Developer, Futures : Join our D.&nbsp;E.&nbsp;Shaw Futures team in New York.
+The D.&nbsp;E.&nbsp;Shaw group seeks software developers to join its Futures team, a quantitatively driven group focused on the&hellip;
 Various
 New York To apply for this job, please email
 your resume and the job title to recruitment-nyc@world.deshaw.com .

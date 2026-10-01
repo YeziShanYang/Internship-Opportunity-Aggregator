@@ -37,16 +37,18 @@ American Mathematical Society, AMS Prizes and Awards
 [ THESISALGEBRA27 ] George Lusztig Thesis Prize in Algebra &nbsp; (deadline 2026/07/31 11:59PM * )
 [ WHITEMAN27 ] Albert Leon Whiteman Memorial Prize &nbsp; (deadline 2026/05/31 11:59PM * )
 American Mathematical Society, Programs and Travel Grants
-[ BIRMAN27 ] The Joan and Joseph Birman Fellowship for the Advancement of Women Scholars &nbsp; Apply
-[ CENT27 ] AMS Centennial Fellowship &nbsp; Apply
-[ CLAYGIL27 ] Claytor-Gilmer Fellowship &nbsp; Apply
+[ BIRMAN27 ] The Joan and Joseph Birman Fellowship for the Advancement of Women Scholars &nbsp; (deadline 2026/09/30 11:59PM) &nbsp; Apply
+[ CENT27 ] AMS Centennial Fellowship &nbsp; (deadline 2026/09/30 11:59PM) &nbsp; Apply
+[ CLAYGIL27 ] Claytor-Gilmer Fellowship &nbsp; (deadline 2026/09/30 11:59PM) &nbsp; Apply
 [ GSTG27 ] Graduate Student Travel Grants to 2027 JMM &nbsp; Apply
-[ STEFBERG27 ] Stefan Bergman Fellowship &nbsp; Apply
+[ STEFBERG27 ] Stefan Bergman Fellowship &nbsp; (deadline 2026/09/30 11:59PM) &nbsp; Apply
 Association for Women in Mathematics
 [ 20263TRAVEL ] AWM - Mathematics Travel Grants &nbsp; Apply
 [ MICHLER2728 ] Ruth I Michler Memorial Prize &nbsp; Nominate
 Columbia University, Department of Mathematics
 [ GROW26 ] GROW 2026 &nbsp; (deadline 2026/09/23 11:59PM) &nbsp; Apply
+Duke University, Department of Mathematics
+[ PRUV2027 ] Program for Research for Undergraduates (PRUV) 2027 &nbsp; Apply
 IAS/Park City Mathematics Institute
 [ PCMIRFP28 ] PCMI Research Topic Proposal &nbsp; Apply
 Institute for Advanced Study, School of Mathematics
@@ -63,5 +65,5 @@ University of Minnesota Twin Cities, School of Mathematics
 [ UMNREU ] Mathematics of Soft Matter &nbsp; (deadline 2026/06/12 11:59PM) &nbsp; Apply
 Williams College, Mathematics and Statistics
 [ POLYMATHREU2027 ] Polymath Jr-REU2027 &nbsp; Apply
-(33 programs listed)
+(34 programs listed)
 &copy; 2026 MathPrograms.Org, American Mathematical Society. All Rights Reserved.

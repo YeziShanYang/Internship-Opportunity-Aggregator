@@ -110,42 +110,6 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1966
 Title:2027 Investment Banking Off-Cycle Internship - Benelux Team, Amsterdam (January - March)
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1961-2027-Human-Resources-Summer-Analyst-Program-Jersey-City-Compensation-and-Benefits/en-GB
-2027 Human Resources Summer Analyst Program – Jersey City, Compensation and Benefits
-<timestamp>
-<timestamp>
-ID:1961
-Title:2027 Human Resources Summer Analyst Program – Jersey City, Compensation and Benefits
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1943-2027-Financial-Controllers-Summer-Analyst-Program-New-York-and-Jersey-City/en-GB
-2027 Financial Controllers Summer Analyst Program – New York and Jersey City
-<timestamp>
-<timestamp>
-ID:1943
-Title:2027 Financial Controllers Summer Analyst Program – New York and Jersey City
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1944-2027-Internal-Audit-Summer-Analyst-Program-New-York/en-GB
-2027 Internal Audit Summer Analyst Program – New York
-<timestamp>
-<timestamp>
-ID:1944
-Title:2027 Internal Audit Summer Analyst Program – New York
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1945-2027-Marketing-Summer-Analyst-Program-New-York/en-GB
-2027 Marketing Summer Analyst Program – New York
-<timestamp>
-<timestamp>
-ID:1945
-Title:2027 Marketing Summer Analyst Program – New York
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1946-2027-Risk-Management-Summer-Internship-Program-New-York/en-GB
-2027 Risk Management Summer Internship Program – New York
-<timestamp>
-<timestamp>
-ID:1946
-Title:2027 Risk Management Summer Internship Program – New York
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1959-2027-Human-Resources-Summer-Analyst-Program-New-York-Campus-Recruiting/en-GB
-2027 Human Resources Summer Analyst Program – New York, Campus Recruiting
-<timestamp>
-<timestamp>
-ID:1959
-Title:2027 Human Resources Summer Analyst Program – New York, Campus Recruiting
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1792-2027-Investment-Banking-Summer-Internship-Programme-London/en-GB
 2027 Investment Banking Summer Internship Programme - London
 <timestamp>

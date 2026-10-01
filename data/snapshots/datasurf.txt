@@ -1,0 +1,133 @@
+Data Science Undergraduate Research Focus | Program in Data Science
+Skip to main content
+Stanford University
+Stanford
+Program in Data Science
+School of Humanities And Sciences
+Search
+Menu
+Home
+Academics Program Overview
+Data Science B.S.
+Toggle Data Science B.S.
+Subplans: Data Science B.S.
+Technical Electives (DataSci B.S.)
+Capstone (DataSci B.S.)
+Honors Program (DataSci B.S.)
+Toggle Honors Program (DataSci B.S.)
+Honors Proposal
+Data Science &amp; Social Systems B.A.
+Toggle Data Science &amp; Social Systems B.A.
+Pathways: Data Science &amp; Social Systems
+Data Science for Artistic and Cultural Analysis B.A.
+Toggle Data Science for Artistic and Cultural Analysis B.A.
+Pathways: Data Science for Artistic &amp; Cultural Analysis
+Data Science Minor
+Toggle Data Science Minor
+Planning Guide (Data Science Minor)
+How to Declare
+Forms &amp; Resources
+Toggle Forms &amp; Resources
+Past Requirements
+Transfer Credit
+Resources for International Students
+How to Graduate
+Frequently Asked Questions
+Toggle Frequently Asked Questions
+FAQ: Transition from MCS to Data Science
+Research &amp; Impact Get Involved in Research
+DataSURF Summer Program
+Toggle DataSURF Summer Program
+DataSURF Projects: Summer 2026
+Independent Research Project as Capstone
+Our Community Program Directors
+Program Steering Committee
+Faculty Advisors (DataSci B.S.)
+Faculty Advisors (DataSci &amp; Social Systems B.A.)
+Student Services
+Peer Advisors
+Toggle Peer Advisors
+Peer Advisor Office Hours
+Events &amp; News Listen. Engage. Connect.
+Upcoming Events
+Past Events
+News
+Opportunities
+Research &amp; Impact
+Get Involved in Research
+DataSURF Summer Program
+Toggle DataSURF Summer Program
+DataSURF Projects: Summer 2026
+Independent Research Project as Capstone
+Main content start
+Data Science Undergraduate Research Focus
+Data Science Undergraduate Research Focus (DataSURF) is a 10-week, in-person summer program that connects undergraduate students with faculty across campus conducting research involving data science. The 2026 program will run from June 22 to August 28, offering hands-on experience in applying data-driven methods to real-world projects.&nbsp;
+Please note: DataSURF was previously known as the Summer Undergraduate Research Program through the Statistics Department (SURP-Stats). The new name reflects our expanded project areas and audience across the data science community.
+[DataSURF] is a summer program where undergraduates work with faculty mentors on research in data science or statistics. I’d recommend it to students curious about any kind of quantitative research in general. It’s a great way to gain hands-on experience, learn new methods, and build connections with faculty and peers.
+2024 Participant
+Eligibility
+This research opportunity is for current Stanford University undergraduate students only. To participate, students must not have conferred their undergraduate degree (even if they are a coterm student).
+Students must be in the undergraduate (not graduate) tuition group to participate. Please refer to this Registrar webpage for details on when coterm students are switched to graduate tuition.
+To ensure that students are eligible, please review VPUE’s eligibility requirements .
+Stanford undergraduate students from any department who meet the prerequisites are encouraged to apply. Students in the Data Science (B.A. and B.S.) major will receive additional consideration.
+Students should have taken some coursework in math, probability, statistics, data science, and/or computer science. Some course examples include: DATASCI 112, 120, 154, 156, STATS 32, 60, 117, 118, 141, 191, 195, 200, 202, 217, 229, MATH 51-53, 104, 113, 151, CS 106A/B, 103, 107, 109, MS&amp;E 120, 125, 226.
+More specific prerequisite classes or skills are listed for each project.
+Projects
+Explore the projects for DataSURF 2026!
+Faculty mentors will select which students are a good match to join their project.
+Program Expectations
+Students should expect to do the following:
+Do research on campus (in person) for 35+ hours per week for a full 10 weeks during the summer. This should be your primary activity this quarter.
+Attend weekly community meetings, where students will informally share about their research experience and connect with their DataSURF cohort.
+Attend group meetings, talks, seminars, or professional development activities to learn about research (usually 1 or 2 per week).
+Prepare a poster and lightning talk, and present at a final poster session during the last week of the program.
+Stipend
+Students will receive a stipend of $8,500, with a needs-based supplement (of up to $1,500) for eligible students.
+How to Apply
+Apply Now for DataSURF 2026
+Students must be logged in through their Stanford account to access the application.
+Applications for DataSURF 2026 are due by February 8, 2026 at 11:59pm (PST).
+We strongly recommend that students concurrently apply to the Data Science for Social Good (DSSG) program to maximize opportunities. Those who would like to participate in DSSG need to complete a separate application, which is expected to open in winter 2026.
+Questions about DataSURF may be directed to datasciencemajor-inquiries [at] lists.stanford.edu ( datasciencemajor-inquiries[at]lists[dot]stanford[dot]edu ) .
+What are students saying about DataSURF?
+We surveyed participants from the summer 2023, 2024, and 2025 cohorts -- when the program was still known as SURP-Stats. Each year,&nbsp; all &nbsp;respondents reported that their research experience was intellectually interesting, meaningful, and beneficial, and they&nbsp; all&nbsp; said they would recommend SURP-Stats to a friend.
+SURP-Stats is a great way for people who have experience in data science in the classroom to get exposed to research. You end up learning a lot about what research is and how to go about it.
+-- 2025 Participant&nbsp;
+“[SURP-Stats] is a program to allow students to apply many of the statistical concepts they may have learned about (and some they haven't) to completely new situations that require more problem solving and understanding. I would recommend it to anyone who has an interest in any field that data science could be applied in, and it allows for people to gain real experience from a data-based side of whatever field they're working in.”&nbsp;
+-- 2023 Participant&nbsp;
+“SURP-Stats is a welcoming community that will support you while you work on your research project. It brings great opportunities to learn in the form of talks and getting to know your peers. I would recommend it to anyone interested in stats research, especially those exploring it for the first time.”
+-- 2024 Participant&nbsp;
+“SURP-Stats is a great opportunity to conduct statistical research and/or work on statistics-related projects under the supervision of a faculty mentor. Students interested in focusing deep into a particular subfield or continuously working on a specific project should apply to the program. A major benefit of the program is the cohort of students participating as well as the associated technical and general programming for the program, including multiple speaker sessions and a close relationship with the Data Science for Social Good program.”&nbsp;
+-- 2023 Participant&nbsp;
+“[SURP-Stats is] A great way to get an introduction to statistics research. I would recommend [it for] people who are not sure whether they want to study statistics/data science. It gives a great feel of what a project in the space looks like.”
+-- 2024 Participant
+I would describe SURP-Stats as an not only just a summer research opportunity, but also an experience that allows one to really learn more about data science techniques that benefit real world issues.
+-- 2025 Participant
+“Throughout the experience, I got better at reworking problems. Usually, your first approach doesn't work, and as the summer progressed, I got better at finding alternative angles to approach the problem. I also got better at formalizing my thoughts in writing.”&nbsp;
+-- 2023 Participant&nbsp;
+When asked about the best parts of the SURP-Stats experience, one student said, “Interacting with my mentor every week, attending talks, and meeting other students. Getting to know/hear from people was not only socially rewarding but also taught me a lot about many topics and the nature of doing research.”
+-- 2024 Participant&nbsp;
+Back to Top
+Contact Us
+390 Jane Stanford Way
+Stanford, CA 94305
+datasciencemajor-inquiries [at] lists.stanford.edu (datasciencemajor-inquiries[at]lists[dot]stanford[dot]edu)
+Campus Map
+Connect with Us
+Linkedin
+Instagram
+SUNet Login
+Stanford
+University
+Stanford Home
+Maps &amp; Directions
+Search Stanford
+Emergency Info
+Terms of Use
+Privacy
+Copyright
+Trademarks
+Non-Discrimination
+Accessibility
+&copy; Stanford University.
+&nbsp; Stanford, California 94305.
