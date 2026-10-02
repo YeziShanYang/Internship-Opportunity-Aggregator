@@ -1,0 +1,235 @@
+Best Internship Data & Analytics Jobs 2026 | Built In
+Companies Jobs Articles
+View All Jobs
+Join
+Log In
+For Employers
+= 0 ? availableJobTitleOptions[selectedJobTitleIndex] : jobSearchTerm)" x-on:keydown.arrow-down.prevent="nextJobTitle()" x-on:keydown.arrow-up.prevent="previousJobTitle()" @blur="onJobSearchBlur()" @focus="getJobTitles()" id="searchJobsInput" x-ref="searchJobsInput" type="text" class="flex-grow-1 border-0 pe-2xl form-control" aria-describedby="search" placeholder="Job Title, Company or Keyword">
+Job Title, Company or Keyword
+0" type="button" class="position-absolute d-flex align-items-center justify-content-center h-2xl w-2xl" style="right:3rem;">
+Remote / Hybrid
+Clear
+Skills
+Clear
+Apply
+New Jobs
+Clear
+Job Category
+Clear
+Clear
+0}" class="btn btn-outline-light rounded-4 fw-semibold fs-sm dropdown-toggle">
+Industry
+Clear
+0}"
+data-bs-toggle="offcanvas"
+data-bs-target="#allFiltersOffcanvas"
+aria-controls="offcanvasRight"
+aria-expanded="false">
+All Filters
+Reset
+Save Job Alert
+Save Alert
+Maximum of 25 job preferences reached.
+Top Internship Data &amp; Analytics Jobs
+Citadel
+Quantitative Research Engineer - PhD Intern (US)
+<age> Saved
+In-Office
+4 Locations
+5K-5K Hourly
+Internship
+5K-5K Hourly
+Internship
+Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
+As a PhD intern, you will design and develop software solutions for automated trading systems, collaborating closely with the Quantitative Research team.
+Top Skills:
+C&#x2B;&#x2B; Python R
+Spectrum
+2027 Summer Intern: Business Analyst
+<age> Saved
+In-Office
+Stamford, CT, USA
+31K-33K Annually
+Internship
+31K-33K Annually
+Internship
+Information Technology &#x2022; Internet of Things &#x2022; Mobile &#x2022; On-Demand &#x2022; Software
+Supports Business Assurance by analyzing order-to-cash financial datasets to identify billing discrepancies and revenue leakage. Performs root cause analysis, assesses customer and revenue impacts, develops corrective options, and presents findings with BI, Sales, and Operations teams. The intern also participates in professional development, networking, mentorship, cross-functional projects, and final presentations.
+Top Skills:
+Excel Python SQL
+MetLife
+2027 METx Data &amp; Analytics Internship Program
+<age> Saved
+Hybrid
+Cary, NC, USA
+28K-30K Hourly
+Internship
+28K-30K Hourly
+Internship
+Fintech &#x2022; Information Technology &#x2022; Insurance &#x2022; Financial Services &#x2022; Big Data Analytics
+Undergraduate interns will support data and analytics projects involving data pipelines, machine learning, generative AI, dashboards, reporting, data governance, process improvement, production support, and analytics solution development. Interns will collaborate cross-functionally, document data assets, validate data, and present project outcomes. The hybrid program requires approximately 40 hours weekly for ten weeks in Cary, North Carolina.
+Top Skills:
+Ataccama Azure Devops C# C&#x2B;&#x2B; Collibra Databricks Edc Git Azure Power BI Python Scala SQL Tableau
+Ibotta
+Business Intelligence Intern
+<age> Saved
+Hybrid
+Denver, CO, USA
+27-27 Hourly
+Internship
+27-27 Hourly
+Internship
+eCommerce &#x2022; Mobile &#x2022; Payments
+Business Intelligence Interns will conduct exploratory data analysis, create ad hoc reports, and support the development, migration, and improvement of dashboards using Looker and Databricks. They will gather requirements, build visualizations, test dashboard accuracy and usability, identify data inconsistencies, and document findings while collaborating with team members on business initiatives.
+Top Skills:
+Databricks Looker Power BI Python SQL Tableau
+Perchwell
+Data Analytics Engineering Intern
+<age> Saved
+In-Office
+New York, NY, USA
+12K-12K Annually
+Internship
+12K-12K Annually
+Internship
+Mobile &#x2022; Real Estate &#x2022; Software &#x2022; Database &#x2022; Analytics
+Summer data analytics engineering internship focused on profiling new MLS data, extending dbt models, building warehouse transformations, adding tests and documentation, defining metrics, and supporting semantic models and dashboards. The intern will own a project, collaborate with analytics and data engineers, product managers, and customer-facing teams, and deliver production-ready solutions. This is a full-time, fully in-person role in New York City from June 7 through August 13, 2027.
+Top Skills:
+BigQuery Dbt Git Looker Metabase Mode Pandas Python Rdbms Redshift Snowflake SQL Tableau
+New
+Cut your apply time in half.
+Use our AI Assistant to automatically fill your job applications.
+Use For Free
+JPMorganChase
+2027 Quantitative Research - Risk and Treasury - Summer Internship - Associate - United States
+<age> Saved
+Hybrid
+3 Locations
+Internship
+Internship
+Financial Services
+Summer internship in Quantitative Research for Risk and Treasury focusing on data analysis, backtesting, model development, validation, and software/tool improvement. Collaborate with teams to assess model soundness, design mathematical models and algorithms, optimize financial solutions across asset classes, and propose creative quantitative solutions.
+Top Skills:
+C&#x2B;&#x2B; Python
+Cencora
+Business Analytics Intern
+<age> Saved
+Remote
+Pennsylvania, USA
+38K-57K Annually
+Internship
+38K-57K Annually
+Internship
+Healthtech &#x2022; Logistics &#x2022; Pharmaceutical
+Supports Cencora’s enterprise data and analytics platform modernization by collecting and analyzing datasets, creating dashboards with BI tools, tracking KPIs, conducting ad hoc analyses, documenting findings, and contributing to CI/CD and self-service solution delivery. Collaborates with cross-functional stakeholders to provide actionable insights, improve processes, and support data-driven decisions for internal and customer-facing products.
+Top Skills:
+Ci/Cd Excel Power BI Salesforce SQL Tableau
+Cox Enterprises
+Cox Conserves Technical Intern - Summer 2027
+<age> Saved
+Hybrid
+Atlanta, GA, USA
+24-36 Hourly
+Internship
+24-36 Hourly
+Internship
+Artificial Intelligence &#x2022; Automotive &#x2022; Greentech &#x2022; Information Technology &#x2022; Machine Learning &#x2022; Software &#x2022; Cybersecurity
+Supports sustainability data analytics through AI proof-of-concepts, data pipeline and QA work, reporting, dashboard maintenance, data quality investigations, process automation, and documentation. The intern will help develop future-state pipelines, standardize reports, support environmental data collection, and ensure reporting aligns with sustainability standards. The role includes mentorship and hands-on experience with SQL, Python, visualization tools, cloud platforms, and environmental data.
+Top Skills:
+AI AWS Azure Data Pipelines Excel Microsoft Fabric MS Office Power BI Python Qa Reporting SQL Tableau
+Clearwater Analytics (CWAN)
+Data Management &amp; Reporting Intern
+<age> Saved
+Hybrid
+New York, NY, USA
+Internship
+Internship
+Fintech &#x2022; Software &#x2022; Financial Services
+Supports enterprise data management and reporting for an investment management SaaS platform. Responsibilities include maintaining investment datasets, preparing reports and dashboards, performing data quality checks, documenting data governance standards, supporting ad hoc analytics, and archiving reports for compliance. The intern collaborates across teams and gains experience in financial data, investment analytics, and enterprise data governance.
+Top Skills:
+Excel Power BI Python SQL Tableau
+Wipfli
+Data &amp; Analytics Consulting Internship - Summer 2027
+<age> Saved
+Remote or Hybrid
+Milwaukee, WI, USA
+32-32 Hourly
+Internship
+32-32 Hourly
+Internship
+Cloud &#x2022; Fintech &#x2022; Software &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Financial Services
+Supports consulting projects involving business intelligence system analysis, design, implementation, dashboard creation, data collection, dataset organization, data management, and business analysis. Interns use visualization tools to communicate insights, assist with client technology and process-improvement initiatives, and participate in training while collaborating with senior mentors and client teams.
+Top Skills:
+Power BI Python Qlik R SQL Tableau
+1
+2
+3
+4
+5
+...
+...
+47
+Let Your Resume Do The Work
+Upload your resume to be matched with jobs you're a great fit for.
+All Filters
+Early Applicant
+JobType
+New Jobs
+Job Category
+Experience
+Industry
+10" @click="showAllOffcanvasIndustryFilters = true">Show more
+Show less
+Company Name
+0}" x-ref="companyDropdownContainer"> = 0 ? availableCompanyOptions[selectedCompanyIndex] : null)" x-on:keydown.arrow-down.prevent="nextCompany()" x-on:keydown.arrow-up.prevent="previousCompany()" @blur="onCompanySearchBlur()" @focus="getCompanies()" type="text" name="companySearch" autocomplete="off" class="form-control ps-2xl pe-lg" id="companySearchInput" x-ref="companySearchInput" placeholder="Find Company">
+Find Company
+Company Size
+Reset
+View Results
+Sign up now
+Access later
+Create Free Account
+Already have an account?
+Log In
+Companies
+Jobs
+Tracker
+Articles
+More
+Join
+Log In
+Tech Jobs
+Companies
+Articles
+Remote
+Salaries
+Best Places To Work
+Tech Hubs
+Post Job
+© 2026 Built In. All rights reserved.
+About
+Our Story
+Careers
+Our Staff Writers
+Content Descriptions
+Get Involved
+Recruit With Built In
+Become an Expert Contributor
+Resources
+Customer Support
+Share Feedback
+Report a Bug
+Tech Job Tools + Career Resources
+Browse Jobs
+Tech A-Z
+Tech
+Hubs
+Our Sites
+© 2026 Built In. All rights reserved.
+Learning Lab User Agreement
+Accessibility Statement
+Copyright Policy
+Privacy Policy
+Terms of Use
+Your Privacy Choices/Cookie Settings
+CA Notice of Collection

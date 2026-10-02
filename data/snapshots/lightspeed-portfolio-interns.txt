@@ -2,7 +2,7 @@ Jobs at Lightspeed Venture Partners Companies | Lightspeed Venture Partners
 Menu 01 About 02 Team 03 Companies 04 Founder Experience 05 Stories 06 Launch 07 Research Hub
 Faction Gaming LP Login Events Lighthouse Contact Portfolio Jobs
 Careers
-518 companies. 16,521 jobs.
+518 companies. 16,543 jobs.
 Jobs Companies
 Filter jobs by skills and more
 Roles
@@ -30,26 +30,28 @@ Los Angeles Posted <age>
 Operations
 Defense &amp; Space, Manufacturing
 Seed, 10–100 employees
-Interviews ERP Supply Chain Management Advisor Spacecraft Finance SAP Compliance Export Controls SQL
+SQL ERP Supply Chain Management Export Controls Advisor SAP Interviews Compliance Finance Spacecraft
 Apply
-#LI-DNI Amca Engineering Internship, Supply Chain (Summer 2027)
-El Segundo, CA Posted <age>
-Supply Chain
+#LI-DNI Amca Electrical Engineering Internship (Winter Spring 2027)
+Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
+Similar jobs pay USD 35,000 - 85,000 / year
+El Segundo, CA Posted less than 1 day ago
+Engineering
 Series A, 10–100 employees
-GD&amp;T Supply Chain Engineering PCBA Supply Chain Management Aerospace Supplier Quality Infrastructure Aviation Vehicles Quality Assurance
+Spring Robotics Vehicles Aerospace Troubleshooting Infrastructure Team Leadership EDA Quality Assurance Electrical Design
 Apply
 #LI-DNI Manex AI Founders Associate Intern - People &amp; Talent (f/m/d)
 Munich, Bavaria, Germany, Munich Posted <age>
 Leadership
 AI, Enterprise Software
 Seed, 10–100 employees
-Interviews Artificial Intelligence Voter Targeting/Outreach LinkedIn Marketing Employer Branding Recruiting
+Employer Branding LinkedIn Marketing Interviews Voter Targeting/Outreach Artificial Intelligence Recruiting
 Apply
 #LI-DNI Amca Sourcing Intern, Supply Chain (Summer 2027)
 El Segundo Posted <age>
 Supply Chain
 Series A, 10–100 employees
-PCBA Supply Chain Management Procurement Infrastructure Aviation Vehicles Quality Assurance Coatings Machining Prototyping
+PCBA Aviation Machining Vehicles Supply Chain Management Infrastructure Prototyping C Quality Assurance Procurement
 Apply
 #LI-DNI Amca Growth Internship (Summer 2027)
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -57,7 +59,13 @@ Similar jobs pay USD 40,000 - 100,000 / year
 El Segundo, CA Posted <age>
 Growth
 Series A, 10–100 employees
-Visual Design Cancer Biology Infrastructure Business Development Mergers &amp; Acquisitions Aviation Vehicles Quality Assurance Research Prototyping
+Visual Design Aviation Vehicles Mergers &amp; Acquisitions Cancer Biology Infrastructure Prototyping Research Quality Assurance Business Development
+Apply
+#LI-DNI Amca Engineering Internship, Supply Chain (Summer 2027)
+El Segundo, CA Posted <age>
+Supply Chain
+Series A, 10–100 employees
+PCBA Aviation Aerospace Vehicles Supply Chain Engineering Supply Chain Management Infrastructure GD&amp;T Quality Management Prototyping
 Apply
 #LI-DNI Amca Software Engineering Internship (Summer 2027)
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -65,13 +73,13 @@ Similar jobs pay USD 45,000 - 115,000 / year
 El Segundo, CA Posted <age>
 Software
 Series A, 10–100 employees
-Avionics Aviation Vehicles Quality Assurance Prototyping Infrastructure
+Aviation Vehicles Infrastructure Prototyping Quality Assurance Avionics
 Apply
 #LI-DNI Amca Production Operations Internship (Summer 2027)
 El Segundo, CA Posted <age>
 Production Operations
 Series A, 10–100 employees
-Infrastructure Aviation Vehicles Quality Assurance Machining Prototyping Avionics
+Aviation Machining Vehicles Infrastructure Prototyping Quality Assurance Avionics
 Apply
 #LI-DNI Amca Mechanical Engineering Intern (Summer 2027)
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -79,13 +87,7 @@ Similar jobs pay USD 40,000 - 85,000 / year
 El Segundo, CA Posted <age>
 Engineering
 Series A, 10–100 employees
-Quality Assurance Troubleshooting Aviation Manufacturing Engineering Finite Element Analysis Infrastructure Team Leadership NX Vehicles Thermodynamics
-Apply
-#LI-DNI Amca Engineering Internship, Business Operations (Summer 2027)
-El Segundo, CA Posted <age>
-Business Operations
-Series A, 10–100 employees
-Business Operations Cancer Biology DoD Aerospace Attention to Detail Procurement Government Contracting
+Aviation Manufacturing Engineering Physics Solid Mechanics Aerospace Infrastructure Avionics NX Troubleshooting GD&amp;T
 Apply
 #LI-DNI Amca Electrical Engineering Internship (Summer 2027)
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -93,7 +95,7 @@ Similar jobs pay USD 35,000 - 85,000 / year
 El Segundo, CA Posted <age>
 Engineering
 Series A, 10–100 employees
-Team Leadership PCB design Aerospace Infrastructure Aviation Electrical Design Electronic circuit simulation Vehicles Quality Assurance Firmware
+KiCad Aviation Robotics Vehicles Aerospace Troubleshooting Infrastructure Prototyping Team Leadership Quality Assurance
 Apply
 #LI-DNI Amca Business Operations Internship (Summer 2027)
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -101,7 +103,13 @@ Similar jobs pay USD 45,000 - 150,000 / year
 El Segundo, CA Posted <age>
 Business Operations
 Series A, 10–100 employees
-Business Operations Cancer Biology DoD Aerospace Attention to Detail Procurement Government Contracting
+DoD Business Operations Aerospace Cancer Biology Attention to Detail Government Contracting Procurement
+Apply
+#LI-DNI Amca Engineering Internship, Business Operations (Summer 2027)
+El Segundo, CA Posted <age>
+Business Operations
+Series A, 10–100 employees
+DoD Business Operations Aerospace Cancer Biology Attention to Detail Government Contracting Procurement
 Apply
 #LI-DNI Skild AI Social Media Intern
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -110,7 +118,7 @@ San Mateo Posted <age>
 Marketing
 AI, Research
 Growth, 10–100 employees
-Data Driven Artificial Intelligence Machine Learning Social Media Robotics
+Machine Learning Robotics Data Driven Artificial Intelligence Social Media
 Apply
 #LI-DNI Airbound Mechanical Engineer - Internship
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -119,7 +127,7 @@ Hoskote, Bangalore, Karnataka , India, Bangalore Posted <age>
 Research &amp; Development
 Logistics and Supply Chain
 Seed, 10–100 employees
-Drones Aerospace Budgeting System Design Sketch App Goods Hardware Engineering Tolerance Analysis Prototyping Assembly
+Drones Goods Hardware Engineering Concept Design Robotics Sketch App Aerospace System Design Prototyping Budgeting
 Apply
 #LI-DNI K2 Space Simulation Software Engineering Intern - Summer 2027
 Always confirm salary details from the job posting.
@@ -128,14 +136,7 @@ Los Angeles Posted <age>
 GNC
 Defense &amp; Space, Manufacturing
 Seed, 10–100 employees
-Interviews Systems Programming Mechanics Quality Assurance SciPy Compliance CI/CD Linux Advisor Julia
-Apply
-#LI-DNI Cylake Security Research Intern (2027 Masters/PhD)
-Sunnyvale, California, United States, Sunnyvale Posted <age>
-Engineering
-AI, Computer &amp; Network Security
-Seed, 10–100 employees
-Security Research Threat Hunting Research Early-Stage Network Security
+Statistics Systems Programming Export Controls Interviews Spacecraft Signal Processing NumPy Matlab Linux CI/CD
 Apply
 Show more jobs Back to top
 Share these results

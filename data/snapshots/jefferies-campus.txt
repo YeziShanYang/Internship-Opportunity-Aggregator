@@ -128,12 +128,12 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1928
 Title:2027 Private Credit Investment Summer Internship Programme - London
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1930-2027-Equities-Sales-and-Trading-Summer-Internship-Programme-London/en-GB
-2027 Equities Sales and Trading Summer Internship Programme - London
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1930-2027-Equity-Sales-and-Trading-Summer-Internship-Programme-London/en-GB
+2027 Equity Sales and Trading Summer Internship Programme - London
 <timestamp>
 <timestamp>
 ID:1930
-Title:2027 Equities Sales and Trading Summer Internship Programme - London
+Title:2027 Equity Sales and Trading Summer Internship Programme - London
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1933-2027-Equity-Research-Spring-Week-Programme-London/en-GB
 2027 Equity Research Spring Week Programme - London
 <timestamp>
@@ -290,12 +290,12 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1832
 Title:2027 Investment Banking Internship – Frankfurt, M&amp;A (Q2 - Q4)
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1833-2027-Investment-Banking-Internship-Frankfurt-Equity-Capital-Markets-ALL-INTAKES/en-GB
-2027 Investment Banking Internship – Frankfurt, Equity Capital Markets (ALL INTAKES)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1833-2027-Investment-Banking-Internship-Frankfurt-Equity-Capital-Markets-July-October-Start-Dates/en-GB
+2027 Investment Banking Internship – Frankfurt, Equity Capital Markets (July / October Start Dates)
 <timestamp>
 <timestamp>
 ID:1833
-Title:2027 Investment Banking Internship – Frankfurt, Equity Capital Markets (ALL INTAKES)
+Title:2027 Investment Banking Internship – Frankfurt, Equity Capital Markets (July / October Start Dates)
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1814-2027-Summer-Analyst-Program-Investment-Banking-Hong-Kong/en-GB
 2027 Summer Analyst Program - Investment Banking - Hong Kong
 <timestamp>
