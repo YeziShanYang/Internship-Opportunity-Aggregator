@@ -29,8 +29,6 @@ Stanford University October 6, 2026 Career Fair
 Auburn University October 8, 2026 Info-session
 New York University October 15, 2026 OCR
 University of Chicago October 2026 Info-session
-University of Chicago October 2026 OCR
-Northwestern University October 2026 OCR
 Drexel University December 2026 OCR
 * Please note, the schedule is subject to change .
 Below is a list of the current job openings with our company. Click on the job title to learn more about the opening. (Please note- You must be an active student in order to be considered for an internship.)
@@ -40,6 +38,7 @@ Desktop Engineer Intern
 Office Manager Intern
 Project Manager
 Quantitative Researcher
+Senior Data Engineer
 Software Developer Intern
 Software Software Engineer
 Senior Quantitative Developer

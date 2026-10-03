@@ -28,7 +28,14 @@ Powered by Consider
 10-100 employees, 1-10 employees
 Internships only
 Clear filters
-21 jobs
+22 jobs
+#LI-DNI Deep Infra Software Engineer Intern - Sofia, Bulgaria
+Sofia Posted less than 1 day ago
+Engineering
+AI
+Seed, 10–100 employees
+SciPy Python TensorFlow Pandas Machine Learning Version Control Systems NumPy PyTorch Design Patterns Algorithms and Data Structures
+Apply
 #LI-DNI Skild AI Social Media Intern
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
 Similar jobs pay USD 30,000 - 40,000 / year
@@ -36,43 +43,7 @@ San Mateo Posted <age>
 Marketing
 AI, Research
 Growth, 10–100 employees
-Machine Learning Robotics Data Driven Artificial Intelligence Social Media
-Apply
-#LI-DNI Revel Internship: Software Engineer, Test
-Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
-Similar jobs pay USD 45,000 - 115,000 / year
-Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
-Internship
-Hardware, Manufacturing
-Growth, 10–100 employees
-Department of State Physics Artificial Intelligence Automation Rust Test Equipment Robotics Aerospace Embedded Systems Jenkins
-Apply
-#LI-DNI Revel Internship: Forward Deployed Engineer, Test
-Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
-Similar jobs pay USD 45,000 - 95,000 / year
-Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
-Internship
-Hardware, Manufacturing
-Growth, 10–100 employees
-Department of State Test Automation Rust Test Equipment Physics Robotics Aerospace C/C++ Embedded Systems Software Testing
-Apply
-#LI-DNI Revel Internship: Full Stack Software Engineer
-Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
-Similar jobs pay USD 45,000 - 115,000 / year
-Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
-Internship
-Hardware, Manufacturing
-Growth, 10–100 employees
-Department of State JavaScript SQL Application Development Artificial Intelligence Rust Robotics Aerospace TypeScript Full Stack Development
-Apply
-#LI-DNI Revel Internship: Embedded Software Engineer
-Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
-Similar jobs pay USD 45,000 - 100,000 / year
-Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
-Internship
-Hardware, Manufacturing
-Growth, 10–100 employees
-Industrial Automation Rust Robotics Computer Architecture Aerospace Systems Programming C/C++ Operating Systems Networking Technologies Research
+Social Media Machine Learning Data Driven Robotics Artificial Intelligence
 Apply
 #LI-DNI Revel Internship: Forward Deployed Engineer, Software
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -81,7 +52,43 @@ Los Angeles, California, United States, San Francisco, California, United States
 Internship
 Hardware, Manufacturing
 Growth, 10–100 employees
-Industrial Automation Department of State Test Equipment Build Automation Software Robotics Aerospace C/C++ Embedded Systems C Sensors
+Python Embedded Systems Artificial Intelligence C/C++ Department of State C Test Equipment Data Acquisition Robotics Build Automation Software
+Apply
+#LI-DNI Revel Internship: Embedded Software Engineer
+Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
+Similar jobs pay USD 45,000 - 100,000 / year
+Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
+Internship
+Hardware, Manufacturing
+Growth, 10–100 employees
+Embedded Software Linux Computer Architecture Communication Protocols C/C++ C Systems Programming Robotics Networking Technologies Operating Systems
+Apply
+#LI-DNI Revel Internship: Full Stack Software Engineer
+Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
+Similar jobs pay USD 45,000 - 115,000 / year
+Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
+Internship
+Hardware, Manufacturing
+Growth, 10–100 employees
+Web Services Next.js Robotics C/C++ Databases SQL Research Application Software Python JavaScript
+Apply
+#LI-DNI Revel Internship: Forward Deployed Engineer, Test
+Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
+Similar jobs pay USD 45,000 - 95,000 / year
+Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
+Internship
+Hardware, Manufacturing
+Growth, 10–100 employees
+Python Physics Embedded Systems Rust C/C++ Department of State C Software Testing Test Equipment Data Acquisition
+Apply
+#LI-DNI Revel Internship: Software Engineer, Test
+Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
+Similar jobs pay USD 45,000 - 115,000 / year
+Los Angeles, California, United States, San Francisco, California, United States, Los Angeles, San Francisco Posted <age>
+Internship
+Hardware, Manufacturing
+Growth, 10–100 employees
+Linux Version Control Systems Robotics Docker Infrastructure Embedded Systems C/C++ Quality Assurance Microcontrollers Research
 Apply
 #LI-DNI Deep Infra Software Engineer Intern (US)
 Always confirm salary details from the job posting.
@@ -90,14 +97,14 @@ Palo Alto, CA, USA Posted 30+ days ago
 Engineering
 AI
 Seed, 10–100 employees
-PyTorch Pandas Machine Learning NumPy Design Patterns Git Version Control Systems TensorFlow Cross-functional Team Leadership Artificial Intelligence
+SciPy Python TensorFlow Pandas Machine Learning Version Control Systems NumPy PyTorch Design Patterns Algorithms and Data Structures
 Apply
 #LI-DNI Periodic Labs Research Intern, Thin Films
 Menlo Park, California, United States, Menlo Park, CA Posted 30+ days ago
 Science
 AI, Research
 Series A, 10–100 employees
-Photonics Good Lab Practice MEMS Optics Process Flow Documentation Sputtering Research SEM Sensors Characterization
+MEMS Thin Films Photonics SEM Optics Optoelectronics Semiconductor Devices Sputtering Nanofabrication Good Lab Practice
 Apply
 #LI-DNI Simular GTM Intern, Content &amp; Distribution
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -106,14 +113,14 @@ Remote, Hybrid Palo Alto, California, United States, Palo Alto, Remote, Singapor
 Go-to-Market
 AI
 Series A, 10–100 employees
-Motion Graphics Marketing Strategy Organizing Newsletters Artificial Intelligence Video Editing
+Video Editing Newsletters Organizing Marketing Strategy Motion Graphics Artificial Intelligence
 Apply
 #LI-DNI Deep Infra Software Engineer Intern (Europe)
 Remote EU Remote Posted 30+ days ago
 Engineering
 AI
 Seed, 10–100 employees
-PyTorch Pandas Machine Learning NumPy Design Patterns Git Version Control Systems TensorFlow Cross-functional Team Leadership Artificial Intelligence
+SciPy Python TensorFlow Pandas Machine Learning Version Control Systems NumPy PyTorch Design Patterns Algorithms and Data Structures
 Apply
 #LI-DNI Simular GTM Intern, Growth Operations
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -122,14 +129,14 @@ Remote, Hybrid Palo Alto, California, United States, Palo Alto, Remote, Singapor
 Go-to-Market
 AI
 Series A, 10–100 employees
-Analytics Attention to Detail Marketing Strategy Salesforce CRM HubSpot Automation
+Automation HubSpot Marketing Strategy CRM Analytics Attention to Detail Salesforce
 Apply
 #LI-DNI Simular People &amp; Operations Intern
 Singapore, Singapore, Singapore Posted 30+ days ago
 Corporate
 AI
 Series A, 10–100 employees
-Early-Stage Attention to Detail Organizing Job Fairs Interviews Compliance Logistics Onboarding Artificial Intelligence Recruiting
+Interviews Logistics Organizing Recruiting Job Fairs Early-Stage Compliance Onboarding Attention to Detail Resume Screening
 Apply
 #LI-DNI BREVIAN Software Engineering Intern
 Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
@@ -137,22 +144,13 @@ Similar jobs pay USD 45,000 - 115,000 / year
 Sunnyvale, CA Posted 30+ days ago
 AI, Enterprise Software
 Seed, 1–10 employees
-Data Engineering Amazon Web Services Quality Assurance Big Data SDLC Version Control Systems Apache Kafka
+SDLC Data Engineering Amazon Web Services Version Control Systems Quality Assurance Apache Kafka Big Data
 Apply
 #LI-DNI BREVIAN UX Intern
 Sunnyvale, CA Posted 30+ days ago
 AI, Enterprise Software
 Seed, 1–10 employees
-User Experience Design Usability Testing User Research Prototyping
-Apply
-#LI-DNI Simular GTM Intern, Strategy &amp; Operations
-Based on jobs posted for similar roles and locations by various companies. The actual compensation will be determined by the employer.
-Similar jobs pay USD 40,000 - 290,000 / year
-Remote Palo Alto, California, United States, Remote, Singapore, Singapore, Palo Alto, Remote and 1 other Posted 30+ days ago
-Go-to-Market
-AI
-Series A, 10–100 employees
-Research Analytics Tools Spreadsheets Marketing Strategy
+Usability Testing User Research Prototyping User Experience Design
 Apply
 Show more jobs Back to top
 Share these results
