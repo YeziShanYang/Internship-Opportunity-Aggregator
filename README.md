@@ -30,8 +30,8 @@ Opportunity digest — 2026-09-20
 
 <details><summary>■ RULED OUT (2)</summary>
 
-- Axiom Space / Software Engineer Intern — requires junior standing: "rising junior"
-- Thrivent / Associate SWE - Junior Intern Summer 2027 — "Junior Intern Summer 2027"
+- Axiom Space / Software Engineer Intern — juniors and above
+- Waymo / 2027 Summer Intern, MS/PhD — graduate students only
 
 </details>
 
@@ -198,7 +198,7 @@ without anyone noticing, and that has already happened twice here.
 | `MIN_ABSOLUTE_CHARS` | $500$ | The other content floor. A page under this didn't really load. |
 | `SHRINK_RATIO` | $0.4$ | A page that drops below 40% of its last good size is a redesign or a block, not a quiet day. Self-calibrating, so there's no per-source constant to rot. |
 | `MAX_ISSUE_BODY_CHARS` | $65{,}536$ | GitHub's hard limit. Exceed it and the POST 422s and opens *nothing*. |
-| `MAX_CLASSIFICATIONS_PER_RUN` | $250$ | Spend ceiling. The worst day observed was 162 changes. |
+| `MAX_CLASSIFICATIONS_PER_RUN` | $250$ | Spend ceiling, counted after the deterministic screen. The worst day observed was 243 model calls (2026-10-03). |
 | `CLASSIFY_REASONING_EFFORT` | `low` | Was `minimal`; see [Reflection](#the-model-needed-room-to-think). |
 | `REQUEST_DELAY_SECONDS` | $1.0$ | Requests are serialised and identify themselves. Nothing is hammered. |
 

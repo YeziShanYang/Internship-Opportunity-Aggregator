@@ -860,6 +860,22 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(to_classify, [change], "low-signal rows must be classified now")
         self.assertEqual(summarise_only, [])
 
+    def test_14_7a_the_cap_counts_model_calls_not_screened_rows(self):
+        """2026-10-03: the cap was applied before the screen, so 61 of its 250 slots went
+        to rows the screen then settled for free and 54 rows reached the digest
+        unverified. A screened row must not use up a classification."""
+        changes = [self._change(key=f"Co{i} / SWE Intern") for i in range(4)]
+        for i, change in enumerate(changes):
+            change.change_id = f"c{i}"
+        verdicts = {c.change_id: screen.rules.Verdict(why="w", rule="graduate-only")
+                    for c in changes[:2]}
+        with unittest.mock.patch.object(classify, "MAX_CLASSIFICATIONS_PER_RUN", 2), \
+                unittest.mock.patch.object(classify, "select_provider", return_value=None):
+            judged = classify.classify(changes, {"simplify-2027": self.SOURCE}, {}, verdicts)
+        outcomes = sorted(j.outcome for j in judged.judgments)
+        self.assertNotIn(models.OVER_BUDGET, outcomes)
+        self.assertEqual(outcomes.count(models.SCREENED), 2)
+
     def test_14_7b_posting_url_prefers_the_posting_over_the_company_page(self):
         """/c/ is a company listing; only /p/ carries this role's requirements.
 
@@ -2472,42 +2488,41 @@ class CircuitBreakerTests(_IsolatedState, unittest.TestCase):
 
 
 class RuledOutBlockTests(_IsolatedState, unittest.TestCase):
-    """RULED OUT grew into 52% of the digest, so it is split by what it can be wrong about.
+    """RULED OUT prints each row with its reason in a few words, not a sentence.
 
-    On 2026-09-15 the block held 123 rows and 33,797 characters -- larger than the
-    opportunities table -- and nine real opportunities were trimmed out of the table to
-    make room for it. 65 of those rows were eligibility calls, which quote a phrase from
-    the posting and have been reliable; 58 were rule 8's judgement of value, which got
-    Figma, Robinhood and Datadog wrong. The two deserve different amounts of space.
+    On 2026-10-03 the block held 145 rows and 39,494 characters at a median of 271 a
+    row, the largest block in the digest. The model now writes a two-to-five-word phrase
+    when it rules a row out, and a screen rule-out prints as its rule's label.
     """
 
-    def _ruled(self, why, kind):
+    def _ruled(self, why, kind, rule=""):
         return models.Judgment(
             change=models.Change(source_id="s", kind="added",
                                  key="Acme / SWE Intern", detail="x"),
-            relevant=False, outcome=models.MODEL, why=why, ruled_out_by=kind)
+            relevant=False, outcome=models.SCREENED if rule else models.MODEL,
+            why=why, ruled_out_by=kind, screen_rule=rule)
 
-    WORDY = ('Posting states a graduation window this owner (class of 2030) cannot '
-             'meet: "graduating between December 2027 and August 2028"')
+    def test_a_model_rule_out_prints_its_phrase_as_it_stands(self):
+        line = digest._ruled_out_line(self._ruled("master's program", digest.ELIGIBILITY))
+        self.assertEqual(line, "- **Acme / SWE Intern** — master's program")
 
-    def test_an_eligibility_rule_out_keeps_only_the_quoted_phrase(self):
-        """The phrase from the posting is the whole of the evidence."""
-        line = digest._ruled_out_line(self._ruled(self.WORDY, digest.ELIGIBILITY))
-        self.assertIn("graduating between December 2027 and August 2028", line)
-        self.assertNotIn("class of 2030", line, "the wrapper sentence repeats the header")
-        self.assertLess(len(line), len(self.WORDY), "the point is that it is shorter")
+    def test_a_screen_rule_out_prints_its_rule_label_not_the_quote(self):
+        why = ('Posting states a graduation window that closes before June 2030: '
+               '"graduating between December 2027 and August 2028"')
+        line = digest._ruled_out_line(self._ruled(why, "", "graduation-window"))
+        self.assertEqual(line, "- **Acme / SWE Intern** — graduates before 2030")
 
-    def test_a_value_rule_out_keeps_its_full_reasoning(self):
-        """Rule 8 is a judgement and it has been wrong, so it stays arguable."""
-        why = ("Posting is a generic Software Engineer Intern at EquipmentShare, a "
-               "construction equipment firm with no notable software reputation")
-        line = digest._ruled_out_line(self._ruled(why, digest.VALUE))
-        self.assertIn(why, line)
+    def test_a_title_rule_out_names_the_field_it_matched(self):
+        why = ('Title names a field outside quant/maths/software ("Civil Engineering") '
+               "and nothing technical: Civil Engineering Intern")
+        line = digest._ruled_out_line(self._ruled(why, "", "out-of-field-title"))
+        self.assertEqual(line, "- **Acme / SWE Intern** — Civil Engineering role")
 
-    def test_an_unlabelled_rule_out_is_printed_in_full(self):
-        """Conservative: an unlabelled row might be the arguable kind."""
-        line = digest._ruled_out_line(self._ruled(self.WORDY, ""))
-        self.assertIn("class of 2030", line)
+    def test_every_screen_rule_has_a_short_label(self):
+        """A rule added to the screen without a label would print its long quote."""
+        rules = set(re.findall(r'rule="([a-z-]+)"', pathlib.Path(
+            screen.rules.__file__).read_text(encoding="utf-8")))
+        self.assertEqual(rules - set(digest._SCREEN_LABELS), {"out-of-field-title"})
 
     def test_value_rule_outs_are_listed_first(self):
         """Whoever opens the block is usually opening it to disagree with one."""

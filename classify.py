@@ -130,7 +130,7 @@ Rules, in priority order:
    "penultimate year", "third or fourth year", "junior or senior standing", "completed
    sophomore year", a Master's or PhD program, or a graduation window that closes before
    June 2030 (2027, 2028 or 2029) -- set relevant: false and
-   quote the exact phrase in `why`. Measured: about a third of these postings carry
+   name the gate in `why` in a few words: "rising juniors only", "master's program". Measured: about a third of these postings carry
    such a gate, so this is the filter that does the most work.
    Absence of a gate is NOT a reason to rule out. "Currently enrolled in a Bachelor's
    degree program" includes a first-year: that is relevant: true.
@@ -168,8 +168,9 @@ Rules, in priority order:
    contractor, an aerospace or industrial conglomerate, a utility, an insurer, a
    government-services contractor, a retail or manufacturing corporation -- when the
    posting does not say it is open to first- or second-years. Those programmes run
-   through junior-year recruiting pipelines. Name the employer and say what it does in
-   `why`, so the call can be audited and argued with.
+   through junior-year recruiting pipelines. Say what kind of employer it is in `why`,
+   in a few words -- "large defence contractor", "large insurer" -- so the call can be
+   audited and argued with.
 
    This is a judgement of value and not of eligibility, so it is the one rule where you
    should NOT err toward keeping. It is safe to be decisive because a ruled-out row is
@@ -180,8 +181,13 @@ If the POSTING TEXT is missing or a fetch error is noted, you are judging on a j
 title alone. Say so in `why`, use confidence "low", and do NOT rule the item out on
 class-year grounds -- you have not seen the requirements.
 
-`why` must be one sentence and must name the specific reason -- the class year, the
-identity gate, the deadline -- not a generic statement of interest.
+`why` must name the specific reason -- the class year, the identity gate, the
+deadline -- not a generic statement of interest. When relevant is false it is printed
+verbatim in the digest's RULED OUT list, so it must be a phrase of two to five words and
+never a sentence: "master's program", "rising juniors only", "graduating 2028", "civil
+engineering role", "Canada only", "large insurer", "hardware role (title only)". The
+phrase only reports the reason; it does not change which items are ruled out. When
+relevant is true, `why` is one sentence.
 
 The fields below are read straight off the POSTING TEXT and rendered as their own
 bullets in the digest, so each must stand alone without `why` for context. Report what
@@ -666,16 +672,6 @@ def classify(
     argument for the same reason: the loop and its tally used to be a module global
     here, which is concretely why `run.py render` could not run on its own.
     """
-    to_classify, summarise_only = triage(changes, sources)
-    # The `why` here used to say "low-signal source and the row did not match the
-    # underclassman or rolling-firm filters", which stopped being true when triage
-    # stopped bypassing low-signal sources. This list is now only ever the overflow
-    # past MAX_CLASSIFICATIONS_PER_RUN, so that is what it says.
-    judgments = [
-        Judgment.over_budget(change, MAX_CLASSIFICATIONS_PER_RUN)
-        for change in summarise_only
-    ]
-
     reset_usage()
 
     # The posting text is read by the deterministic screen as well as by the model, and
@@ -691,16 +687,28 @@ def classify(
     # The screen runs as its own stage. If this caller did not run it, run it here
     # rather than skipping it: it costs nothing, it works without a provider, and
     # skipping it would send changes to the model that a quoted phrase already settles.
-    settled = screen.apply(to_classify, table) if verdicts is None else verdicts
+    settled = screen.apply(changes, table) if verdicts is None else verdicts
 
-    to_judge: list[models.Change] = []
-    for change in to_classify:
+    judgments: list[Judgment] = []
+    unsettled: list[models.Change] = []
+    for change in changes:
         verdict = settled.get(change.change_id)
         if verdict is None:
-            to_judge.append(change)
+            unsettled.append(change)
             continue
         judgments.append(Judgment.from_screen(
             change, why=verdict.why, rule=verdict.rule, version=verdict.version))
+
+    # The cap counts model calls, so it is applied after the screen and not before.
+    # On 2026-10-03 it was applied to all 304 changes: 61 of the 250 slots went to rows
+    # the screen then settled for free, and 54 rows reached the digest unverified while
+    # only 197 calls were made. This list is only ever the overflow past
+    # MAX_CLASSIFICATIONS_PER_RUN, so that is what its `why` says.
+    to_judge, summarise_only = triage(unsettled, sources)
+    judgments += [
+        Judgment.over_budget(change, MAX_CLASSIFICATIONS_PER_RUN)
+        for change in summarise_only
+    ]
 
     provider = select_provider()
     if provider is None:

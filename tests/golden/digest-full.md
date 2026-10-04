@@ -19,9 +19,9 @@ Opportunity digest — 2026-09-12
 
 <details><summary>■ RULED OUT (1)</summary>
 
-_Read and judged out of scope. Expand to audit; a wrong call here is the expensive kind, so the reasons are shown rather than hidden. A row ruled out on **value** — it could be applied to, but the role is not worth a morning — carries its full reasoning, because that is a judgement and it has been wrong. A row ruled out on **eligibility** carries the phrase from the posting that did it, which is the whole of the evidence._
+_Read and judged out of scope, with the reason in a few words._
 
-- **Senior Platform Engineer @ Remote** — Posting requires junior standing or above; this owner is a rising sophomore for Summer 2027: "rising junior"
+- **Senior Platform Engineer @ Remote** — juniors and above
 
 </details>
 

@@ -202,8 +202,7 @@ def _notes(judgment: models.Judgment) -> str:
     looking at repeats what its appearance in the digest already says.
     It was also the longest bullet by a wide margin. `why` is still requested, still
     stored on the Judgment, still in the artifacts and the state commit, and still
-    printed in full in RULED OUT -- where the row's presence proves the opposite and the
-    reasoning is the entire point.
+    printed in RULED OUT, as a few words -- where the row's presence proves the opposite.
 
     Ordered most-decision-relevant first. A rolling deadline changes what the owner
     does today; a confidence caveat only changes how far to trust a row already being
@@ -236,28 +235,33 @@ def _notes(judgment: models.Judgment) -> str:
 VALUE = "value"
 ELIGIBILITY = "eligibility"
 
-# The phrase a rule-out quoted from the posting. For an eligibility call that phrase is
-# the entire evidence -- "rising junior", a graduation window, a clearance requirement --
-# and the sentence wrapped around it repeats what the block header already says. Keeping
-# only the quote took the block from 274 characters a row to about 90 on the morning it
-# had grown to 123 rows and 52% of the whole digest, which is what pushed nine real
-# opportunities out of the table for want of room.
-_QUOTED = re.compile(r"[\"\u201c\u2018']([^\"\u201c\u201d\u2018\u2019']{3,140})[\"\u201d\u2019']")
+# The deterministic screen's own `why` quotes the posting at length, which is what
+# `.run/screened.json` is for. The digest prints only the rule, in a few words: RULED OUT
+# had grown to 145 rows and 39,494 characters at a median of 271 a row, the largest block
+# in the body, and a reason the reader can take in at a glance is all it needs to carry.
+_SCREEN_LABELS = {
+    "graduation-window": "graduates before 2030",
+    "already-graduated": "degree already required",
+    "advanced-standing": "juniors and above",
+    "graduate-only": "graduate students only",
+}
+
+# The field a title-only rule-out matched, e.g. ("Civil Engineering").
+_QUOTED = re.compile(r"[\"\u201c]([^\"\u201c\u201d]{3,60})[\"\u201d]")
 
 
 def _ruled_out_line(judgment: models.Judgment) -> str:
-    """One RULED OUT entry. Compact for eligibility, in full for a value judgement.
+    """One RULED OUT entry: the row and its reason in a few words.
 
-    Anything that is not explicitly an eligibility call is printed in full, including a
-    row whose `ruled_out_by` is missing entirely. That is the conservative direction: an
-    unlabelled rule-out might be the arguable kind, and shortening it would hide exactly
-    the reasoning worth reading.
+    The model is asked for a two-to-five-word phrase when it rules a row out, so its
+    `why` is printed as it stands. A screen rule-out is printed as its rule's label.
     """
     why = judgment.why or "not relevant"
-    if judgment.ruled_out_by == ELIGIBILITY:
+    if judgment.screen_rule == "out-of-field-title":
         quoted = _QUOTED.search(why)
-        if quoted:
-            why = f"\u201c{quoted.group(1).strip()}\u201d"
+        why = f"{quoted.group(1)} role" if quoted else "out-of-field role"
+    elif judgment.screen_rule in _SCREEN_LABELS:
+        why = _SCREEN_LABELS[judgment.screen_rule]
     return f"- **{judgment.change.key}** — {why}"
 
 
@@ -393,14 +397,7 @@ def render(
     if ruled_out:
         body.append(f"<details><summary>■ RULED OUT ({len(ruled_out)})</summary>")
         body.append("")
-        body.append(
-            "_Read and judged out of scope. Expand to audit; a wrong call here is the "
-            "expensive kind, so the reasons are shown rather than hidden. A row ruled "
-            "out on **value** — it could be applied to, but the role is not worth a "
-            "morning — carries its full reasoning, because that is a judgement and it "
-            "has been wrong. A row ruled out on **eligibility** carries the phrase from "
-            "the posting that did it, which is the whole of the evidence._"
-        )
+        body.append("_Read and judged out of scope, with the reason in a few words._")
         body.append("")
         # Value first: they are the arguable ones, and the reader who opens this block
         # is usually opening it to disagree with one.
