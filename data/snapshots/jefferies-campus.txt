@@ -2,6 +2,18 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-1/brand-4/candidate/jobboard/vac
 Campus Opportunities
 Jefferies
 <timestamp>
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2009-Equity-Research-Off-Cycle-Intern-Brazil/en-GB
+Equity Research Off-Cycle Intern - Brazil
+<timestamp>
+<timestamp>
+ID:2009
+Title:Equity Research Off-Cycle Intern - Brazil
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2002-2026-Fixed-Income-Off-Cycle-Internship-Programme-Dubai-MENA-January-2026-Copy/en-GB
+2026 Fixed Income Off-Cycle Internship Programme - Dubai, MENA (January 2026)(Copy)
+<timestamp>
+<timestamp>
+ID:2002
+Title:2026 Fixed Income Off-Cycle Internship Programme - Dubai, MENA (January 2026)(Copy)
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1890-2027-Jefferies-Finance-Summer-Analyst-New-York-Data-Analytics/en-GB
 2027 Jefferies Finance Summer Analyst - New York, Data Analytics
 <timestamp>
@@ -104,6 +116,12 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1966
 Title:2027 Investment Banking Off-Cycle Internship - Benelux Team, Amsterdam (January - March)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1943-2027-Financial-Controllers-Summer-Analyst-Program-New-York-and-Jersey-City/en-GB
+2027 Financial Controllers Summer Analyst Program – New York and Jersey City
+<timestamp>
+<timestamp>
+ID:1943
+Title:2027 Financial Controllers Summer Analyst Program – New York and Jersey City
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1792-2027-Investment-Banking-Summer-Internship-Programme-London/en-GB
 2027 Investment Banking Summer Internship Programme - London
 <timestamp>

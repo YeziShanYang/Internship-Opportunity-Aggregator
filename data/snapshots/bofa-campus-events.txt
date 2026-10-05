@@ -122,20 +122,6 @@ School/University:Auburn University,Belmont University,Boston College,Bradley Un
 Event description:Bank of America Presents: Merrill Wealth Management Campus Recruiting Information Session Are you interested in exploring a career with Wealth Management? The Merrill Wealth Management team would like to invite you to join us for an exciting information s
 Event address / venue details:Virtual via Teams
 Event Timezone:US/Eastern
-https://bankcampuscareers.tal.net/vx/mobile-0/brand-4/candidate/so/pm/1/pl/2/opp/15001-APAC-Japan-Global-Investment-Banking-and-Global-Capital-Market-Virtual-Marketing-Event-for-MBA-Students/en-GB
-APAC | Japan | Global Investment Banking and Global Capital Market| Virtual Marketing Event for MBA Students
-<timestamp>
-<timestamp>
-~~DATADICT_OPTGROUP_POSTING_LIST_OPP_ID~~:15001
-Title:APAC | Japan | Global Investment Banking and Global Capital Market| Virtual Marketing Event for MBA Students
-Event Date:6 Oct 2026 09:30 PM JST
-Region:Asia Pacific
-Country:Hong Kong
-Line of Business:GLOBAL CORPORATE &amp; INVESTMENT BANKING
-Program (Event):Global Capital Markets Program,Global Investment Banking Program
-Event description:Join Bank of America for an exclusive virtual event designed specifically for Japanese-speaking MBA students to learn more about opportunities within our Global Investment Banking and Global Capital Markets divisions. This interactive session will provide
-Event address / venue details:Shortlisted candidates will receive a confirmation email from us.
-Event Timezone:Asia/Tokyo
 https://bankcampuscareers.tal.net/vx/mobile-0/brand-4/candidate/so/pm/1/pl/2/opp/14979-The-Power-to-Realize-your-Potential/en-GB
 The Power to Realize your Potential
 <timestamp>

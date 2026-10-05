@@ -42,6 +42,7 @@ All available internships
 Administration
 COO Group
 Communications
+Corporate Development
 Design and Experience
 Executive Assistance
 Financial Operations
@@ -80,16 +81,25 @@ New York
 Internal Communications Associate : The D.&nbsp;E.&nbsp;Shaw group seeks a talented individual to join its Communications group as an associate on its Internal Communications team. This team is responsible for developing and&hellip;
 Communications
 New York
-Thought Leadership Associate – External Communications : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, analytical individual with proven research and communication skills to join its External Communications group as an associate on its&hellip;
+Thought Leadership Associate : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, analytical individual with proven research and communication skills to join its External Communications group as an associate on its&hellip;
+Communications
+Denver
+Thought Leadership Associate (Denver) : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, analytical individual with proven research and communication skills to join its External Communications group as an associate on its&hellip;
 Communications
 New York
 Thought Leadership Associate — Hedge Fund Portfolio Strategy : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, analytical individual to help build its Hedge Fund Portfolio Strategy function, which develops portfolio and markets-related insights into&hellip;
+Communications
+Denver
+Thought Leadership Associate — Hedge Fund Portfolio Strategy (Denver) : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, analytical individual to help build its Hedge Fund Portfolio Strategy function, which develops portfolio and markets-related insights into&hellip;
 COO Group
 New York
 Associate – Firmwide Technology Management : The D.&nbsp;E.&nbsp;Shaw group seeks a proactive, collaborative, and highly organized individual to work with the chief of staff to the firm’s senior-most technology leadership. This&hellip;
 COO Group
 New York
 COO Group Associate : The D.&nbsp;E.&nbsp;Shaw group seeks a creative, critical thinker with demonstrated analytical, communication, and project leadership skills to join its COO Group. This individual will&hellip;
+Corporate Development
+New York
+Corporate Development Associate : The D.&nbsp;E.&nbsp;Shaw group seeks a talented associate to join its Corporate Development team. This team is responsible for proposing, developing, and executing high-priority&hellip;
 Design and Experience
 New York
 Product Designer : The D.&nbsp;E.&nbsp;Shaw group seeks a product designer to join the Human Capital team focused on delivering high-quality, organized design execution across multiple platforms. The team&hellip;
@@ -150,6 +160,9 @@ Human Capital Analytics Developer : The D.&nbsp;E.&nbsp;Shaw group seeks a talen
 Human Capital
 New York
 Learning & Development Specialist : The D.&nbsp;E.&nbsp;Shaw group seeks a versatile specialist with a keen interest in artificial intelligence (AI) to join its Learning & Development (L&D) team. This team develops&hellip;
+Human Capital
+New York
+Learning and Development Program Operations Manager : The D.&nbsp;E.&nbsp;Shaw group seeks an organized, execution-minded leader to join its Learning & Development (L&D) team as a program operations manager. This role combines people&hellip;
 Human Capital
 New York
 Product Manager – Data Warehouse : The D.&nbsp;E.&nbsp;Shaw group seeks a product manager to join its Human Capital Products team to support the ongoing development of data infrastructure that enables people analytics. This&hellip;
@@ -285,9 +298,6 @@ Video and Voice Engineer : The D.&nbsp;E.&nbsp;Shaw group seeks a voice and vide
 Technology
 New York
 All Positions in Systems : Are you looking for new challenges and collaborative problem-solving opportunities at the firm, but finding that the perfect role for you might not be currently available? If you’d like&hellip;
-Technology
-New York
-Full-Stack Software Engineer: Application Engineering : The D.&nbsp;E.&nbsp;Shaw group seeks a full-stack software engineer to join its Application Engineering (AppEng) team in the Systems group. The AppEng team builds and supports a variety of&hellip;
 Various
 Off-site
 Chief Executive Officer, AI-Native Healthcare RCM Platform : The D.&nbsp;E.&nbsp;Shaw group seeks an accomplished and hands-on chief executive officer to lead Cove’s new AI-native healthcare revenue cycle management (RCM) platform. Cove, the firm’s&hellip;
@@ -307,8 +317,8 @@ The D.&nbsp;E.&nbsp;Shaw group seeks software developers to join its Futures tea
 Various
 New York To apply for this job, please email
 your resume and the job title to recruitment-nyc@world.deshaw.com .
-Structured Products Trader, ABS : Join our D.&nbsp;E.&nbsp;Shaw Asset-Backed Strategies (ABS) team in New York.
-The D.&nbsp;E.&nbsp;Shaw group seeks talented structured products traders to join its Asset-Backed&hellip;
+Vice President, COO Group : Join our D.&nbsp;E.&nbsp;Shaw COO Group in New York.
+The D.&nbsp;E.&nbsp;Shaw group seeks creative, critical thinkers with demonstrated analytical, communication, and project leadership&hellip;
 Venture Studio – Internal
 New York
 AI Product Engineer – Venture Studio (Startup Incubator) : The D.&nbsp;E.&nbsp;Shaw group seeks a pragmatic, engineering-oriented AI technical product manager to join its DESCOvery team’s venture studio. The DESCOvery team ideates, researches, and&hellip;

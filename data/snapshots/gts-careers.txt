@@ -18,6 +18,15 @@ Job Location (Descending)
 Overview (Ascending)
 Overview (Descending)
 Job Title
+Head of Treasury
+GTS is seeking an experienced Entity Controller/Financial and Operations Principal to own financial reporting, regulatory compliance, and audit management for one or more of our registered broker-dealer entities. This role sits at the intersection of technical accounting, financial systems, and regulatory reporting, and serves as the primary point of contact for external auditors and regulators.
+&nbsp;
+The ideal candidate brings deep broker-dealer accounting expertise,...
+Job Location
+US-NY-New York
+Additional Locations
+US-IL-Chicago
+Job Title
 Software Developer - Java &ndash; Wholesale Market Making Team
 The GTS Wholesale Market Making Team is seeking an experienced Software Engineer specializing in Java to help build, enhance, and scale the order management systems that support our U.S. equities market-making business. This is a hands-on engineering role for someone with strong Java expertise and a practical understanding of electronic trading, order lifecycles, and production trading environments.
 &nbsp;
@@ -44,15 +53,6 @@ Quantitative Trader - 2027 Graduates
 The ETF trading group at GTS is seeking applications to join our Quantitative Trader program for the May 2027 Graduates. The ultimate goal of the program is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidates will work closely with senior traders on projects across the quantitative trading space. They will see their work directly impact the group&rsquo;s activities and drive revenue. The role will offer deep insight into how the trading desk operates and how our traders evaluate trading opportunities. There is opportunity for the right candidate to get involved in...
 Job Location
 US-NY-New York
-Job Title
-Operations Analyst
-GTS Asset Management is seeking an Operations Analyst to support the day-to-day operational activities of multiple fund-of-funds vehicles. The role sits within the operations function and works closely with portfolio management, fund administrators, counterparties, and internal control teams to ensure accurate, timely, and well-controlled execution of operational processes. This position is well-suited to a detail-oriented individual with strong organisational skills and a foundational understanding of fund operations and financial processes.
-&nbsp;
-GTS is a...
-Job Location
-UY-Montevideo
-Additional Locations
-AR
 Job Title
 Senior Software Engineer C++
 Senior Software Engineer &ndash; C++
