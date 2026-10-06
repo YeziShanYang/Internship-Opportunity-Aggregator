@@ -42,6 +42,8 @@ American Mathematical Society, Programs and Travel Grants
 [ CLAYGIL27 ] Claytor-Gilmer Fellowship &nbsp; (deadline 2026/09/30 11:59PM) &nbsp; Apply
 [ GSTG27 ] Graduate Student Travel Grants to 2027 JMM &nbsp; Apply
 [ STEFBERG27 ] Stefan Bergman Fellowship &nbsp; (deadline 2026/09/30 11:59PM) &nbsp; Apply
+Carnegie Mellon University, Mathematical Sciences
+[ ANTIRAMSEY ] Workshop on Anti-Ramsey Problems &nbsp; Apply
 Columbia University, Department of Mathematics
 [ GROW26 ] GROW 2026 &nbsp; (deadline 2026/09/23 11:59PM) &nbsp; Apply
 Duke University, Department of Mathematics
@@ -61,5 +63,5 @@ University of Minnesota Twin Cities, School of Mathematics
 [ UMNREU ] Mathematics of Soft Matter &nbsp; (deadline 2026/06/12 11:59PM) &nbsp; Apply
 Williams College, Mathematics and Statistics
 [ POLYMATHREU2027 ] Polymath Jr-REU2027 &nbsp; Apply
-(31 programs listed)
+(32 programs listed)
 &copy; 2026 MathPrograms.Org, American Mathematical Society. All Rights Reserved.

@@ -31,6 +31,32 @@ Save Job Alert
 Save Alert
 Maximum of 25 job preferences reached.
 Top Internship Software Engineer Jobs
+BAE Systems, Inc.
+Programmer Intern, Summer 2027
+<age> Saved
+Hybrid
+Washington, DC, USA
+49K-68K Annually
+Internship
+49K-68K Annually
+Internship
+Aerospace &#x2022; Hardware &#x2022; Information Technology &#x2022; Security &#x2022; Software &#x2022; Cybersecurity &#x2022; Defense
+Programmer Intern supporting enterprise software for the U.S. Navy’s Strategic Systems Programs. Responsibilities include developing applications and modules, administering COTS/GOTS software, documenting program development, resolving system issues, applying patches and upgrades, and building add-on modules. The role requires collaboration across teams, strong communication, independent work, and foundational programming knowledge. Candidates must be sophomores or later in a related degree program with a minimum 2.8 GPA.
+Top Skills:
+Abap C# C/C&#x2B;&#x2B; Configuration Management Excel Java Microsoft Office Suite Object-Oriented Programming PHP PowerPoint Relational Database Concepts SQL Visio Visual Basic Word
+BAE Systems, Inc.
+Computer Science Intern, Summer 2027
+<age> Saved
+Hybrid
+Rockville, MD, USA
+50K-69K Annually
+Internship
+50K-69K Annually
+Internship
+Aerospace &#x2022; Hardware &#x2022; Information Technology &#x2022; Security &#x2022; Software &#x2022; Cybersecurity &#x2022; Defense
+Participate in BAE Systems’ LEAP internship program while developing scientific application software for submarine-generated data analysis. Support the full software development lifecycle, including requirements analysis, design, coding, testing, and acceptance. Collaborate with software developers, test engineers, analysts, peers, and management. Apply Java, Python, SQL, statistics, algorithm development, software testing, and engineering principles to projects supporting strategic systems programs.
+Top Skills:
+Excel Java Matlab MS Office PowerPoint Python SQL Teams Visio Word
 Ericsson
 AI Software Engineer Intern
 <age> Saved
@@ -42,19 +68,6 @@ Cloud &#x2022; Information Technology &#x2022; Internet of Things &#x2022; Machi
 Develop and test integration services, automated recompilation tools, data-mapping scripts, microservices, and software automation. Recompile legacy code into Java, create Helm Charts for Kubernetes deployments, execute integration test cases, and collaborate in an Agile environment. The intern will also support data security, privacy, compliance, and operational processes.
 Top Skills:
 Agile Assembly AWS Azure C C&#x2B;&#x2B; Ci/Cd Git Helm Charts Java JavaScript Kubernetes Microservices Oracle Sql Pl/I Python Software Testing Automation
-BAE Systems, Inc.
-Software Engineering Intern II, Summer 2027 (Onsite)
-<age> Saved
-Hybrid
-Totowa, NJ, USA
-51K-69K Annually
-Internship
-51K-69K Annually
-Internship
-Aerospace &#x2022; Hardware &#x2022; Information Technology &#x2022; Security &#x2022; Software &#x2022; Cybersecurity &#x2022; Defense
-Software engineering interns design, develop, integrate, test, troubleshoot, and document software for military electronic systems, including software-defined radios, avionics, and electronic warfare systems. They collaborate with systems, hardware, and mechanical engineers using Agile methodologies in Windows or Linux development environments and x86 or PowerPC target systems. Interns also support requirements development, algorithm and data analysis, and integration testing.
-Top Skills:
-Agile C# C&#x2B;&#x2B; Java Linux Powerpc Unix Windows X86
 Affirm
 Software Engineer Intern (Summer 2027)
 <age> Saved
@@ -83,6 +96,10 @@ Artificial Intelligence &#x2022; Fintech &#x2022; Insurance &#x2022; Marketing T
 An 11-week technology internship embedded within Liberty Mutual's agile tech teams. Interns will contribute to real customer-facing and backend software projects, gaining experience in modern engineering practices, AI-assisted development tools, planning, coding, testing, and delivery. The program emphasizes collaboration, continuous learning, critical thinking, and customer-focused innovation.
 Top Skills:
 AI Ai-Assisted Development Tools Version Control
+New
+Cut your apply time in half.
+Use our AI Assistant to automatically fill your job applications.
+Use For Free
 Federal Reserve Bank of Chicago
 Summer 2027 Intern-Computer Science and Software Engineering
 <age> Saved
@@ -96,10 +113,6 @@ Agency &#x2022; Fintech &#x2022; Payments &#x2022; Sharing Economy &#x2022; Soci
 Paid summer internship for current undergraduate, graduate, or doctoral students in computer science or software engineering. Interns work 40 hours weekly for 10–12 weeks on project-based assignments, gaining exposure to Federal Reserve operations and collaborating with subject matter experts. Responsibilities may include interpreting data, developing insights, presenting information, supporting decisions, and contributing to departmental initiatives in an onsite or hybrid environment.
 Top Skills:
 Excel Microsoft Word
-New
-Track Smarter, Apply Better.
-Ditch the spreadsheets. Organize your job search with our free Application Tracker.
-Use For Free
 MetLife
 2027 METx Global Technology Internship Program
 <age> Saved

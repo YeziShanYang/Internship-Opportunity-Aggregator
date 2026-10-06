@@ -8,18 +8,24 @@ Equity Research Off-Cycle Intern - Brazil
 <timestamp>
 ID:2009
 Title:Equity Research Off-Cycle Intern - Brazil
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2002-2026-Fixed-Income-Off-Cycle-Internship-Programme-Dubai-MENA-January-2026-Copy/en-GB
-2026 Fixed Income Off-Cycle Internship Programme - Dubai, MENA (January 2026)(Copy)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2002-2027-Fixed-Income-Off-Cycle-Internship-Programme-Dubai-MENA-January-February-2027/en-GB
+2027 Fixed Income Off-Cycle Internship Programme - Dubai, MENA (January/February 2027)
 <timestamp>
 <timestamp>
 ID:2002
-Title:2026 Fixed Income Off-Cycle Internship Programme - Dubai, MENA (January 2026)(Copy)
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1890-2027-Jefferies-Finance-Summer-Analyst-New-York-Data-Analytics/en-GB
-2027 Jefferies Finance Summer Analyst - New York, Data Analytics
+Title:2027 Fixed Income Off-Cycle Internship Programme - Dubai, MENA (January/February 2027)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2010-2027-Investment-Banking-Off-Cycle-Internship-Milan-Q1-February-Start/en-GB
+2027 Investment Banking Off-Cycle Internship – Milan (Q1) February Start
 <timestamp>
 <timestamp>
-ID:1890
-Title:2027 Jefferies Finance Summer Analyst - New York, Data Analytics
+ID:2010
+Title:2027 Investment Banking Off-Cycle Internship – Milan (Q1) February Start
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2011-2027-Asset-Management-Summer-Internship-Programme-London/en-GB
+2027 Asset Management Summer Internship Programme - London
+<timestamp>
+<timestamp>
+ID:2011
+Title:2027 Asset Management Summer Internship Programme - London
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1997-2027-Equities-Sales-Trading-Summer-Analyst-Program-Cash-Trading-Hong-Kong/en-GB
 2027 Equities Sales &amp; Trading Summer Analyst Program - Cash Trading - Hong Kong
 <timestamp>
@@ -116,6 +122,12 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1966
 Title:2027 Investment Banking Off-Cycle Internship - Benelux Team, Amsterdam (January - March)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1961-2027-Human-Resources-Summer-Analyst-Program-Jersey-City-Compensation-and-Benefits/en-GB
+2027 Human Resources Summer Analyst Program – Jersey City, Compensation and Benefits
+<timestamp>
+<timestamp>
+ID:1961
+Title:2027 Human Resources Summer Analyst Program – Jersey City, Compensation and Benefits
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1943-2027-Financial-Controllers-Summer-Analyst-Program-New-York-and-Jersey-City/en-GB
 2027 Financial Controllers Summer Analyst Program – New York and Jersey City
 <timestamp>
