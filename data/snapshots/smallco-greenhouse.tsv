@@ -36,6 +36,7 @@ divcowest
 docugami
 dominodatalab
 doordashusa
+drwuniversityjobs
 emergentlabsinc
 enova
 eqtcorporation
@@ -141,7 +142,6 @@ thinkacademyus
 tifin
 togetherai
 trueanomalyinc
-truveta
 vardaspace
 veeamsoftware
 vercel
@@ -159,7 +159,6 @@ xpengmotors
 xtillion
 ziprecruiter
 # rows
-advancedspace	2026 Team Member Success Fall Internship @ Westminster, CO	URL=https://job-boards.greenhouse.io/advancedspace/jobs/4376598009
 advancedspace	2027 DevOps Summer Internship @ Westminster, CO	URL=https://job-boards.greenhouse.io/advancedspace/jobs/4333179009
 advancedspace	2027 Machine Learning Summer Internship @ Westminster, CO	URL=https://job-boards.greenhouse.io/advancedspace/jobs/4324875009
 advancedspace	2027 Mission Design Summer Internship @ Westminster, CO	URL=https://job-boards.greenhouse.io/advancedspace/jobs/4324900009
@@ -397,7 +396,7 @@ clarityinnovates	Skillbridge Internships @ Herndon, VA	URL=https://job-boards.gr
 clerkie	Software Engineer Internship @ Remote	URL=http://getfiber.ai/careers?gh_jid=5225258007
 clockworksystems	Software Engineer Intern @ Palo Alto, CA	URL=https://job-boards.greenhouse.io/clockworksystems/jobs/6174230004
 cloudflare	Engineering Manager, Agentic Internet & Data Insights @ Hybrid	URL=https://boards.greenhouse.io/cloudflare/jobs/8143649?gh_jid=8143649
-cloudflare	People Analytics Data Engineering Intern (Winter/Spring 2027) @ Hybrid	URL=https://boards.greenhouse.io/cloudflare/jobs/8241790?gh_jid=8241790
+cloudflare	People Team: Software Engineer Intern (Winter/Spring 2027) @ Hybrid	URL=https://boards.greenhouse.io/cloudflare/jobs/7774167?gh_jid=7774167
 cloudflare	Software Engineer Intern (2027) - Austin, TX @ In-Office	URL=https://boards.greenhouse.io/cloudflare/jobs/8199958?gh_jid=8199958
 cloudflare	Software Engineer Intern (2027) @ In-Office	URL=https://boards.greenhouse.io/cloudflare/jobs/8245197?gh_jid=8245197
 cloudflare	Software Engineer Intern (2027) @ In-Office #2	URL=https://boards.greenhouse.io/cloudflare/jobs/8245211?gh_jid=8245211
@@ -470,6 +469,7 @@ doordashusa	Product Design, Entry-Level (2027 start) @ San Francisco, CA; New Yo
 doordashusa	Product Design, Intern (Summer 2027) @ San Francisco, CA; New York, NY	URL=https://job-boards.greenhouse.io/doordashusa/jobs/8176863
 doordashusa	Software Engineer I, Entry-Level (Graduation Date: Fall 2026-Summer 2027) - US @ Los Angeles, CA; New York, NY; San Francisco, CA; Sunnyvale, CA; Seattle, WA	URL=https://job-boards.greenhouse.io/doordashusa/jobs/8163709
 doordashusa	Software Engineer, Intern (Summer 2027) - US @ New York, NY; San Francisco, CA; Sunnyvale, CA; Los Angeles, CA; Seattle, WA	URL=https://job-boards.greenhouse.io/doordashusa/jobs/8171041
+drwuniversityjobs	Quantitative Trading Analyst Intern - IAP Winternship @ Chicago, IL	Type=Intern; URL=https://job-boards.greenhouse.io/drwuniversityjobs/jobs/8259714
 emergentlabsinc	Community Manager Intern @ San Francisco	URL=https://job-boards.greenhouse.io/emergentlabsinc/jobs/4321265009
 emergentlabsinc	Marketing Intern @ San Francisco	URL=https://job-boards.greenhouse.io/emergentlabsinc/jobs/4321228009
 emergentlabsinc	Software Engineering Intern @ San Francisco	URL=https://job-boards.greenhouse.io/emergentlabsinc/jobs/4323651009
@@ -662,7 +662,7 @@ formlabs	Robotic Systems Integration Engineer (SLA & SLS) - June 2027 Grads @ Bo
 formlabs	Robotic Systems Integration Engineer (SLA & SLS) - June 2027 Grads @ Somerville, MA	Type=Full-time; URL=https://careers.formlabs.com/job/8241424/apply/?gh_jid=8241424
 formlabs	SLS Materials Scientist - June 2027 Grads @ Boston, MA	Type=Full-time; URL=https://careers.formlabs.com/job/8241541/apply/?gh_jid=8241541
 formlabs	SLS Materials Scientist - June 2027 Grads @ Somerville, MA	Type=Full-time; URL=https://careers.formlabs.com/job/8241542/apply/?gh_jid=8241542
-formlabs	Software Engineer Intern (Full stack) @ Budapest, Hungary	Type=Intern; URL=https://careers.formlabs.com/job/8081194/apply/?gh_jid=8081194
+formlabs	Software Engineer Intern (Full stack) @ Budapest, Hungary	Type=Intern; URL=https://careers.formlabs.com/job/8260955/apply/?gh_jid=8260955
 formlabs	Technical Sales Representative (December 2026 Grad) @ Milwaukee, WI	Type=Full-time; URL=https://careers.formlabs.com/job/8250096/apply/?gh_jid=8250096
 formlabs	Technical Sales Representative (May 2027 Grad) @ Milwaukee, Wisconsin	Type=Full-time; URL=https://careers.formlabs.com/job/8250084/apply/?gh_jid=8250084
 freeformfuturecorp	Additive Engineer (New Grad December 2026) @ Los Angeles, CA (On-site)	URL=https://job-boards.greenhouse.io/freeformfuturecorp/jobs/7826912003
@@ -731,7 +731,6 @@ gallup	Fintech Intern — Summer 2027 @ Omaha Riverfront	URL=https://job-boards.
 gallup	IT Help Desk/Technology Support Specialist Intern — Summer 2027 @ Omaha Riverfront	URL=https://job-boards.greenhouse.io/gallup/jobs/4391520009
 gallup	Product Design Intern — Summer 2027 @ Omaha Riverfront	URL=https://job-boards.greenhouse.io/gallup/jobs/4394610009
 gallup	Site Reliability Engineer Intern — Summer 2027 @ San Francisco	URL=https://job-boards.greenhouse.io/gallup/jobs/4393731009
-gallup	Software Engineer Intern — Summer 2027 @ San Francisco	URL=https://job-boards.greenhouse.io/gallup/jobs/4395897009
 gallup	Workplace Advisory Consulting Intern — Summer 2027 @ Omaha Riverfront	URL=https://job-boards.greenhouse.io/gallup/jobs/4398625009
 gallup	Workplace Advisory Consulting Intern — Summer 2027 @ Washington, D.C.	URL=https://job-boards.greenhouse.io/gallup/jobs/4398221009
 gardacp	Software Engineer Intern @ New York, New York, United States	URL=https://job-boards.greenhouse.io/gardacp/jobs/6146213004
@@ -750,7 +749,6 @@ gemini	Prediction Markets Operations Intern (Winter 2027) @ New York, New York	U
 gemini	Product Management Intern (Winter 2027) @ New York, New York	URL=https://boards.greenhouse.io/embed/job_app?for=gemini&token=8214332&gh_jid=8214332
 gemini	Software Engineering Intern (Winter 2027) @ New York, New York	URL=https://boards.greenhouse.io/embed/job_app?for=gemini&token=8214272&gh_jid=8214272
 generalmatter	Electrical Engineer (New Grad) @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/generalmatter/jobs/5375934008
-generalmatter	Electrical Engineer - Buildings (New Grad) @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/generalmatter/jobs/5375921008
 generalmatter	Electrical I&C Engineer, New Grad @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/generalmatter/jobs/5375939008
 generalmatter	Financial Analyst (New Grad) @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/generalmatter/jobs/5439284008
 generalmatter	Mechanical Engineer (New Grad) @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/generalmatter/jobs/5375956008
@@ -836,7 +834,6 @@ integrainterns	(SUMMER) Data Analyst Intern @ Austin, Texas	URL=https://job-boar
 integrainterns	(SUMMER) Data Scientist Intern - PhD @ Austin, Texas	URL=https://job-boards.greenhouse.io/integrainterns/jobs/5406095008
 integrainterns	(SUMMER) Marketing and Business Development Intern @ Austin, Texas	URL=https://job-boards.greenhouse.io/integrainterns/jobs/5406085008
 integrainterns	(SUMMER) Research Analyst Intern @ Austin, Texas	URL=https://job-boards.greenhouse.io/integrainterns/jobs/5406120008
-internrecruiting	Intern - Video Production Coordinator @ Wakefield, MA (on-site)	URL=https://job-boards.greenhouse.io/internrecruiting/jobs/8172030
 internrecruiting	Software Engineer Co-op @ Boston, MA	URL=https://job-boards.greenhouse.io/internrecruiting/jobs/8204511
 iterrasolutions	Computer Science & Computer Vision AI/ML Intern @ Hatillo Puerto Rico	URL=https://job-boards.greenhouse.io/iterrasolutions/jobs/4412233009
 iterrasolutions	Electrical Engineering & Embedded Systems Intern @ Hatillo Puerto Rico	URL=https://job-boards.greenhouse.io/iterrasolutions/jobs/4412241009
@@ -848,7 +845,6 @@ ixllearning	Software Engineer, New Grad @ San Mateo, CA	URL=https://www.ixl.com/
 judihealth	Data Engineering Fall Intern (Part Time) @ Denver, Colorado, United States; New York, New York, United States	URL=https://job-boards.greenhouse.io/judihealth/jobs/5418671008
 judihealth	Implementation Analytics Fall Intern - Claims Monitoring & Automation (Part Time) @ Denver, Colorado, United States; New York, New York, United States	URL=https://job-boards.greenhouse.io/judihealth/jobs/5429077008
 judihealth	MBA Analytics Fall Intern - Clinical Programs (Part Time) @ Denver, Colorado, United States; New York, New York, United States	URL=https://job-boards.greenhouse.io/judihealth/jobs/5427074008
-judihealth	MBA Market Analysis Fall Intern - Clinical Programs (Part Time) @ Denver, Colorado, United States; New York, New York, United States	URL=https://job-boards.greenhouse.io/judihealth/jobs/5429048008
 k2spacecorporation	Avionics Systems/Test Engineering Intern – Summer 2027 @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/k2spacecorporation/jobs/5411921008
 k2spacecorporation	Dynamics Engineering Intern – Summer 2027 @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/k2spacecorporation/jobs/5411916008
 k2spacecorporation	Electrical Engineering Intern – Summer 2027 @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/k2spacecorporation/jobs/5411918008
@@ -861,7 +857,6 @@ k2spacecorporation	Supply Chain Internship - Summer 2027 @ Los Angeles	URL=https
 k2spacecorporation	Vehicle Operations Engineering Intern – Summer 2027 @ Los Angeles, CA	URL=https://job-boards.greenhouse.io/k2spacecorporation/jobs/5411914008
 katalyst	Engineering Intern (Electrical / Mechanical / GNC / Software) @ Broomfield, Colorado, United States	URL=https://job-boards.greenhouse.io/katalyst/jobs/6176711004
 klaviyocampus	AI Engineer Intern (Summer 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/8003260003
-klaviyocampus	Accounting Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7991091003
 klaviyocampus	FP&A Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7996176003
 klaviyocampus	Financial Operations Co-op - Procure to Pay (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7991090003
 klaviyocampus	Internal Communications & Employer Brand Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7997420003
@@ -870,7 +865,6 @@ klaviyocampus	Marketing Brand & Creative Events Co-op (Spring 2027) @ Boston, MA
 klaviyocampus	Marketing Operations Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7993119003
 klaviyocampus	People Analytics Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/8002711003
 klaviyocampus	People Operations Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7991092003
-klaviyocampus	Product Design Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7986465003
 klaviyocampus	Product Manager Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7990059003
 klaviyocampus	Sales Intern (Summer 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7989958003
 klaviyocampus	Software Engineer Co-op (Spring 2027) @ Boston, MA	URL=https://job-boards.greenhouse.io/klaviyocampus/jobs/7989365003
@@ -881,10 +875,11 @@ kodiak	Winter 2027 Intern, Mission Planning @ Mountain View, CA	URL=https://job-
 kodiak	Winter 2027 Intern, Motion Planning @ Mountain View, CA	URL=https://job-boards.greenhouse.io/kodiak/jobs/4377721009
 kodiak	Winter 2027 Intern, Security @ Mountain View, CA	URL=https://job-boards.greenhouse.io/kodiak/jobs/4430607009
 kodiak	Winter 2027 Intern, Simulation @ Mountain View, CA	URL=https://job-boards.greenhouse.io/kodiak/jobs/4378662009
-lyft	Applied Scientist Intern (Summer 2027) @ San Francisco, CA	URL=https://app.careerpuck.com/job-board/lyft/job/8843341002?gh_jid=8843341002
+lyft	Applied Scientist Intern, PhD (Summer 2027) @ San Francisco, CA	URL=https://app.careerpuck.com/job-board/lyft/job/8843341002?gh_jid=8843341002
 lyft	Data Analyst Intern (Summer 2027) @ New York, NY	URL=https://app.careerpuck.com/job-board/lyft/job/8802198002?gh_jid=8802198002
 lyft	Data Science Intern, Algorithms (Summer 2027 - SF/NYC) @ New York, NY	URL=https://app.careerpuck.com/job-board/lyft/job/8796124002?gh_jid=8796124002
 lyft	Data Science Intern, Algorithms (Summer 2027 - SF/NYC) @ San Francisco, CA	URL=https://app.careerpuck.com/job-board/lyft/job/8767723002?gh_jid=8767723002
+lyft	PhD Machine Learning Software Engineer Intern (Summer 2027) @ San Francisco, CA	URL=https://app.careerpuck.com/job-board/lyft/job/8817974002?gh_jid=8817974002
 lyft	Software Engineer Intern, Backend (Summer 2027 - SF) @ San Francisco, CA	URL=https://app.careerpuck.com/job-board/lyft/job/8767726002?gh_jid=8767726002
 machindustries	Dec 2026 New Graduate Engineer, Electrical / Avionics @ Huntington Beach, California, United States	URL=https://job-boards.greenhouse.io/machindustries/jobs/4413291009
 machindustries	December 2026 New Graduate Engineer, Manufacturing @ Huntington Beach, California, United States	URL=https://job-boards.greenhouse.io/machindustries/jobs/4393144009
@@ -1031,10 +1026,11 @@ northmarq	Portfolio and Asset Management Intern, Summer 2027 @ Dallas, Texas, Un
 northmarq	Portfolio and Asset Management Intern, Summer 2027 @ Denver, Colorado, United States	Type=Full time - hourly; URL=https://job-boards.greenhouse.io/northmarq/jobs/5415779008
 northmarq	Portfolio and Asset Management Intern, Summer 2027 @ Minneapolis, Minnesota, United States	Type=Full time - hourly; URL=https://job-boards.greenhouse.io/northmarq/jobs/5414561008
 northmarq	Software Engineering Intern, Summer 2027 @ Minneapolis, Minnesota, United States	Type=Full time - hourly; URL=https://job-boards.greenhouse.io/northmarq/jobs/5414475008
-nuro	New Grad Software Engineer, Routing @ Mountain View, California (HQ)	URL=https://nuro.ai/careersitem?gh_jid=8248317
+nuro	New Grad Software Engineer, Product Engineering @ Mountain View, California (HQ)	URL=https://nuro.ai/careersitem?gh_jid=8248317
 nuro	Social Media Intern @ Mountain View, California (HQ)	URL=https://nuro.ai/careersitem?gh_jid=8222063
 nuro	Software Engineer, AI Platform - Intern @ Mountain View, California (HQ)	URL=https://nuro.ai/careersitem?gh_jid=7351061
 nuro	Software Engineer, AI Platform - New Grad @ Mountain View, California (HQ)	URL=https://nuro.ai/careersitem?gh_jid=7351066
+nuro	Software Engineer, Performance Tooling and Infrastructure New Grad @ Mountain View, California (HQ)	URL=https://nuro.ai/careersitem?gh_jid=8227399
 olsson	Accounting Student Internship @ Omaha, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5434137008
 olsson	Civil Drafting Internship - Water Resources @ Lincoln, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5395590008
 olsson	Civil Drafting Internship - Water/Wastewater @ North Kansas City, MO	URL=https://job-boards.greenhouse.io/olsson/jobs/5399464008
@@ -1072,7 +1068,6 @@ olsson	Electrical Engineering Internship - Facilities (Healthcare) @ Dallas, TX;
 olsson	Electrical Engineering Internship - Facilities (Healthcare) @ Omaha, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5423876008
 olsson	Electrical Engineering Internship - Facilities @ Lincoln, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5394106008
 olsson	Electrical Engineering Internship - Facilities @ Oklahoma City, OK; Tulsa, OK	URL=https://job-boards.greenhouse.io/olsson/jobs/5396167008
-olsson	Electrical Engineering Internship - Federal Infrastructure @ North Kansas City, MO; Overland Park, KS	URL=https://job-boards.greenhouse.io/olsson/jobs/5396125008
 olsson	Electrical Engineering Internship - Industrial Facilities @ Lincoln, NE; Omaha, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5407194008
 olsson	Electrical Engineering Internship - Instrumentation and Controls @ Lincoln, NE; Omaha, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5407776008
 olsson	Electrical Engineering Internship - Substation and Power Generation @ Fayetteville, AR	URL=https://job-boards.greenhouse.io/olsson/jobs/5411131008
@@ -1124,7 +1119,6 @@ olsson	Student Internship - Survey @ North Kansas City, MO	URL=https://job-board
 olsson	Student Internship - Survey @ Overland Park, KS	URL=https://job-boards.greenhouse.io/olsson/jobs/5407752008
 olsson	Student Internship- Construction Materials Testing @ Springfield, MO	URL=https://job-boards.greenhouse.io/olsson/jobs/5395791008
 olsson	Survey Internship @ Grand Island, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5394227008
-olsson	Survey Internship @ Lincoln, NE; Omaha, NE	URL=https://job-boards.greenhouse.io/olsson/jobs/5381444008
 pacificfusion	Summer 2027 Internship - Electrical Engineering @ San Leandro, CA/ Fremont, CA or Los Lunas, NM	Type=Intern; URL=https://job-boards.greenhouse.io/pacificfusion/jobs/4398021009
 pacificfusion	Summer 2027 Internship- Mechanical Engineering @ San Leandro, CA/Fremont, CA or Los Lunas, NM	Type=Intern; URL=https://job-boards.greenhouse.io/pacificfusion/jobs/4398312009
 pacificfusion	Summer 2027 Internship- Software Engineering @ San Leandro, CA/Fremont, CA or Los Lunas, NM	Type=Intern; URL=https://job-boards.greenhouse.io/pacificfusion/jobs/4398373009
@@ -1135,16 +1129,13 @@ perpay	Business Operations Internship, Summer 2027 @ Philadelphia, Pennsylvania,
 perpay	Data Engineering Internship, Summer 2027 @ Philadelphia, Pennsylvania, United States	URL=https://job-boards.greenhouse.io/perpay/jobs/4076965007
 perpay	Data Science Internship, Summer 2027 @ Philadelphia, Pennsylvania, United States	URL=https://job-boards.greenhouse.io/perpay/jobs/4076978007
 perpay	Finance Internship, Summer 2027 @ Philadelphia, Pennsylvania, United States	URL=https://job-boards.greenhouse.io/perpay/jobs/4536787007
+perpay	Software Engineer, New Grad - Super Day @ Philadelphia, Pennsylvania, United States	URL=https://job-boards.greenhouse.io/perpay/jobs/5252881007
 perpay	Software Engineer, New Grad @ Philadelphia, Pennsylvania, United States	URL=https://job-boards.greenhouse.io/perpay/jobs/4034578007
 perpay	Software Engineering Internship, Summer 2027 @ Philadelphia, Pennsylvania, United States	URL=https://job-boards.greenhouse.io/perpay/jobs/4076988007
 phoenixcontact	Data Science & Analytics Intern - Fall 2026 @ Middletown, Pennslyvania	URL=https://job-boards.greenhouse.io/phoenixcontact/jobs/7964865003
 phoenixcontact	Manufacturing Co-Op - High School Students @ Middletown, Pennsylvania	URL=https://job-boards.greenhouse.io/phoenixcontact/jobs/7817228003
-prizepicks	Data & Machine Learning Platform Engineering Internship - Spring 2027 @ Atlanta, Georgia, United States	URL=http://prizepicks.com/position?gh_jid=8009261003
-prizepicks	Data Engineering Internship - Spring 2027 @ Atlanta, Georgia, United States	URL=http://prizepicks.com/position?gh_jid=8009358003
 prizepicks	Fraud Analytics Internship - Spring 2027 @ Atlanta, Georgia, United States	URL=http://prizepicks.com/position?gh_jid=8008655003
 prizepicks	Product Analytics Internship - Spring 2027 @ Atlanta, Georgia, United States	URL=http://prizepicks.com/position?gh_jid=8008103003
-prizepicks	Software Engineering Internship - Spring 2027 @ Atlanta, Georgia, United States	URL=http://prizepicks.com/position?gh_jid=7996172003
-prizepicks	Software Engineering Internship - Summer 2027 @ Atlanta, Georgia, United States	URL=http://prizepicks.com/position?gh_jid=7999266003
 psiquantum	Intern, Optical Packaging and Characterization Engineer @ Milpitas, California, United States	URL=https://www.psiquantum.com/apply?gh_jid=7761881003
 psiquantum	Intern, Quantum Algorithms and Compilation @ Palo Alto, California, United States; Remote	URL=https://www.psiquantum.com/apply?gh_jid=7695559003
 psiquantum	Intern, Quantum Architecture @ Brisbane, Queensland, Australia; Palo Alto, California, United States; Remote	URL=https://www.psiquantum.com/apply?gh_jid=6536805003
@@ -1174,6 +1165,7 @@ relaypro	Sales Development Intern (Summer 2027) @ Raleigh, NC	URL=https://job-bo
 relaypro	Software Engineering Intern (AI/ML) - Summer 2027 @ Raleigh, NC	URL=https://job-boards.greenhouse.io/relaypro/jobs/8176774
 relaypro	Software Engineering Intern (Device Team) - Summer 2027 @ Raleigh, NC	URL=https://job-boards.greenhouse.io/relaypro/jobs/8180836
 relaypro	Solutions Engineer Intern (Summer 2027 Opportunity) @ Raleigh, NC	URL=https://job-boards.greenhouse.io/relaypro/jobs/8214334
+relaypro	Value Engineering Intern (Spring Semester 2027) @ Raleigh, NC	URL=https://job-boards.greenhouse.io/relaypro/jobs/8245644
 rendezvousrobotics	Avionics Engineering Intern (Spring 2027) @ Golden, CO	URL=https://job-boards.greenhouse.io/rendezvousrobotics/jobs/4329118009
 rendezvousrobotics	Avionics Engineering Intern (Summer 2027) @ Golden, CO	URL=https://job-boards.greenhouse.io/rendezvousrobotics/jobs/4408578009
 rendezvousrobotics	GNC Intern (Spring 2027) @ Golden, CO	URL=https://job-boards.greenhouse.io/rendezvousrobotics/jobs/4332465009
@@ -1208,7 +1200,6 @@ robinhood	Fraud Operations Intern (Summer 2027) @ Denver, CO	URL=https://boards.
 robinhood	Futures & Prediction Market Operations Intern (Summer 2027) @ Chicago, IL	URL=https://boards.greenhouse.io/robinhood/jobs/8187309?t=gh_src=&gh_jid=8187309
 robinhood	Growth Marketing Intern (Summer 2027) @ Menlo Park, CA	URL=https://boards.greenhouse.io/robinhood/jobs/8192367?t=gh_src=&gh_jid=8192367
 robinhood	Investment Analyst MBA Intern, Robinhood Ventures (Summer 2027) @ Menlo Park, CA	URL=https://boards.greenhouse.io/robinhood/jobs/8198187?t=gh_src=&gh_jid=8198187
-robinhood	Offensive Security Intern (Summer 2027) @ Bellevue, WA; Menlo Park, CA	URL=https://boards.greenhouse.io/robinhood/jobs/8214142?t=gh_src=&gh_jid=8214142
 robinhood	People Partner Intern (Summer 2027) @ New York, NY	URL=https://boards.greenhouse.io/robinhood/jobs/8197614?t=gh_src=&gh_jid=8197614
 robinhood	PeopleX Insights & Analytics Intern (Summer 2027) @ Menlo Park, CA	URL=https://boards.greenhouse.io/robinhood/jobs/8198255?t=gh_src=&gh_jid=8198255
 robinhood	Security Risk Management Intern (Summer 2027) @ Menlo Park, CA	URL=https://boards.greenhouse.io/robinhood/jobs/8207970?t=gh_src=&gh_jid=8207970
@@ -1405,6 +1396,7 @@ singlestore	Software Engineer Intern- Helios- 2027 @ United States	URL=https://j
 singlestore	Software Engineer-Engine-New Grad 2027 @ United States	URL=https://job-boards.greenhouse.io/singlestore/jobs/8205427
 singlestore	Software Engineer-Helios-New Grad 2027 @ United States	URL=https://job-boards.greenhouse.io/singlestore/jobs/8205389
 skhynixmemorysolutionsamericainc	Embedded Software Engineer Intern @ San Jose	URL=https://job-boards.greenhouse.io/skhynixmemorysolutionsamericainc/jobs/4404646009
+skhynixmemorysolutionsamericainc	Research Intern - Loop Engineering @ San Jose	URL=https://job-boards.greenhouse.io/skhynixmemorysolutionsamericainc/jobs/4435645009
 skhynixmemorysolutionsamericainc	SSD Firmware Development Engineer Intern @ San Jose	URL=https://job-boards.greenhouse.io/skhynixmemorysolutionsamericainc/jobs/4387708009
 skhynixmemorysolutionsamericainc	Software Engineer Intern @ San Jose	URL=https://job-boards.greenhouse.io/skhynixmemorysolutionsamericainc/jobs/4402959009
 skhynixmemorysolutionsamericainc	Test Automation Software Engineer Intern @ San Jose	URL=https://job-boards.greenhouse.io/skhynixmemorysolutionsamericainc/jobs/4342038009
@@ -1506,7 +1498,11 @@ tanium	Software Engineering Intern – Summer 2027 @ Durham, NC (Hybrid); Emeryv
 tanium	Technical Support Engineer (TSE) Intern @ Addison, TX (Hybrid)	URL=https://job-boards.greenhouse.io/tanium/jobs/8176322
 tanium	Technical Support Engineer (TSE) Intern @ Bellevue, WA (Hybrid); Emeryville, CA (Hybrid)	URL=https://job-boards.greenhouse.io/tanium/jobs/8189328
 teads1	Software Engineer Assistant - Internship @ Montpellier	URL=https://job-boards.eu.greenhouse.io/teads1/jobs/4846998101
-tenstorrentuniversity	Inference Server – Product Software Intern (Oct 2026 start) @ Belgrade, Serbia	URL=https://job-boards.greenhouse.io/tenstorrentuniversity/jobs/5065140007
+tenstorrentuniversity	AI SW Intern, Cloud, Infrastructure & Data Centre Deployment @ Austin, Texas, United States; Santa Clara, California, United States	URL=https://job-boards.greenhouse.io/tenstorrentuniversity/jobs/5256686007
+tenstorrentuniversity	AI Software Intern @ Austin, Texas, United States; Santa Clara, California, United States	URL=https://job-boards.greenhouse.io/tenstorrentuniversity/jobs/5258901007
+tenstorrentuniversity	Hardware Intern - Architecture, AI HW & System on a Chip @ Austin, Texas, United States; Boston, Massachusetts, United States; Fort Collins, Colorado, United States; Santa Clara, California, United States	URL=https://job-boards.greenhouse.io/tenstorrentuniversity/jobs/5256691007
+tenstorrentuniversity	Intern, Physical Design & DFT @ Austin, Texas, United States; Boston, Massachusetts, United States; Fort Collins, Colorado, United States; Santa Clara, California, United States	URL=https://job-boards.greenhouse.io/tenstorrentuniversity/jobs/5256706007
+tenstorrentuniversity	Intern, RISC-V CPU @ Austin, Texas, United States; Boston, Massachusetts, United States; Fort Collins, Colorado, United States; Santa Clara, California, United States	URL=https://job-boards.greenhouse.io/tenstorrentuniversity/jobs/5256699007
 testnisc	Intern - Data Engineer @ Cedar Rapids, IA	Type=Intern; URL=https://job-boards.greenhouse.io/testnisc/jobs/8167883
 testnisc	Intern - Data Engineer @ Lake Saint Louis, MO	Type=Intern; URL=https://job-boards.greenhouse.io/testnisc/jobs/8167884
 testnisc	Intern - Database Conversion Programming @ Lake St. Louis, MO	Type=Intern; URL=https://job-boards.greenhouse.io/testnisc/jobs/8191885
@@ -1577,7 +1573,8 @@ thinkacademyus	(Recent Graduate/Class of 2026 friendly) Full-Time Math Teacher @
 thinkacademyus	2026 Math Teaching + Future Leadership Program @ San Jose, CA	URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/7678152003
 thinkacademyus	2026 On-site English Classroom Teacher (Pre-Kinder - Kinder) + Business Operation Specialist @ San Jose, CA	URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/7683217003
 thinkacademyus	2026 Spring Business Operation Specialist + Math Content Teacher @ San Jose, CA	URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/7678153003
-thinkacademyus	Community Content & Growth Specialist (Reddit) @ Remote	Type=Internship; URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/7980991003
+thinkacademyus	Reddit Content Specialist @ Remote	Type=Internship; URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/8015114003
+thinkacademyus	Reddit Marketing Intern @ Remote	Type=Internship; URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/8015116003
 thinkacademyus	Remote Marketing Intern (Mandarin Required) @ Remote	Type=Contractor; URL=https://job-boards.greenhouse.io/thinkacademyus/jobs/7980990003
 tifin	AI Engineering Intern, TIFIN.ai @ Boulder CO	URL=https://tifin.com/careers/apply/?gh_jid=5981740004
 togetherai	Research Intern, Frontier Agents (Summer 2027) @ San Francisco	URL=https://job-boards.greenhouse.io/togetherai/jobs/5238468007
@@ -1592,13 +1589,11 @@ togetherai	Software Engineer Intern (Winter 2027) @ San Francisco	URL=https://jo
 togetherai	Software Engineer, New Grad (2027) @ San Francisco	URL=https://job-boards.greenhouse.io/togetherai/jobs/5211582007
 togetherai	Systems Research Engineer Intern - GPU Programming (Summer 2027) @ San Francisco	URL=https://job-boards.greenhouse.io/togetherai/jobs/5238460007
 togetherai	Systems Research Engineer Intern - GPU Programming (Winter 2027) @ San Francisco	URL=https://job-boards.greenhouse.io/togetherai/jobs/5238411007
-trueanomalyinc	DevOps Engineer I (New Grad) @ Denver, CO or Long Beach, CA.	URL=https://job-boards.greenhouse.io/trueanomalyinc/jobs/5218935007
 trueanomalyinc	Software Engineer I, Data Science (New Grad) @ Denver, CO or Long Beach, CA	URL=https://job-boards.greenhouse.io/trueanomalyinc/jobs/5221560007
 trueanomalyinc	Software Engineer I, Elixir (New Grad) @ Denver, CO or Long Beach, CA	URL=https://job-boards.greenhouse.io/trueanomalyinc/jobs/5232802007
 trueanomalyinc	Software Engineer I, Full Stack (New Grad) @ Denver, CO or Long Beach, CA	URL=https://job-boards.greenhouse.io/trueanomalyinc/jobs/5092069007
 trueanomalyinc	Software Engineer I, Perception (New Grad) @ Denver, CO or Long Beach, CA	URL=https://job-boards.greenhouse.io/trueanomalyinc/jobs/5221970007
 trueanomalyinc	Software Engineer I, Spacecraft Simulation (New Grad) @ Denver, CO or Long Beach, CA	URL=https://job-boards.greenhouse.io/trueanomalyinc/jobs/5221555007
-truveta	ML PhD Intern - LLMs & Generative AI @ Seattle, WA	URL=https://job-boards.greenhouse.io/truveta/jobs/5712997004
 vardaspace	Aerodynamics & Analysis Engineering Internship - Summer 2027 @ El Segundo, California, United States	URL=https://job-boards.greenhouse.io/vardaspace/jobs/8010632003
 vardaspace	Applications Engineering Internship - Spring 2027 @ El Segundo, California, United States	URL=https://job-boards.greenhouse.io/vardaspace/jobs/7824822003
 vardaspace	Avionics Engineering Internship - Spring 2027 @ El Segundo, California, United States	URL=https://job-boards.greenhouse.io/vardaspace/jobs/7824780003
@@ -1678,7 +1673,9 @@ voyagertechnologiesinc	Fall 2026 Mechanical Engineering Internship @ Reno, NV	UR
 voyagertechnologiesinc	Supply Chain Intern - Fall Season @ Folsom, CA	URL=https://job-boards.greenhouse.io/voyagertechnologiesinc/jobs/4392099009
 waymo	2027 Summer Intern, BS, Depot Automation @ San Francisco, California	URL=https://careers.withwaymo.com/jobs?gh_jid=8234553
 waymo	2027 Summer Intern, BS, Software Engineer, Driver Refinement Foundations @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8224900
+waymo	2027 Summer Intern, BS, Software Engineer, Model Eval @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8257660
 waymo	2027 Summer Intern, BS, Software Engineering, Labeling @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8238525
+waymo	2027 Summer Intern, BS, Waymo ML Ops & Automation @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8257237
 waymo	2027 Summer Intern, BS/MS, Embedded, Software Engineer @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8221198
 waymo	2027 Summer Intern, BS/MS, Global Supply Management (GSM) @ Mountain View, California	URL=https://careers.withwaymo.com/jobs?gh_jid=8201252
 waymo	2027 Summer Intern, BS/MS, Scenes @ Mountain View, California	URL=https://careers.withwaymo.com/jobs?gh_jid=8210170
@@ -1686,7 +1683,9 @@ waymo	2027 Summer Intern, BS/MS, Software Engineering, Commercialization @ Mount
 waymo	2027 Summer Intern, MBA, Operations Planning @ San Francisco, California, United States	URL=https://careers.withwaymo.com/jobs?gh_jid=8165014
 waymo	2027 Summer Intern, MBA, Salesforce Product Owner @ Los Angeles, California, United States	URL=https://careers.withwaymo.com/jobs?gh_jid=8198582
 waymo	2027 Summer Intern, MBA, Strategic Finance @ San Francisco, California, United States	URL=https://careers.withwaymo.com/jobs?gh_jid=8197014
+waymo	2027 Summer Intern, MS, PhD, Software Engineer @ Mountain View, California, United States	URL=https://careers.withwaymo.com/jobs?gh_jid=8250220
 waymo	2027 Summer Intern, MS, Software Engineering, Behavior Test @ San Francisco, California, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8174504
+waymo	2027 Summer Intern, MS/PhD,  Research, Perception Foundation Models @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8257801
 waymo	2027 Summer Intern, MS/PhD, AI-driven ML Performance Engineering Intern @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8248060
 waymo	2027 Summer Intern, MS/PhD, Conflict Behavior @ Mountain View, California	URL=https://careers.withwaymo.com/jobs?gh_jid=8210138
 waymo	2027 Summer Intern, MS/PhD, ML Systems & Behavior Discovery @ Mountain View, CA, USA	URL=https://careers.withwaymo.com/jobs?gh_jid=8257159

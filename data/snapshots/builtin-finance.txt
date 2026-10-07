@@ -31,6 +31,54 @@ Save Job Alert
 Save Alert
 Maximum of 25 job preferences reached.
 Top Internship Finance Jobs
+Citadel
+Equities - Citadel Associate Program - Summer Internship 2028
+<age> Saved
+In-Office
+New York, NY, USA
+3K-3K Annually
+Internship
+3K-3K Annually
+Internship
+Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
+Summer internship for undergraduate students graduating December 2028 through May 2029. Interns will develop financial modeling and company research skills, evaluate businesses and investment opportunities, analyze external data, and support long/short equities investing through investment-team rotations and mentorship.
+Top Skills:
+External Data Sources Financial Modeling Quantitative Risk Systems
+Citadel
+Quantitative Researcher - Post-Doctoral Intern (US)
+<age> Saved
+In-Office
+4 Locations
+5K-6K Annually
+Internship
+5K-6K Annually
+Internship
+Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
+Conduct quantitative research for financial markets by developing valuation strategies, mathematical models, trading signals, and monetization systems. Responsibilities include translating algorithms into code, backtesting and implementing trading models, analyzing unconventional data sources, and applying statistical techniques. The 11-week post-doctoral internship involves collaboration with senior researchers in a fast-paced investment environment.
+Top Skills:
+C&#x2B;&#x2B; Machine Learning Natural Language Processing (Nlp) Pattern Recognition Python R Time-Series Analysis
+Citadel
+Trader: Fixed Income &amp; Macro Rotational Trader - Intern (US)
+<age> Saved
+In-Office
+3 Locations
+4K-5K Annually
+Internship
+4K-5K Annually
+Internship
+Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
+Participate in a structured fixed income and macro trading rotation. Develop expertise in financial markets, apply statistical techniques to trading, adapt investment approaches, and use advanced trading technology. Collaborate with traders, quantitative researchers, and technologists while identifying opportunities and managing risk. The internship also includes networking with senior team members and peers.
+Rocket
+Treasury Operations Intern - Winter 2027
+<age> Saved
+In-Office
+Detroit, MI, USA
+Internship
+Internship
+Fintech &#x2022; Real Estate &#x2022; Sales &#x2022; Financial Services
+Supports daily treasury operations, including cash positioning, reconciliations, forecasting, reporting, warehouse line monitoring, settlements, audits, settlement instructions, and bank fee analysis. The intern also contributes to finance close activities and process-improvement projects while developing Excel proficiency and exposure to capital markets.
+Top Skills:
+Excel MS Office Microsoft Powerpoint Microsoft Word
 Wipfli
 Tax Internship - Spring 2028
 <age> Saved
@@ -42,17 +90,6 @@ Cloud &#x2022; Fintech &#x2022; Software &#x2022; Business Intelligence &#x2022;
 Tax interns support client engagements by preparing individual, business, and fiduciary tax returns, researching tax issues, analyzing data, responding to client requests, gathering information, and identifying process improvements. They use tax and accounting software, conduct limited tax interviews, and collaborate with professionals while developing accounting, communication, organizational, and analytical skills.
 Top Skills:
 Accounting Software Tax Software
-Wipfli
-Audit Internship - Spring 2028
-<age> Saved
-Hybrid
-Denver, CO, USA
-34-34 Hourly
-Internship
-34-34 Hourly
-Internship
-Cloud &#x2022; Fintech &#x2022; Software &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Financial Services
-Audit interns support client engagements by performing audit, review, and compliance testing; preparing financial statements, footnotes, reports, and engagement outputs; gathering client information; analyzing data; identifying process improvements; and communicating with engagement leaders. Interns develop practical audit, accounting, GAAP, software, administrative, communication, and teamwork skills while working with clients across various industries.
 Lowe&#x2019;s
 Accounting Intern - Undergrad Internship - Summer 2027
 <age> Saved
@@ -62,15 +99,10 @@ Internship
 Internship
 Consumer Web &#x2022; eCommerce &#x2022; Information Technology &#x2022; Retail &#x2022; Software &#x2022; Analytics &#x2022; App development
 Accounting internship for an undergraduate student at Lowe’s corporate headquarters in Mooresville, North Carolina. The description provides company and workplace information but does not specify detailed accounting responsibilities or qualifications.
-Lowe&#x2019;s
-Accounting Intern - Undergrad Internship - Summer 2027
-<age> Saved
-Hybrid
-Mooresville, NC, USA
-Internship
-Internship
-Consumer Web &#x2022; eCommerce &#x2022; Information Technology &#x2022; Retail &#x2022; Software &#x2022; Analytics &#x2022; App development
-This summer 2027 undergraduate internship provides accounting experience at Lowe’s corporate headquarters in Mooresville, North Carolina. The description emphasizes collaboration, professional development, and Lowe’s workplace amenities, but does not specify detailed accounting duties or qualifications.
+New
+Track Smarter, Apply Better.
+Ditch the spreadsheets. Organize your job search with our free Application Tracker.
+Use For Free
 PwC
 Audit - Japanese Business Network (JBN) - Intern - Summer 2028 - Destination CPA
 <age> Saved
@@ -84,36 +116,6 @@ Artificial Intelligence &#x2022; Professional Services &#x2022; Business Intelli
 Supports audit teams serving Japanese business clients by reviewing financial documents, applying GAAP and GAAS, analyzing financial data, documenting findings, assessing internal controls, identifying risks, and assisting with financial reporting. The intern learns PwC audit methodologies while developing accounting, communication, teamwork, and professional skills.
 Top Skills:
 AI Gaap Gaas
-PwC
-Audit - Japanese Business Network (JBN) - Intern - Summer 2027
-<age> Saved
-Hybrid
-3 Locations
-29K-48K Hourly
-Internship
-29K-48K Hourly
-Internship
-Artificial Intelligence &#x2022; Professional Services &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Cybersecurity &#x2022; Generative AI
-Supports audit teams serving Japanese business clients by reviewing financial documents, applying GAAP and GAAS, analyzing financial data, documenting findings, assessing internal controls, identifying risks, and preparing financial reports. The intern learns PwC audit methodologies while developing accounting, communication, analytical, and professional skills in a client-service environment.
-Top Skills:
-AI Gaap Gaas
-New
-Cut your apply time in half.
-Use our AI Assistant to automatically fill your job applications.
-Use For Free
-Citadel
-Finance &amp; Accounting - Intern (US)
-<age> Saved
-In-Office
-New York, NY, USA
-114K-120K Annually
-Internship
-114K-120K Annually
-Internship
-Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
-An 11-week Finance and Accounting internship offering placements in corporate accounting, fund and broker-dealer accounting, or financial reporting. Responsibilities include auditing expense reports, supporting cash receipts and journal entries, assisting with regulatory and financial reporting, monitoring compliance, overseeing accounting records and NAV calculations, supporting audits, and researching U.S. GAAP and IFRS questions. Interns also identify process improvements and collaborate with stakeholders.
-Top Skills:
-Concur Ifrs Excel U.S. Gaap
 MetLife
 Actuarial Intern
 <age> Saved
@@ -177,19 +179,6 @@ Artificial Intelligence &#x2022; Automotive &#x2022; Greentech &#x2022; Informat
 Accounting Intern supports corporate accounting through financial statement analysis, journal entries, balance sheet accuracy checks, reconciliations, computations, reporting, and special projects. The role provides hands-on training, cross-functional collaboration, and exposure to business projects while developing analytical, communication, organizational, and problem-solving skills.
 Top Skills:
 Microsoft Office Suite
-Hilton
-2027 Corporate 12-month Internship - Hilton Accounting and Financial Services
-<age> Saved
-In-Office
-Memphis, TN, USA
-24-40 Hourly
-Internship
-24-40 Hourly
-Internship
-Software &#x2022; Hospitality
-Finance internship supporting accounting, financial services, compliance, forecasting, risk management, and transformation teams. Responsibilities include preparing reports and presentations, conducting research, analyzing data, supporting team projects, developing solutions, collaborating with managers, and presenting internship outcomes. The program is onsite in Memphis, includes a full-time summer period followed by part-time work through June 2028, and provides professional development and networking opportunities.
-Top Skills:
-Excel
 1
 2
 3

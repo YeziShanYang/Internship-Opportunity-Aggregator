@@ -124,198 +124,203 @@ For Mentors: Explore mentoring opportunities and learn how to get involved in th
 For further questions, explore our FAQ or contact us at dreu@cra.org .
 Past Participants
 2026
+DREU-AI
 Student
 Mentor
-Student Website
-Parth Nilesh Kheni (Boston University)
-Elaine Schaertl Short (Tufts University)
-Parth&#8217;s Log
-Melissa Liseth Mercado-Garcia (Bowie State University)
-Kyla A. McMullen (University of Florida)
-Melissa&#8217;s Log
-Yaneli Ava Cruz (California State Polytechnic University)
-Tiziano Piccardi (Johns Hopkins University)
-Yaneli&#8217;s Log
-Citlalli Monique Martinez Cervantes (California State University, Northridge)
-Asma Jodeiri Akbarfam (Washington State University)
-https://github.com/quesitopre/
-Avni Israni (California State University, Northridge)
-Marjan Asadinia (California State University, Northridge)
-https://github.com/AvniIsrani1/
-Juliette R Dashe (Colorado State University)
-Angelique Taylor (Cornell University)
-https://github.com/juliettedashe-creates/
-Rosa Jahankhah (De Anza College)
-Ananya Ashish Joshi (Johns Hopkins University)
-Rosa&#8217;s Google Doc log
-Susanna Mary Quayle (Fayetteville Technical Community College)
-Tiffany Barnes (North Carolina State University)
-https://github.com/susanna3003/
-Sai Gayathri Prakash (Georgia Institute of Technology)
-Nancy M. Amato (University of Illinois, Urbana Champaign)
-Sai&#8217;s Log
-Grace Megan Yu (Georgia Institute of Technology)
-Suresh Marru (Georgia Institute of Technology)
-https://gracemyu.github.io/
-Mykhaylo Severinov (Ivy Tech Community College)
-Roberto Yus (University of Maryland, Baltimore County)
-https://github.com/myk-sev/
-Ankita Banik (New Jersey City University)
-Neelu Sinha (Fairleigh Dickinson University (FDU))
-Ankita&#8217;s Log
-Matthew Garcia (Northeastern University)
-Megan Hofmann (Northeastern University)
-Matt&#8217;s Log
-Anthony Maxim Bazhenov (Northeastern University)
-Orit Peleg (University of Colorado, Boulder)
-https://github.com/anthonybazhenov/
-Phoenix Eros Wilson (University of California, Berkeley)
-Kristina Gligoric (Johns Hopkins University)
-https://github.com/lordkilgore/
-Isabela Sforcin (University of California, Riverside)
-Maja Mataric (University of Southern California)
-https://github.com/sforcin/
-Marianne Kaye Dapuay Martinez (University of Hawaii at Hilo)
-Paul Rosen (University of Utah)
-https://github.com/marikmartinez/
-Steven Sanchez (University of Houston)
-Ali Ghanbari (Auburn University)
-https://stvsz04.github.io/
-Vanessa Meyer (University of Houston)
-Jian Gong (University of Wyoming)
-Vanessa&#8217;s Log
+Research Website
 Shaheer Abbasi (University of Houston)
 Michael K. Reiter (Duke University)
 https://github.com/Shaheer-Abbasi/
-Isabella Marquez (University of Illinois, Urbana Champaign)
-ChengXiang Zhai (University of Illinois, Urbana Champaign)
-https://github.com/ISAMCS/
-Saketh Kantipudi (University of Illinois, Urbana Champaign)
-Nancy M. Amato (University of Illinois, Urbana Champaign)
-Saketh&#8217;s Log
-Robert Cesar Molina (University of Illinois, Urbana Champaign)
-Nancy M. Amato (University of Illinois, Urbana Champaign)
-https://github.com/RCMolina0/
-Aryan Karnick (University of Maryland)
-Aravind Srinivasan (University of Maryland)
-https://github.com/ARKie-09/agentmath
-Shaashvat Sachendra Shetty (University of Maryland)
-Bahar Asgari (University of Maryland)
-https://github.com/shaashvatshetty8/dreu-2026-research-log-shaashvat/blob/main/README.md
-McKenzie Delia Davis Watkins (University of Maryland)
-Laurel Riek (UC San Diego)
-McKenzie&#8217;s Log
-Gaëlle Carla Milfort (University of Maryland, Baltimore County)
-Maja Mataric (University of Southern California)
-Gaelle&#8217;s Log
-Adya Gopi Bharadwaj (University of Massachusetts, Amherst)
-Zhao Han (University of South Florida)
-https://github.com/Adya-G-Bharadwaj/
-Farzeen Nafees (University of New Orleans)
-Orit Peleg (University of Colorado, Boulder)
-https://github.com/fnafees/
-Aniyah Simone Jaylin Tucker (University of North Carolina, Charlotte)
-Roberto Yus (University of Maryland, Baltimore County)
-Aniyah&#8217;s Log
-Brian Emre Tekmen (University of North Carolina, Greensboro)
-Kyla A. McMullen (University of Florida)
-https://github.com/etekmen13/
 Titilope Oluwatosin Adeniyi (University of North Carolina, Greensboro)
 Yingcheng Sun (University of North Carolina, Greensboro)
 https://github.com/TitilopeAdeniyi/
-Isabella Taylor Morgan (University of Texas Rio Grande Valley)
-Ergun Simsek (University of Maryland, Baltimore County)
-https://github.com/777isabella/
-Xiaoqi (Cici) Lu (Wake Technical Community College)
-Vishnu Pendyala (San Jose State University)
-Cici&#8217;s Log
+Ankita Banik (New Jersey City University)
+Neelu Sinha (Fairleigh Dickinson University (FDU))
+Ankita&#8217;s Log
+Anthony Maxim Bazhenov (Northeastern University)
+Orit Peleg (University of Colorado, Boulder)
+https://github.com/anthonybazhenov/
+Adya Gopi Bharadwaj (University of Massachusetts, Amherst)
+Zhao Han (University of South Florida)
+https://github.com/Adya-G-Bharadwaj/
+Yaneli Ava Cruz (California State Polytechnic University)
+Tiziano Piccardi (Johns Hopkins University)
+Yaneli&#8217;s Log
+Juliette R Dashe (Colorado State University)
+Angelique Taylor (Cornell University)
+https://github.com/juliettedashe-creates/
+McKenzie Delia Davis-Watkins (University of Maryland)
+Laurel Riek (UC San Diego)
+McKenzie&#8217;s Log
 Ronald Deng (Williams College)
 Ananya Ashish Joshi (Johns Hopkins University)
 https://github.com/ronalddengz/
-Siddharth Raghav Chander (California Institute of Technology)
-Leandros Tassiulas (Yale University)
-https://www.overleaf.com/read/spbyxvsrnqwd#4c8e8f
-Amin Weinman (Colorado School of Mines)
-Mustafa Ilhan Akbas (Embry-Riddle Aeronautical University)
-https://github.com/Amin9666/
-Audrey Feng (Dartmouth College)
-Phuong Cao (University of Illinois, Urbana Champaign)
-https://github.com/audreyfeng13/
-Ourania Nassis Rahman (Fairleigh Dickinson University)
-Lei Zhang (University of Maryland, Baltimore County)
-https://github.com/ourania-r/
-Vilohith Gokarakonda (Georgia Institute of Technology)
-Ming Lin (University of Maryland, College Park)
-https://github.com/VMaster123/
-Vincent Jacob Sanchez (New Mexico State University)
-Samee U. Khan (Kansas State University)
-https://github.com/VSanchez33/
-Chaitanya Singh Chauhan (North Carolina State University)
-Md Shafayat Hossain (University of California, Los Angeles)
-https://github.com/firstDecades/
-Evan Matthew Gerns (Northwestern University)
-Swapnil Patel (Lawrence Berkeley National Laboratory)
-https://github.com/EvanGerns/
-April Gu Wang (Northwestern University)
-Yongshan Ding (Yale University)
-https://github.com/april864/
-Sofia Furda (Pace University)
-Dr. Rutal Mahajan (Utica University)
-https://github.com/Sofiafurda/
-Raphael F. Bastos (Pennsylvania State University)
-Leandros Tassiulas (Yale University)
-https://github.com/raphaelfbastos/
-Asdaq Rafeeque (Rochester Institute of Technology)
-Wibe Albert de Jong (Lawrence Berkeley National Laboratory)
-https://github.com/Asdaqr/
-Owen A. Barnes (Towson University)
-Fernando Granha Jeronimo (University of Illinois, Urbana Champaign)
-https://owenabarnes.com/projects/UIUC_DREU.html
-Bach Le (University of California, Santa Barbara)
-Swamit Tannu (University of Wisconsin, Madison)
-https://github.com/btle109/
-Victoria Zhang (University of Illinois, Urbana Champaign)
-Phuong Cao (University of Illinois, Urbana Champaign)
-https://github.com/victoriiz/
-Samir Nazar (University of Maryland)
-Ming Lin (University of Maryland, College Park)
-Samir&#8217;s Log
-Patrina Pun (University of Maryland, Baltimore County)
-Pushpita Chatterjee (Meharry Medical College)
-https://github.com/patrinapun1-bit/
-Simran (Summer) Malik (University of North Carolina, Charlotte)
-Fernando Granha Jeronimo (University of Illinois, Urbana Champaign)
-https://simransummermalik.github.io/
-Hecdier Damian Crespo (University of North Texas)
-Mustafa Ilhan Akbas (Embry-Riddle Aeronautical University)
-https://github.com/crexpoxjr/
-Jack William Nero (University of Notre Dame)
-Lei Zhang (University of Maryland, Baltimore County)
-https://github.com/jacknero2/
-William Kittelberger (University of Rochester)
-Swamit Tannu (University of Wisconsin, Madison)
-Will&#8217;s Log
-Braden Cohen Lenn (University of Rochester)
-Wibe Albert de Jong (Lawrence Berkeley National Laboratory)
-Braden&#8217;s Log
+Matthew Garcia (Northeastern University)
+Megan Hofmann (Northeastern University)
+Matthew&#8217;s Log
+Avni Israni (California State University, Northridge)
+Marjan Asadinia (California State University, Northridge)
+https://github.com/AvniIsrani1/
+Rosa Jahankhah (De Anza College)
+Ananya Ashish Joshi (Johns Hopkins University)
+Rosa&#8217;s Log
+Saketh Kantipudi (University of Illinois, Urbana Champaign)
+Nancy M. Amato (University of Illinois, Urbana Champaign)
+Saketh&#8217;s Log
+Aryan Karnick (University of Maryland)
+Aravind Srinivasan (University of Maryland)
+https://github.com/ARKie-09/agentmath
+Parth Nilesh Kheni (Boston University)
+Elaine Schaertl Short (Tufts University) (Tufts University)
+Parth&#8217;s Log
+Xiaoqi (Cici) Lu (Wake Technical Community College)
+Vishnu Pendyala (San Jose State University)
+Cici&#8217;s Log
+Isabella Marquez (University of Illinois, Urbana Champaign)
+ChengXiang Zhai (University of Illinois, Urbana Champaign)
+https://github.com/ISAMCS/
+Marianne Kaye Dapuay Martinez (University of Hawaii at Hilo)
+Paul Rosen (University of Utah)
+https://github.com/marikmartinez/
+Citlalli Monique Martinez-Cervantes (California State University, Northridge)
+Asma Jodeiri Akbarfam (Washington State University)
+https://github.com/quesitopre/
+Melissa Liseth Mercado-Garcia (Bowie State University)
+Kyla A. McMullen (University of Florida)
+Melissa&#8217;s Log
+Vanessa Meyer (University of Houston)
+Jian Gong (University of Wyoming)
+Vanessa&#8217;s Log
+Gaëlle Carla Milfort (University of Maryland, Baltimore County)
+Maja Mataric (University of Southern California)
+Gaelle&#8217;s Log
+Robert Cesar Molina (University of Illinois, Urbana Champaign)
+Nancy M. Amato (University of Illinois, Urbana Champaign)
+https://github.com/RCMolina0/
+Isabella Taylor Morgan (University of Texas Rio Grande Valley)
+Ergun Simsek (University of Maryland, Baltimore County)
+https://github.com/777isabella/
+Farzeen Nafees (University of New Orleans)
+Orit Peleg (University of Colorado, Boulder)
+https://github.com/fnafees/
+Sai Gayathri Prakash (Georgia Institute of Technology)
+Nancy M. Amato (University of Illinois, Urbana Champaign)
+Sai&#8217;s Log
+Susanna Mary Quayle (Fayetteville Technical Community College)
+Tiffany Barnes (North Carolina State University)
+https://github.com/susanna3003/
+Steven Sanchez (University of Houston)
+Ali Ghanbari (Auburn University)
+https://stvsz04.github.io/
+Mykhaylo Severinov (Ivy Tech Community College)
+Roberto Yus (University of Maryland, Baltimore County)
+https://github.com/myk-sev/
+Isabela Sforcin (University of California, Riverside)
+Maja Mataric (University of Southern California)
+https://github.com/sforcin/
+Shaashvat Sachendra Shetty (University of Maryland)
+Bahar Asgari (University of Maryland)
+https://github.com/shaashvatshetty8/
+Brian Emre Tekmen (University of North Carolina, Greensboro)
+Kyla A. McMullen (University of Florida)
+https://github.com/etekmen13/
+Aniyah Simone Jaylin Tucker (University of North Carolina, Charlotte)
+Roberto Yus (University of Maryland, Baltimore County)
+Aniyah&#8217;s Log
+Phoenix Eros Wilson (University of California, Berkeley)
+Kristina Gligoric (Johns Hopkins University)
+https://github.com/lordkilgore/
+Grace Megan Yu (Georgia Institute of Technology)
+Suresh Marru (Georgia Institute of Technology)
+https://gracemyu.github.io/dreu/
+DREU-QIS
+Student
+Mentor
+Research Website
 Joel Banks (University of Texas at Austin)
 Md Shafayat Hossain (University of California, Los Angeles)
 https://github.com/iamjb4321/
-Cosmo Yang Wu (University of Texas at Austin)
-Samee U. Khan (Kansas State University)
-https://github.com/CosmoWuu1579/
-Kevin Li (University of Texas at Austin)
-Wibe Albert de Jong (Lawrence Berkeley National Laboratory)
-Kevin&#8217;s Log
-Khadijah Talib (University of the District of Columbia)
-Pushpita Chatterjee (Meharry Medical College)
-https://github.com/BlackWidow33/
-Kyle Hartness (Utica University)
-Dr. Rutal Mahajan (Utica University)
-https://github.com/kahartne/
+Owen Barnes (Towson University)
+Fernando Granha Jeronimo (University of Illinois, Urbana Champaign)
+https://owenabarnes.com/projects/UIUC_DREU.html
+Raphael F. Bastos (Pennsylvania State University)
+Leandros Tassiulas (Yale University)
+https://github.com/raphaelfbastos/
 Edmund Daragh Bombardieri (Washington and Lee University)
 Dr. Rutal Mahajan (Utica University)
 Edmund&#8217;s Log
+Siddharth Raghav Chander (California Institute of Technology)
+Leandros Tassiulas (Yale University)
+https://www.overleaf.com/read/spbyxvsrnqwd#4c8e8f
+Chaitanya Singh Chauhan (North Carolina State University)
+Md Shafayat Hossain (University of California, Los Angeles)
+https://github.com/firstDecades/
+Hecdier Damian Crespo (University of North Texas)
+Mustafa Ilhan Akbas (Embry-Riddle Aeronautical University)
+https://github.com/crexpoxjr/
+Audrey Feng (Dartmouth College)
+Phuong Cao (University of Illinois, Urbana Champaign)
+https://github.com/audreyfeng13/
+Sofia Furda (Pace University)
+Dr. Rutal Mahajan (Utica University)
+https://github.com/Sofiafurda/
+Evan Matthew Gerns (Northwestern University)
+Swapnil Patel (Lawrence Berkeley National Laboratory)
+https://github.com/EvanGerns/
+Vilohith Gokarakonda (Georgia Institute of Technology)
+Ming Lin (University of Maryland, College Park)
+https://github.com/VMaster123/
+Kyle Hartness (Utica University)
+Dr. Rutal Mahajan (Utica University)
+https://github.com/kahartne/
+William Kittelberger (University of Rochester)
+Swamit Tannu (University of Wisconsin, Madison)
+William&#8217;s Log
+Bach Le (University of California, Santa Barbara)
+Swamit Tannu (University of Wisconsin, Madison)
+https://github.com/btle109/
+Braden Cohen Lenn (University of Rochester)
+Wibe Albert de Jong (Lawrence Berkeley National Laboratory)
+Braden&#8217;s Log
+Kevin Li (University of Texas at Austin)
+Wibe Albert de Jong (Lawrence Berkeley National Laboratory)
+Kevin&#8217;s Log
+Simran (Summer) Malik (University of North Carolina, Charlotte)
+Fernando Granha Jeronimo (University of Illinois, Urbana Champaign)
+https://simransummermalik.github.io/
+Samir Nazar (University of Maryland)
+Ming Lin (University of Maryland, College Park)
+Samir&#8217;s Log
+Jack William Nero (University of Notre Dame)
+Lei Zhang (University of Maryland, Baltimore County)
+https://github.com/jacknero2/
+Patrina Pun (University of Maryland, Baltimore County)
+Pushpita Chatterjee (Meharry Medical College)
+https://github.com/patrinapun1-bit/
+Asdaq Rafeeque (Rochester Institute of Technology)
+Wibe Albert de Jong (Lawrence Berkeley National Laboratory)
+https://github.com/Asdaqr/
+Ourania Nassis Rahman (Fairleigh Dickinson University)
+Lei Zhang (University of Maryland, Baltimore County)
+https://github.com/ourania-r/
+Vincent Jacob Sanchez (New Mexico State University)
+Samee U. Khan (Kansas State University)
+https://github.com/VSanchez33/
+Khadijah Talib (University of the District of Columbia)
+Pushpita Chatterjee (Meharry Medical College)
+https://github.com/BlackWidow33/
+April Gu Wang (Northwestern University)
+Yongshan Ding (Yale University)
+https://github.com/april864/
+Amin Weinman (Colorado School of Mines)
+Mustafa Ilhan Akbas (Embry-Riddle Aeronautical University)
+https://github.com/Amin9666/
+Cosmo Wu (University of Texas at Austin)
+Samee U. Khan (Kansas State University)
+https://github.com/CosmoWuu1579/
+Victoria Zhang (University of Illinois, Urbana Champaign)
+Phuong Cao (University of Illinois, Urbana Champaign)
+https://github.com/victoriiz/
 2024
 Student
 Mentor

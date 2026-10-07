@@ -48,6 +48,8 @@ Columbia University, Department of Mathematics
 [ GROW26 ] GROW 2026 &nbsp; (deadline 2026/09/23 11:59PM) &nbsp; Apply
 Duke University, Department of Mathematics
 [ PRUV2027 ] Program for Research for Undergraduates (PRUV) 2027 &nbsp; Apply
+The EDGE Foundation
+[ RUSKAI ] Ruskai Research Fund &nbsp; Apply
 IAS/Park City Mathematics Institute
 [ PCMIRFP28 ] PCMI Research Topic Proposal &nbsp; Apply
 Institute for Advanced Study, School of Mathematics
@@ -63,5 +65,5 @@ University of Minnesota Twin Cities, School of Mathematics
 [ UMNREU ] Mathematics of Soft Matter &nbsp; (deadline 2026/06/12 11:59PM) &nbsp; Apply
 Williams College, Mathematics and Statistics
 [ POLYMATHREU2027 ] Polymath Jr-REU2027 &nbsp; Apply
-(32 programs listed)
+(33 programs listed)
 &copy; 2026 MathPrograms.Org, American Mathematical Society. All Rights Reserved.
