@@ -146,6 +146,41 @@ class UnderclassmanDetectionTests(unittest.TestCase):
                                               digest.company_and_position), [])
 
 
+class StanfordBlockTests(unittest.TestCase):
+    """Stanford's own programme pages go in the top block, on the morning they change."""
+
+    def _page(self, url, relevant=True):
+        change = models.Change(source_id="surim-apply", kind="changed",
+                               key="Stanford SURIM (2 added, 1 removed)", detail="d",
+                               url=url, change_id="surim-apply:page")
+        return models.Judgment(change=change, outcome=models.MODEL, relevant=relevant,
+                               confidence="high", program_name="Stanford SURIM")
+
+    def test_a_stanford_page_is_in_the_top_block_and_not_ranked(self):
+        judgment = self._page("https://surim.stanford.edu/apply-surim")
+        self.assertTrue(urgency.in_top_block(judgment))
+        self.assertFalse(urgency.is_urgent(judgment))
+        _, body = digest.render([judgment], [], {})
+        self.assertIn("## ■ FOR FRESHMEN & UNDERCLASSMEN (1)", body)
+        self.assertNotIn("## ■ OPPORTUNITIES", body)
+
+    def test_the_host_must_be_stanford_not_merely_mention_it(self):
+        self.assertTrue(urgency.is_stanford(self._page("https://careers.slac.stanford.edu/x")))
+        self.assertFalse(urgency.is_stanford(self._page("https://stanford.edu.example.com/")))
+        self.assertFalse(urgency.is_stanford(self._page("https://example.com/?u=stanford.edu")))
+
+    def test_a_ruled_out_stanford_page_stays_in_ruled_out(self):
+        self.assertFalse(urgency.in_top_block(
+            self._page("https://surim.stanford.edu/", relevant=False)))
+
+    def test_a_stanford_page_is_never_pinned(self):
+        """A programme page stays up all year, so a pin would never retire."""
+        judgment = self._page("https://surim.stanford.edu/apply-surim")
+        self.assertEqual(urgency.refresh_pins(
+            [judgment], [], {"surim-apply": {"surim-apply:page"}}, {"surim-apply"}, TODAY,
+            digest.company_and_position), [])
+
+
 class PinRefreshTests(unittest.TestCase):
     def test_a_new_underclassman_row_is_pinned(self):
         judgments = [_judgment("Acme / First-Year Analyst")]

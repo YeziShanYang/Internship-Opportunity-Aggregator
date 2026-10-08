@@ -353,11 +353,11 @@ def render(
     def by_size(rows: list[models.Judgment]) -> list[models.Judgment]:
         return sorted(rows, key=lambda j: j.employer_size != "small")
 
-    underclass = [j for j in judgments if j.relevant and urgency.targets_underclassmen(j)]
+    underclass = [j for j in judgments if urgency.in_top_block(j)]
     high = by_size([j for j in judgments if urgency.is_urgent(j)])
     medium = sorted(
         by_size([j for j in judgments if j.relevant and not urgency.is_urgent(j)
-                 and not urgency.targets_underclassmen(j)]),
+                 and not urgency.in_top_block(j)]),
         key=urgency.medium_order)
     ruled_out = [j for j in judgments if not j.relevant]
 
@@ -386,7 +386,8 @@ def render(
     # 2026-10-08. They are the rows this owner is most likely to land, and they used to
     # compete for the top tier with every posting that had a deadline. A pin keeps a row
     # here every morning until its posting comes down; one that moved today prints its
-    # full cell, and a carried one prints compactly -- see `_pinned_row`.
+    # full cell, and a carried one prints compactly -- see `_pinned_row`. Stanford's own
+    # programme pages join them on the morning they change; see `urgency.is_stanford`.
     moved = {j.change.change_id for j in judgments}
     first_years = [_judgment_row(j, ranked=False) for j in underclass]
     first_years += [_pinned_row(pin, today) for pin in (pinned or [])
@@ -394,8 +395,9 @@ def render(
     if first_years:
         body.append(f"## ■ FOR FRESHMEN & UNDERCLASSMEN ({len(first_years)})")
         body.append("")
-        body.append("_Built for first- or second-years. Each stays here until its "
-                    "posting comes down._")
+        body.append("_Built for first- or second-years, plus Stanford's own programmes. A "
+                    "posting stays here until it comes down; a Stanford page shows on the "
+                    "morning it changes._")
         body.append("")
         body.append("| Company | Position | Notes |")
         body.append("|---|---|---|")

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import datetime
 import re
+from urllib.parse import urlsplit
 
 from core import clock, models
 from screen import rules as screen_rules
@@ -107,6 +108,26 @@ def targets_underclassmen(judgment: models.Judgment) -> bool:
     return _aimed_at_underclassmen(judgment.class_year, judgment.change.key)
 
 
+def is_stanford(judgment: models.Judgment) -> bool:
+    """Whether the change comes from a Stanford page (stanford.edu, SLAC included).
+
+    Added 2026-10-08: Stanford's own research programmes -- CURIS, SURIM, SIEPR, the
+    VPUE index, SOLO's first-year filter -- are open to its first-years almost without
+    exception, so they go in the top block with the postings built for them. Read off
+    the host rather than a sources.csv column, because the host is the fact and a column
+    would be one more thing to remember to set. Unlike an underclassman posting this is
+    never pinned: a programme page stays up all year, so a pin would never retire, and a
+    page change is news on the morning it happens.
+    """
+    host = (urlsplit(judgment.change.url or "").hostname or "").lower()
+    return host == "stanford.edu" or host.endswith(".stanford.edu")
+
+
+def in_top_block(judgment: models.Judgment) -> bool:
+    """Relevant, and either built for underclassmen or a Stanford programme."""
+    return judgment.relevant and (targets_underclassmen(judgment) or is_stanford(judgment))
+
+
 def is_rolling(judgment: models.Judgment) -> bool:
     """Whether the posting itself says it closes when full."""
     return judgment.deadline.strip().lower() == ROLLING
@@ -172,8 +193,8 @@ def medium_order(judgment: models.Judgment) -> int:
 
 
 def is_urgent(judgment: models.Judgment) -> bool:
-    """High tier: relevant, not in the underclassman block, and a dated reason."""
-    if not judgment.relevant or targets_underclassmen(judgment):
+    """High tier: relevant, not in the top block, and a dated reason."""
+    if not judgment.relevant or in_top_block(judgment):
         return False
     return rank(judgment)[0] == HIGH
 
