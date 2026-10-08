@@ -215,14 +215,59 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 | | |
 |:---|:---|
 | Sources watched | **250** (242 fetched, 8 blocked and handled by hand); three of them read 343 small employers' job boards in bulk |
-| Breakdown | 87 ATS boards · 103 watched pages · 8 aggregator repos · 4 manual |
-| Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
+| Breakdown | 91 ATS boards · 135 watched pages · 12 aggregator repos · 3 bulk sources · the NSF REU feed · 8 manual |
+| Read each morning | **~33,000** job-board postings, cut to the student roles and diffed against 106 board snapshots and 103 page snapshots |
 | Programmes in the database | **351** |
-| Digests delivered | **16 of 16**, one a day since 2026-09-05 |
-| Cost | **~$0.065/day** median, ~$24/yr; range $0.007-$0.084 over the six days at the current settings; $0.34 on the worst day ever recorded |
-| Tests | **292 passing** (6 skip without an API key) |
-| Code | ~8,960 lines across 46 modules, plus ~4,640 lines of tests |
-| Runtime | ~4 min, almost all of it `gather` |
+| Digests delivered | **33 of 33**, one every day from 2026-09-06 to 2026-10-08 |
+| Cost | **~$0.08/day** median over 23 digests (2026-09-16 to 2026-10-08), range $0.007-$0.25 |
+| Tests | **339 passing** (6 skip without an API key) |
+| Code | ~10,300 lines across 49 modules, plus ~5,500 lines of tests |
+| Runtime | ~20 min on the Actions runner, almost all of it `gather` |
+
+### Coverage against the largest public list
+
+The question the project has to answer is whether watching 250 sources beats bookmarking
+[Simplify](https://github.com/SimplifyJobs/Summer2027-Internships), the most-used internship
+list. `process/coverage.py` answers it weekly and records it in
+[`data/coverage.csv`](data/coverage.csv). Measured on 2026-10-08:
+
+| | Tracker | Simplify | Tracker has, Simplify doesn't | Of those, on no public list |
+|:---|---:|---:|---:|---:|
+| Open US internships in quant, math, CS, data and ML | **1,640** | 1,526 | **571 (+37%)** | 125 |
+| Quant only | **177** | 153 | **55 (+36%)** | 29 |
+
+"On no public list" means the posting came from an employer's own job board and appears
+on none of the aggregators the tracker reads, Simplify included.
+
+How it is counted, and why the figure is a floor:
+
+- **Simplify is measured from its whole `listings.json`**, every active posting whatever
+  term it is filed under, not from the sections of its README the tracker happens to
+  read. Comparing against the tracker's own snapshot of Simplify gave 2.3x; that was wrong.
+- **Both sides are deduplicated the same way**: by the employer's posting link, and
+  failing that by company plus most of the title words. The second rule merges some
+  genuinely different roles, which can only lower the tracker's count.
+- **Graduate-only and non-US postings are excluded on both sides.**
+- The first baseline, on 2026-10-01, was +14%. The difference is the sources added on
+  2026-10-01 and 10-02, after that baseline was taken, not a change of method. Sources
+  added on 2026-10-08 are not yet in the figure.
+
+### Selectivity
+
+The digest is not a firehose. Across the 23 digests from 2026-09-16 to 2026-10-08:
+
+- **59% of changed postings were ruled out before reaching the table** (1,462 of 2,459),
+  on class year, field or employer, each with its reason printed in RULED OUT.
+- **A median of 31 rows a day** reached the table.
+- On the job boards, **about 90% of the postings read each morning are dropped as not
+  student roles** before anything is diffed (30,002 of 33,122 on 2026-10-08).
+
+### Speed is not the advantage
+
+Measured on Greenhouse postings on 2026-10-01, Simplify lists a new posting a median of **4.1h** after the
+employer publishes it; this tracker's daily run records it a median of **17.1h** after.
+A daily digest is read once a day, so polling faster would not change what reaches the
+reader. The advantage is coverage, and the numbers above are the claim.
 
 A few numbers I find more interesting than the headline ones:
 
