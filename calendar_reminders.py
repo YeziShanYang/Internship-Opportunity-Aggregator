@@ -23,6 +23,12 @@ BY_MONTH: dict[int, list[str]] = {
         "MIT Pokerbots runs this month, but it is marked NO in your sheet: the "
         "competition server needs a teammate with MIT certificates. Only worth revisiting "
         "if you have an MIT teammate.",
+        "Caltech SURF and USC ICT's Summer Research Program refuse the Actions runner, so "
+        "nothing watches them - check their pages for the Summer 2027 cycle this month: "
+        "sfp.caltech.edu/undergraduate-research/programs/surf/application_information and "
+        "ict.usc.edu/careers/internships/summer-research-program-application. Berkeley "
+        "SUPERB-AI4E is unwatched for the same reason, but it takes rising juniors and "
+        "seniors, so it is one for later.",
     ],
     2: [
         "SURIM (~Feb 26), CURIS (Jan 27-Feb 10), UChicago REU (~Feb 6), VPUE Faculty "
