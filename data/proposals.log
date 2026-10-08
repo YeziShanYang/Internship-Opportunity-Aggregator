@@ -1055,3 +1055,15 @@
 2026-10-08T14:49:47+00:00	llnl-students	LLNL student internships (Lawrence Livermore National Laboratory) (4 added, 4 removed)	proposed eligible=Check the main listing for explicit year eligibility; if it says "undergraduate" or "any undergraduate year" mark eligible true.	Large national lab internship that can admit undergraduates; posting text here is only a student bio so eligibility is unclear, so keep as potentially relevant.
 2026-10-08T14:49:47+00:00	smallco-greenhouse	Early Career, Associate Product Manager (2027) @ San Francisco, CA	proposed eligible=ineligible — targets 2027 graduates (not a June 2030 grad)	graduating 2027
 2026-10-08T14:49:47+00:00	smallco-greenhouse	FPGA Engineer (New Grad Summer 2027) @ Los Angeles, CA (On-site)	proposed eligible=false: posting targets new grads for Summer 2027 (graduating 2027), which excludes a June 2030 grad	new grad 2027
+2026-10-08T16:05:44+00:00	add-opportunity	Cal Hacks	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	HackMIT	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	HackGT	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	HackPrinceton	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	YHack	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	HackUMass	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	LA Hacks	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	HopHacks	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	SF Hacks	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	SJHacks	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	Cerebral Valley SF & Bay Area AI events calendar	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
+2026-10-08T16:05:44+00:00	add-opportunity	Hack for Humanity (Santa Clara University)	added from hackathon coverage sweep 2026-10-08	eligible=CHECK (agent-set; confirm by hand)
