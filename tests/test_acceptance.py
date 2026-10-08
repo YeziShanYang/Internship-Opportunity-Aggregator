@@ -1453,6 +1453,23 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         r = _check_page(self._src(), FakeHTMLClient(shell))
         self.assertFalse(r.ok)
 
+    def test_14_9l2_a_page_under_the_floor_quotes_what_answered(self):
+        """2026-10-08: three unrelated sites failed from the runner with an identical
+        "73 characters of text" and nothing recorded what those characters were."""
+        block = "<html><body><h1>Access denied</h1><p>Your request was blocked.</p></body></html>"
+        r = _check_page(self._src(), FakeHTMLClient(block))
+        self.assertFalse(r.ok)
+        self.assertIn('"Access denied / Your request was blocked."', r.error)
+        # Clipped, so a long-ish block page cannot flood HEALTH.
+        wordy = "<html><body><p>" + "blocked " * 55 + "</p></body></html>"
+        r = _check_page(self._src(), FakeHTMLClient(wordy))
+        self.assertFalse(r.ok)
+        self.assertLess(len(r.error), 300)
+        self.assertTrue(r.error.endswith('…"'), r.error)
+        # An empty body says so rather than quoting nothing.
+        r = _check_page(self._src(), FakeHTMLClient("<html><body></body></html>"))
+        self.assertIn("(no text at all)", r.error)
+
     def test_14_9m_a_page_that_shrinks_is_a_failure(self):
         r = _check_page(self._src(source_id="shrink"), FakeHTMLClient(self.PAGE))
         store.write_snapshot("shrink", r.snapshot_text, ext="txt")

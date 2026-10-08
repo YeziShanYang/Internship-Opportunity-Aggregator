@@ -50,6 +50,14 @@ SHRINK_RATIO = 0.4
 # A nav change can move dozens of lines; the digest only needs enough to judge.
 MAX_DIFF_LINES = 12
 
+# How much of a page under the absolute floor is quoted in its failure message. A block
+# page is short by definition, so quoting it costs one line of HEALTH and answers the
+# only question that matters: who answered. On 2026-10-08 three unrelated sites (on
+# LiteSpeed, nginx and Apache, on three different hosts) failed from the Actions runner
+# with an identical "73 characters of text" while all three answered a laptop in full,
+# and nothing recorded what those 73 characters were.
+SHORT_PAGE_QUOTE_CHARS = 160
+
 # No single diff line may be longer than this. Several watched sources are vendor JSON
 # feeds (Workable, Rippling, Teamtailor, Pinpoint) served as one unbroken line, and
 # Wolverine's is 147,741 characters. Emitting that verbatim would put a single line past
@@ -119,6 +127,14 @@ def normalise(raw_html: str) -> list[str]:
             lines.append(collapsed)
     return lines
 
+
+
+def _quote(lines: list[str]) -> str:
+    """A short page's own text, on one line and clipped, for a failure message."""
+    joined = " / ".join(lines).replace("`", "'")
+    if len(joined) > SHORT_PAGE_QUOTE_CHARS:
+        joined = joined[: SHORT_PAGE_QUOTE_CHARS - 1].rstrip() + "…"
+    return f'"{joined}"' if joined else "(no text at all)"
 
 
 def _same_feed(previous: str, text: str) -> bool:
@@ -237,7 +253,7 @@ def assess(
             content_length=len(text),
             error=(
                 f"page returned only {len(text)} characters of text "
-                "(renders in JavaScript, or was blocked)"
+                f"(renders in JavaScript, or was blocked): {_quote(lines)}"
             ),
         )
     # The ratio exists to catch a JavaScript shell, and a rendered page is by
