@@ -57,6 +57,14 @@ MAX_DIFF_LINES = 12
 # reach the digest and the classifier; they just do not inherit either flag.
 MAX_FLAGGED_ADDED_LINES = 10
 
+# How much of a page under the absolute floor is quoted in its failure message. A block
+# page is short by definition, so quoting it costs one line of HEALTH and answers the
+# only question that matters: who answered. On 2026-10-08 three unrelated sites (on
+# LiteSpeed, nginx and Apache, on three different hosts) failed from the Actions runner
+# with an identical "73 characters of text" while all three answered a laptop in full,
+# and nothing recorded what those 73 characters were.
+SHORT_PAGE_QUOTE_CHARS = 160
+
 # No single diff line may be longer than this. Several watched sources are vendor JSON
 # feeds (Workable, Rippling, Teamtailor, Pinpoint) served as one unbroken line, and
 # Wolverine's is 147,741 characters. Emitting that verbatim would put a single line past
@@ -128,6 +136,14 @@ def normalise(raw_html: str) -> list[str]:
 
 
 
+def _quote(lines: list[str]) -> str:
+    """A short page's own text, on one line and clipped, for a failure message."""
+    joined = " / ".join(lines).replace("`", "'")
+    if len(joined) > SHORT_PAGE_QUOTE_CHARS:
+        joined = joined[: SHORT_PAGE_QUOTE_CHARS - 1].rstrip() + "…"
+    return f'"{joined}"' if joined else "(no text at all)"
+
+
 def _same_feed(previous: str, text: str) -> bool:
     """True when both texts are the same vendor JSON feed, so a shrink is postings closing.
 
@@ -145,6 +161,32 @@ def _same_feed(previous: str, text: str) -> bool:
     if isinstance(old, dict) and isinstance(new, dict):
         return old.keys() == new.keys()
     return isinstance(old, list) and isinstance(new, list)
+
+# A listing page's own statement that it has nothing listed, as a whole line. Anchored at
+# both ends so prose that merely contains the words ("there are no events like it") is
+# not read as an empty state.
+_EMPTY_LISTING = re.compile(
+    r"(?i)^(?:there\s+are\s+)?(?:currently\s+)?no\s+"
+    r"(?:upcoming\s+|current\s+|open\s+|available\s+)?"
+    r"(?:events?|positions?|openings?|jobs?|opportunities|postings?|programs?)"
+    r"(?:\s+(?:are\s+)?(?:available|found|posted|scheduled|listed|open|currently"
+    r"|at\s+this\s+time))*\s*[.!]?$")
+
+
+def _states_empty_listing(previous: str, lines: list[str]) -> bool:
+    """True when the page now says, in a line of its own, that its listing is empty.
+
+    The shrink guard is for a page that lost its body to a redesign, a block or a partial
+    render. A listing page whose last item has passed loses most of its text too, and
+    says so: IAQF's upcoming-events page went from 3,878 to 1,380 characters on
+    2026-10-07 when its one seminar (6 Oct) passed, and now reads "No events available".
+    A failed fetch never replaces its baseline, so without this the source would fail
+    every morning until IAQF next schedules an event. The statement has to be new, so a
+    page that already said it and then lost its body still fails.
+    """
+    before = set(previous.splitlines())
+    return any(_EMPTY_LISTING.match(line) and line not in before for line in lines)
+
 
 # A live countdown renders one unit per line -- "Days", "69", "Hours", "03", "Minutes",
 # "07", "Seconds", "57" on the SMART Scholarship page (2026-09-26) -- so it would read as
@@ -245,7 +287,7 @@ def assess(
             content_length=len(text),
             error=(
                 f"page returned only {len(text)} characters of text "
-                "(renders in JavaScript, or was blocked)"
+                f"(renders in JavaScript, or was blocked): {_quote(lines)}"
             ),
         )
     # The ratio exists to catch a JavaScript shell, and a rendered page is by
@@ -267,6 +309,7 @@ def assess(
         previous is not None
         and len(text) < SHRINK_RATIO * len(previous)
         and not _same_feed(previous, text)
+        and not _states_empty_listing(previous, lines)
     ):
         return models.SourceResult(
             source_id=source_id,

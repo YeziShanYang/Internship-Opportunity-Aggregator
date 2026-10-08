@@ -827,6 +827,58 @@ class RepoCollapseTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(len(result.changes), 6)
 
 
+class RepoFilePathTests(_IsolatedState, unittest.TestCase):
+    """A repo whose table is not in README.md.
+
+    aprameyak/2027-tech-jobs moved its listings into SUMMER.md on 2026-10-05 and left
+    the README as a page of links, which parsed to zero rows for three mornings.
+    """
+
+    class Recording(FakeClient):
+        def __init__(self, readme):
+            super().__init__(readme)
+            self.urls = []
+
+        def get(self, url, *args, **kwargs):
+            self.urls.append(url)
+            return super().get(url, *args, **kwargs)
+
+    def test_the_url_column_may_name_a_file_inside_the_repo(self):
+        self.assertEqual(github_readme.split_target("owner/repo"), ("owner/repo", "README.md"))
+        self.assertEqual(github_readme.split_target("owner/repo/SUMMER.md"),
+                         ("owner/repo", "SUMMER.md"))
+        self.assertEqual(github_readme.split_target("owner/repo/docs/LIST.md"),
+                         ("owner/repo", "docs/LIST.md"))
+
+    def test_the_metadata_call_names_the_repo_and_the_raw_call_names_the_file(self):
+        client = self.Recording("| Company | Role |\n| --- | --- |\n| A | B |\n")
+        fetched = github_readme.fetch(
+            {"source_id": "r", "url": "owner/repo/SUMMER.md"}, client)
+        self.assertTrue(fetched.attempt.ok, fetched.attempt.error)
+        self.assertEqual(client.urls[0], f"{github_readme.GITHUB_API}/repos/owner/repo")
+        self.assertEqual(client.urls[1],
+                         f"{github_readme.RAW_BASE}/owner/repo/main/SUMMER.md")
+        self.assertTrue(fetched.attempt.final_url.endswith("/main/SUMMER.md"))
+
+    def test_discovery_still_knows_the_repo_is_watched(self):
+        from jobs import discovery
+        known = discovery._known([{"method": "github_readme",
+                                   "url": "Owner/Repo/SUMMER.md"}])
+        self.assertIn("repo:owner/repo", known)
+
+    def test_the_watched_file_parses_above_its_floor(self):
+        """The live config against the shape SUMMER.md has: one '#' heading."""
+        config = parse_readme.REPO_CONFIGS["aprameyak-2027"]
+        rows = "\n".join(
+            f"| Firm {i} | Software Engineer Intern | City {i} | Undergrad "
+            f"| [Apply](https://example.test/{i}) | Oct 8 |"
+            for i in range(config.min_rows + 1))
+        text = ("# ☀️ Summer 2027 Internships\n\n"
+                "| Company | Role | Location | Education | Application/Link | Date Added |\n"
+                "| --- | --- | --- | --- | --- | --- |\n" + rows + "\n")
+        self.assertEqual(len(parse_readme.extract(text, config).rows), config.min_rows + 1)
+
+
 # --- 14.7 -----------------------------------------------------------------------
 class PostingFilterTests(_IsolatedState, unittest.TestCase):
     """The change that made WORTH A LOOK readable: fetch the posting, then judge it.
@@ -1458,6 +1510,23 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         r = _check_page(self._src(), FakeHTMLClient(shell))
         self.assertFalse(r.ok)
 
+    def test_14_9l2_a_page_under_the_floor_quotes_what_answered(self):
+        """2026-10-08: three unrelated sites failed from the runner with an identical
+        "73 characters of text" and nothing recorded what those characters were."""
+        block = "<html><body><h1>Access denied</h1><p>Your request was blocked.</p></body></html>"
+        r = _check_page(self._src(), FakeHTMLClient(block))
+        self.assertFalse(r.ok)
+        self.assertIn('"Access denied / Your request was blocked."', r.error)
+        # Clipped, so a long-ish block page cannot flood HEALTH.
+        wordy = "<html><body><p>" + "blocked " * 55 + "</p></body></html>"
+        r = _check_page(self._src(), FakeHTMLClient(wordy))
+        self.assertFalse(r.ok)
+        self.assertLess(len(r.error), 300)
+        self.assertTrue(r.error.endswith('…"'), r.error)
+        # An empty body says so rather than quoting nothing.
+        r = _check_page(self._src(), FakeHTMLClient("<html><body></body></html>"))
+        self.assertIn("(no text at all)", r.error)
+
     def test_14_9m_a_page_that_shrinks_is_a_failure(self):
         r = _check_page(self._src(source_id="shrink"), FakeHTMLClient(self.PAGE))
         store.write_snapshot("shrink", r.snapshot_text, ext="txt")
@@ -1485,6 +1554,32 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
             FakeHTMLClient("<html><body>" + "<p>Access denied for this client.</p>" * 20 + "</body></html>"),
         )
         self.assertFalse(blocked.ok)
+
+    def test_14_9m2b_a_listing_that_says_it_is_empty_is_not_a_failure(self):
+        """IAQF's upcoming-events page, 2026-10-07: the one seminar passed, the page
+        shrank from 3,878 to 1,380 characters and now reads "No events available"."""
+        nav = "<p>Home</p><p>About</p><p>Membership</p>" * 30
+        seminar = "<p>Seminar abstract and speaker biography, at some length.</p>" * 40
+        listed = f"<html><body>{nav}<h2>Upcoming</h2>{seminar}</body></html>"
+        empty = f"<html><body>{nav}<h2>Upcoming</h2><p>No events available</p></body></html>"
+        r = _check_page(self._src(source_id="events"), FakeHTMLClient(listed))
+        store.write_snapshot("events", r.snapshot_text, ext="txt")
+        second = _check_page(self._src(source_id="events"), FakeHTMLClient(empty))
+        self.assertTrue(second.ok, second.error)
+        self.assertEqual(len(second.changes), 1, "the emptying is still reported")
+
+        # Prose that merely contains the words is not an empty state.
+        prose = f"<html><body>{nav}<p>There are no events like it in the field.</p></body></html>"
+        third = _check_page(self._src(source_id="events"), FakeHTMLClient(prose))
+        self.assertFalse(third.ok)
+        self.assertIn("shrank", third.error)
+
+        # Nor is a statement the page already made before it lost its body.
+        store.write_snapshot("said", "\n".join(
+            parse_page.normalise(listed.replace("<h2>", "<p>No events available</p><h2>"))),
+            ext="txt")
+        fourth = _check_page(self._src(source_id="said"), FakeHTMLClient(empty))
+        self.assertFalse(fourth.ok)
 
     def test_14_9m3_a_job_lists_relative_age_is_not_a_change(self):
         """The VC portfolio boards added 2026-09-30 print an age on every row."""

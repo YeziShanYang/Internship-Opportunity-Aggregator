@@ -149,6 +149,12 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         section_include=re.compile(r"^(engineering|data science|security)\b", re.I),
         min_rows=300,
     ),
+    # Read from SUMMER.md since 2026-10-08 (the url column carries the path). On
+    # 2026-10-05 the README stopped carrying its "newest 75" table and became a page of
+    # links, so the README parsed to zero rows. SUMMER.md is the full table: 5,452 rows
+    # on 2026-10-08, 2,894 of them marked 🔒 closed, and it only grows, so the floor sits
+    # well under that rather than at the old window's 40. Measured over the 24h to
+    # 2026-10-08 08:24 UTC: 83 added, 30 removed, 27 changed.
     "aprameyak-2027": RepoConfig(
         table_format="markdown",
         entity_columns=("Company",),
@@ -156,7 +162,7 @@ REPO_CONFIGS: dict[str, RepoConfig] = {
         qualifier_columns=("Location",),
         ignore_columns=("Date Added",),
         section_include=re.compile(r"summer 2027 internships", re.I),
-        min_rows=40,
+        min_rows=2000,
     ),
     "mehek-2027": RepoConfig(
         table_format="markdown",

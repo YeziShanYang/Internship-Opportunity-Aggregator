@@ -47,7 +47,7 @@ import httpx
 import classify
 from core import clock, paths, profile
 from persist import store
-from gather import ats
+from gather import ats, github_readme
 from process import parse_ats, parse_readme
 
 GITHUB_SEARCH = "https://api.github.com/search/repositories"
@@ -310,7 +310,8 @@ def _known(sources: list[dict[str, str]]) -> set[str]:
         url = (source.get("url") or "").strip()
         method = (source.get("method") or "").strip()
         if method == "github_readme":
-            known.add(f"repo:{url.lower()}")
+            # The repo, not the file: a row may name a path inside it.
+            known.add(f"repo:{github_readme.split_target(url)[0].lower()}")
         elif method in ats.SINGLE_SHOT:
             known.add(f"{method}:{url.lower()}")
         elif method in ats.BULK:
