@@ -6,7 +6,7 @@
 
 ## Overview
 
-A daily job that watches **229 sources, covering about 560 job boards and programme pages,** for quant, math and CS
+A daily job that watches **241 sources, covering about 570 job boards and programme pages,** for quant, math and CS
 internships, reads the postings that changed overnight, throws out the ones I can't
 apply to, and mails me what's left as a single table. It has run every morning since
 2026-09-05 and costs about **6-7 cents a day**.
@@ -109,7 +109,7 @@ The files that matter most, roughly in the order I'd read them:
    that prompt enforces.
 5. **[`deliver/urgency.py`](deliver/urgency.py)** — what gets to be urgent, which I have
    now been wrong about in both directions.
-6. **[`data/`](data/)** — the database: 334 programmes, 229 sources, the slug lists
+6. **[`data/`](data/)** — the database: 342 programmes, 241 sources, the slug lists
    behind the three bulk board sources, and one snapshot file per source, all committed on
    every run.
 7. **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the long version: every failure
@@ -146,7 +146,7 @@ Eight stages in a fixed order. Each one writes an artifact that the next one rea
 any stage can be re-run on its own without redoing the one before it.
 
 ```
-gather    →  fetch 221 sources                      ~11 min, the only slow stage
+gather    →  fetch 233 sources                      ~11 min, the only slow stage
 process   →  parse and diff against yesterday        0.7s, no network at all
 enrich    →  fetch the posting body behind each      O(changes), not O(postings)
              row that actually moved
@@ -214,10 +214,10 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 
 | | |
 |:---|:---|
-| Sources watched | **229** (221 fetched, 8 blocked and handled by hand); three of them read 343 small employers' job boards in bulk |
+| Sources watched | **241** (233 fetched, 8 blocked and handled by hand); three of them read 343 small employers' job boards in bulk |
 | Breakdown | 87 ATS boards · 103 watched pages · 8 aggregator repos · 4 manual |
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
-| Programmes in the database | **334** |
+| Programmes in the database | **342** |
 | Digests delivered | **16 of 16**, one a day since 2026-09-05 |
 | Cost | **~$0.065/day** median, ~$24/yr; range $0.007-$0.084 over the six days at the current settings; $0.34 on the worst day ever recorded |
 | Tests | **292 passing** (6 skip without an API key) |
