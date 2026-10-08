@@ -146,7 +146,7 @@ Eight stages in a fixed order. Each one writes an artifact that the next one rea
 any stage can be re-run on its own without redoing the one before it.
 
 ```
-gather    →  fetch 224 sources                      ~11 min, the only slow stage
+gather    →  fetch 221 sources                      ~11 min, the only slow stage
 process   →  parse and diff against yesterday        0.7s, no network at all
 enrich    →  fetch the posting body behind each      O(changes), not O(postings)
              row that actually moved
@@ -214,7 +214,7 @@ It works, and it has kept working, which for this kind of tool is the entire cla
 
 | | |
 |:---|:---|
-| Sources watched | **229** (224 fetched, 5 blocked and handled by hand); three of them read 343 small employers' job boards in bulk |
+| Sources watched | **229** (221 fetched, 8 blocked and handled by hand); three of them read 343 small employers' job boards in bulk |
 | Breakdown | 87 ATS boards · 103 watched pages · 8 aggregator repos · 4 manual |
 | Rows under diff | **2,165** structured rows across 85 board snapshots, plus 59 page snapshots — distilled from ~4,000 raw postings a day |
 | Programmes in the database | **334** |
