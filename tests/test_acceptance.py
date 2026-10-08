@@ -827,6 +827,58 @@ class RepoCollapseTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(len(result.changes), 6)
 
 
+class RepoFilePathTests(_IsolatedState, unittest.TestCase):
+    """A repo whose table is not in README.md.
+
+    aprameyak/2027-tech-jobs moved its listings into SUMMER.md on 2026-10-05 and left
+    the README as a page of links, which parsed to zero rows for three mornings.
+    """
+
+    class Recording(FakeClient):
+        def __init__(self, readme):
+            super().__init__(readme)
+            self.urls = []
+
+        def get(self, url, *args, **kwargs):
+            self.urls.append(url)
+            return super().get(url, *args, **kwargs)
+
+    def test_the_url_column_may_name_a_file_inside_the_repo(self):
+        self.assertEqual(github_readme.split_target("owner/repo"), ("owner/repo", "README.md"))
+        self.assertEqual(github_readme.split_target("owner/repo/SUMMER.md"),
+                         ("owner/repo", "SUMMER.md"))
+        self.assertEqual(github_readme.split_target("owner/repo/docs/LIST.md"),
+                         ("owner/repo", "docs/LIST.md"))
+
+    def test_the_metadata_call_names_the_repo_and_the_raw_call_names_the_file(self):
+        client = self.Recording("| Company | Role |\n| --- | --- |\n| A | B |\n")
+        fetched = github_readme.fetch(
+            {"source_id": "r", "url": "owner/repo/SUMMER.md"}, client)
+        self.assertTrue(fetched.attempt.ok, fetched.attempt.error)
+        self.assertEqual(client.urls[0], f"{github_readme.GITHUB_API}/repos/owner/repo")
+        self.assertEqual(client.urls[1],
+                         f"{github_readme.RAW_BASE}/owner/repo/main/SUMMER.md")
+        self.assertTrue(fetched.attempt.final_url.endswith("/main/SUMMER.md"))
+
+    def test_discovery_still_knows_the_repo_is_watched(self):
+        from jobs import discovery
+        known = discovery._known([{"method": "github_readme",
+                                   "url": "Owner/Repo/SUMMER.md"}])
+        self.assertIn("repo:owner/repo", known)
+
+    def test_the_watched_file_parses_above_its_floor(self):
+        """The live config against the shape SUMMER.md has: one '#' heading."""
+        config = parse_readme.REPO_CONFIGS["aprameyak-2027"]
+        rows = "\n".join(
+            f"| Firm {i} | Software Engineer Intern | City {i} | Undergrad "
+            f"| [Apply](https://example.test/{i}) | Oct 8 |"
+            for i in range(config.min_rows + 1))
+        text = ("# ☀️ Summer 2027 Internships\n\n"
+                "| Company | Role | Location | Education | Application/Link | Date Added |\n"
+                "| --- | --- | --- | --- | --- | --- |\n" + rows + "\n")
+        self.assertEqual(len(parse_readme.extract(text, config).rows), config.min_rows + 1)
+
+
 # --- 14.7 -----------------------------------------------------------------------
 class PostingFilterTests(_IsolatedState, unittest.TestCase):
     """The change that made WORTH A LOOK readable: fetch the posting, then judge it.
