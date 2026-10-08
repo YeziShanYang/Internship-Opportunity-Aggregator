@@ -39,7 +39,7 @@ from dataclasses import dataclass
 
 # Bump when a rule changes. Stored on each verdict, so a rule fix re-screens the
 # backlog instead of applying only to changes seen afterwards.
-VERSION = 2
+VERSION = 3
 
 # The graduation years that exclude this owner, and the ones that include them. A window
 # naming both ("graduating between 2027 and 2030") is inclusive and must not rule out.
@@ -119,6 +119,27 @@ _OUT_OF_FIELD = re.compile(
     re.IGNORECASE,
 )
 
+# A title naming sophomores or second-years and not first-years. The owner is a first-year,
+# so "Associate Software Engineer - Sophomore Intern Summer 2027" (Thrivent, pinned into
+# the top of the digest on 2026-10-08) is a class-year rule-out. "Rising sophomore" is the
+# exception: for a Summer 2027 role that is this owner's own standing.
+_SOPHOMORE = re.compile(r"\bsophomores?\b|\bsecond[\s-]?year\b|\b2nd[\s-]?year\b", re.IGNORECASE)
+_FIRST_YEAR = re.compile(
+    # A bare "first" rather than "first-year": "First- & Second-Year Undergrads" names
+    # both years with the hyphen left hanging.
+    r"freshm[ae]n|\bfirst\b|\b1st\b|underclass|rising\s+sophomore",
+    re.IGNORECASE,
+)
+
+
+def sophomore_only(text: str) -> str | None:
+    """The sophomore phrase in `text` when it names sophomores and not first-years."""
+    hit = _SOPHOMORE.search(text or "")
+    if hit and not _FIRST_YEAR.search(text):
+        return hit.group(0)
+    return None
+
+
 # Rule 7's own caveat: when a role is technical at all, keep it. "Marketing Data
 # Scientist" and "Recruiting Software Engineer" are in scope despite the first word.
 _TECHNICAL = re.compile(
@@ -191,7 +212,14 @@ def _excluded_by(pattern, text: str, *, guards=()) -> str | None:
 
 
 def screen_title(title: str) -> Verdict | None:
-    """Rule 7, on the title alone. Safe without any posting text."""
+    """Rules 6 and 7, on the title alone. Safe without any posting text."""
+    sophomore = sophomore_only(title)
+    if sophomore:
+        return Verdict(
+            why=f'Title is for sophomores ("{sophomore}"), and this owner is a first-year: '
+                f"{_quote(title)}",
+            rule="sophomore-title",
+        )
     hit = _OUT_OF_FIELD.search(title)
     if hit and not _TECHNICAL.search(title):
         return Verdict(

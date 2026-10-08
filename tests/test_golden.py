@@ -328,7 +328,7 @@ class GoldenDigestTests(_Pinned, unittest.TestCase):
         for block in ("## ■ OPPORTUNITIES", "■ RULED OUT", "## ■ DISCOVERED",
                       "## ■ CALENDAR", "## ■ HEALTH"):
             self.assertIn(block, body, block)
-        for line in ("**ACT NOW**", "Worth a look", "SOURCE BLIND",
+        for line in ("**High** · ", "Medium · ", "SOURCE BLIND",
                      "circuit breaker has them quarantined", "were not student roles",
                      "no longer watching the page", "collapsed into one item",
                      "first run, recorded", "are muted in data/applied.tsv",

@@ -50,6 +50,13 @@ SHRINK_RATIO = 0.4
 # A nav change can move dozens of lines; the digest only needs enough to judge.
 MAX_DIFF_LINES = 12
 
+# Past this many added lines a page diff is list churn, not one announcement, and its
+# text no longer says anything about a single programme. On 2026-10-08 a Built In list
+# page added 41 lines, matched the discovery and rolling-firm patterns somewhere in them,
+# and went into the High tier as though it were a discovery programme. Its rows still
+# reach the digest and the classifier; they just do not inherit either flag.
+MAX_FLAGGED_ADDED_LINES = 10
+
 # No single diff line may be longer than this. Several watched sources are vendor JSON
 # feeds (Workable, Rippling, Teamtailor, Pinpoint) served as one unbroken line, and
 # Wolverine's is 147,741 characters. Emitting that verbatim would put a single line past
@@ -167,6 +174,7 @@ def diff_pages(
         return []
 
     blob = " ".join(added)
+    flaggable = len(added) <= MAX_FLAGGED_ADDED_LINES
 
     def clip(line: str) -> str:
         return line if len(line) <= MAX_DIFF_LINE_CHARS else (
@@ -193,8 +201,8 @@ def diff_pages(
             program_name=program_name,
             # Added text only. A removed "Freshman" line is a programme going away, not
             # a discovery, and flagging it would push a closure into ACT NOW.
-            is_discovery_candidate=bool(snapshot.DISCOVERY_PATTERN.search(blob)),
-            rolling=bool(snapshot.ROLLING_PATTERN.search(blob)),
+            is_discovery_candidate=flaggable and bool(snapshot.DISCOVERY_PATTERN.search(blob)),
+            rolling=flaggable and bool(snapshot.ROLLING_PATTERN.search(blob)),
             posting_text=blob[: coretext.MAX_TEXT_CHARS],
         )
     ]

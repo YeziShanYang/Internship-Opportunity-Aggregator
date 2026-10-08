@@ -4,18 +4,25 @@ Opportunity digest — 2026-09-12
 
 > Note: Not classified: no classifier credentials are configured (neither ANTHROPIC_API_KEY nor AZURE_OPENAI_API_KEY), so this is surfaced unjudged rather than dropped.
 
-## ■ OPPORTUNITIES (8)
+## ■ FOR FRESHMEN & UNDERCLASSMEN (1)
 
-| Urgency | Company | Position | Notes |
+_Built for first- or second-years. Each stays here until its posting comes down._
+
+| Company | Position | Notes |
+|---|---|---|
+| InfiniteQuant | [Quantitative Trader @ NYC](https://simplify.jobs/p/abc) | • **Deadline:** 2026-09-20<br>• **Year:** first- and second-year undergraduates<br>• **Location:** New York, NY |
+
+## ■ OPPORTUNITIES (7)
+
+| Priority | Company | Position | Notes |
 |---|---|---|---|
-| **ACT NOW** | aqr-internship-program | SOURCE BLIND — 4 failures running | not quiet, blind. Last success never. redirected to what looks like an error page: https://www.aqr.com/About-Us/Our-Internship-Program -> https://www.aqr.com/404. |
-| **ACT NOW** | crabel-careers | SOURCE BLIND — 5 failures running | not quiet, blind. Last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting |
-| **ACT NOW** | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | • **Deadline:** rolling — closes when full<br>• **Year:** all undergraduate years<br>• **Location:** New York, NY |
-| **ACT NOW** | InfiniteQuant | [Quantitative Trader @ NYC](https://simplify.jobs/p/abc) | • **Deadline:** 2026-09-20<br>• **Year:** first- and second-year undergraduates<br>• **Location:** New York, NY |
-| Worth a look | Optiver FutureFocus | [page updated (3 added, 1 removed)](https://optiver.com/working-at-optiver/career-opportunities/?level=student) | • **Location:** Chicago, IL or Amsterdam, NL |
-| Worth a look | Millennium Campus | [2027 Quantitative Researcher Intern \| Austin](https://campusjobs.mlp.com/1) | • **Deadline:** 2027-03-31<br>• **Year:** Bachelor's, no year stated<br>• **Location:** Austin, TX |
-| Worth a look | Millennium Campus | 2027 Applied AI Engineer Intern, New York | • low confidence, kept deliberately |
-| Worth a look | Millennium Campus | 2027 Data Engineer Intern, Miami | • ⚠ unverified — open the page |
+| **High** · source blind | aqr-internship-program | SOURCE BLIND — 4 failures running | not quiet, blind. Last success never. redirected to what looks like an error page: https://www.aqr.com/About-Us/Our-Internship-Program -> https://www.aqr.com/404. |
+| **High** · source blind | crabel-careers | SOURCE BLIND — 5 failures running | not quiet, blind. Last success never. quarantined for 24h after 5 consecutive failures, retry after 2026-09-13T07:00+00:00 — it has never succeeded, so check the URL rather than waiting |
+| **High** · rolling firm, fills early | Jane Street FTTP | [Quantitative Trader @ New York](https://janestreet.test/1) | • **Deadline:** rolling — closes when full<br>• **Year:** all undergraduate years<br>• **Location:** New York, NY |
+| Medium · closes Mar 31 | Millennium Campus | [2027 Quantitative Researcher Intern \| Austin](https://campusjobs.mlp.com/1) | • **Deadline:** 2027-03-31<br>• **Year:** Bachelor's, no year stated<br>• **Location:** Austin, TX |
+| Medium · no deadline stated | Optiver FutureFocus | [page updated (3 added, 1 removed)](https://optiver.com/working-at-optiver/career-opportunities/?level=student) | • **Location:** Chicago, IL or Amsterdam, NL |
+| Medium · no deadline stated | Millennium Campus | 2027 Applied AI Engineer Intern, New York | • low confidence, kept deliberately |
+| Medium · unverified | Millennium Campus | 2027 Data Engineer Intern, Miami | • ⚠ unverified — open the page |
 
 <details><summary>■ RULED OUT (1)</summary>
 

@@ -285,8 +285,8 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         return result
 
     # --- 14.2 -------------------------------------------------------------------
-    def test_14_2_edited_snapshot_surfaces_in_act_now(self):
-        """Hand-edit a stored snapshot to simulate a page change -> ACT NOW."""
+    def test_14_2_edited_snapshot_surfaces_as_high(self):
+        """Hand-edit a stored snapshot to simulate a page change -> High."""
         self._baseline()
         # Simulate the previous run not having seen the Jane Street row.
         path = store.snapshot_path("nuft-2027", "tsv")
@@ -307,7 +307,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         judgments = classify.classify(result.changes, {"nuft-2027": self.source}).judgments
         self.assertTrue(any(urgency.is_urgent(j) for j in judgments), "rolling change must be urgent")
         _, body = digest.render(judgments, _metrics(result), {"nuft-2027": self.source})
-        self.assertIn("ACT NOW", body)
+        self.assertIn("**High**", body)
         self.assertIn("| Jane Street | [QT]", body)
 
     # --- 14.3 -------------------------------------------------------------------
@@ -328,12 +328,12 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertIn("HEALTH", body)
         self.assertIn("1 FAILING", body)
 
-    def test_14_3b_three_failures_escalate_to_act_now(self):
+    def test_14_3b_three_failures_escalate_to_high(self):
         """Spec 10.1: at >=3 consecutive failures the source is blind, not quiet."""
         result = models.SourceResult(source_id="nuft-2027", ok=False, error="HTTP 404")
         source = dict(self.source, consecutive_failures="4", last_success="2026-09-01")
         title, body = digest.render([], _metrics(result), {"nuft-2027": source})
-        self.assertIn("ACT NOW", body)
+        self.assertIn("**High** · source blind", body)
         self.assertIn("SOURCE BLIND", body)
         self.assertIn("4 failures running", body)
         self.assertIn("source failing", title)
@@ -417,7 +417,7 @@ class AcceptanceTests(_IsolatedState, unittest.TestCase):
         self.assertFalse(judgments[0].classified)
         self.assertTrue(judgments[0].relevant, "unclassified changes must still surface")
         _, body = digest.render(judgments, [], {})
-        self.assertIn("Worth a look", body)
+        self.assertIn("Medium · unverified", body)
         self.assertIn("unverified", body)
 
     @unittest.skipUnless(
@@ -948,7 +948,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
 
         Classifying every source made every eligible job-board row "confidently
         relevant", which promoted 22 generic internships into ACT NOW and emptied
-        WORTH A LOOK. Urgency now means rolling review or a first-year-targeted row.
+        WORTH A LOOK. High now needs a dated reason; see deliver.urgency.rank.
         """
         def judge(**kw):
             change = models.Change(source_id="simplify-2027", kind="added",
@@ -957,7 +957,7 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
                                      confidence="high")
 
         self.assertFalse(urgency.is_urgent(judge()),
-                         "merely eligible is WORTH A LOOK, not ACT NOW")
+                         "merely eligible is Medium, not High")
         self.assertTrue(urgency.is_urgent(judge(rolling=True)),
                         "rolling firms close when full")
         self.assertTrue(urgency.is_urgent(judge(is_discovery_candidate=True)),
@@ -990,8 +990,13 @@ class PostingFilterTests(_IsolatedState, unittest.TestCase):
                 deadline=deadline)
 
         self.assertTrue(urgency.is_urgent(judge(soon)), "closing inside the window")
-        self.assertTrue(urgency.is_urgent(judge("rolling")),
-                        "the posting says it closes when full")
+        self.assertFalse(urgency.is_urgent(judge("rolling")),
+                         "most postings say rolling, so on its own it is Medium (2026-10-08)")
+        self.assertEqual(urgency.rank(judge("rolling")), (urgency.MEDIUM, "rolling, no close date"))
+        tier, reason = urgency.rank(judge(soon))
+        self.assertEqual(tier, urgency.HIGH)
+        self.assertTrue(reason.startswith("closes "), reason)
+        self.assertEqual(urgency.rank(judge(past)), (urgency.MEDIUM, "deadline passed"))
         self.assertFalse(urgency.is_urgent(judge(far)),
                          "an autumn close date is WORTH A LOOK, or the block floods")
         self.assertFalse(urgency.is_urgent(judge(past)),
@@ -1529,6 +1534,18 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         self.assertIn("chars]", changes[0].detail, "truncation must be visible, not silent")
 
 
+    def test_14_9r2_a_long_list_page_diff_inherits_no_flags(self):
+        """2026-10-08: a Built In list page added 41 lines, matched the discovery and
+        rolling-firm patterns somewhere in them, and went into the High tier."""
+        source = {"program_names": "P", "url": "u"}
+        lines = [f"NVIDIA Launch Intern {i}" for i in range(parse_page.MAX_FLAGGED_ADDED_LINES + 1)]
+        big = parse_page.diff_pages("s", [], lines, source)[0]
+        self.assertFalse(big.is_discovery_candidate)
+        self.assertFalse(big.rolling)
+        small = parse_page.diff_pages("s", [], lines[:2], source)[0]
+        self.assertTrue(small.is_discovery_candidate)
+        self.assertTrue(small.rolling)
+
 class Phase2DiscoveryTests(_IsolatedState, unittest.TestCase):
     def test_14_9o_discovery_never_writes_sources_csv(self):
         """Discovery proposes and never adds. Watched against a seeded copy rather
@@ -1728,7 +1745,7 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         self.assertEqual(clock.recruiting_cycle("2027-06-30"), 2027)
         self.assertEqual(clock.recruiting_cycle("2027-07-01"), 2028)
 
-    def test_14_9t_the_digest_is_one_table_with_act_now_rows_first(self):
+    def test_14_9t_the_digest_is_one_table_with_high_rows_first(self):
         """The digest is a table, not two prose sections.
 
         Urgency became a column rather than a heading, so the ordering guarantee moved
@@ -1750,13 +1767,13 @@ class Phase2SuppressionTests(_IsolatedState, unittest.TestCase):
         _, body = digest.render([ordinary, rolling], [], {})
 
         self.assertIn("## \u25a0 OPPORTUNITIES (2)", body)
-        self.assertIn("| Urgency | Company | Position | Notes |", body)
+        self.assertIn("| Priority | Company | Position | Notes |", body)
         self.assertNotIn("WORTH A LOOK (", body, "the old section heading is gone")
 
         rows = [line for line in body.splitlines() if line.startswith("| ")]
         urgencies = [row.split("|")[1].strip() for row in rows[1:]]
         self.assertEqual(
-            urgencies, [digest.URGENCY_ACT_NOW, digest.URGENCY_WORTH_A_LOOK],
+            urgencies, ["**High** · rolling firm, fills early", "Medium · no deadline stated"],
             "the rolling item is urgent and must be rendered above the ordinary one",
         )
         self.assertIn("[SWE Intern @ NYC](https://example.com/a)", body)
@@ -2327,6 +2344,20 @@ class DeterministicScreenTests(_IsolatedState, unittest.TestCase):
         self.assertDeferred("", title="Quantitative Research Intern")
 
 
+class SophomoreTitleTests(_IsolatedState, unittest.TestCase):
+    """The owner is a first-year: a sophomore-only title is a class-year rule-out."""
+
+    def test_a_sophomore_only_title_is_ruled_out(self):
+        verdict = screen.rules.screen_title(
+            "Thrivent / Associate Software Engineer - Sophomore Intern Summer 2027 @ MN")
+        self.assertEqual(verdict.rule, "sophomore-title")
+
+    def test_a_title_that_also_names_first_years_is_not(self):
+        for title in ("Acme / Rising Sophomore Analyst", "Acme / Freshman & Sophomore Day",
+                      "Acme / First- & Second-Year Insight", "Acme / Underclassmen Sophomore"):
+            self.assertIsNone(screen.rules.screen_title(title), title)
+
+
 class ScreenIntegrationTests(_IsolatedState, unittest.TestCase):
     """The screen and the classifier wired together, with no provider behind them.
 
@@ -2574,9 +2605,9 @@ class BodyLimitTests(_IsolatedState, unittest.TestCase):
     def test_the_trim_keeps_the_urgent_rows_and_the_footers(self):
         """Trimming from the end is what makes it safe: the table is already sorted."""
         judgments = self._judgments(400, "B" * 300)
-        judgments[0].deadline = "rolling"  # promotes it into ACT NOW, so it sorts first
+        judgments[0].change.rolling = True  # a named rolling firm is High, so it sorts first
         _, body = digest.render(judgments, [], {})
-        self.assertIn("**ACT NOW**", body, "the urgent row must survive the trim")
+        self.assertIn("**High**", body, "the urgent row must survive the trim")
         self.assertIn("■ CALENDAR", body)
         self.assertIn("■ HEALTH", body, "the health block is the blind-source alarm")
 
@@ -2604,7 +2635,7 @@ class AggregatorRowRenderingTests(_IsolatedState, unittest.TestCase):
             program_name=program, relevant=True, outcome=models.MODEL, confidence="high",
         )
         _, body = digest.render([j], [], {})
-        return next(l for l in body.splitlines() if l.startswith("| Worth"))
+        return next(l for l in body.splitlines() if l.startswith("| Medium"))
 
     def test_the_linked_employer_becomes_the_company_column(self):
         row = self._row("[InfiniteQuant](https://simplify.jobs/c/InfiniteQuant) / "

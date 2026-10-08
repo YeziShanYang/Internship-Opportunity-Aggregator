@@ -1,4 +1,8 @@
-"""Which rows go in ACT NOW rather than WORTH A LOOK.
+"""Which rows are High rather than Medium, and why; and which are for underclassmen.
+
+The tiers were ACT NOW and WORTH A LOOK until 2026-10-08. They are now High and Medium,
+each row carries the reason it got its tier, and postings aimed at first-years have
+their own block at the top of the digest instead of competing for the High tier.
 
 A pure function rather than a property on `Judgment`, because three of its four inputs
 live on the `Change` and were never properties of the model's answer -- and because
@@ -7,14 +11,19 @@ surface and not in another; the classifier has no opinion about it.
 """
 from __future__ import annotations
 
+import datetime
 import re
 
 from core import clock, models
+from screen import rules as screen_rules
 
 # The word the model returns for "reviews on a rolling basis / closes when full". One
 # constant because two modules compare against it and a typo in either would silently
 # stop promoting the most time-critical rows there are.
 ROLLING = "rolling"
+
+HIGH = "High"
+MEDIUM = "Medium"
 
 # A stated deadline this close is same-day news. Three weeks is the window in which the
 # owner still has to write an application rather than merely note one: shorter and a
@@ -52,10 +61,16 @@ NOT_TARGETED = re.compile(
 def _aimed_at_underclassmen(class_year: str, title: str) -> bool:
     """The shared test for a live judgment and a carried pin.
 
-    The title is decisive on its own ("Sophomore Intern", "First-Year Insight"): an
-    employer that names the year in the job title has built the role for it. The
-    class-year phrase has to both name the year and not be a floor or a wider list.
+    The title is decisive on its own ("First-Year Insight"): an employer that names the
+    year in the job title has built the role for it. The class-year phrase has to both
+    name the year and not be a floor or a wider list.
+
+    Sophomores alone are not a match. The owner is a first-year, so "Sophomore Intern"
+    is a class-year rule-out and not a pin; Thrivent's sat at the top of the digest on
+    2026-10-08 until this check existed. Re-asked of carried pins, so that one retires.
     """
+    if screen_rules.sophomore_only(title) or screen_rules.sophomore_only(class_year):
+        return False
     if UNDERCLASSMAN.search(title):
         return True
     return bool(UNDERCLASSMAN.search(class_year)) and not NOT_TARGETED.search(class_year)
@@ -97,51 +112,70 @@ def is_rolling(judgment: models.Judgment) -> bool:
     return judgment.deadline.strip().lower() == ROLLING
 
 
-def is_urgent(judgment: models.Judgment) -> bool:
-    """ACT NOW is only useful while it stays short, and only honest while it is not empty.
+def _closes(deadline: str, days: int) -> str:
+    """"closes Oct 10 (2 days)" inside the High window; past it, only the date."""
+    date = datetime.date.fromisoformat(deadline)
+    if days > URGENT_WITHIN_DAYS:
+        return f"closes {date:%b} {date.day}"
+    when = "today" if days == 0 else "1 day" if days == 1 else f"{days} days"
+    return f"closes {date:%b} {date.day} ({when})"
 
-    This used to mean "relevant and confidently classified", which worked while only
-    high-signal sources were classified at all. Once every source was classified that
-    rule promoted every generic-but-eligible job-board row: a measured run put 22 of
-    them in ACT NOW and left WORTH A LOOK empty, burying the two or three items that
-    actually needed same-day attention. So it was narrowed to two specific things -- a
-    firm on the rolling list, or a row that reads as aimed at first-years.
 
-    Narrowing it that way overshot, and the 2026-09-13 digest is the measurement: 27
-    rows in the block, 18 of them real opportunities, and **not one** of the 18 urgent.
-    Only the nine blind sources were there. The reason is that both surviving tests read
-    regexes over the *snapshot row text* -- a title, a location and some links -- while
-    the deadline lives in the posting body that `enrich` had already fetched and the
-    model had already read. On the source that supplies nearly all the volume, 7 of 592
-    rows mention a class year at all, so `is_discovery_candidate` is about 1% there and
-    `rolling` only fires for five named firms. ACT NOW could not have promoted an
-    opportunity on that source however urgent it was.
+def rank(judgment: models.Judgment) -> tuple[str, str]:
+    """(tier, reason) for a relevant judgment. The reason is printed beside the tier.
 
-    So the rule now asks the evidence: a firm on the rolling list, a posting that says
-    it reviews on a rolling basis, or a stated close date inside three weeks. Merely
-    being eligible for something is still WORTH A LOOK -- the block has to stay short,
-    and every test here is a *dated* reason rather than a quality judgment.
+    High is only useful while it stays short, so every High reason is a *dated* one,
+    never a quality judgement: a stated close date inside `URGENT_WITHIN_DAYS`, a firm on
+    the named rolling list, or a discovery programme. Underclassman postings are not
+    ranked here at all -- they have their own block; see `targets_underclassmen`.
+
+    **A posting that merely says it reviews on a rolling basis is Medium.** It was High
+    from 2026-09-13 until 2026-10-08, when it accounted for 10 of the 18 opportunities in
+    the block -- National Life, Centene, TikTok -- because most postings say it. A rule
+    every posting satisfies sorts nothing. The named firms on `ROLLING_PATTERN` stay
+    High, because there the claim is measured (Jane Street has filled by late October).
+    Within Medium a rolling posting still sorts first; see `medium_order`.
 
     A deadline the codec could not parse never promotes a row. It is still printed in
-    the Notes cell, so the case degrades to the owner reading the date by hand rather
-    than to a row quietly going missing. (Failing sources are escalated into the same
-    block separately, by the renderer.)
+    the Notes cell, so it can still be read by hand.
     """
     change = judgment.change
-    if not judgment.relevant:
-        return False
-    if targets_underclassmen(judgment):  # standing fact, not a dated one; see pins below
-        return True
-    if change.rolling:  # on the named list; time-critical regardless of stage
-        return True
-    if is_rolling(judgment):  # the posting says so itself
-        return True
     days = clock.days_until(judgment.deadline)
     if days is not None and 0 <= days <= URGENT_WITHIN_DAYS:
-        return True
-    if not change.is_discovery_candidate:
+        return HIGH, _closes(judgment.deadline, days)
+    if change.rolling:
+        return HIGH, "rolling firm, fills early"
+    if change.is_discovery_candidate and judgment.classified \
+            and judgment.confidence in ("medium", "high"):
+        return HIGH, "discovery programme"
+    if not judgment.classified:
+        return MEDIUM, "unverified"
+    if is_rolling(judgment):
+        return MEDIUM, "rolling, no close date"
+    if days is not None and days > URGENT_WITHIN_DAYS:
+        return MEDIUM, _closes(judgment.deadline, days)
+    if days is not None:
+        return MEDIUM, "deadline passed"
+    return MEDIUM, "no deadline stated"
+
+
+def medium_order(judgment: models.Judgment) -> int:
+    """Sort key within Medium: rolling first, then dated, then undated, then unverified."""
+    reason = rank(judgment)[1]
+    if reason.startswith("rolling"):
+        return 0
+    if reason.startswith("closes"):
+        return 1
+    if reason == "unverified":
+        return 3
+    return 2
+
+
+def is_urgent(judgment: models.Judgment) -> bool:
+    """High tier: relevant, not in the underclassman block, and a dated reason."""
+    if not judgment.relevant or targets_underclassmen(judgment):
         return False
-    return judgment.classified and judgment.confidence in ("medium", "high")
+    return rank(judgment)[0] == HIGH
 
 
 def live_change_ids(

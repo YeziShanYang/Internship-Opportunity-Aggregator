@@ -81,8 +81,16 @@ ROLLING_NOTE = "rolling — closes when full"
 # Past this many sources, a filter line reports the count instead of the names.
 MAX_FILTER_SOURCES = 6
 
-URGENCY_ACT_NOW = "**ACT NOW**"
-URGENCY_WORTH_A_LOOK = "Worth a look"
+# The first column is the tier and the reason for it, since 2026-10-08: "High · closes
+# Oct 10 (2 days)", "Medium · rolling, no close date". The tiers were ACT NOW and WORTH A
+# LOOK before that, and nothing on the row said which test had put it there.
+PRIORITY_HIGH = f"**{urgency.HIGH}**"
+PRIORITY_MEDIUM = urgency.MEDIUM
+
+
+def _priority(tier: str, reason: str) -> str:
+    label = PRIORITY_HIGH if tier == urgency.HIGH else PRIORITY_MEDIUM
+    return f"{label} · {reason}" if reason else label
 
 
 def _cell(text: str) -> str:
@@ -244,6 +252,7 @@ _SCREEN_LABELS = {
     "already-graduated": "degree already required",
     "advanced-standing": "juniors and above",
     "graduate-only": "graduate students only",
+    "sophomore-title": "sophomores only",
 }
 
 # The field a title-only rule-out matched, e.g. ("Civil Engineering").
@@ -265,7 +274,9 @@ def _ruled_out_line(judgment: models.Judgment) -> str:
     return f"- **{judgment.change.key}** — {why}"
 
 
-def _table_row(urgency: str, company: str, position: str, notes: str, url: str = "") -> str:
+def _table_row(priority: str | None, company: str, position: str, notes: str,
+               url: str = "") -> str:
+    """One table row. `priority` None is the underclassman block, which has no tier."""
     company = _cell(company)
     position = _cell(position)
     if url:
@@ -274,7 +285,9 @@ def _table_row(urgency: str, company: str, position: str, notes: str, url: str =
         # a backstop for a literal bracket in a job title.
         label = position.replace("[", "(").replace("]", ")")
         position = f"[{label}]({url})"
-    return f"| {urgency} | {company} | {position} | {notes} |"
+    if priority is None:
+        return f"| {company} | {position} | {notes} |"
+    return f"| {priority} | {company} | {position} | {notes} |"
 
 
 def company_and_position(judgment: models.Judgment) -> tuple[str, str]:
@@ -296,14 +309,13 @@ def _pinned_row(pin: models.PinnedRow, today: str) -> str:
     """
     facts = [bit for bit in (pin.deadline, pin.class_year, pin.location) if bit.strip()]
     facts.append(f"pinned {pin.first_pinned}" if pin.first_pinned != today else "pinned today")
-    return _table_row(URGENCY_ACT_NOW, pin.company, pin.position,
-                      _cell(" · ".join(facts)), pin.url)
+    return _table_row(None, pin.company, pin.position, _cell(" · ".join(facts)), pin.url)
 
 
-def _judgment_row(judgment: models.Judgment) -> str:
+def _judgment_row(judgment: models.Judgment, ranked: bool = True) -> str:
     company, position = _company_and_position(judgment)
     return _table_row(
-        URGENCY_ACT_NOW if urgency.is_urgent(judgment) else URGENCY_WORTH_A_LOOK,
+        _priority(*urgency.rank(judgment)) if ranked else None,
         company,
         position,
         _notes(judgment),
@@ -341,9 +353,12 @@ def render(
     def by_size(rows: list[models.Judgment]) -> list[models.Judgment]:
         return sorted(rows, key=lambda j: j.employer_size != "small")
 
-    act_now = by_size([j for j in judgments if urgency.is_urgent(j)])
-    worth_a_look = by_size([j for j in judgments
-                            if j.relevant and not urgency.is_urgent(j)])
+    underclass = [j for j in judgments if j.relevant and urgency.targets_underclassmen(j)]
+    high = by_size([j for j in judgments if urgency.is_urgent(j)])
+    medium = sorted(
+        by_size([j for j in judgments if j.relevant and not urgency.is_urgent(j)
+                 and not urgency.targets_underclassmen(j)]),
+        key=urgency.medium_order)
     ruled_out = [j for j in judgments if not j.relevant]
 
     if escalated:
@@ -367,28 +382,44 @@ def render(
         body.append(f"> Note: {reasons.pop()}")
         body.append("")
 
-    # One table rather than two sections, sorted so every ACT NOW row sits above every
-    # WORTH A LOOK row. The urgency column carries the distinction the headings used to.
+    # Postings built for first- or second-years come first, in their own block, since
+    # 2026-10-08. They are the rows this owner is most likely to land, and they used to
+    # compete for the top tier with every posting that had a deadline. A pin keeps a row
+    # here every morning until its posting comes down; one that moved today prints its
+    # full cell, and a carried one prints compactly -- see `_pinned_row`.
+    moved = {j.change.change_id for j in judgments}
+    first_years = [_judgment_row(j, ranked=False) for j in underclass]
+    first_years += [_pinned_row(pin, today) for pin in (pinned or [])
+                    if pin.change_id not in moved]
+    if first_years:
+        body.append(f"## ■ FOR FRESHMEN & UNDERCLASSMEN ({len(first_years)})")
+        body.append("")
+        body.append("_Built for first- or second-years. Each stays here until its "
+                    "posting comes down._")
+        body.append("")
+        body.append("| Company | Position | Notes |")
+        body.append("|---|---|---|")
+        body += first_years
+        body.append("")
+
+    # Everything else is one table sorted so every High row sits above every Medium
+    # row, and the first column says which test put it there.
     #
     # Collected as a list rather than appended straight onto the body, because the table
     # is the one block that can be trimmed if the whole digest will not fit. Built in
     # priority order, so trimming from the end always drops the least urgent row.
     table: list[str] = [
-        _table_row(URGENCY_ACT_NOW, source_id, position, _cell(notes))
+        _table_row(_priority(urgency.HIGH, "source blind"), source_id, position,
+                   _cell(notes))
         for source_id, position, notes in escalated
     ]
-    table += [_judgment_row(j) for j in act_now]
-    # Pins whose row did not move today. The ones that did are already in `act_now`
-    # above with their full cell, so they are excluded here rather than printed twice.
-    moved = {j.change.change_id for j in judgments}
-    table += [_pinned_row(pin, today) for pin in (pinned or [])
-              if pin.change_id not in moved]
-    table += [_judgment_row(j) for j in worth_a_look]
+    table += [_judgment_row(j) for j in high]
+    table += [_judgment_row(j) for j in medium]
     table_index = None
     if table:
         body.append(f"## ■ OPPORTUNITIES ({len(table)})")
         body.append("")
-        body.append("| Urgency | Company | Position | Notes |")
+        body.append("| Priority | Company | Position | Notes |")
         body.append("|---|---|---|---|")
         table_index = len(body)
         body += table
@@ -457,7 +488,7 @@ def render(
         # a block that is working from one that has quietly filled up with stale pins.
         carried = sum(1 for pin in pinned if pin.change_id not in moved)
         body.append(
-            f"- {len(pinned)} underclassman posting(s) pinned to ACT NOW while they "
+            f"- {len(pinned)} underclassman posting(s) pinned to the top block while they "
             f"stay on their boards; {carried} carried over from an earlier morning. "
             "A pin is retired only when its source is checked and no longer lists it."
         )

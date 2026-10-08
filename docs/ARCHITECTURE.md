@@ -141,7 +141,7 @@ classify.py (level 6)    one model call per change the screen had no opinion on
 deliver/    (level 7)    every string the owner reads is composed here
   digest.py              the one-table body
   health.py              the HEALTH block: sources, filters, spend
-  urgency.py             ACT NOW vs WORTH A LOOK
+  urgency.py             High vs Medium, the reason, the underclassman block
   issue.py               the cadence decision and the Issue POST
 
 jobs/                    compose stages into something runnable. Not stages themselves
@@ -306,7 +306,7 @@ routes an opportunity to Manual Watch rather than being worked around.
    you conclude nothing has opened for four months. Mitigated: every source returns a
    result object; "returned zero rows" and "fetch failed" are first-class alerts;
    `consecutive_failures` and `last_success` are tracked per source; **three consecutive
-   failures escalates the source into ACT NOW**, not the health footnote. Each source also
+   failures escalates the source into the High tier**, not the health footnote. Each source also
    has a plausibility floor — and for NUFT that floor is on *section* count, not row
    count, because its row count legitimately drains to near zero out of season.
 2. **GitHub disables scheduled workflows on inactive repos.** This is the classic way
@@ -437,7 +437,7 @@ properties of the live repo, and the digest history and `git log` are the eviden
 | # | What it checks | Status |
 |---|---|---|
 | 14.1 | `workflow_dispatch` completes and opens an Issue | verified in production |
-| 14.2 | Hand-edited snapshot → reported in ACT NOW | passing |
+| 14.2 | Hand-edited snapshot → reported as High | passing |
 | 14.3 | A 404 → HEALTH, not a change; `consecutive_failures` increments | passing |
 | 14.4 | A new "Freshman Insight Program" row → discovery candidate | passing |
 | 14.5 | Women-only program → `relevant: false`, identity gate cited | **needs `ANTHROPIC_API_KEY`** |

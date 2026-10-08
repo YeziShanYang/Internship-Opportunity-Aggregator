@@ -128,8 +128,11 @@ Rules, in priority order:
 6. Class-year gates stated on the posting are decisive. When the POSTING TEXT below
    states a requirement this person cannot meet -- "rising junior", "rising senior",
    "penultimate year", "third or fourth year", "junior or senior standing", "completed
-   sophomore year", a Master's or PhD program, or a graduation window that closes before
-   June 2030 (2027, 2028 or 2029) -- set relevant: false and
+   sophomore year", a programme for sophomores or second-years that does not also take
+   first-years ("Sophomore Intern", "current sophomores"; "rising sophomore" for a Summer
+   2027 role is this person and is NOT a rule-out), a Master's or PhD program, or a
+   graduation window that closes before June 2030 (2027, 2028 or 2029) -- set
+   relevant: false and
    name the gate in `why` in a few words: "rising juniors only", "master's program". Measured: about a third of these postings carry
    such a gate, so this is the filter that does the most work.
    Absence of a gate is NOT a reason to rule out. "Currently enrolled in a Bachelor's
@@ -194,9 +197,11 @@ bullets in the digest, so each must stand alone without `why` for context. Repor
 the posting says, never what you infer, and leave a field empty rather than guessing --
 an empty bullet is simply not shown, whereas a wrong one is read as fact:
 
-* `class_year` -- who the posting says may apply, as a short phrase quoting its own
-  words where possible: "any undergraduate", "graduating 2029-2030", "rising junior",
-  "Bachelor's, no year stated". This is the field the owner scans first.
+* `class_year` -- who the posting says may apply, in two to six words and never a
+  sentence: "any undergraduate", "grads Dec 2027-May 2030", "rising juniors",
+  "first-years only", "Bachelor's or Master's", "Bachelor's, no year stated". A major or
+  enrolment requirement is not a class year: "currently enrolled in a CS-related degree"
+  is "any undergraduate". This is the field the owner scans first.
 * `location` -- where the role sits, as written: "New York, NY", "London, UK",
   "remote", "Chicago or NYC". Several locations is fine; list them.
 * `employer_size` -- `small` for a startup, a small or mid-size company, or a small

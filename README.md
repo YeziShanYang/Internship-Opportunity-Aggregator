@@ -19,14 +19,20 @@ permanent archive of every digest.
 ```
 Opportunity digest — 2026-09-20
 
+## ■ FOR FRESHMEN & UNDERCLASSMEN (1)
+
+| Company | Position                                      | Notes                                       |
+|---------|-----------------------------------------------|---------------------------------------------|
+| SIG     | Discovery Event: High School + First Year ... | • Year: first- and second-years             |
+
 ## ■ OPPORTUNITIES (5)
 
-| Urgency      | Company                   | Position                                | Notes                              |
-|--------------|---------------------------|-----------------------------------------|------------------------------------|
-| **ACT NOW**  | Thrivent                  | Associate SWE – Sophomore Intern 2027   | • Year: Sophomore Intern Sum. 2027 |
-| Worth a look | Baxter International      | Associate Data Scientist Co-op          | • Location: Skaneateles, NY        |
-| Worth a look | Fable                     | Software Engineering Intern             | • Location: San Francisco, CA      |
-| …            |                           |                                         |                                    |
+| Priority                           | Company       | Position                     | Notes                         |
+|------------------------------------|---------------|------------------------------|-------------------------------|
+| **High** · closes Oct 19 (11 days) | Manulife      | Spring Co-op 2027 – SWE      | • Year: any undergraduate     |
+| Medium · rolling, no close date    | TikTok        | ML Engineer Intern           | • Location: San Jose, CA      |
+| Medium · no deadline stated        | Fable         | Software Engineering Intern  | • Location: San Francisco, CA |
+| …                                  |               |                              |                               |
 
 <details><summary>■ RULED OUT (2)</summary>
 
@@ -191,9 +197,9 @@ without anyone noticing, and that has already happened twice here.
 | `MAX_CHANGE_RATIO` | $0.25$ | An aggregator reporting more than 25% of its rows changed has restructured, not restocked. Collapse to one line instead of believing it. |
 | `MIN_CHANGES_TO_COLLAPSE` | $25$ | Both conditions must trip, so a small repo legitimately turning over doesn't get collapsed. |
 | `MAX_CHANGES_PER_BOARD` | $25$ | The same guard for ATS boards, flat rather than proportional — boards don't post 100 real roles overnight. |
-| `URGENT_WITHIN_DAYS` | $21$ | A stated close date inside this window promotes a row to ACT NOW. |
+| `URGENT_WITHIN_DAYS` | $21$ | A stated close date inside this window makes a row High. |
 | `QUARANTINE_AFTER_FAILURES` | $3$ | Three consecutive failures and the source backs off: $6 \to 12 \to 24 \to 48$ h, capped at $72$. |
-| `FAILURE_ESCALATION_THRESHOLD` | $3$ | Three failures also escalates the source **into ACT NOW**, not into a footnote. |
+| `FAILURE_ESCALATION_THRESHOLD` | $3$ | Three failures also escalates the source **into the High tier**, not into a footnote. |
 | `MIN_TEXT_HTML_RATIO` | $0.0015$ | Text-to-HTML floor. Catches a JavaScript shell serving 221 characters out of 402KB. |
 | `MIN_ABSOLUTE_CHARS` | $500$ | The other content floor. A page under this didn't really load. |
 | `SHRINK_RATIO` | $0.4$ | A page that drops below 40% of its last good size is a redesign or a block, not a quiet day. Self-calibrating, so there's no per-source constant to rot. |
@@ -275,9 +281,9 @@ list can only ever hold what someone already noticed. One repo had three markers
 configured and a fourth still churned 39 postings. Enumerating specific problems doesn't
 scale; a guard that doesn't need to know what the problem was does.
 
-### I was wrong about urgency, twice, in opposite directions
+### I was wrong about urgency, three times
 
-The ACT NOW block only works if it's short. Getting there took two failures:
+The top tier only works if it's short. Getting there took three failures:
 
 - **First attempt: "relevant and confidently classified."** That put 22 generic rows in
   ACT NOW and emptied the section below it. Useless.
@@ -289,6 +295,13 @@ Both versions read the *snapshot row* — a title, a location, some links — wh
 deadline was sitting in the posting body that `enrich` had already fetched and the model
 had already read. The fix was to make urgency ask the evidence: a posting that says it
 reviews on a rolling basis, or a stated close date inside 21 days.
+
+That overshot too. By 2026-10-08, "the posting says rolling" was what put 10 of the 18
+High rows there, because most postings say it. Now a rolling posting is Medium unless the
+firm is one of the few known to fill early. The tiers are called High and Medium, and every
+row prints the reason it got its tier ("closes Oct 10 (2 days)", "rolling, no close
+date"), so a wrong call is visible on the row. Postings built for first-years have their own
+block above the table rather than competing with deadlines.
 
 The rule I settled on is that **every test for urgency must be a dated reason, never a
 quality judgment.** "This is a great opportunity" is not a reason to put something at the
@@ -424,7 +437,7 @@ with no email was either "nothing happened" or "the job is broken" and I couldn'
 which. Now **silence always means broken.**
 
 And it drives the circuit breaker's one strange property: a quarantined source still
-appears in HEALTH and still escalates into ACT NOW. "We have stopped looking" is the
+appears in HEALTH and still escalates into the High tier. "We have stopped looking" is the
 strongest possible form of blind-not-quiet, and it's the one a reader would most readily
 assume hadn't happened.
 

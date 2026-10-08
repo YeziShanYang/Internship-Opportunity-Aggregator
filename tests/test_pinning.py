@@ -1,4 +1,4 @@
-"""Underclassman postings stay in ACT NOW until they leave their board.
+"""Underclassman postings stay in the top block until they leave their board.
 
 Added 2026-09-18. Every other ACT NOW test is a *dated* reason that
 fires on the morning a row moves; this one is a standing fact about who the posting is
@@ -32,10 +32,10 @@ def _judgment(key: str, *, relevant=True, class_year="", source_id="s",
                            class_year=class_year, deadline=deadline, confidence="high")
 
 
-def _pin(change_id="s:Acme / Sophomore Analyst", source_id="s",
+def _pin(change_id="s:Acme / First-Year Analyst", source_id="s",
          first_pinned=YESTERDAY) -> models.PinnedRow:
     return models.PinnedRow(change_id=change_id, source_id=source_id, company="Acme",
-                            position="Sophomore Analyst", first_pinned=first_pinned,
+                            position="First-Year Analyst", first_pinned=first_pinned,
                             last_seen=first_pinned)
 
 
@@ -116,35 +116,56 @@ class UnderclassmanDetectionTests(unittest.TestCase):
                                     digest.company_and_position)
         self.assertEqual(pins, [])
 
-    def test_an_underclassman_row_is_urgent(self):
-        self.assertTrue(urgency.is_urgent(_judgment("Acme / Sophomore Analyst")))
+    def test_an_underclassman_row_goes_in_its_own_block_not_the_high_tier(self):
+        judgment = _judgment("Acme / First-Year Analyst")
+        self.assertTrue(urgency.targets_underclassmen(judgment))
+        self.assertFalse(urgency.is_urgent(judgment))
 
     def test_an_irrelevant_underclassman_row_is_not_urgent(self):
         """Relevance still gates everything. A ruled-out row prints once in RULED OUT."""
         self.assertFalse(urgency.is_urgent(
-            _judgment("Acme / Sophomore Analyst", relevant=False)))
+            _judgment("Acme / First-Year Analyst", relevant=False)))
+
+    def test_a_sophomore_only_posting_is_not_a_target(self):
+        """The owner is a first-year. Thrivent's "Sophomore Intern" was pinned on
+        2026-10-08; "rising sophomore" is the owner's own standing and still is one."""
+        self.assertFalse(urgency.targets_underclassmen(_judgment(
+            "Thrivent / Associate Software Engineer - Sophomore Intern Summer 2027")))
+        self.assertFalse(urgency.targets_underclassmen(
+            _judgment("Acme / Analyst", class_year="current sophomores")))
+        self.assertTrue(urgency.targets_underclassmen(
+            _judgment("Acme / Rising Sophomore Analyst")))
+        self.assertTrue(urgency.targets_underclassmen(
+            _judgment("Acme / Freshman & Sophomore Program")))
+
+    def test_a_carried_sophomore_pin_is_retired(self):
+        stale = models.PinnedRow(change_id="s:x", source_id="s", company="Thrivent",
+                                 position="Associate Software Engineer - Sophomore Intern",
+                                 first_pinned=YESTERDAY, last_seen=YESTERDAY)
+        self.assertEqual(urgency.refresh_pins([], [stale], {"s": {"s:x"}}, {"s"}, TODAY,
+                                              digest.company_and_position), [])
 
 
 class PinRefreshTests(unittest.TestCase):
     def test_a_new_underclassman_row_is_pinned(self):
-        judgments = [_judgment("Acme / Sophomore Analyst")]
+        judgments = [_judgment("Acme / First-Year Analyst")]
         pins = urgency.refresh_pins(
-            judgments, [], {"s": {"s:Acme / Sophomore Analyst"}}, {"s"}, TODAY,
+            judgments, [], {"s": {"s:Acme / First-Year Analyst"}}, {"s"}, TODAY,
             digest.company_and_position)
-        self.assertEqual([p.change_id for p in pins], ["s:Acme / Sophomore Analyst"])
+        self.assertEqual([p.change_id for p in pins], ["s:Acme / First-Year Analyst"])
         self.assertEqual(pins[0].first_pinned, TODAY)
 
     def test_a_ruled_out_row_is_not_pinned(self):
         pins = urgency.refresh_pins(
-            [_judgment("Acme / Sophomore Analyst", relevant=False)], [],
-            {"s": {"s:Acme / Sophomore Analyst"}}, {"s"}, TODAY,
+            [_judgment("Acme / First-Year Analyst", relevant=False)], [],
+            {"s": {"s:Acme / First-Year Analyst"}}, {"s"}, TODAY,
             digest.company_and_position)
         self.assertEqual(pins, [])
 
     def test_a_pin_survives_a_day_with_no_changes(self):
         """The feature. Nothing moved, the row is still on the board, it stays."""
         pins = urgency.refresh_pins(
-            [], [_pin()], {"s": {"s:Acme / Sophomore Analyst"}}, {"s"}, TODAY,
+            [], [_pin()], {"s": {"s:Acme / First-Year Analyst"}}, {"s"}, TODAY,
             digest.company_and_position)
         self.assertEqual(len(pins), 1)
         self.assertEqual(pins[0].first_pinned, YESTERDAY)  # not re-dated
@@ -169,7 +190,7 @@ class PinRefreshTests(unittest.TestCase):
 
     def test_a_removed_row_retires_its_pin(self):
         pins = urgency.refresh_pins(
-            [_judgment("Acme / Sophomore Analyst", kind="removed")], [_pin()],
+            [_judgment("Acme / First-Year Analyst", kind="removed")], [_pin()],
             {"s": set()}, {"s"}, TODAY, digest.company_and_position)
         self.assertEqual(pins, [])
 
@@ -196,15 +217,19 @@ class PinnedRenderingTests(unittest.TestCase):
         _, body = digest.render(judgments, [], {}, pinned=pinned)
         return body
 
-    def test_a_carried_pin_renders_compactly_in_act_now(self):
+    def test_a_carried_pin_renders_compactly_in_the_top_block(self):
         body = self._body([], [_pin()])
-        row = next(line for line in body.splitlines() if "Acme" in line)
-        self.assertIn(digest.URGENCY_ACT_NOW, row)
+        lines = body.splitlines()
+        row = next(line for line in lines if "Acme" in line)
+        heading = max(i for i, line in enumerate(lines[:lines.index(row)])
+                      if line.startswith("## "))
+        self.assertTrue(lines[heading].startswith("## ■ FOR FRESHMEN & UNDERCLASSMEN"))
+        self.assertEqual(row.count("|"), 4, "three columns: no priority in this block")
         self.assertIn(f"pinned {YESTERDAY}", row)
         self.assertNotIn("<br>", row)  # the full bullet cell is what this replaces
 
     def test_a_pin_is_not_printed_twice_on_the_day_it_moves(self):
-        judgment = _judgment("Acme / Sophomore Analyst")
+        judgment = _judgment("Acme / First-Year Analyst")
         body = self._body([judgment], [_pin(change_id=judgment.change.change_id)])
         self.assertEqual(sum("Acme" in line for line in body.splitlines()), 1)
 

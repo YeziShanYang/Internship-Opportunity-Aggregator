@@ -299,7 +299,7 @@ def run(args: argparse.Namespace) -> int:
     )
     judgments = judged.judgments
 
-    # Underclassman postings stay in ACT NOW until they leave their board (added
+    # Underclassman postings stay in the top block until they leave their board (added
     # 2026-09-18). Only sources that were *checked and healthy* this run may
     # retire a pin: a failing, quarantined or --only-skipped source keeps every one of
     # its pins, because "we have stopped looking" must never render as "it closed".

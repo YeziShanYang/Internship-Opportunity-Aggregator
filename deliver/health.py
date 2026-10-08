@@ -104,7 +104,7 @@ def filter_lines(reports: list[models.FilterReport]) -> list[str]:
 def source_lines(
     results: list[models.SourceMetrics], sources: dict[str, dict[str, str]]
 ) -> tuple[list[str], list[tuple[str, str, str]]]:
-    """Return (health lines, escalated failures as ACT NOW table rows).
+    """Return (health lines, escalated failures as High table rows).
 
     Takes the `SourceMetrics` projection rather than live `SourceResult`s, which is
     what lets `run.py render` reproduce a digest from `.run/changes.json` alone. Every
