@@ -155,6 +155,32 @@ def _same_feed(previous: str, text: str) -> bool:
         return old.keys() == new.keys()
     return isinstance(old, list) and isinstance(new, list)
 
+# A listing page's own statement that it has nothing listed, as a whole line. Anchored at
+# both ends so prose that merely contains the words ("there are no events like it") is
+# not read as an empty state.
+_EMPTY_LISTING = re.compile(
+    r"(?i)^(?:there\s+are\s+)?(?:currently\s+)?no\s+"
+    r"(?:upcoming\s+|current\s+|open\s+|available\s+)?"
+    r"(?:events?|positions?|openings?|jobs?|opportunities|postings?|programs?)"
+    r"(?:\s+(?:are\s+)?(?:available|found|posted|scheduled|listed|open|currently"
+    r"|at\s+this\s+time))*\s*[.!]?$")
+
+
+def _states_empty_listing(previous: str, lines: list[str]) -> bool:
+    """True when the page now says, in a line of its own, that its listing is empty.
+
+    The shrink guard is for a page that lost its body to a redesign, a block or a partial
+    render. A listing page whose last item has passed loses most of its text too, and
+    says so: IAQF's upcoming-events page went from 3,878 to 1,380 characters on
+    2026-10-07 when its one seminar (6 Oct) passed, and now reads "No events available".
+    A failed fetch never replaces its baseline, so without this the source would fail
+    every morning until IAQF next schedules an event. The statement has to be new, so a
+    page that already said it and then lost its body still fails.
+    """
+    before = set(previous.splitlines())
+    return any(_EMPTY_LISTING.match(line) and line not in before for line in lines)
+
+
 # A live countdown renders one unit per line -- "Days", "69", "Hours", "03", "Minutes",
 # "07", "Seconds", "57" on the SMART Scholarship page (2026-09-26) -- so it would read as
 # a changed page on every run. Only a bare number directly after a bare unit is masked:
@@ -275,6 +301,7 @@ def assess(
         previous is not None
         and len(text) < SHRINK_RATIO * len(previous)
         and not _same_feed(previous, text)
+        and not _states_empty_listing(previous, lines)
     ):
         return models.SourceResult(
             source_id=source_id,

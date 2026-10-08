@@ -1498,6 +1498,32 @@ class Phase2PageWatchTests(_IsolatedState, unittest.TestCase):
         )
         self.assertFalse(blocked.ok)
 
+    def test_14_9m2b_a_listing_that_says_it_is_empty_is_not_a_failure(self):
+        """IAQF's upcoming-events page, 2026-10-07: the one seminar passed, the page
+        shrank from 3,878 to 1,380 characters and now reads "No events available"."""
+        nav = "<p>Home</p><p>About</p><p>Membership</p>" * 30
+        seminar = "<p>Seminar abstract and speaker biography, at some length.</p>" * 40
+        listed = f"<html><body>{nav}<h2>Upcoming</h2>{seminar}</body></html>"
+        empty = f"<html><body>{nav}<h2>Upcoming</h2><p>No events available</p></body></html>"
+        r = _check_page(self._src(source_id="events"), FakeHTMLClient(listed))
+        store.write_snapshot("events", r.snapshot_text, ext="txt")
+        second = _check_page(self._src(source_id="events"), FakeHTMLClient(empty))
+        self.assertTrue(second.ok, second.error)
+        self.assertEqual(len(second.changes), 1, "the emptying is still reported")
+
+        # Prose that merely contains the words is not an empty state.
+        prose = f"<html><body>{nav}<p>There are no events like it in the field.</p></body></html>"
+        third = _check_page(self._src(source_id="events"), FakeHTMLClient(prose))
+        self.assertFalse(third.ok)
+        self.assertIn("shrank", third.error)
+
+        # Nor is a statement the page already made before it lost its body.
+        store.write_snapshot("said", "\n".join(
+            parse_page.normalise(listed.replace("<h2>", "<p>No events available</p><h2>"))),
+            ext="txt")
+        fourth = _check_page(self._src(source_id="said"), FakeHTMLClient(empty))
+        self.assertFalse(fourth.ok)
+
     def test_14_9m3_a_job_lists_relative_age_is_not_a_change(self):
         """The VC portfolio boards added 2026-09-30 print an age on every row."""
         from process import parse_page
