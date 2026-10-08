@@ -12,11 +12,11 @@ Runs on GitHub Actions, so it does not care whether your laptop is awake. State 
 this repo as CSVs, which makes **git the database**: `git log` answers "which page
 changed on which morning" forever, for free.
 
-**Status: Phases 1 and 2 shipped.** 241 sources — 12 GitHub repo trackers, 90 ATS
-boards (Greenhouse 58, Workday 21, Ashby 7, Lever 2, Phenom 1, Eightfold 1), three bulk
-sources reading 343 small employers' boards, the NSF awards feed, 127 watched pages
+**Status: Phases 1 and 2 shipped.** 250 sources — 12 GitHub repo trackers, 91 ATS
+boards (Greenhouse 59, Workday 21, Ashby 7, Lever 2, Phenom 1, Eightfold 1), three bulk
+sources reading 343 small employers' boards, the NSF awards feed, 135 watched pages
 (10 rendered in headless Chromium, `render_js=true`) and 8 `manual` rows — with
-Issue delivery, one digest a day and a weekly source-discovery pass. 233 of the 241 are
+Issue delivery, one digest a day and a weekly source-discovery pass. 242 of the 250 are
 fetched; the `manual` eight are sites that block automation or the Actions runner and
 surface as calendar reminders instead.
 
@@ -70,7 +70,7 @@ stage is also runnable on its own, reading the previous stage's artifact out of 
 instead of recomputing it:
 
 ```bash
-.venv/bin/python run.py gather     # fetch all 233 sources into .run/raw/. The only slow one
+.venv/bin/python run.py gather     # fetch all 242 sources into .run/raw/. The only slow one
 .venv/bin/python run.py process    # parse and diff .run/raw/. No network at all
 .venv/bin/python run.py enrich     # fetch the posting behind each changed row
 .venv/bin/python run.py screen     # rule out what a quoted phrase settles. No model
