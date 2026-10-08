@@ -1,4 +1,4 @@
-# Opportunity Tracker
+# Internship Opportunity Tracker
 
 ## Introduction
 
@@ -9,7 +9,7 @@
 A daily job that watches **250 sources, covering about 580 job boards and programme pages,** for quant, math and CS
 internships, reads the postings that changed overnight, throws out the ones I can't
 apply to, and mails me what's left as a single table. It has run every morning since
-2026-09-05 and costs about **6-7 cents a day**.
+2026-09-05 and costs a median of about **8 cents a day**.
 
 There is no server and no mailing list. The job runs on GitHub Actions and delivers by
 opening a GitHub Issue, which means GitHub's own notification email is the delivery
@@ -48,7 +48,7 @@ Opportunity digest — 2026-09-20
 ```
 
 That was a quiet Sunday — 5 opportunities and 6 classifier calls. A typical weekday is
-35-65 calls and around 6-7 cents; see [Results](#results).
+35-65 calls and around 8 cents; see [Results](#results).
 
 ## Table of Contents
 - [Overview](#overview)
@@ -151,7 +151,7 @@ process   →  parse and diff against yesterday        0.7s, no network at all
 enrich    →  fetch the posting body behind each      O(changes), not O(postings)
              row that actually moved
 screen    →  rule out what a quoted phrase settles   deterministic, no model
-classify  →  one model call per surviving change     ~$0.065 on a normal day
+classify  →  one model call per surviving change     ~$0.08 on a normal day
 render    →  build the digest bytes
 deliver   →  open the Issue, subject to one-a-day
 ```
