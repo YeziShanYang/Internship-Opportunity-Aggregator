@@ -62,7 +62,58 @@ Series A
 Series B
 Clear all
 Powered by Getro
-Showing 37 jobs
+Showing 38 jobs
+Internship - Software Engineering
+Overland AI
+Location: Seattle, WA, USA
+Compensation: USD 28-40 / hour
+Posted <age>
+Series B
+Internship
+Aerospace &amp; Defense
+Artificial Intelligence (AI)
+Automation
+Automotive
+Autonomous Vehicles
+Data &amp; Analytics
+Defense
+Government and Military
+Hardware
+Machine Learning
+Military
+Other Hardware
+Robotics
+Science and Engineering
+Self Driving
+Software
+Software Development
+Technology
+Transportation
+Vehicles
+Series B
+Internship
+Aerospace &amp; Defense
+Artificial Intelligence (AI)
+Automation
+Automotive
+Autonomous Vehicles
+Data &amp; Analytics
+Defense
+Government and Military
+Hardware
+Machine Learning
+Military
+Other Hardware
+Robotics
+Science and Engineering
+Self Driving
+Software
+Software Development
+Technology
+Transportation
+Vehicles
++ 99 more
+View job
 Summer 2027 Internship - Information Technology
 General Matter
 Location: Los Angeles, CA, USA
@@ -127,7 +178,7 @@ View job
 Computer Vision Research Engineer - Intern
 Bobyard
 Location: San Francisco, CA, USA
-Compensation: USD 55-55 / hour
+Compensation: USD 55-55 / hour + Equity
 Posted <age>
 Series A
 Internship
@@ -621,37 +672,6 @@ Summer 2027 Internship - Embedded Software Engineering
 General Matter
 Location: Los Angeles, CA, USA
 Compensation: USD 32-46 / hour
-Posted <age>
-Pre Seed
-Internship
-Alternative Energy Equipment
-Chemicals
-Energy
-Energy Production
-Fuel
-Manufacturing
-Manufacturing &amp; Industrial
-Nuclear
-Power Grid
-Science and Engineering
-Pre Seed
-Internship
-Alternative Energy Equipment
-Chemicals
-Energy
-Energy Production
-Fuel
-Manufacturing
-Manufacturing &amp; Industrial
-Nuclear
-Power Grid
-Science and Engineering
-+ 99 more
-View job
-Summer 2027 Internship - Supply Chain
-General Matter
-Location: Los Angeles, CA, USA
-Compensation: USD 28-36 / hour
 Posted <age>
 Pre Seed
 Internship

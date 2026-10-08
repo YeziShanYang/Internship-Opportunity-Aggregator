@@ -31,6 +31,95 @@ Save Job Alert
 Save Alert
 Maximum of 25 job preferences reached.
 Top Internship Finance Jobs
+Lowe&#x2019;s
+Finance Intern - Undergrad Internship - Summer 2027
+<age> Saved
+Hybrid
+Mooresville, NC, USA
+Internship
+Internship
+Consumer Web &#x2022; eCommerce &#x2022; Information Technology &#x2022; Retail &#x2022; Software &#x2022; Analytics &#x2022; App development
+Finance Interns support financial analysis, business performance tracking, variance analysis, forecasting, budgeting, reporting, and dashboard development. They gain exposure to financial statements, enterprise decision-making, executive leadership, cross-functional collaboration, financial systems such as Oracle, and analysis and modeling tools during a 10-week summer internship.
+Top Skills:
+Excel Financial Reporting And Dashboard Tools MS Office Oracle PowerPoint
+Lowe&#x2019;s
+Finance Intern - Graduate Internship - Summer 2027
+<age> Saved
+Hybrid
+Mooresville, NC, USA
+Internship
+Internship
+Consumer Web &#x2022; eCommerce &#x2022; Information Technology &#x2022; Retail &#x2022; Software &#x2022; Analytics &#x2022; App development
+Finance Intern supporting financial planning, forecasting, budgeting, capital planning, performance analysis, and strategic decision-making. The role involves analyzing business trends, developing financial models, collaborating with cross-functional partners, presenting recommendations to leadership, and gaining exposure to Oracle, financial systems, and corporate reporting.
+Top Skills:
+Excel MS Office Microsoft Powerpoint Oracle
+Wipfli
+Tax Internship - Spring 2028
+<age> Saved
+Hybrid
+Duluth, MN, USA
+29-29 Hourly
+Internship
+29-29 Hourly
+Internship
+Cloud &#x2022; Fintech &#x2022; Software &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Financial Services
+Tax interns prepare individual, business, and fiduciary tax returns and projections; research tax issues; use tax and accounting software; analyze data; respond to client requests; gather information; conduct tax interviews; and identify process improvements. They gain hands-on experience supporting client engagements while developing accounting, tax, administrative, communication, and professional skills.
+Top Skills:
+Accounting Software Tax Software
+Liberty Mutual Insurance
+Underwriting Internship Program - Commercial Lines - Summer 2027
+<age> Saved
+Hybrid
+8 Locations
+25K-27K Hourly
+Internship
+25K-27K Hourly
+Internship
+Artificial Intelligence &#x2022; Fintech &#x2022; Insurance &#x2022; Marketing Tech &#x2022; Software &#x2022; Analytics
+Participate in an 11-week commercial lines underwriting internship evaluating business operations, assessing risk, developing insurance solutions, and supporting business decisions. Gain exposure to commercial insurance products, risk assessment, relationship management, and customer needs while completing meaningful projects and professional development activities. Collaborate with experienced underwriters and build analytical, communication, negotiation, and decision-making skills.
+PwC
+Charlotte - Digital Assurance &amp; Transparency (DAT) - Intern - Summer 2027
+<age> Saved
+Hybrid
+Charlotte, NC, USA
+29K-48K Hourly
+Internship
+29K-48K Hourly
+Internship
+Artificial Intelligence &#x2022; Professional Services &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Cybersecurity &#x2022; Generative AI
+Supports digital assurance and audit teams through research, basic data analysis, compliance and governance activities, and application of auditing methodologies. Participates in testing artificial intelligence platforms and applying cloud engineering principles to audit processes. Collaborates with experienced auditors, gathers information to support decision-making, and develops professional skills through feedback, observation, and hands-on client service assignments.
+Top Skills:
+Artificial Intelligence Cloud Engineering
+New York Life
+2027 Financial Products, Strategy &amp; Modeling Summer Internship
+<age> Saved
+Hybrid
+New York, NY, USA
+27-27 Hourly
+Internship
+27-27 Hourly
+Internship
+Artificial Intelligence &#x2022; Cloud &#x2022; Fintech &#x2022; Information Technology &#x2022; Insurance &#x2022; Financial Services &#x2022; Big Data Analytics
+Summer interns support financial product research, portfolio reviews, performance analysis, product development, financial planning, and strategic initiatives. They analyze market and financial data, prepare reports, dashboards, and presentations, and synthesize findings into recommendations for internal stakeholders. The role provides exposure to institutional annuities, insurance products, investments, and corporate strategy while developing analytical, quantitative, communication, and teamwork skills.
+Top Skills:
+Excel
+New York Life
+2027 Compliance, Audit &amp; Risk Management Summer Internship
+<age> Saved
+Hybrid
+New York, NY, USA
+27-27 Hourly
+Internship
+27-27 Hourly
+Internship
+Artificial Intelligence &#x2022; Cloud &#x2022; Fintech &#x2022; Information Technology &#x2022; Insurance &#x2022; Financial Services &#x2022; Big Data Analytics
+Supports Corporate Audit, Risk Management, and Corporate Compliance through internal control testing, risk indicator reporting, policy reviews, regulatory research, monitoring procedures, and stakeholder presentations. Interns gain exposure to governance, regulatory oversight, ethical operations, and risk management while collaborating with professionals across these departments. The 10-week hybrid program is intended for enrolled undergraduate students graduating between December 2027 and May 2030.
+Top Skills:
+Excel Microsoft Powerpoint Microsoft Word
+New
+Cut your apply time in half.
+Use our AI Assistant to automatically fill your job applications.
+Use For Free
 Citadel
 Equities - Citadel Associate Program - Summer Internship 2028
 <age> Saved
@@ -44,30 +133,6 @@ Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Bi
 Summer internship for undergraduate students graduating December 2028 through May 2029. Interns will develop financial modeling and company research skills, evaluate businesses and investment opportunities, analyze external data, and support long/short equities investing through investment-team rotations and mentorship.
 Top Skills:
 External Data Sources Financial Modeling Quantitative Risk Systems
-Citadel
-Quantitative Researcher - Post-Doctoral Intern (US)
-<age> Saved
-In-Office
-4 Locations
-5K-6K Annually
-Internship
-5K-6K Annually
-Internship
-Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
-Conduct quantitative research for financial markets by developing valuation strategies, mathematical models, trading signals, and monetization systems. Responsibilities include translating algorithms into code, backtesting and implementing trading models, analyzing unconventional data sources, and applying statistical techniques. The 11-week post-doctoral internship involves collaboration with senior researchers in a fast-paced investment environment.
-Top Skills:
-C&#x2B;&#x2B; Machine Learning Natural Language Processing (Nlp) Pattern Recognition Python R Time-Series Analysis
-Citadel
-Trader: Fixed Income &amp; Macro Rotational Trader - Intern (US)
-<age> Saved
-In-Office
-3 Locations
-4K-5K Annually
-Internship
-4K-5K Annually
-Internship
-Information Technology &#x2022; Software &#x2022; Financial Services &#x2022; Big Data Analytics
-Participate in a structured fixed income and macro trading rotation. Develop expertise in financial markets, apply statistical techniques to trading, adapt investment approaches, and use advanced trading technology. Collaborate with traders, quantitative researchers, and technologists while identifying opportunities and managing risk. The internship also includes networking with senior team members and peers.
 Rocket
 Treasury Operations Intern - Winter 2027
 <age> Saved
@@ -79,67 +144,6 @@ Fintech &#x2022; Real Estate &#x2022; Sales &#x2022; Financial Services
 Supports daily treasury operations, including cash positioning, reconciliations, forecasting, reporting, warehouse line monitoring, settlements, audits, settlement instructions, and bank fee analysis. The intern also contributes to finance close activities and process-improvement projects while developing Excel proficiency and exposure to capital markets.
 Top Skills:
 Excel MS Office Microsoft Powerpoint Microsoft Word
-Wipfli
-Tax Internship - Spring 2028
-<age> Saved
-Hybrid
-Madison, WI, USA
-Internship
-Internship
-Cloud &#x2022; Fintech &#x2022; Software &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Financial Services
-Tax interns support client engagements by preparing individual, business, and fiduciary tax returns, researching tax issues, analyzing data, responding to client requests, gathering information, and identifying process improvements. They use tax and accounting software, conduct limited tax interviews, and collaborate with professionals while developing accounting, communication, organizational, and analytical skills.
-Top Skills:
-Accounting Software Tax Software
-Lowe&#x2019;s
-Accounting Intern - Undergrad Internship - Summer 2027
-<age> Saved
-Hybrid
-Mooresville, NC, USA
-Internship
-Internship
-Consumer Web &#x2022; eCommerce &#x2022; Information Technology &#x2022; Retail &#x2022; Software &#x2022; Analytics &#x2022; App development
-Accounting internship for an undergraduate student at Lowe’s corporate headquarters in Mooresville, North Carolina. The description provides company and workplace information but does not specify detailed accounting responsibilities or qualifications.
-New
-Track Smarter, Apply Better.
-Ditch the spreadsheets. Organize your job search with our free Application Tracker.
-Use For Free
-PwC
-Audit - Japanese Business Network (JBN) - Intern - Summer 2028 - Destination CPA
-<age> Saved
-Hybrid
-7 Locations
-29K-48K Hourly
-Internship
-29K-48K Hourly
-Internship
-Artificial Intelligence &#x2022; Professional Services &#x2022; Business Intelligence &#x2022; Consulting &#x2022; Cybersecurity &#x2022; Generative AI
-Supports audit teams serving Japanese business clients by reviewing financial documents, applying GAAP and GAAS, analyzing financial data, documenting findings, assessing internal controls, identifying risks, and assisting with financial reporting. The intern learns PwC audit methodologies while developing accounting, communication, teamwork, and professional skills.
-Top Skills:
-AI Gaap Gaas
-MetLife
-Actuarial Intern
-<age> Saved
-Hybrid
-New York, NY, USA
-32-35 Hourly
-Internship
-32-35 Hourly
-Internship
-Fintech &#x2022; Information Technology &#x2022; Insurance &#x2022; Financial Services &#x2022; Big Data Analytics
-Participate in a structured 10-week actuarial internship supporting pricing, product development, reserve calculations, actuarial modeling, financial analysis, asset-liability management, and investments. Collaborate with experienced actuaries, attend educational sessions, present project outcomes, and build technical and professional skills in insurance, risk management, analytics, and emerging technologies.
-Top Skills:
-Artificial Intelligence Excel Python R SAS SQL VBA
-Liberty Mutual Insurance
-Surety Underwriting Internship - Summer 2027
-<age> Saved
-Hybrid
-8 Locations
-27K-29K Hourly
-Internship
-27K-29K Hourly
-Internship
-Artificial Intelligence &#x2022; Fintech &#x2022; Insurance &#x2022; Marketing Tech &#x2022; Software &#x2022; Analytics
-This 11-week surety underwriting internship provides hands-on experience in financial analysis, risk assessment, decision-making, and relationship management. Interns will learn how underwriters evaluate financial strength, assess business risk, and support businesses seeking bonding capacity. The program includes formal training, mentorship, job shadowing, professional development, and an introduction to the Associate in Fidelity and Surety Bonding curriculum. Candidates must be pursuing a relevant bachelor’s degree, maintain a minimum 3.0 GPA, and have permanent U.S. work authorization.
 Federal Reserve Bank of Chicago
 Summer 2027 Intern - Undergraduate Internal Audit Majors
 <age> Saved

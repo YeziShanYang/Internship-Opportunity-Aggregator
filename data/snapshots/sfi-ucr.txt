@@ -51,16 +51,6 @@ Jobs
 Contact
 Library
 Employee Portal
-Science for a Complex World
-Events
-Here&#x27;s what&#x27;s happening
-Give
-You make SFI possible
-Subscribe
-Sign up for research news
-Connect
-Follow us on social media
-© 2026 Santa Fe Institute. All rights reserved. This site is supported by the Miller Omega Program.
 Home / Engage / Learn / Programs
 Undergraduate Complexity Research
 Overview
@@ -96,3 +86,13 @@ Audience
 Undergraduate students from all backgrounds in the physical, natural, and social sciences and mathematics are invited to participate. Strong quantitative skills and/or experience with a programming language are favorably considered. Please refer to the &ldquo;Applying&rdquo; tab for details regarding eligibility.
 The UCR team is committed to offering programs in which all participants feel valued and supported in their learning journey. We believe that open discourse and the respectful sharing of broad perspectives is essential to meaningful scientific progress, and we welcome you to join us.
 For further information, please review all of the tabs associated with this program; scroll to the top or go directly to Experience , Logistics , and Applying .
+Science for a Complex World
+Events
+Here&#x27;s what&#x27;s happening
+Give
+You make SFI possible
+Subscribe
+Sign up for research news
+Connect
+Follow us on social media
+© 2026 Santa Fe Institute. All rights reserved. This site is supported by the Miller Omega Program.

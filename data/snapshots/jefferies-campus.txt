@@ -98,12 +98,6 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1980
 Title:2027 Risk Management - 12 Month Placement Intern (London, June 2027 Start)
-https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1982-2026-Compliance-Analyst-Toronto/en-GB
-2026 Compliance Analyst - Toronto
-<timestamp>
-<timestamp>
-ID:1982
-Title:2026 Compliance Analyst - Toronto
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1967-2027-Information-Technology-Summer-Internship-Programme-in-London/en-GB
 2027 Information Technology Summer Internship Programme in London
 <timestamp>
@@ -218,6 +212,12 @@ https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl
 <timestamp>
 ID:1958
 Title:2027 Investment Banking Off-Cycle Internship - Global Agriculture Team, Amsterdam (January - April)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2016-2027-Investment-Banking-Off-Cycle-Internship-Zurich-Q3/en-GB
+2027 Investment Banking Off-Cycle Internship – Zurich (Q3)
+<timestamp>
+<timestamp>
+ID:2016
+Title:2027 Investment Banking Off-Cycle Internship – Zurich (Q3)
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1952-2027-Investment-Banking-Off-Cycle-Internship-Zurich-Q1/en-GB
 2027 Investment Banking Off-Cycle Internship – Zurich (Q1)
 <timestamp>
@@ -230,6 +230,18 @@ Tel Aviv - 2026 Investment Banking Off Cycle Internship Programme (November star
 <timestamp>
 ID:1926
 Title:Tel Aviv - 2026 Investment Banking Off Cycle Internship Programme (November start)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2015-2027-Investment-Banking-Off-Cycle-Internship-Zurich-Q2/en-GB
+2027 Investment Banking Off-Cycle Internship – Zurich (Q2)
+<timestamp>
+<timestamp>
+ID:2015
+Title:2027 Investment Banking Off-Cycle Internship – Zurich (Q2)
+https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/2017-2027-Investment-Banking-Off-Cycle-Internship-Zurich-Q4/en-GB
+2027 Investment Banking Off-Cycle Internship – Zurich (Q4)
+<timestamp>
+<timestamp>
+ID:2017
+Title:2027 Investment Banking Off-Cycle Internship – Zurich (Q4)
 https://jefferies.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/1909-2027-Investment-Banking-Summer-Associate-Program-Capital-Structure-Solutions-Group/en-GB
 2027 Investment Banking Summer Associate Program – Capital Structure Solutions Group
 <timestamp>
