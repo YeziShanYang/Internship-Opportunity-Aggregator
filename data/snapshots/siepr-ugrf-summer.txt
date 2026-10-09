@@ -1,0 +1,182 @@
+SIEPR Summer Undergraduate Research Program | Stanford Institute for Economic Policy Research (SIEPR)
+Skip to main content
+Skip to secondary navigation
+Stanford University
+Vote for Econ To Go
+Econ To Go has won gold and silver w3 Awards and is a 2026 Signal Award finalist for best education podcast. Your vote can help us clinch the Listener’s Choice! Polls are open through Oct.15.
+Vote for Econ To Go now
+Stanford
+Institute for Economic
+Policy Research (SIEPR)
+Search this site
+Submit Search
+Menu
+About About SIEPR
+SIEPR Prize for Contributions to Economic Policy
+Annual Reports
+Governance Advisory Board
+Steering Committee
+Contact Information
+People Senior Fellows
+Faculty Fellows
+Senior Fellows Emeriti
+Young Scholars Former Postdoctoral Scholars
+Former Visiting Fellows
+Visitors Former Visitors
+Policy Fellows
+Media Fellows
+Research Staff and Postdocs
+Graduate Fellowship Recipients Former Recipients
+Undergraduate Research Fellows Advisors
+Predoctoral Research Fellows Faculty Mentors
+Alumni
+Staff
+Why Econ?
+Research Focal Areas Focal Area Descriptions
+Education
+Energy and Environment
+Global Development and Trade
+Health
+Housing and Infrastructure
+Inequality
+Innovation and Technology
+Money and Finance
+Politics and Media
+Regulation and Competition
+Taxes and Spending
+Work
+Publications Policy Briefs
+Working Papers
+Filter Publications by Topic
+Centers and Initiatives Stanford Center on China&#039;s Economy and Institutions (SCCEI)
+Stanford Environmental and Energy Policy Analysis Center (SEEPAC)
+Stanford Digital Economy Lab
+Stanford King Center on Global Development
+Universal 0-3: California Child Care Working Groups
+California Policy Research Initiative (CAPRI)
+Programs Undergraduate Students Research Assistant Openings Academic Year Program
+Summer Program
+Graduate Students Fellowships &amp; Awards
+Predoctoral Research Fellows Application Information
+Open Positions
+Frequently Asked Questions
+Young Scholars Program Postdoctoral Fellows Application
+Visiting Fellows Application
+Visiting Faculty Program
+SIEPR Faculty Resources
+News Research Highlights
+Podcast: Econ To Go
+Media Mentions
+Awards &amp; Appointments
+Video Series Bridging research and policy
+Homelessness in California
+The silent cost of school shootings
+Investing in tomorrow’s policy experts
+Welcome to SIEPR
+Economic Impact of COVID-19
+Connect with SIEPR
+Events Academic Conferences
+Associates Meetings
+Policy Forums
+Summits 2026 Summit
+2025 Summit
+2024 Summit
+2023 Summit
+Past Events
+Giving Make a Gift
+Giving Priorities
+SIEPR Philanthropic Recognition Society
+Corporate Summit Sponsorship
+Legacy Giving
+SIEPR Summer Undergraduate Research Program
+Main navigation
+Skip Secondary Navigation
+Secondary Navigation
+Undergraduate Students
+Research Assistant Openings
+Academic Year Program
+Summer Program
+Graduate Students
+Predoctoral Research Fellows
+Young Scholars Program
+Visiting Faculty Program
+SIEPR Faculty Resources
+Main content start
+Applications for Summer 2026 UGRF Program are now closed.&nbsp;
+The SIEPR Undergraduate Research Fellows (UGRF) summer program provides an immersive research experience for Stanford undergraduates. The goals of the program are to connect students with SIEPR faculty and foster mentoring relationships, involve students in policy-relevant economics research, and help them develop research skills. We invite students from all areas of study to apply.
+Summer Program
+The program runs for 10 weeks, June 22 - August 28, 2026.&nbsp; Students are offered a fellowship stipend of $8500. All students are required to participate in the in-person activities during the program. Due to this we encourage students and mentors to be located within commuting distance of Stanford's campus for the duration of the summer program.
+SIEPR UGRF Student Eligibility
+Participants must be current Stanford undergraduates during the summer quarter.
+Coterm students and seniors are eligible only if their bachelor’s degree will not be conferred before the end of the research appointment. Coterm students in the graduate tuition group are not eligible.
+Students serving a suspension or on a leave of absence during Summer quarter are not eligible.
+Students are required to be on campus for program activities for the duration of the summer program.
+Students need to acknowledge that they understand the current Financial Aid policies for receiving a stipend payment while enrolled in classes, and are encouraged to check in with the Financial Aid Office before committing to participating in the SIEPR UGRF Program.
+&nbsp;
+Program Activities
+Students are required to attend meetings and seminars in-person throughout the program.
+Students create research related goals, in collaboration with their faculty mentor, to build research skills and complete tasks on faculty-led projects throughout the summer equaling approx. 35 hours a week.
+Students meet with the Faculty Mentor/Research Team regularly to discuss progress towards research goals.
+Students explore their own research interests with the guidance of their faculty mentor.
+Students prepare a final presentation at the end of the summer to share their progress on their research goals.
+&nbsp;
+Application Requirements
+A list of the courses that you have taken that are research-related.
+Resume
+A&nbsp; cover letter that addresses the following: Why are you interested in a SIEPR UGRF position?
+What is your previous experience, if any, with research?
+What are your personal research interests?
+&nbsp;
+Banking Lab
+Faculty Mentor: &nbsp;Juliane Begenau
+Professors Naz Koont, Greg Buchak, and Juliane Begenau are interested in working together with a research fellow to build a “banking lab” that integrates datasets on banks, fintechs, corporations, regulatory filings, market activity, and technological innovation. The aim is to construct and analyze linked datasets that can speak to broad and foundational questions in banking, financial intermediation, corporate finance, and the evolving role of technology in finance. The project will support research relevant to regulators, policymakers, and academic audiences interested in the evolution of financial intermediation.
+Responsibilities: &nbsp;The research fellow will assist in cleaning, linking, and organizing large datasets on banks, fintechs, corporations, and regulatory filings. They will help build and maintain the lab’s data infrastructure on the server. The fellow will also contribute to empirical analysis that supports ongoing research projects within the Banking Lab.
+Qualifications:&nbsp; Coursework in economics and/or finance is desirable, along with solid coding ability in Python/R and the ability to pick up new coding skills as well as to learn to work on the Stanford GSB server. The ideal candidate is detail-oriented, comfortable working with large datasets, and eager to learn new empirical and computational methods.
+An empirical investigation of young investors
+Faculty Mentor: &nbsp;Annamaria Lusardi
+This project conducts an empirical investigation of young investors, focusing on their characteristics, financial knowledge and investment decision-making. Financial markets have become substantially more complex, offering a growing set of sophisticated instruments, while also becoming far more accessible through online brokerage platforms and app-based interfaces. As a result, young adults can now invest easily but also face greater exposure to products whose volatility, pricing dynamics, and risks are difficult to assess, including meme stocks and crypto assets.
+The project uses data from the National Financial Capability Study (NFCS), in particular the NFCS Investor Survey and other surveys, to document how young investors select financial products as well as how they understand and manage risk. The project also examines emerging trends at the intersection of investing and gambling—such as prediction markets and sports betting—assessing their impact on young investors' beliefs, risk-taking, and financial resilience. Finding from this project will be used not only for academic papers but also for teaching and to design more effective financial education programs.
+Responsibilities:&nbsp; Support the literature review and empirical work by cleaning and merging the NFCS datasets, constructing key measures (investor characteristics, information use, investment knowledge, product use, etc.), and assisting with analysis and robustness checks.
+Qualifications:&nbsp; Knowledge of Stata.&nbsp; Having taken Econometrics, Econ 43, and other advanced Econ courses is not required but is considered a plus. Capacity to write clearly and concisely is highly valued.
+Back to Top
+Stanford
+Institute for Economic
+Policy Research (SIEPR)
+Web Login
+Address
+John A. and Cynthia Fry Gunn Building
+366 Galvez Street
+Stanford , CA 94305-6015
+United States
+General Information
+Campus Map
+Phone: (650) 497-1712
+Instagram
+LinkedIn
+Bluesky
+X
+Youtube
+Resources for
+Policymakers
+Journalists
+Students
+SIEPR Faculty Portal
+SIEPR Staff Portal
+Get Involved
+Join SIEPR&#039;s digital mailing list
+Make a gift
+Follow us on social media
+Stanford
+University
+Stanford Home
+Maps &amp; Directions
+Search Stanford
+Emergency Info
+Terms of Use
+Privacy
+Copyright
+Trademarks
+Non-Discrimination
+Accessibility
+&copy; Stanford University.
+&nbsp; Stanford, California 94305.

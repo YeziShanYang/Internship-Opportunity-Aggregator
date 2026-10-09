@@ -1,0 +1,111 @@
+HopHacks 2026
+HopHacks
+Johns Hopkins University • September 18–20, 2026
+Interested in partnering? ▾
+Meet the team
+About HopHacks
+HopHacks is Johns Hopkins University&#x27;s annual hackathon, where students come together to spend a weekend building, learning, and having fun with technology. We&#x27;re open to both undergraduate and graduate students, whether you&#x27;ve been to a dozen hackathons or have never written a line of code before.
+This September 18–20, grab some friends, find a team, and build something from scratch. You can work on an idea you&#x27;ve had for a while, try out a new technology, or just see what you can make over a weekend. Along the way, there&#x27;ll be workshops, mentors, sponsors, and plenty of food and opportunities to meet other people.
+You don&#x27;t need to come in with a project or even know exactly what you want to build. Just come ready to learn, make something, and have a good time.
+Come hack with us.
+Tracks
+Gaming
+Memetics
+Philanthropy
+Data
+Healthcare
+Use the left and right arrow keys to rotate the tracks. Press Home or End to jump to the first or last track.
+Gaming
+Memetics
+Philanthropy
+Data
+Healthcare
+Schedule
+Schedule subject to change.
+Day 1 Friday, September 18 Day 2 Saturday, September 19 Day 3 Sunday, September 20
+Check-in
+6:00–8:00 PM
+Main — 3400 N Charles St, Levering Hall Glass Pavilion, Baltimore, MD 21218
+Dinner
+6:30–8:00 PM
+Food — Levering Hall Glass Pavilion
+Opening Ceremony and Team Matching
+8:00–9:00 PM
+Main — Levering Hall Glass Pavilion
+Hacking Begins!
+9:00 PM
+Announcement — Hodson Hall
+Team Matching
+9:00 PM
+Main — Hodson 210
+Sponsor Hall Opens
+9:00 PM
+Announcement — Levering Hall Great Hall
+Fellows X Forge Kickoff by Forge
+9:00–9:30 PM
+Workshop — Levering Hall Glass Pavilion
+A fireside chat with Cory Levy of Z Fellows, focused on his experience in the startup ecosystem, his work with emerging founders, and his perspective on supporting early-stage companies. The conversation will include time for audience questions.
+Memetics Data Crash Course by Calcifer Computing
+9:30–10:00 PM
+Workshop — Hodson 210
+Learn the basics of accessing and analyzing Calcifer&#x27;s large social media datasets.
+Sponsor Hall Closes
+11:00 PM
+Announcement — Levering Hall Great Hall
+Sponsors
+Interested in sponsoring HopHacks? hophacks.sponsors@gmail.com
+FAQ
+What is a hackathon?
+A fast paced environment that encourages engineers, designers, and entrepreneurs to explore new ideas and create new software or hardware applications in a short timeframe. Hackers compete for prizes in tracks by sponsors, eat free food, receive cool merch, and make memories that last a lifetime!
+What is HopHacks?
+HopHacks is the 36 hour annual premier Hackathon held at Johns Hopkins University in the fall.
+Who can participate?
+Any university student enrolled in any undergraduate or graduate program may apply to hack. High school students may NOT participate. We will email you closer to the hackathon once we approve your application.
+When are applications due?
+Applications close on September 1, 2026. Apply early — we review applications on a rolling basis and will email you once we have a decision.
+What are the team size requirements?
+Hackers must compete in teams of 2–4. Solo participation is not allowed.
+I don’t have a team, how can I make one?
+We will have a team matching process after we accept hackers! Teams must have 2–4 members (no solo hackers). Additionally, we will be hosting team matching events at the start of the hackathon, so don’t worry!
+Where will HopHacks take place?
+This year, HopHacks is held at Hodson Hall and the Glass Pavilion on the Johns Hopkins Homewood Campus in Baltimore, MD. A campus map can be found here , and you can navigate to us on Google Maps .
+Is HopHacks held in-person?
+Yes! We will be fully in-person this year so you can meet other hackers and sponsors! Unfortunately, there will be no way to attend virtually.
+When can I pick up parking passes?
+We will distribute parking passes to participants on the Sunday morning of HopHacks.
+Will there be travel reimbursement?
+We will not be offering individual travel reimbursements. However, please see the busing interest form in our LinkTree to sign up for updates. If enough people from your city sign up, we may send a FREE bus to pick up hackers in your area!
+What about the free food?
+At registration, all participants will be given a wristband which MUST BE VISIBLE when you are getting food. If you do not have your wristband, you will not be able to get food.
+Where can I find the MLH code of conduct?
+You can find the MLH code of conduct here.
+My question wasn’t answered here!
+Please email hophacks@gmail.com or ask your question in our Discord and one of our organizers will get back to you soon!
+HopHacks
+hophacks@gmail.com Malone Hall Johns Hopkins University Our Team MLH Code of Conduct MLH Code of Conduct
+×
+TL;DR. Be respectful. Harassment and abuse are never tolerated. If you are in a situation that makes you uncomfortable at an MLH Member Event, if the event itself creates an unsafe or inappropriate environment, or if interacting with an MLH representative or event organizer makes you uncomfortable, please report it using the procedures included in this document.
+Major League Hacking (MLH) stands for inclusivity. We believe that every single person has the right to hack in a safe and welcoming environment.
+Harassment includes but is not limited to offensive verbal or written comments related to gender, age, sexual orientation, disability, physical appearance, body size, race, religion, social class, economic status, and veteran status. Additional cases of harassment include but are not limited to sharing sexual images, violent depictions, vulgar language, deliberate intimidation, stalking, following, brigading, doxxing, harassing photography or recording, sustained disruption of talks or other events, inappropriate physical contact, and unwelcome sexual attention.
+In particular, attendees should not use sexualized images, activities, or other material both in their hacks and during the event. Booth staff (including volunteers) should not use sexualized clothing/uniforms/costumes or otherwise create a sexualized environment.
+If what you’re doing is making someone feel uncomfortable, that counts as harassment and is enough reason to stop doing it. Participants asked to stop any harassing behavior are expected to comply immediately.
+Sponsors, judges, mentors, volunteers, organizers, MLH staff, and anyone else participating in the event are also subject to the anti-harassment policy.
+If a participant engages in harassing behavior, MLH may take any action it deems appropriate, including warning the offender or expulsion from the event with no eligibility for reimbursement or refund of any type.
+If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact MLH using the reporting procedures defined below.
+MLH representatives can help participants contact campus security or local law enforcement, provide escorts, or otherwise assist those experiencing harassment to feel safe for the duration of the event. We value your attendance.
+We expect participants to follow these rules at all hackathon venues, hackathon-related social events, hackathon-supplied transportation, and online interactions related to the event.
+Reporting Procedures
+If you feel uncomfortable or think there may be a potential violation of the code of conduct, please report it immediately using one of the following methods. All reporters have the right to remain anonymous. By sending information to the general reporting line, your report will go to our incident response team members.
+North America General Reporting — +1 409 202 6060 , incidents@mlh.io
+Canada General Reporting — +1 343 453 4532 , incidents@mlh.io
+UK General Reporting — +44 800 808 5675 , incidents@mlh.io
+Europe General Reporting — +44 333 038 5995 , incidents@mlh.io
+Asia-Pacific General Reporting — +91 000 80004 02492 , incidents@mlh.io
+India General Reporting — 000 80004 02492 , incidents@mlh.io
+Special Incidents
+If you are uncomfortable reporting your situation to one or more of these people or need to contact any of them directly in case of emergency, direct contact details are listed below.
+Mary Siebert — +1 (516) 362-1835 , mary@mlh.io
+Swift — +1 (347) 220-8667 , swift@mlh.io
+MLH reserves the right to revise, make exceptions to, or otherwise amend these policies in whole or in part. If you have any questions regarding these policies, please contact MLH by e-mail at incidents@mlh.io .
+Last updated April 16th, 2026 · View the canonical document on GitHub
+Follow Us

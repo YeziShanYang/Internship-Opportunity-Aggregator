@@ -1,0 +1,35 @@
+SJHacks
+Home About Tracks Sponsors FAQ Sponsor Us
+Home About Tracks Sponsors FAQ Sponsor Us
+April 25th - 26th, 2026
+&lt;SJHacks/&gt;
+Guildhouse @ San Jose, CA
+Register
+About
+SJHacks is a 24-hour in-person hackathon at San José State University, designed to bring together changemakers from all backgrounds. Whether you are a coder, designer, or just passionate about solving problems, this event offers a space for you to collaborate, innovate, and create solutions that make a difference.
+Featured on PBS Connect the Bay: AI Today!
+Tracks
+Track 1: 3D/CGI
+How can we accelerate and simplify the 3D/CGI pipeline?
+3D creation tools like Blender, Autodesk Maya, and AutoCAD are incredibly powerful, but can often be complex, time-consuming, and intimidating for new users. This track challenges you to design add-ons, plugins, or tools that streamline the workflow and reduce friction in the 3D pipeline.
+Track 2: Digital Content Creation
+How can we empower digital artists to realize their creative vision fully?
+Digital artists use tools like Adobe Creative Cloud, GIMP, and DaVinci Resolve to create stunning graphics, illustrations, or social media content, but many workflows remain manual, fragmented, or constrained by technical complexity. This track focuses on enhancing the creative experience and enabling artists to work more fluidly and expressively. Enhance creativity, not replace it, by reducing friction between imagination and execution.
+Track 3: Game Development
+What parts of the game development pipeline can we accelerate or improve?
+Game development is a multidisciplinary process involving design, art, programming, physics, and storytelling. Engines like Unreal Engine 5, Unity, and Godot provide powerful capabilities, but development can still be slow and complex. This track invites you to build tools that streamline or enhance any part of the game dev pipeline. Help developers build, test, and iterate on games faster and more efficiently!
+Track 4: DIY Software
+How can we build accessible, secure software that empowers independent creatives?
+Independent creators often rely on powerful tools, but many come with trade-offs, such as high costs, limited transparency, cloud dependency, or weak data protection. In today’s digital landscape, creative work is vulnerable to theft, leaks, unauthorized access, and platform lock-in. This track challenges you to build original software that enables creativity while also protecting it.
+Sponsors
+Past Sponsors
+FAQ
+Q: Will this hackathon be open to other students?
+A: This event is open to all currently enrolled students attending an accredited university or community college who are +18. Priority registration will be given to SJSU students during the initial registration period.
+Q: Is this an overnight hackathon?
+A: Yes! This hackathon will be overnight at Guildhouse. Please be sure to prepare hotel or commute arrangements, or a sleep bag if you choose to sleep at the location.
+Q: How many team members are permitted?
+A: You may be in a maximum team of 4. You may also have the option to work on your own.
+Q: Am I allowed to bring guests to the hackathon?
+A: Only competitors at the event with a valid badge (given at the event) will be allowed entry to the event. Guests are prohibited from participating.
+Made with love, by the SJHacks Team

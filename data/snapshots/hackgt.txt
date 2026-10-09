@@ -1,0 +1,75 @@
+HackGT 13
+About Tracks Schedule FAQ Sponsors
+About Tracks Schedule FAQ Sponsors Register
+About
+What is HackGT?
+HackGT is Georgia Tech's largest hackathon and will run from September 25th to September 27th, 2026 at the Klaus Center for Advanced Computing at Georgia Tech in Atlanta! The 13th edition of our flagship event brings you to a seaside plaza with a fresh spirit of innovation for all creators, builders, and visionaries.
+Each year, HackGT welcomes over 1500+ hackers 🤹 from around the world to tackle novel challenges, win exciting prizes, and make lasting connections 🎠! HackGT's stage will be open to everyone, regardless of background, experience, or skill level, to showcase their innovative ideas. 🎢 Hackers can expect a thrilling weekend filled with networking opportunities, top-tier prizes, engaging mini-events, and lots of swag! 🏆
+Tracks
+ML / AI / Data Visualization / Analytics Track
+Dive into the depths of data and surface something brilliant through innovative ML/AI and visualization that sees what no one else can.
+Oracle of the Deep
+Hardware Track
+Show off your best builds and set sail with robots and smart devices to conquer the seven seas.
+The Shipyard
+Immersive (AR/VR/XR) Track
+Explore creating experiences that blur the lines of reality and pull people into another world.
+The Lighthouse Laboratory
+Social Good (Healthcare, Sustainability) Track
+Design technology that makes a real difference, whether it's health, climate, education, or a problem that hits close to home.
+A Marina's Mission
+Presented by Aramco
+Schedule
+Day 1 Day 2 Day 3
+Friday, September 25
+Check-in
+2:00 PM – 4:00 PM · Outside Ferst Center
+Opening Ceremony
+4:00 PM – 5:00 PM · Ferst Theatre
+Team Formation
+5:00 PM – 6:00 PM
+Sponsor Fair
+5:30 PM – 7:00 PM · Klaus Atrium
+Dinner
+7:00 PM – 8:30 PM · Klaus 1116 W
+Hacking Begins
+8:00 PM
+NSA Tech Talk
+8:30 PM – 9:30 PM · Klaus 1456
+Karaoke
+10:30 PM – 12:00 AM
+FAQ
+What is HackGT?
+HackGT is HexLabs' free, 36-hour, annual hackathon where students from across the world come together for a weekend in the fall to create innovative projects that show off their creativity and passion for development. You have the freedom to choose any platform, programming language, or format to show how you build solutions.
+Participating in this event will widen your professional network, build your portfolio, and allow you to put your creativity into production! With tech talks and workshops, you will also have the opportunity to talk to and learn from professionals in various industries. We encourage everyone to be a part of our hacker community at HackGT 13 regardless of location, major, or prior hacking experience.
+When does registration open?
+Early Registration has opened! This year, we have 2 rounds of applications: early bird and regular. Keep an eye out on our socials and subscribe to our newsletter for more information, coming soon 👀
+Who is eligible to apply as a hacker?
+As a hacker, you must be an enrolled college student. Additionally, if you are not a Georgia Tech student, you must be 18 years or older by the day the hackathon starts (September 25th, 2026).
+It's my first hackathon. Should I apply?
+Yes! Experience is not required. Hackathons are open creative and learning environments for everyone.
+How many paths can I apply to?
+You are only allowed to apply to one path. Please select the application path that best fits your needs! Also, note that once you are accepted, you cannot change your path.
+Did you say “FREE”?
+YES! Once you're on GT's campus, HackGT 13 is completely free to participants and mentors thanks to our sponsors. Free food, free swag, free vibes. 😇 If you will be traveling from afar, we offer reimbursements to GT, but transportation would be your only cost otherwise. Learn more on our travel guide .
+Will hardware be provided?
+We have a hardware desk with a variety of devices you can borrow throughout the event. We will release more information about what we'll have as the event approaches.
+What do I need for the event?
+We recommend bringing a laptop, charger, headphones, and anything else you'll need over the weekend. We'll provide hardware, meals, snacks, swag, and ~good vibes~.
+What projects can I make?
+You can make anything you want! If you want more direction, we will have both custom sponsor challenges and HackGT 13 tracks. However, you may not submit your past projects to HackGT. We will send out an event packet containing project submission rules closer to September.
+I'm not a solo hacker. How can I make a team?
+No worries; we love multi-person hacker groups! We will host a team formation event after opening ceremony. You can also form a team with anyone! Teams can have up to four members. Look out for more information about our team matching portal coming soon!
+What are the prizes? Is there swag?
+If you win a prize, we will make sure you get it no matter where in the world you are! We'll announce more info on prizes soon. HackGT 13 swag will be distributed during the event and there will be more opportunities to win exclusive items from winning activities or using points from event participation to redeem additional aesthetic swag. More information coming soon!
+Who is eligible to volunteer?
+Anyone can volunteer! If you are interested in helping us run the event, then apply as a volunteer.
+Where do I apply to be a judge?
+Click the register link and apply to the judge path.
+Want to sponsor?
+Contact us at sponsorship@hexlabs.org for more information
+I have more questions…
+Contact us at hello@hexlabs.org, or join our&nbsp; Discord! &nbsp;We're happy to help!,
+Sponsors
+With &lt;3 from the HexLabs team
+MLH Code of Conduct

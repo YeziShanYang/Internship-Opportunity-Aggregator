@@ -1,0 +1,91 @@
+Stanford
+University Stanford Home
+Maps &amp; Directions
+Search Stanford
+Emergency Info
+Terms of Use
+Privacy
+Copyright
+Trademarks
+Non-Discrimination
+Accessibility
+© Stanford University. Stanford, California 94305.
+Pause Media
+Student Research Opportunities
+Opportunities across HAI&#x27;s programs, centers, labs, and initiatives.
+Learn More
+The Stanford Institute for Human-Centered Artificial Intelligence (HAI) is looking for research assistants with excellent analytical and organizational skills and outstanding academic credentials to support HAI. Please note that the position is open to Stanford students ONLY.
+Stanford Digital Economy Lab (DEL) Research Opportunities
+Center for Research on Foundation Models (CRFM) Research Opportunities
+HAI Research for the AI Index
+HAI Organizational Analytics
+RAISE Health Research Opportunities
+RegLab Opportunities
+The Stanford Digital Economy Lab is an interdisciplinary research group that studies how digital technologies are transforming work, organizations, and the economy. The Lab focuses on three core areas of research: AI and the Future of Work, Measuring the Digital Economy, and Digital Platforms and Society. The Lab’s insights help companies, policymakers, students, and professionals rise to the challenges and opportunities created by digitization. The Stanford Digital Economy Lab is an initiative of the Stanford Institute for Human-Centered AI (HAI) and is co-sponsored by the Stanford Institute for Economic Policy Research (SIEPR).
+We are looking for students to support our three key areas of work:
+AI and the Future of Work: Understanding the future of the workforce in a rapidly changing global economy.
+Measuring the Digital Economy: Creating better methods of measuring the health of an increasingly digital economy.
+Digital Platforms and Society: Exploring how digital technologies can transform platforms and social media infrastructure to benefit society
+We are looking for students to assist with logistics of data gathering, cleaning, analyzing data using state of the art techniques, and data visualization. Proficiency with R or Python is required.
+The Stanford Center for Research on Foundation Models (CRFM) is an interdisciplinary center at HAI. CRFM advances both the science of foundation models and the responsible deployment of these models in society. Our research spans three broad pillars: (i) technical research (e.g. creating new methods to train better models), (ii) applied research (e.g. building models in high-impact domains like medicine) and (iii) society impact (e.g. informing public policy on foundation models).
+We are looking for students across these three pillars. At this moment, we are looking for strong students with engineering/CS expertise to build CRFM infrastructure (e.g. the HELM benchmark for foundation models). In addition, we are looking for students with data science and policy expertise to advance our societal efforts (e.g. maintain the Ecosystem Graphs initiative for documenting the foundation model ecosystem, translating CRFM research into policy and industry standards). CRFM is a large entity with many ongoing research efforts, so we encourage students to apply proactively and specify precise specific interests/strengths, even if they may not relate to the few projects listed above.
+The AI Index program at the Stanford Institute for Human-Centered Artificial Intelligence (HAI) is looking for research assistants with excellent analytical and organizational skills and outstanding academic credentials to support research and data collection. The research and data collection would assist projects that support the next AI Index report and additional AI Index projects such as the legal AI database, AI regulations database and Global AI Vibrancy Tool.
+About AI Index : The AI Index program at the Stanford Institute for Human-Centered Artificial Intelligence (HAI) tracks, collates, distills, and visualizes data relating to artificial intelligence. Our mission is to provide unbiased, rigorous, and comprehensive data for policymakers, researchers, journalists, executives, and the general public to develop a deeper understanding of the complex field of AI.
+HAI manages hundreds of annual programs including, grant-making, educational courses, and research, policy and industry convenings. We interface with faculty from all seven Stanford schools and researchers, industry leaders, and policymakers from across the globe. In order to continuously build upon and improve HAI programming in service of the overall mission, we are looking for students interested in utilizing data science and advanced analytics to inform leadership decisions in a data-driven manner.
+Responding to rapid advances in artificial intelligence and the urgent need to define its responsible use in health and medicine. Stanford School of Medicine (SoM) and Stanford Institute for Human-Centered Artificial Intelligence (HAI) share a vision for the future where the benefits of AI across biomedical research, education, and patient care are broadly shared and the risks are mitigated. RAISE Health (Responsible AI for Safe and Equitable Health) seeks to accelerate current work at Stanford focused on responsible healthcare, translate the latest AI technologies into tangible health benefits while considering the critical ethical and safety issues and help others navigate this complex and evolving field.
+We are looking for students to support our three key areas of work:
+Establishing and maintaining a platform for sharing responsible AI in health and medicine standards, tools, models, data, research and best practices.
+Defining structured frameworks for ethical standards and safeguards
+Convening a diverse group of multidisciplinary innovators, experts and decision makers on the topic
+The Stanford Regulation, Evaluation, and Governance Lab (RegLab) partners with government agencies and nonprofits to leverage AI and data science to modernize and revitalize the public sector. We are an interdisciplinary team of legal experts, data scientists, social scientists, and engineers who build and evaluate high-impact demonstration projects focused on some of society’s most urgent challenges.
+RegLab is hiring for a range of full-time and part-time positions. Please refer to the RegLab website for the most up-to-date information.
+Student Research Opportunities | Stanford HAI
+Stay Up To Date
+Get the latest news, advances in research, policy work, and education program updates from HAI in your inbox weekly.
+Sign Up For Latest News
+Navigate
+About
+Events
+AI Glossary
+Careers
+Search
+Participate
+Get Involved
+Support HAI
+Contact Us
+Skip to content
+About About
+About
+People
+Get Involved with HAI
+Support HAI
+Subscribe to Email
+Research Research
+Research
+Research Programs
+Grants
+Marlowe (opens in new tab)
+Student Affinity Groups
+Centers &amp; Labs
+Research Publications
+Research Partners
+Education Education
+Education
+Executive and Professional Education
+Government and Policymakers
+K-12
+Stanford Students
+Policy Policy
+Policy
+Policy Publications
+Policymaker Education
+Student Opportunities
+AI Index AI Index
+AI Index
+AI Index Report
+Global Vibrancy Tool
+People
+News
+Events
+Industry
+Centers &amp; Labs

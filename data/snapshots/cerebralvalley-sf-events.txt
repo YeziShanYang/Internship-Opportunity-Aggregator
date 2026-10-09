@@ -1,0 +1,142 @@
+AI Events in San Francisco – Cerebral Valley
+Skip to Main Content Events
+Search Sign In Sign In
+Discover
+Submit Event
+Event Type
+All Events CV Events Hackathons
+AI Events in San Francisco
+Submit Event
+Discover
+San Francisco is where the frontier labs ship, and the calendar shows it. Explore Cerebral Valley&#x27;s curated selection of hackathons, research talks, demo nights, and founder dinners across the Bay.
+Featured Previous slide
+Next slide
+Oct 17
+The Recursive Agents Hackathon
+Sat, Oct 17 · 9:00 AM PDT
+Shack15, San Francisco, CA
+Teams of up to four will build persistent AI agents that plan, delegate, recover from errors, and operate with minimal oversight using Crusoe Managed Inference, NVIDIA infrastructure, and open models like Nemotron. Approved participants will compete for $25,000 in cash prizes and an NVIDIA RTX 5090.
+Oct 15
+Vercel Ship 26 | San Francisco
+Thu, Oct 15 · 9:00 AM PDT
+Palace of Fine Arts
+Vercel will host a hands-on event where developers will explore building, deploying, and scaling AI agents with industry experts leading the charge. Attendees can participate in person or tune in online to dive into the latest agent frameworks and connect with fellow builders pushing the boundaries of AI development.
+Oct 11
+The Harness Engineering &amp; Model Wrangling Hackathon
+Sun, Oct 11 · 9:00 AM PDT
+San Francisco, CA
+Developers will build persistent-memory and self-evolving AI agents with MongoDB Atlas and Vector Search, tackling long-term context, reliability, and rewritable guardrails. Ecosystem judges will assess the projects and their approaches to agents that adapt over time.
+Oct 12
+Open Intelligence Summit
+Mon, Oct 12 · 9:00 AM PDT
+San Francisco, CA
+On October 12–13, AI founders, builders, and researchers will explore open weights, data, agents, infrastructure, and tooling, and how openness can drive more choice, better economics, faster innovation, and greater control.
+Oct 13
+AI is already making decisions at work. The question is which ones stay human
+Tue, Oct 13 · 5:30 PM PDT
+3333 Coyote Hill Rd
+Dr. Paula Goldman, Salesforce&#x27;s Chief Ethical &amp; Humane Use Officer and trained anthropologist, will keynote on her new book *Manage the Machine*, sharing global research on what separates successful AI implementations from risky ones—spoiler: it&#x27;s keeping people at the center. Dr. Caroline Simard, Dean of Northeastern University Silicon Valley and tech industry inclusion researcher, joins the conversation, followed by a book signing and reception where everyone walks away with a free copy.
+Oct 23
+Intelligence at Work Hackathon
+Fri, Oct 23 · 8:30 AM PDT
+Menlo Park, CA
+Snowflake and Anthropic will host a hands-on build day where engineers, product builders, and data teams use Claude and Snowflake to solve real business challenges with company or public data. Teams will develop ideas ranging from workflow automation to new products and customer experiences, with speakers, judges, and prizes to be announced.
+Oct 5
+ur +1 is a stranger
+Mon, Oct 5 · 12:00 AM PDT LIVE
+San Francisco, CA
+During SF Tech Week, NEXA will use AI-powered, opt-in matchmaking to connect attendees with potential hires, customers, and investors at events they already plan to attend. The week will bring together startup and VC professionals across the tech ecosystem, with introductions made only when there’s a strong fit.
+Oct 5
+Tech Week
+Mon, Oct 5 · 9:00 AM PDT LIVE
+San Francisco, CA
+Bond’s curated guide will track the full Tech Week 2026 schedule from October 5–11, with Bond AI’s approved picks clearly marked.
+Oct 8
+NatSec + Space Innovation Summit | Fleet Week × Tech Week
+Thu, Oct 8 · 9:00 AM PDT LIVE
+Klamath (Historic Ship)
+The Pentagon and Silicon Valley are converging for a high-stakes 48 hours where defense tech founders, government innovation leaders, frontier AI companies, venture investors, and veteran operators will cut through the noise and actually build partnerships—with live autonomous systems demos on the water and the Blue Angels overhead as the backdrop.
+Oct 8
+Beyond Tomorrow x The AI Collective – Live
+Thu, Oct 8 · 6:00 PM PDT LIVE
+VibeShack Studios
+Oct 9
+run 6miles
+Fri, Oct 9 · 6:00 AM PDT LIVE
+Dogpatch
+A 6 a.m. zone-2 six-mile run will bring together tech and startup community members to discuss the future of AI in fitness wearables. Runners will take in a sunrise along the route.
+Oct 9
+Waves &amp; Breakfast with CodeRabbit
+Fri, Oct 9 · 8:00 AM PDT
+San Francisco, CA
+SF Tech Week 2026 will wrap with an early-morning surf, cold plunge, and beach hang for founders, builders, investors, and friends, followed by sponsor-provided breakfast and coffee. Surfing is optional, and a limited number of loaner boards and wetsuits will be available.
+Oct 9
+World Models &amp; GPUs Coffee
+Fri, Oct 9 · 8:30 AM PDT
+San Francisco, CA
+Teams training or serving world models on real GPUs will compare notes over coffee on memory limits, serving-stack bottlenecks, and what has changed this year. The discussion will bring together practitioners working directly with GPU infrastructure and world models.
+Oct 9
+Private Fund CFO Breakfast — The AI-Enabled Fund: Reporting, Compliance &amp; Tax Strategy
+Fri, Oct 9 · 9:00 AM PDT
+San Francisco, CA
+KPMG and Suntera Fund Services will deliver an intermediate, 1-credit session for private equity and venture capital fund finance leaders on AI in reporting, compliance, and workflows, plus QSBS eligibility and tax-planning strategies. Attendees will explore practical automation, security and regulatory risks, and governance controls for more efficient, audit-ready operations.
+Oct 9
+AI Summit — The Infrastructure Era
+Fri, Oct 9 · 9:00 AM PDT
+W Hotel San Francisco
+The B.E.L.L.E AI Summit will bring founders, investors, enterprise leaders, researchers, and policymakers together to explore AI infrastructure, enterprise deployment, agentic AI, and robotics, alongside keynotes, panels, and a startup pitch competition. The summit will draw on B.E.L.L.E’s track record as a 501(c)(3) nonprofit community connecting 30,000+ people, supporting 1,000+ companies, and contributing to $1B+ in fundraising impact.
+Oct 9
+The Responsible AI Capital &amp; Investment Forum- an AI 2030 Summit event
+Fri, Oct 9 · 9:00 AM PDT
+San Francisco, CA
+The Responsible AI Capital &amp; Investment Forum will bring investors, philanthropic foundations, innovators, and industry leaders together to explore funding opportunities, governance, and scalable AI models that balance returns with public good. Hosted by AI 2030, a global responsible AI initiative, and FinTech4Good, an innovation and investment platform, the forum will spotlight high-integrity approaches to AI investment and stewardship.
+Oct 9
+Pitch or NGMI: 20 Startups. 2 Minutes. One Winner
+Fri, Oct 9 · 9:00 AM PDT
+San Francisco, CA
+Twenty founders will each get two minutes to demo AI-powered technology for real-world industries, competing for prizes and investor conviction. Active venture investors and industry leaders will give direct feedback as 100+ founders, operators, and corporate innovation leaders hear pitches across climate, robotics, energy, infrastructure, and more.
+Oct 9
+VirtusLab Tech Walk
+Fri, Oct 9 · 9:00 AM PDT
+San Francisco, CA
+Technology leaders will trade conference rooms for a relaxed, two-hour San Francisco walk, discussing AI budgets, data foundations, and ownership in a small, invite-only group capped at 15–20. Hosted by VirtusLab, with 15 years of experience building data platforms and developer tooling for teams at Databricks, Airbnb, DHL, JetBrains, and Volkswagen, the gathering will be part of SF Tech Week.
+Oct 9
+Pickleball &amp; Breakfast for Physical AI
+Fri, Oct 9 · 9:00 AM PDT
+San Francisco, CA
+Founders and operators across construction, real estate, data centers, energy, and robotics will connect over pickleball and breakfast during SF Tech Week. Players and spectators alike will have a chance to meet others building the physical economy.
+Oct 9
+Women in AI Coffee, Breakfast, &amp; Fireside Chat
+Fri, Oct 9 · 9:00 AM PDT
+Mission Rock
+InstaLILY AI will host a Women in AI coffee and breakfast featuring a fireside chat and conversations across the AI community. The gathering will be part of SF Tech Week, a program bringing together leading founders, funds, and companies.
+Oct 9
+Build It Anyway: Signal Hunt with Apify | Tech Week Hackathon for Non-Technical Builders
+Fri, Oct 9 · 9:30 AM PDT
+461 Bryant St
+Build It Anyway will offer a one-day, beginner-friendly hackathon where participants use Apify and AI to create web-signal agents for sales, e-commerce, or marketing, with live demos, hands-on support, and team prizes. Hosted by Build It Anyway and the European Startup Embassy, with Apify powering the event and Build Club as community partner.
+Oct 9
+AI &amp; Blockchain Summit
+Fri, Oct 9 · 9:30 AM PDT
+San Francisco, CA
+The AI &amp; Blockchain Summit will bring founders, technical builders, and investors together to explore how AI and Web3 are converging. Sessions will focus on decentralized training clusters, zero-knowledge machine learning, on-chain AI agents, and DePIN infrastructure.
+Oct 9
+Cyberdefense Hackathon
+Fri, Oct 9 · 9:30 AM PDT
+San Francisco, CA
+Developers, security engineers, and AI builders will tackle the growing intersection of AI-powered threats and defense by building tools for vulnerability discovery, attack intelligence, and autonomous remediation—with support from AWS, Guild AI, and ClickHouse. Hackers will compete to create next-gen security solutions that keep critical systems protected as AI capabilities accelerate.
+Oct 9
+Connecting over a Game of H.O.R.S.E. for AI Founders — Hoopers Meet
+Fri, Oct 9 · 10:00 AM PDT
+Hayward Basketball Courts
+A casual H.O.R.S.E. game and shootaround will offer tech professionals an easy way to connect, play, or hang on the sidelines. The session will be part of SF Tech Week, a series of events hosted by VCs and startups across the tech ecosystem.
+Oct 17
+The Recursive Agents Hackathon
+Sat, Oct 17 · 9:00 AM PDT
+Shack15, San Francisco, CA
+Teams of up to four will build persistent AI agents that plan, delegate, recover from errors, and operate with minimal oversight using Crusoe Managed Inference, NVIDIA infrastructure, and open models like Nemotron. Approved participants will compete for $25,000 in cash prizes and an NVIDIA RTX 5090.
+Oct 23
+Intelligence at Work Hackathon
+Fri, Oct 23 · 8:30 AM PDT
+Menlo Park, CA
+Snowflake and Anthropic will host a hands-on build day where engineers, product builders, and data teams use Claude and Snowflake to solve real business challenges with company or public data. Teams will develop ideas ranging from workflow automation to new products and customer experiences, with speakers, judges, and prizes to be announced.

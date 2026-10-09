@@ -91,8 +91,8 @@ Paid, full-time software engineering internship supporting Microsoft 365 collabo
 Top Skills:
 CSS Excel HTML JavaScript Microsoft 365 Onedrive Power Apps Power Automate Powershell Python Sharepoint Online
 New
-Cut your apply time in half.
-Use our AI Assistant to automatically fill your job applications.
+Track Smarter, Apply Better.
+Ditch the spreadsheets. Organize your job search with our free Application Tracker.
 Use For Free
 Ericsson
 AI Software Engineer Intern
@@ -166,7 +166,7 @@ AI Azure Devops C# Cloud Platforms Cobol Git Java JavaScript Powershell Python T
 5
 ...
 ...
-82
+83
 Let Your Resume Do The Work
 Upload your resume to be matched with jobs you're a great fit for.
 All Filters

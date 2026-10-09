@@ -31,21 +31,6 @@ School/University:University of Nevada - Las Vegas
 Event description:The UNLV FMA Meet the Firms event connects employers with undergraduate finance students seeking internship and full-time opportunities. Hosted by UNLV's Financial Management Association, the event is expected to attract 50–70 finance majors and provides
 Event address / venue details:UNLV Student Union 4505 S. Maryland Parkway Las Vegas, NV 89154
 Event Timezone:US/Pacific
-https://bankcampuscareers.tal.net/vx/mobile-0/brand-0/candidate/so/pm/1/pl/2/opp/15038-What-s-Next-Career-Conversation-with-Bank-of-America/en-GB
-What's Next? Career Conversation with Bank of America
-<timestamp>
-<timestamp>
-~~DATADICT_OPTGROUP_POSTING_LIST_OPP_ID~~:15038
-Title:What's Next? Career Conversation with Bank of America
-Event Date:19 Nov 2026 04:00 PM EST
-Region:U.S. and Canada
-Country:United States of America
-Line of Business:FIRMWIDE
-Program (Event):Merrill Lynch Program,Private Bank Program
-School/University:Clark Atlanta University,Delaware State University,Florida A&amp;M,Hampton University,Howard University,Johnson C. Smith University,Morehouse College,Morgan State University,Norfolk State University,North Carolina A&amp;T University,Prairie View A&amp;M University,Spelman College,Tennessee State University,Texas Southern University,Tuskegee University
-Event description:Join our virtual information session to learn more about Bank of America's 2028 Wealth Management Summer Analyst Programs: The Private Bank, Merrill Wealth Management, and Chief Investment Office, Investment Solutions Group, Merrill Home Office. Hear dire
-Event address / venue details:Virtual - - A meeting link will be shared with registered attendees prior to the event.
-Event Timezone:US/Eastern
 https://bankcampuscareers.tal.net/vx/mobile-0/brand-0/candidate/so/pm/1/pl/2/opp/15036-Private-Bank-2028-Wealth-Management-Analyst-Program-Information-Session-11-4/en-GB
 Private Bank 2028 Wealth Management Analyst Program Information Session – 11/4
 <timestamp>

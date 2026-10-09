@@ -1,0 +1,166 @@
+Cal Hacks 13.0
+Hackathons @ Berkeley ABOUT VENUE OUR STORY SPONSORS FAQ REGISTER
+Open navigation
+Cal Hacks application timeline
+You Belong At Cal Hacks!
+Whether you’ve barely ever coded in your life or have participated in twenty hackathons, Cal Hacks is here to give you a platform to build, to learn, and to create – the world is your oyster!
+As the world’s largest collegiate hackathon, we recognize that tech spaces need to do more to create environments where hackers of marginalized backgrounds can thrive.
+As long as you’re passionate about technology and looking to change the world, you belong at Cal Hacks.
+The numbers that make our hackathon the largest — celebrating diversity, record-breaking participation, and a prize pool like no other.
+Our Venue
+The Palace of Fine Arts
+3601 Lyon St, San Francisco, CA 94123 Get directions
+Our Story — Thirteen Years of Hacking
+Year after year, we bring together the brightest minds to inspire breakthroughs. Scroll through to explore our history!
+2013 2015 “Thanks to the amazing planning, I feel like I was able to make the most out of my ‘first hackathon experience’ while building a project, working with mentors, and talking to employees at various companies.” “I loved the energy. The karaoke really made it feel like such a fun event.” “It was so unique working with people from all around the world on my project. We all shared and respected each other’s individual backgrounds.” 2014
+Join us for DDoSki’s Hack Month !
+Prime yourself for the best Cal Hacks yet with a series of tech talks, sponsor workshops, and hack nights — show off what you’re building, bring your friends (&amp; meet new ones), and come immerse yourself among the best &amp; brightest in tech!
+01 /
+Women’s Hack Night
+10/2 5 - 7 PM @ SCET (Grimes 304)
+RSVP
+02 /
+DDoSki’s Team Formation Social
+10/9 5 - 8 PM @ Memorial Glade
+RSVP
+03 /
+DDoSki’s Hack Night
+10/16 6 - 10 PM @ SCET (Grimes 304)
+RSVP
+04 /
+Intro to Hackathons Workshop
+Date TBD Details TBD
+RSVP coming soon
+05 /
+Co-Host Pre-Event Workshops
+10/15, 16, 19, 20 Details TBD
+RSVP coming soon
+Scroll for more
+A round of applause to our sponsors , who make all of this possible.
+And a big thank you to our partners .
+FAQs
+General
++ − What is Cal Hacks? Cal Hacks is a 3-day hackathon, where hackers creatively collaborate on innovative technology for a chance to win prizes including cash, and attend workshops and panels to learn more about emerging tech!
++ − Who are your hosts? We’re Hackathons @ Berkeley, the team behind Cal Hacks and the UC Berkeley AI Hackathon. We ourselves are a team of students wanting to cultivate a space where people can build without boundaries!
++ − Who can participate? Cal Hacks is open to undergraduate and graduate students as well as new grads of under 1 year from all colleges and universities. We have had 300+ universities represented at past editions and are partnering with clubs at other colleges throughout the US.
++ − How many people can be on a single team? Up to 4 people can be part of a single team.
++ − What qualifies as a beginner team? Every team member must be a first-time hacker. Note that attending a prior hackathon and not submitting a project or demoing still counts as having prior experience. We will be verifying with outside sources upon choosing winners.
++ − Do I have to have a team to participate? Not at all! You can come with a team or solo. Whatever works for you!
+We will be hosting more relaxed socials before the hackathon to meet like-minded builders. As well as a team matching event during the event itself.
++ − What experience level is needed to attend? All experience levels are welcome!
++ − Can I start on my project before the hackathon? You cannot work on a project you started before the hackathon. Ideation before the hackathon is allowed, but all implementation must occur during the hackathon.
++ − I can’t wait until the weekend to get started at Cal Hacks! We will be launching a whole month of tech talks, workshops, and hack nights leading up to Cal Hacks 13.0! Stay tuned for more information!
++ − Still have questions? Reach out to us at team@hackberkeley.org !
+Registration
++ − Who can apply? Cal Hacks is open to undergraduate and graduate students as well as new grads of under 1 year from all colleges and universities. Those who graduated prior to Fall 2025 will not qualify.
++ − How do I apply? Apply at hive.hackberkeley.org by September 13 (priority) / September 20 (regular)!
++ − Why are there two timelines for applying? If you’d like to hear a decision earlier (for planning or financial purposes), the priority deadline is there to ensure you hear back by September 17!
++ − Do I get guaranteed admission if I apply early? No, but chances are much higher!
++ − I applied! What’s next? If you applied during the priority application cycle, you will get one of the following decisions a few days after the deadline: accepted, deferred, or rejected. If you were accepted, you will need to confirm your spot before the provided deadline to attend Cal Hacks 13.0!
++ − If I don’t meet the qualifications to participate, can I volunteer to be a judge or mentor? Yes! Applications can be submitted at hive.hackberkeley.org. Note that judges and mentors must have completed their undergraduate studies to be eligible.
++ − Do you have a waitlist or accept walk-ins on the day-of? Unfortunately, only hackers who were accepted and confirmed by the deadlines will be allowed in the venue. We will not make exceptions. However, we hold multiple events a year — be on the lookout for upcoming events in 2027!
+In-Person Logistics
++ − Where is Cal Hacks? Palace of Fine Arts! The schedule and more details will be sent closer to the event!
++ − What should I bring? You should bring a school/gov ID, laptop and chargers, headphones, and anything else you need to stay through the weekend.
++ − Do I have to be in-person? Yes, you and your team will all have to be in-person at the Palace of Fine Arts to participate in the hackathon.
++ − Will food be provided? Yes! Meals and snacks will be provided.
++ − Will there be overnight accommodations? Yes! Hacking all night is fun, but you can also get some rest! We will have a sleeping room in the venue, and there are many local hotels within a 10 minute walk should you opt to book one.
++ − Will my travel be reimbursed? This year, we will be offering travel stipends to a limited number of hackers with regional caps based on the region you are coming from. The application for travel stipend is embedded into the hacker application as an optional question. Choosing whether or not to apply for travel stipend will not affect your chances of being admitted as a hacker. Hackers who are admitted and applied for travel stipend will be informed of their travel stipend decision at the same time as their admission decision. Regional cap amounts will be determined at the same time travel stipend decisions are released.
+However, for most attendees, hackers will be in charge of getting themselves to the venue. There’s reliable public transportation in the Bay, such as CalTrain, BART, and buses in San Francisco. We will also be offering a free hacker bus from the BART line to the Palace of Fine Arts for accepted and confirmed hackers – more details to come!
++ − Will there be hardware I can use? Yes! We will provide hardware that you can borrow for your projects.
++ − Will the Wi-Fi work this year? We understand the frustration around the Wi-Fi service at Cal Hacks 12.0 — trust us, we were frustrated too. We are doing everything in our power and making heavy investments to ensure that Wi-Fi runs smoothly this year.
+Made with ❤️ love — the Hackathons @ Berkeley Team
+Allison Wang exec
+Charlie Huang exec
+Abby Li cubstart Lead
+Jessica Chiu cubstart lead
+Mauricio Yeverino Penunuri cubstart lead
+Victor Pham design director
+Lanna Xiao design lead
+Trinity Nguyen design lead
+Yutong Cui design director
+Christy Huang finance director
+Jeffrey Gong finance lead
+Rosy Sun finance director
+Kiana Yassini hacker experience lead
+Neha Gopal hacker experience lead
+Allison Wang exec
+Charlie Huang exec
+Abby Li cubstart Lead
+Jessica Chiu cubstart lead
+Mauricio Yeverino Penunuri cubstart lead
+Victor Pham design director
+Lanna Xiao design lead
+Trinity Nguyen design lead
+Yutong Cui design director
+Christy Huang finance director
+Jeffrey Gong finance lead
+Rosy Sun finance director
+Kiana Yassini hacker experience lead
+Neha Gopal hacker experience lead
+Nastasia Golembusch hacker experience director
+Shreya Korlipara hacker experience director
+Sumin Cho logistics lead
+Wallace Tang logistics lead
+Jay Chong logistics director
+Kylie Marcisz logistics director
+Sophia Choi logistics director
+Steven Zhang logistics director
+Tanisha Saxena logistics director
+Kandra Chau marketing director
+Christopher Blu Lopez marketing director &amp; hacker experience director
+Edward Kim marketing lead
+Javin Ku marketing director
+Rodin Luo marketing lead
+Nastasia Golembusch hacker experience director
+Shreya Korlipara hacker experience director
+Sumin Cho logistics lead
+Wallace Tang logistics lead
+Jay Chong logistics director
+Kylie Marcisz logistics director
+Sophia Choi logistics director
+Steven Zhang logistics director
+Tanisha Saxena logistics director
+Kandra Chau marketing director
+Christopher Blu Lopez marketing director &amp; hacker experience director
+Edward Kim marketing lead
+Javin Ku marketing director
+Rodin Luo marketing lead
+Jessenia Chan sponsorship lead
+Nathan Rhee exec
+Collin Hargreaves sponsorship director
+Jane Dong sponsorship director
+Kaden Huang marketing director &amp; sponsorship lead
+Nicole Lee sponsorship director
+Shahene Chaouachi sponsorship director
+Victor Hui sponsorship director
+Gary Sun tech lead
+Nicole Lee tech director
+Carl Djapardi tech director
+Eric Cao tech lead
+Kelly Yang tech director
+Justin Zhang tech director
+Jessenia Chan sponsorship lead
+Nathan Rhee exec
+Collin Hargreaves sponsorship director
+Jane Dong sponsorship director
+Kaden Huang marketing director &amp; sponsorship lead
+Nicole Lee sponsorship director
+Shahene Chaouachi sponsorship director
+Victor Hui sponsorship director
+Gary Sun tech lead
+Nicole Lee tech director
+Carl Djapardi tech director
+Eric Cao tech lead
+Kelly Yang tech director
+Justin Zhang tech director
+Exec
+Cubstart
+Design
+Finance
+HEI
+Logistics
+Marketing
+Sponsorship
+Tech
+Copyright © 2026 Cal Hacks | Cal Hacks is a registered 501c3 Non-Profit.

@@ -1,0 +1,70 @@
+Stanford Math Directed Reading Program
+Stanford Math Directed Reading Program
+The Directed Reading Program is a program of Stanford's Graduate Mathematics Outreach Organization in which undergraduate students (of any major) interested in independently reading some mathematics outside of their official coursework are paired for a quarter with math graduate students for weekly guidance and discussions. At the end of the quarter, participants gather for a colloquium in which each participant gives a short talk about their reading. The program began in winter quarter 2017.
+The application for the Fall 2026 DRP is now open
+here ! The application is due Monday September 28 at 11:59PM PDT.
+If you'd like to receive announcements about the program in the future, please subscribe to our mailing list.
+Program format
+Each quarter,
+Interested undergraduate students submit a brief application which asks something about their background and mathematical interests.
+The organizing committee matches undergraduates with graduate student mentors with similar interests. Pairings will generally be one-on-one.
+Each pair agrees on material that the undergraduate will read over the course of the quarter.
+Each week, the undergraduate student will be expected to spend at least four hours reading the material.
+During the week, students and mentors meet remotely for about one hour to discuss the material.
+At the end of the quarter, we will hold an optional colloquium.
+Participating undergraduates each give a short (12 minute) talk about what they learned during the quarter. We have compiled a list of guidelines for giving a presentation .
+The next quarter, we start from step 1 again (new pool of mentors, new pairings, etc.). Of course, mentoring relationships may last beyond the single quarter if both participants wish.
+Goals and philosophy
+The guiding principle is informality: this is a way for everyone to learn new things, meet new people, and explore new areas in a friendly and casual environment. This is not to say that people should not learn serious math, but a DRP project is not supposed to be like another math course or even like a reading course with a faculty member&mdash;more like independent reading with a bit of guidance. In particular, the DRP is independent of the Stanford Math Department curriculum and does not confer academic credit.
+One of the explicit goals of the program is to provide a streamlined way for undergraduate students to participate in the larger mathematical community and to gain mathematical cultural capital. We welcome applications from all Stanford undergraduates interested in mathematics, and women and members of other underrepresented groups are especially encouraged to apply.
+Ways and means
+This program is organized and run by a committee of mathematics graduate students. The current organizers are
+Miles Cua ,
+Carl Schildkraut , and
+Eha Srivastava .
+Please feel free to email the organizers with any questions or concerns.
+The DRP concept is based on that of similar programs at other institutions, going back to the first DRP started in 2003 at UChicago . There is now a national DRP network which maintains a list of resources and information about DRPs.
+The Math DRP is administered under the auspices of Stanford's Graduate Mathematics Outreach Organization. We are very grateful to Stanford's Office of the Vice Provost for Graduate Education (VPGE) for supporting the DRP through its Student Projects for Intellectual Community Enhancement (SPICE) and Diversity and Inclusion Innovation Funds (DIF) grants. We would also like to thank the staff of the Stanford Mathematics Department for invaluable administrative and logistical support.
+Winter 2026 participants
+Mentor Student(s)
+Miles Cua John Vaccaro
+Jiyun Park Sybren van den Bedem
+Michael Ren Blake Chang
+Yuefeng Song Harrison Plhak
+Esty Gusak Shivatmica Murgai
+Andrew Lee Anna Olivia, Susan Zhang
+Zehan Hu Rishubh Thaper
+Mikhail Molodyk Sophia Wei
+Romain Speciel Skyler Hamlin
+Fred Rajasekaran Haoyan Jiang
+Past participants
+See the list of participants and topics in previous quarters .
+The following is a list of abstract booklets from the final presentation sessions in previous quarters. Prospective participants may like to take a look to get an idea about what topics past participants have studied. (Note that in most cases, time constraints mean that each final presentation is only able to scratch the surface of the material that the participant studied!)
+Fall 2023, session 1 (January 9, 2024)
+Spring 2023, session 1 (June 8, 2023)
+Winter 2022, session 1 (April 1, 2022)
+Winter 2021, session 1 (April 2, 2021)
+Spring 2019, session 2 (June 10, 2019)
+Spring 2019, session 1 (June 4, 2019)
+Winter 2019, session 2 (April 4, 2019)
+Winter 2019, session 1 (April 3, 2019)
+Autumn 2018, session 2 (January 10, 2018)
+Autumn 2018, session 1 (January 9, 2018)
+Spring 2018, session 2b (June 12, 2018, room 384-I)
+Spring 2018, session 2a (June 12, 2018, room 384-H)
+Spring 2018, session 1 (June 7, 2018, room 384-I)
+Winter 2018, session 2b (April 4, 2018, room 384-I)
+Winter 2018, session 2a (April 4, 2018, room 384-H)
+Winter 2018, session 1 (April 2, 2018)
+Autumn 2017, session 2 (January 11, 2018)
+Autumn 2017, session 1 (January 10, 2017)
+Spring 2017, session 2 (two concurrent sessions, June 8, 2017)
+Spring 2017, session 1 (two concurrent sessions, June 6, 2017)
+Winter 2017, session 2 (two concurrent sessions, April 6, 2017)
+Winter 2017, session 1 (March 16, 2017)
+Links
+Undergraduates in math and allied fields may also be interested in the following programs and resources:
+The Stanford University Mathematics Organization is Stanford's undergraduate math club.
+Stanford Women in Math Mentoring (SWIMM) creates one-on-one mentoring relationships between undergraduate and graduate students in quantitative fields.
+SWIMM also maintains a list of resources for undergraduate students .
+The Stanford Math Department has another list of resources .
