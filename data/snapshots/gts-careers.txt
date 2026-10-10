@@ -18,6 +18,11 @@ Job Location (Descending)
 Overview (Ascending)
 Overview (Descending)
 Job Title
+Senior DeFi Trading Systems Engineer
+GTS is seeking a Senior DeFi Trading Systems Engineer to help build and scale our decentralized finance trading infrastructure. In this role, you will work closely with quantitative traders, researchers, and engineers to design, develop, and optimize high-performance trading systems supporting automated market making, liquidity provision, and on-chain execution across decentralized exchanges and protocols. The ideal candidate combines deep C++ engineering expertise with hands-on institutional DeFi experience and a strong understanding of smart contracts, AMM mechanics, and blockchain execution. This is an opportunity to solve complex technical challenges at the intersection of quantitative...
+Job Location
+US-NY-New York
+Job Title
 Head of Treasury
 The Treasurer will lead the firm's Treasury and Financing function, with accountability for its strategy, execution,day-to-day management, and overall direction....
 Job Location
@@ -44,6 +49,15 @@ Quantitative Trader - 2027 Graduates
 The ETF trading group at GTS is seeking applications to join our Quantitative Trader program for the May 2027 Graduates. The ultimate goal of the program is to turn you into a trader capable of designing, building and managing profitable trading strategies as part of a multi-disciplinary team. The successful candidates will work closely with senior traders on projects across the quantitative trading space. They will see their work directly impact the group&rsquo;s activities and drive revenue. The role will offer deep insight into how the trading desk operates and how our traders evaluate trading opportunities. There is opportunity for the right candidate to get involved in...
 Job Location
 US-NY-New York
+Job Title
+Operations Analyst
+GTS Asset Management is seeking an Operations Analyst to support the day-to-day operational activities of multiple fund-of-funds vehicles. The role sits within the operations function and works closely with portfolio management, fund administrators, counterparties, and internal control teams to ensure accurate, timely, and well-controlled execution of operational processes. This position is well-suited to a detail-oriented individual with strong organisational skills and a foundational understanding of fund operations and financial processes.
+&nbsp;
+GTS is a...
+Job Location
+UY-Montevideo
+Additional Locations
+AR
 Job Title
 Senior Software Engineer C++
 Senior Software Engineer &ndash; C++

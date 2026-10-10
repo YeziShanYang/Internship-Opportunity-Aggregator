@@ -19,7 +19,7 @@ Don&#8217;t miss a thing!!
 Sign up to receive emails directly from REU Finder.
 FREE TO SIGN UP
 Opportunities are just a click away!!
-Many REU programs for summer have not yet posted for summer 2027 just yet we will be posting as these are annouced.
+Many REU programs for summer have not yet posted for summer 2027 just yet we will be posting as these are announced.
 Barry Gold Water Summer Internship Program
 The Goldwater Summer Research Internship Program is designed to help college freshmen and sophomores build the skills, knowledge, and confidence needed to make informed decisions about their academic and career paths. Through hands-on research experiences, students will strengthen their preparation for future scholarships, research opportunities, and graduate school.
 The program is especially intended for undergraduates who have had limited access to research experiences , providing an opportunity to explore research, develop valuable skills, and gain greater confidence as they consider their next steps in STEM
@@ -42,7 +42,7 @@ University of Alabama Birmingham
 The Regional Initiative to Promote Undergraduate Participation in Experimental and Computational Materials Research at U of A Birmingham will pay a $7,000 stipend for the ten-week period and reimbursement for roundtrip travel. Participants stay in one of the UAB dorms and UAB Campus Housing directly. Housing is provided for eligible participants (certain restrictions apply). Other covered expenses include an allowance for supplies relevant to the research, travel to conferences recommended by research mentors.
 Levels: Freshmen, Sophomores, Juniors and non-graduating seniors
 Citizenship: US Citizens &amp; Permanent Residents
-Deadline to Apply: TBD for 2027
+Deadline to Apply: April 1, 2027
 Apply
 Portland State
 Virtual NSF REU Computational Modeling Serving Portland!
@@ -63,11 +63,6 @@ Prior research experience is not required, but strong candidates should have sig
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Deadline to Apply: TBD for 2027
-Apply
-The ASPIRE REU Program will be hosted at one of the four U.S. based ASPIRE institutions (Utah State University, University of Texas El Paso, University of Colorado-Boulder, and Purdue University)The purpose of the REU program is to provide students with opportunities to receive quality mentoring and research experiences ultimately impacting their academic and professional development.
-Levels: Rising Sophomores, Juniors, or Seniors are eligible to apply.
-Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply TBD for 2027
 Apply
 Louisiana Universities Marine Consortium
 In this program students conduct hands-on interdisciplinary research on Louisiana’s changing coastal environments while working with faculty, postdocs, or visiting scientists.
@@ -97,42 +92,26 @@ FoDOMMaT (The Future of Discovery) is a 10-week, on-site Research Experiences fo
 The program begins with a week-long training in ML/DL methods. Applicants must have some Python software development experience and basic exposure to machine learning through coursework, self-study, or projects.
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Resident
-Deadline to Apply: TBD for 2027
+Deadline to Apply: February 15, 2027
 Apply
 Boise State Department of Energy Consolidated Innovative Nuclear Research REU
 This 9-week internship, beginning in the first week of June, is designed for undergraduate students and will take place in Boise, Idaho. Participants will collaborate directly with Idaho National Laboratory and Boise State on nanoparticle synthesis, ink preparation, printer operation, and materials characterization. The program provides a $700 weekly stipend, housing in a Boise State dormitory, a $1,200 meal allowance, and travel support of up to $1,000.
 Levels: Freshmen, Sophomore, Junior
 Citizenship Requirements: US Citizens, Permanent Residents, International Students attending US Institutions
-Deadline to Apply: March 31, 2026
+Deadline to Apply: TBD for 2027
 Please email your resume to Dr. Deng zhangxiandeng@boisestate.edu to apply .
 Apply
-University of Kansas
-Participants will gain hands-on experience through technical training, collaborative research projects, and field visits to explore innovative solutions for energy efficiency, environmental impact reduction, and sustainable engineering. The program fosters interdisciplinary collaboration, pairing students with faculty and industry mentors to address real-world challenges like retrofitting systems for eco-friendly refrigerants and optimizing HVACR performance. By combining skill development, research execution, and career preparation, the REU aims to equip students with the technical expertise and motivation to become leaders in advancing sustainable technologies and addressing environmental challenges in the HVACR industry. Who should apply? Chemical engineering, mechanical engineering, environmental engineering and related majors
-Community College Students are encouraged to apply
-Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
-Minimum GPA: 3.0
-Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: March 31, 2026
-APPLY
 University of Kansas
 Students majoring in chemical engineering and related fields (chemistry, biology, physics) are encouraged to apply to the Chemical Engineering REU BioPATH at the University of Kansas. This REU provides an empowering learning and research experience in topics related to Bio based P roducts a nd T echnologies (BioPATH). This experience will nurture innovative thinking, enhance communication skills, foster a solid understanding of size and scale, and offer professional development to help students prepare for future careers.
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA 2.8
-Deadline to Apply: March 31, 2026
-Apply
-Oklahoma State University &amp; University of Alabama in Huntsville
-The main goal of the National Science Foundation (NSF) funded Collaborative Research Experience for Undergraduates (REU) site is to increase undergraduate participation in research projects on technologies that lead to the development of Smart Personal Protective Equipment (SMAPP). The research projects on material for protective equipment, heat flux measurement in fire conditions, and human-robot interaction in dangerous environments will be conducted at the Division of Engineering Technology (DET), Oklahoma State University (OSU) , Stillwater, OK. The projects on wireless sensor development, circuit design, and artificial intelligence for human health monitoring will be offered at Electrical and Computer Engineering (ECE) at the University of Alabama in Huntsville (UAH), Huntsville, AL. The students have an option to choose their project.
-Applicants must be from Engineering/Engineering Technology/Applied Science majors or closely related fields
-Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
-Minimum GPA: 3.0
-Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: March 31, 2026 11:59 PM EST
+Deadline to Apply: TBD
 Apply
 Keck Graduate Institute
 Program for undergraduate research in biotechnology and bioengineering
 The Summer Undergraduate Research Experience (SURE) program for undergraduate research in biotechnology and bioengineering at Keck Graduate Institute (KGI) in Claremont, CA provides undergraduate students the opportunity for cutting-edge, interdisciplinary research in the areas of applied molecular and cellular biology, bioengineering, computational biology, drug discovery and development, as well as exposure to related ethics and business topics.
-Deadline to Apply: March 31, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Montana State University Extreme Biofilms REU
 Research Experience for Undergraduates (REU) program focused on biofilms in extreme environments
@@ -140,7 +119,7 @@ The Extreme Biofilms REU is a 10-week summer program at Montana State University
 No prior research experience or formal coursework in biofilm science or thermal biology is required to apply.
 Levels: Freshmen, Sophomore, Juniors, and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: March 27, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Texas State University San Marcos
 This Texas State University (TXST) REU site engages undergraduate students in innovative Smart and Connected Health and Communities research in collaboration with Texas A&amp;M-San Antonio (TAMUSA). Students explore areas like AI-driven emotion recognition for children with Autism Spectrum Disorder (ASD), enhanced firefighting systems, and tech-assisted sports assessments for spinal cord injuries. Projects apply machine learning, AI, and IoT to real-world challenges, such as developing AI-powered smart homes for individuals with ASD and improving chronic ankle instability diagnosis. Students also study advanced computer vision for object tracking in engineering. This interdisciplinary experience prepares participants for advanced STEM studies and careers.
@@ -148,7 +127,7 @@ Ideal candidates have programming experience and are majoring in engineering, co
 Levels: sophomore, junior, or non-graduating senior
 Citizenship: US Citizen or permanent resident
 Minimum GPA: 3.0
-Deadline to Apply March 28, 2026
+Deadline to Apply: TBD for 2027
 Apply
 South Dakota School of Mines and Technology
 This Research Experiences for Undergraduates (REU) site at South Dakota School of Mines and Technology, located in Rapid City, SD, supports the training of 10 students for 10 weeks. In this program, funded by the Division of Chemistry and the Established Program to Stimulate Competitive Research (EPSCoR), the students will participate in interdisciplinary research projects, alongside professional development activities to prepare students for post-graduate work and careers in science and engineering.
@@ -156,31 +135,22 @@ The program emphasizes interdisciplinary research in chemistry, biology, environ
 Levels: sophomore, junior, or non-graduating senior
 Citizenship: US Citizen or permanent resident
 Minimum GPA: 3.0
-Deadline to Apply: March 28, 2026
-11:59 PM ET
+Deadline to Apply: TBD for 2027
 Apply
 Students from ID, MT, NE, ND, SD, WY are highly encouraged to apply
-Portland State
-Virtual NSF REU Computational Modeling Serving Portland!
-The intellectual focus of this virtual REU site is computational modeling to serve and enhance Portland (OR) and its greater region. Students will be involved in multi-disciplinary, community-based research projects and trained in computational thinking across different disciplines. In doing so, they will gain an understanding of the potential and limits of these tools and how they can serve communities.
-Portland State University (PSU), with its NSF-funded Portland Institute for Computational Science (PICS), is ideally suited for this REU site as it has developed a reputation as a national model for urban universities that enhance their region by working with partners to solve problems. The activities of this REU Site will involve a 2-week training followed by an 8-week research project completed under a faculty mentor’s guidance and with the involvement of a community partner.
-Levels: Sophomores, Juniors and non-graduating Seniors
-Citizenship Requirements: US Citizens &amp; Permanent Residents.
-Deadline to Apply: March 29, 2026
-Apply
 Florida Atlantic University
 Florida Atlantic University&#8217;s Institute for Sensing and Embedded Network Systems Engineering (I-SENSE) hosts an intensive summer research program in sensing and smart systems for talented undergraduate students across the country.
 Closely related to the Internet of Things, smart systems represent an emerging class of distributed systems that provide real-time awareness of conditions, trends, and patterns to support improved decision-making, and often, automation. The on-campus research will focus on I-SENSE&#8217;s three main program areas: Infrastructure Systems, Marine and Environment and Health and Behavior.
 Levels: Sophomores, Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
-Deadline: March 30, 2026
+Deadline: TBD for 2027
 Apply
 REU Site in Magnetics
 The Magnetics REU at Virginia Commonwealth University (VCU) hosts 10 students who work with 12 faculty from VCU, Virginia Union University , and Virginia State University . Students train in advanced micro- and nanofabrication, materials processing, and magnetic characterization at VCU’s research centers.
 Participants also spend a week conducting specialized experiments at NIST , Harvard University , and the Commonwealth Center for Advanced Manufacturing , and visit Micron Technology to explore industry nanofabrication facilities.
 Levels: Sophomores, Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
-Deadline: March 31, 2026
+Deadline: TBD for 2027
 Apply
 University of South Carolina
 The Research Experiences for Undergraduates (REU) site “Quantum Computing Workforce Development in the New Era of Computing” at the University of South Carolina offers a nine-week, fully funded summer research program. Led by Stephen Fenner with co-investigators Homayoun Valafar and Peng Fu , the interdisciplinary program brings together Computer Science and Mathematics faculty to train future quantum computing researchers.
@@ -188,18 +158,18 @@ In partnership with SC Quantum and the Boyd Innovation Center , students conduct
 Levels: Rising Sophomores or Junior
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
 Minimum GPA: 3.0
-Deadline: March 31, 2026
+Deadline: TBD for 2027
 Apply
 University of California at San Diego
 VERSA is a 9-week hybrid summer Research Experience for Undergraduates (REU) program in discipline-based education research (DBER) . This program is funded by the National Science Foundation . In VERSA, students will do STEM (science, technology, engineering, mathematics) education research with one of our faculty mentors. The goal of the program is to engage in the study and transformation of college STEM education through education research that is grounded in various STEM disciplines, including anthropology, biology, chemistry, computer science, physics, and psychology. Participants will not only gain research experience but also learn critical thinking and presentation skills and feel a part of the scientific community.
 Levels: Freshmen, Sophomore, Juniors, and non-graduating seniors
 Citizenship Requirements: US citizen or permanent residents
-Deadline to Apply: April 5, 2026
+Deadline to Apply: TBD for 2027
 Apply
 NSF REU Site: Cyberinfrastructure Research 4 Social Change
 The University of Texas at Austin
 Apply now: https://www.tacc.utexas.edu/reu
-Deadline to Apply: April 1, 2024
+Deadline to Apply: TBD for 2027
 The National Science Foundation Research Experience for Undergraduates (REU) Site: Cyberinfrastructure (CI) Research for Social Change is now recruiting undergraduates for the paid 9-week summer research experience at The University of Texas at Austin Texas Advanced Computing Center. Students gain skills in advanced programming and problem solving to conduct research in engineering, science, and computational medicine. Research projects emphasize advanced computing as a tool to power discoveries that will impact social change for future generations.
 Prior research or programming experience is not required.
 REU participants will receive:
@@ -208,16 +178,14 @@ Free housing at The University of Texas at Austin + meal card
 Travel arranged (and paid) by the REU
 Levels: Freshmen, Sophomores, Juniors &amp; non-graduating Seniors
 Minimum GPA: no minimum GPA but should be in good standing.
-Citizenship Requirements: US Citizens &amp; Permanent Residents. Undergraduate students who are not eligible for NSF funding may still be considered for participation through other sources of funding. If you are a non-US Citizen
-Please contact Marques Bland at: cir4sc@tacc.utexas.edu BEFORE applying.
-Deadline to Apply: Rolling admissions until April 10th
+Citizenship Requirements: US Citizens &amp; Permanent Residents. Undergraduate students who are not eligible for NSF funding may still be considered for participation through other sources of funding.
 Apply
 New Mexico Institute of Mining and Technology
 The Intelligent Energetic Systems Engineering (INTENSE) REU at New Mexico Institute of Mining and Technology engages undergraduates in research on robotics, smart materials, explosives, high-speed fluid dynamics, and shock physics. Students complete individual projects tied to federally funded research, exploring intelligent and energetic systems such as human-robot interaction and reacting energetic materials.
 Participants also gain exposure to advanced research facilities and tour Sandia National Laboratories and Kirtland Air Force Base .
 Levels: Applicants should have completed at least 3 semesters of engineering, science, or mathematics coursework prior to the start of the REU
 Citizenship: US Citizens &amp; Permanent Residents
-Deadline to Apply: April 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 SCIPE AI Research in Civil Engineering
 Potential application areas of AI in Civil Engineering include, but are not limited to, computer vision techniques for structural health monitoring, automation in construction, robotics in extreme environments, AI-accelerated simulations, AI-enabled knowledge discovery, AI for natural hazards engineering, and AI for mobility, water, and energy.
@@ -228,17 +196,17 @@ Travel arranged by TACC.
 Travel grants to present research at an annual conference will be available to selected participants.
 Levels: Freshmen, Sophomores, Juniors &amp; non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
-Deadline to Apply: April 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Clemson University
 This program introduces undergraduates to deep eutectic solvents (DES) —tunable, environmentally friendly fluids that can replace traditional organic solvents in sustainable chemistry. Because DES are rarely covered in undergraduate curricula, the program connects students with multiple mentors working on the topic across institutions.
 Participants collaborate and choose from 10 research projects spanning areas such as machine learning, organic synthesis, and interactions with proteins and cells, while learning from leading researchers in the field.
 Levels: Freshmen, Sophomores, Juniors &amp; non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
-Deadline to Apply: April 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of Chattanooga Tennessee
-iCompBio REU in 2026 (funding pending) tentatively is from May 19 to July 27, 2026.
+iCompBio REU
 The about 10-week iCompBio REU focuses on interdisciplinary computational biology training to undergraduates in science, technology, engineering, math, and other related fields. Please look through the potential research projects and then choose your preferences of the potential research topics.
 $7,000 stipend + housing and meal plan
 Travel allowance up to $500
@@ -247,37 +215,36 @@ Coding boot camp.
 Diverse range of research topics.
 Chattanooga is a great outdoor city
 A one-week computing bootcamp will be provided to teach students essential data science, advanced data processing and deep learning methods using Python. Each student will be jointly mentored by a computer science mentor and a biology mentor. The computing training includes coding, modeling, simulation, deep learning neural networks, computer vision, parallel computing, statistics, data visualization, and mobile App development.
-Review of applications will start on April 1st, 2026.
+Deadline to Apply: TBD for 2027
 Apply
 University of North Carolina at Chapel Hill
 This 9-week Summer Research Experiences for Undergraduates (REU) program at immerses students in cutting-edge research at the intersection of networks, distributed systems, machine learning, cybersecurity, and emerging cyberinfrastructure applications. Leveraging the NSF FABRIC research instrument—a nationwide testbed for advanced networking and systems research—students gain hands-on experience with technologies such as in-band telemetry, P4 and FPGA-based networking, ML-driven cybersecurity, TCP congestion control, AI-assisted medical imaging, and federated learning.
 Required Skills: Proficiency in Python, basic understanding of computer systems, fundamental networking concepts, and familiarity with distributed or cloud computing.
 Preferred Skills: Hands-on experience with cloud platforms (AWS, Azure, GCP), testbeds, experimental infrastructures, distributed computing, distributed applications, network emulation/virtualization platforms, or empirical systems research; familiarity with version control (Git), Linux/Unix, or debugging tools; prior research or open-source experience; and interest in multidisciplinary collaboration and new tools/infrastructure.
-Deadline to Apply: April 10, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Marshall University
 This REU: URDA is centered on data analytics, which addresses the urgent need to prepare skilled data scientists for a data-driven world. Participants will engage with research methods and tools, focusing on seven areas: Predictive, Descriptive, Diagnostic, Risk, Threat, Behavior, and Visual Analytics. This broad thematic approach advances industry-relevant knowledge and enriches undergraduate research experiences by equipping students with essential skills and confidence to thrive in their academic and professional careers. The program’s activities will also generate insights into how to enhance student engagement in Data Science.
 Students majoring in computer science, electrical engineering, data science, or related fields are strongly encouraged to apply.
-Application Deadline: April 20, 2026
+Application Deadline: TBD for 2027
 Apply
 Purdue Summer Research Experience in Structural and Computational Biology and Biophysics
 This 10-week summer undergraduate research program will bridge this education gap by establishing a framework that integrates research projects aimed at studying the structure and function of macromolecules with in-depth workshops designed to provide theoretical and practical training in contemporary structural biology techniques and biophysical methods. The goal is that each trainee will leave the program with a solid foundation and understanding of the various structural biology methods regardless of the expertise within their host lab.
 Eligible students are expected to be able to demonstrate an interest in research within the life sciences, particularly in structural and computational biology and biophysics, with preferred prerequisites in biology, biochemistry, chemistry, physics, and mathematics; although not required.
 Minimum GPA: 3.0
-Deadline to Apply: April 30, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Bermuda Institute of Ocean Sciences &#8211; Arizona State University
-This is a semester long research experience that will take place during the fall 2026 semester.
-An REU internship at BIOS is a great way for U.S. undergraduate students to gain the experience necessary to embark on graduate studies or careers in science. BIOS has National Science Foundation Research Experiences for Undergraduates (REU) funding to support undergraduate student researchers at BIOS during the fall semester. Participants will conduct research projects under the expert mentorship of BIOS scientists.
+This is a semester long research experience. An REU internship at BIOS is a great way for U.S. undergraduate students to gain the experience necessary to embark on graduate studies or careers in science. BIOS has National Science Foundation Research Experiences for Undergraduates (REU) funding to support undergraduate student researchers at BIOS during the fall semester. Participants will conduct research projects under the expert mentorship of BIOS scientists.
 Throughout the semester, participants will give oral and virtual poster presentations that outline their research topic, experimental methods and results and attend a series of professional development workshops and seminars hosted by BIOS faculty. In addition, they will provide a project report at the end of the program. Schedule and weather permitting, all participants will be offered an exciting opportunity to join an oceanographic research cruise aboard R/V Atlantic Explorer . They will also have the option to enjoy field and boat excursions to learn about Bermuda&#8217;s history, flora and fauna.
-Deadline to Apply: May 31, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Discipline Based Educational Research at UC San Diego
 Curious about how college students learn STEM (science, technology, engineering, mathematics) and experience STEM classes? Do you want to know whether we can change STEM classes to be inclusive of students with diverse backgrounds and experiences? Do you desire research experience? If so, VERSA may be a good summer research program for you. Applications are welcome from students pursuing any STEM discipline OR in education OR social science
 VERSA is a 9-week hybrid summer Research Experience for Undergraduates (REU) program in discipline-based education research (DBER) . This program is funded by the National Science Foundation . In VERSA, students will do STEM (science, technology, engineering, mathematics) education research with one of our faculty mentors. The goal of the program is to engage in the study and transformation of college STEM education through education research that is grounded in various STEM disciplines, including anthropology, biology, chemistry, computer science, physics, and psychology. Participants will not only gain research experience but also learn critical thinking and presentation skills and feel a part of the scientific community.
 Levels: Freshmen, Sophomore, Juniors, and non-graduating seniors
 Citizenship Requirements: US citizen or permanent resident
-Deadline to Apply: April 5, 2026
+Deadline to Apply: TBD fir 2027
 Apply
 University of Texas at Austin Undergraduate Summer Fellows Program
 Science of Learning and Metacognition Lab
@@ -285,7 +252,7 @@ In this summer program, students will learn about cognitive, metacognitive, and 
 This program welcomes applications from any undergraduate interested in education &#8211; all majors welcomed. No prior coursework or background in psychology or education required. No prior research experience required
 Levels: Freshmen, Sophomore, Juniors, and non-graduating seniors
 Citizenship Requirements: US citizen or permanent resident
-Deadline to Apply: March 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Costa Rica REU: Ecohydrology/Biogeochemistry of Tropical Forests (Texas A&amp;M University)
 ECOHYDROLOGY OF TROPICAL MONTANE FORESTS – DIVERSITY IN SCIENCE, INTERDISCIPLINARY BREADTH, AND GLOBAL AWARENESS”
@@ -294,32 +261,32 @@ Open to all, but the program encourages applications from first generation, rura
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Minimum GPA: 3.0
 Citizenship Requirements: US Citizens
-Deadline to Apply: February 2, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Boise State Department of Energy Consolidated Innovative Nuclear Research REU
 This 9-week internship, beginning in the first week of June, is designed for undergraduate students and will take place in Boise, Idaho. Participants will collaborate directly with Idaho National Laboratory and Boise State on nanoparticle synthesis, ink preparation, printer operation, and materials characterization. The program provides a $700 weekly stipend, housing in a Boise State dormitory, a $1,200 meal allowance, and travel support of up to $1,000.
 Levels: Freshmen, Sophomore, Junior
 Citizenship Requirements: US Citizens, Permanent Residents, International Students attending US Institutions
-Deadline to Apply: March 31, 2026
+Deadline to Apply: TBD for 2027
 Please email your resume to Dr. Deng zhangxiandeng@boisestate.edu to apply .
 Apply
 Clemson University DESSA: Deep Eutectic Solvents, from Synthesis to Applications
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Minimum GPA: 3.0
 Citizenship Requirements: US Citizens
-Deadline to Apply: April 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of Denver
 The NSF REU Site offers a 9-week paid summer research experience for undergraduate students to explore innovative solutions for the energy systems that power tomorrow’s smart cities. Hosted at the University of Denver (DU), the program provides hands-on research opportunities in renewable energy, power systems, AI applications, electrified transportation, and sustainable urban infrastructure.
 Levels: Freshmen, Sophomore, Junior
 Citizenship Requirements: US Citizens, Permanent Residents
-Deadline to Apply: March 1, 2026
+Deadline to Apply: March 3rd, 2027
 Apply
 James Madison University Chemistry REU program
 The Department of Chemistry and Biochemistry at JMU hosts an REU site that integrates Deaf, hearing and sign language interpreting students in chemical research.
 Participants include Deaf and hard-of-hearing (D/HH) students, first-generation college students, primarily from institutions with limited research infrastructure. In addition, American Sign Language (ASL) interpreting students are immersed in the Science community, expanding the pool of interpreters who are comfortable in a STEM setting. Through the REU, both Deaf and hearing participants learn together, removing communication barriers in the scientific research environment, fostering cultural awareness, and growing a more inclusive scientific community.
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
-Deadline to Apply: February 23, 2026
+Deadline to Apply: February 26, 2027
 Apply
 Are you interested in cutting edge Naval science research?
 University of Rhode Island Anchor Fellowship
@@ -328,19 +295,19 @@ Engineering majors of all disciplines are encouraged to apply
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Minimum GPA: 3.0
 Citizenship Requirements: US Citizens
-Deadline to Apply: February 13, 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of Denver
 The NSF REU Site offers a 9-week paid summer research experience for undergraduate students to explore innovative solutions for the energy systems that power tomorrow’s smart cities. Hosted at the University of Denver (DU), the program provides hands-on research opportunities in renewable energy, power systems, AI applications, electrified transportation, and sustainable urban infrastructure.
 Levels: Freshmen, Sophomore, Junior
 Citizenship Requirements: US Citizens, Permanent Residents
-Deadline to Apply: March 1, 2026
+Deadline to Apply: March 3, 2027
 Apply
 James Madison University Chemistry REU program
 The Department of Chemistry and Biochemistry at JMU hosts an REU site that integrates Deaf, hearing and sign language interpreting students in chemical research.
 Participants include Deaf and hard-of-hearing (D/HH) students, first-generation college students, primarily from institutions with limited research infrastructure. In addition, American Sign Language (ASL) interpreting students are immersed in the Science community, expanding the pool of interpreters who are comfortable in a STEM setting. Through the REU, both Deaf and hearing participants learn together, removing communication barriers in the scientific research environment, fostering cultural awareness, and growing a more inclusive scientific community.
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
-Deadline to Apply: February 23, 2026
+Deadline to Apply: February 26, 2027
 Apply
 University of Kansas
 Participants will gain hands-on experience through technical training, collaborative research projects, and field visits to explore innovative solutions for energy efficiency, environmental impact reduction, and sustainable engineering. The program fosters interdisciplinary collaboration, pairing students with faculty and industry mentors to address real-world challenges like retrofitting systems for eco-friendly refrigerants and optimizing HVACR performance. By combining skill development, research execution, and career preparation, the REU aims to equip students with the technical expertise and motivation to become leaders in advancing sustainable technologies and addressing environmental challenges in the HVACR industry. Who should apply? Chemical engineering, mechanical engineering, environmental engineering and related majors
@@ -348,28 +315,26 @@ Community College Students are encouraged to apply
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Minimum GPA: 3.0
 Citizenship Requirements: US Citizens
-Deadline to Apply: March 31, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Distributed Research Experiences for Undergraduates
 Are you an undergraduate interested in computing research but worried about your experience level? No problem! No prior research experience is required to apply for the NSF Distributed Research Experiences for Undergraduates (DREU) program. This 10-week summer opportunity gives you the chance to work on exciting research projects, guided by experienced faculty mentors.
 The NSF Distributed Research Experiences for Undergraduates (DREU) program offers a unique opportunity for undergraduate students to immerse themselves in computing research and gain firsthand experience working with faculty mentors at institutions across the U.S. This 10-week summer program helps students explore what graduate school is like, while mentors support the next generation of researchers and promote diversity within the computing field.
 Levels: Freshman, Sophomores, Juniors, and Seniors
 Citizenship: no restrictions but must be attending a US University
-Deadline to Apply:
-Early Application Deadline: December 1, 2025
-General Application Deadline: January 31, 2026
+Deadline to Apply: TBD for 2027
 Apply
 The MDI Biological Laboratory’s Research Experience for Undergraduates (REU) program aims to engage students in scientific explorations in the Laboratory’s focus area, comparative regenerative biology, while providing them with opportunities to build skills important to successful careers in the biological sciences. For 10 weeks, each REU student will conduct independent research under the mentorship of a research scientist while having access to state-of-the-art research laboratories, core facilities and support staff. Students will join in MDI Biological Laboratory’s active scientific community, which includes other undergraduate research fellows, visiting scientists, graduate students and post-docs as well as research assistants.&#8221;
 Levels: Freshmen, Sophomores, Juniors and Seniors
 Minimum GPA: 3.0
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: January 25, 2026 by 11:59 pm EST
+Deadline to Apply: TBD for 2027
 Apply
 CMU&#8217;s Robotics Institute Summer Scholars Program brings together undergraduates from around the world to the CMU campus to participate in a eleven-week summer research program. Participants will work in robotics labs with leaders in the field.
 Levels: Freshmen, Sophomores, Juniors, and non-graduating Seniors.
 Citizenship Requirements: All no restrictions.
 Minimum GPA: 2.8
-Deadline to Apply: January 21 at 3 PM EST.
+Deadline to Apply: TBD for 2027
 Apply
 University of Massachusetts at Boston
 The summer REU program in Integrative and Evolutionary Biology is sponsored by the National Science Foundation. The program offers undergraduate students the opportunity to:
@@ -381,7 +346,7 @@ Exchange ideas with students at weekly workshops and other activities in and aro
 Applicants should have completed at least one semester of college-level biology. Students from primarily undergraduate institutions are especially encouraged to apply.
 Levels: Sophomores, Juniors, and non-graduating seniors
 Citizenship Status: US Citizens &amp; Permanent Residents
-Deadline to Apply: February 15, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Boston University
 The Summer Undergraduate Research Fellowship (SURF) Program at Boston University (BU) is designed to promote access to research experiences for talented undergraduate students. This includes students from BU and other institutions, especially ones with lesser access to first-class research opportunities for undergraduates. As such, one long-term goal of the NSF-REU program is to enhance and broaden training and participation in order to sustain the nation’s vibrant STEM workforce. The SURF Program is supported by funds from the National Science Foundation (NSF-REU) and Boston University.
@@ -389,13 +354,13 @@ Major in Biology or related field
 Levels: Rising sophomore, junior, or senior
 Citizenship: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply: April 1, 2026 Rolling Admissions
+Deadline to Apply: The application period for the Summer 2027 SURF program will run from late January, 2027 until April 1, 2027. Rolling applications apply early.
 Apply
 The Smithsonian Environmental Research Center’s (SERC) Internship Program o ffers undergraduate and beginning graduate students a unique opportunity to gain exposure and experience in a research environment. The program enables students to work on specific projects under the direction of the Center’s professional staff and is tailored to provide the maximum educational benefit to each participant. SERC is focused on understanding the causes and consequences of environmental change for marine, freshwater, and terrestrial ecosystems. Interns at SERC conduct independent projects (field of research and education) over 10-16 weeks, utilizing our 2,650 acre research site on the shores of the Chesapeake Bay to provide novel insights into some of the most profound issues challenging our world today; including habitat loss, climate change, and invasive species. Students will become familiar with much of the research being conducted at SERC, but they will devote most of their time to a project and content area of particular interest to them. In addition to their research, students participate in field trips, seminars, and lectures. All participants are expected to integrate what they have learned during their experience and present a brief seminar at the end of their appointment.
 Levels: Freshmen, Sophomore, Junior, Seniors, Grad students and recent college graduates.
 Minimum GPA: Not specified
 Citizenship Status: US Citizens , Permanent Residents, and International Students
-Deadline to Apply: Deadline to Apply: February 15, 2026 at 11:59 p.m. ET.
+Deadline to Apply: Deadline to Apply: February 15, 2027 at 11:59 p.m. ET.
 Apply
 Portland State
 Virtual NSF REU Computational Modeling Serving Portland!
@@ -403,47 +368,47 @@ The intellectual focus of this virtual REU site is computational modeling to ser
 Portland State University (PSU), with its NSF-funded Portland Institute for Computational Science (PICS), is ideally suited for this REU site as it has developed a reputation as a national model for urban universities that enhance their region by working with partners to solve problems. The activities of this REU Site will involve a 2-week training followed by an 8-week research project completed under a faculty mentor’s guidance and with the involvement of a community partner.
 Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: Mar 29, 2026.
+Deadline to Apply: TBD for 2027
 Apply
 SURE: Summer Undergraduate Research Experience
 The SURE program pairs passionate undergraduate students with top researchers for an unforgettable 8-week, hands-on journey into the world of geoscience. Dive into real projects like seismic modeling and earthquake engineering, gain skills in labs and field sites across the nation, and connect with peers on the epic All-Intern Field Trip along the San Andreas Fault. Conclude by presenting your work at the SCEC Annual Meeting! With travel and lodging covered, SURE is your pathway to impactful research and career-defining connections.
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
 Citizenship Requirements: US Citizens or Permanent Residents
-Deadline to Apply: February 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of Rochester
 The Nanophotonics, Quantum Photonics, and Vision/Biomedical Optics REU at University of Rochester aims to create a well-defined pipeline to a career in photonics for REU participants. There is a particular focus on undergraduates from colleges without strong photonics research programs, and community college students—all of whom might not otherwise recognize photonics as a possible career path. This program will engage participating students in the frontiers of photonics research while at the same time providing them with experiences to recognize the excellent career opportunities, both academic and industry based, available in photonics. The host department is the university’s world-renowned Institute of Optics, located in the Hajim School of Engineering and Applied Sciences. REU participants will benefit from the Institute’s Summer School, its Industrial Associates program, and its strong ties with the local Rochester photonics industry.
 Levels: Freshmen, Sophomores, Juniors, Seniors and graduate students
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: February 15, 2026
+Deadline to Apply: TBD for 2027
 Apply
 SOURCES: Supported Opportunities for Undergraduates and Researchers to Collaborate on Earthquake Science
 SOURCES offers undergrads nationwide the chance to conduct research through remote mentorship with leading experts. Interns explore STEM careers, develop essential research and data analysis skills, and gain valuable scientific experience. They join the All-Intern Field Trip along the San Andreas Fault and present their research at the SCEC Annual Meeting, building connections with peers and experts. SOURCES provides an accessible pathway to geosciences
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
 Citizenship Requirements: US Citizens or Permanent Residents
-Deadline to Apply: Apply by February 14, 2026
+Deadline to Apply: TBD for 2027
 Apply
 UC Berkeley, Yale, Cornell, Georgia Tech, University of Minnesota, and Boston College
 C-GEM is learning how to repurpose nature’s protein synthesizing machine – the ribosome and all its associated factors – to biosynthesize genetically encoded, sequence-defined bio-polymers and natural product-like molecules – with unprecedented structures, functions, and activities. C-GEM’s goal is to develop the science that transforms how scientists design and produce both bio-materials and medicines. No previous research experience is required!
 Levels: Freshmen, Sophomore, Junior, and non-graduating Seniors
 Citizenship Requirements: US Citizens, Permanent Residents
-Deadline to Apply: February 1, 2026 at 11:59pm PT.
+Deadline to Apply: February 1, 2027 at 11:59pm PT.
 Apply
 Open Quantum Initiative Fellowship, Chicago Quantum Exchange
 The Open Quantum Initiative (OQI) Undergraduate Fellowship provides undergraduate students with research experiences working in quantum science laboratories and research groups.
 With the support of Chicago Quantum Exchange (CQE) member and partner institutions this fellowship helps to establish diversity, equity, and inclusion as priorities central to the development of the quantum ecosystem. Through the Fellowship, students expand their understanding of quantum information science and engineering (QISE), connect with leaders in academia and industry, and increase awareness of quantum career opportunities, including the wide range of opportunities to leverage applied quantum research in fields such as drug design, bioimaging, artificial intelligence, cybersecurity, and finance.
 Applicants should be majoring in physics, chemistry, materials science, mathematics, electrical engineering, computer engineering, mechanical engineering, computer science, quantum science, philosophy, or a QISE related major. Students must be currently enrolled in an undergraduate program at an accredited educational institution, including community colleges, located in the United States.
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
-Deadline to Apply: Deadline to Apply: February 10, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Rochester Institute of Technology
-REU in Multimessenger Astrophysics
-Building on RIT&#8217;s history as a center for undergraduate research, students in the Multimessenger Astrophysics REU, one of several on campus, will join a vibrant community and work with top-flight researchers.
+REU in Multi-messenger Astrophysics
+Building on RIT&#8217;s history as a center for undergraduate research, students in the Multi-messenger Astrophysics REU, one of several on campus, will join a vibrant community and work with top-flight researchers.
 Students in the REU program will learn about and perform research on topics spanning gravitational wave detection and data analysis, observational astronomy and astrophysics, visualization of scientific data, detector building and characterization, and theoretical and numerical modeling.
 This program encourages applications from students who are deaf and hard of hearing students, community college students, and/or first generation college students.
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
 Citizenship Requirements: US Citizens or Permanent Residents
-Deadline to Apply: February 27, 2026.
+Deadline to Apply: TBD for 2027
 Apply
 University of Missouri
 Scientific Study of Interpersonal Relationships Across the Lifespan
@@ -451,13 +416,13 @@ This nine-week summer program is centered on the interdisciplinary, lifespan dev
 This site is interested in students from a wide variety of diverse backgrounds and minoritized identities (e.g., First-generation, Veterans, Pell-eligible, rural). Additionally, participants must have a strong interest in a close relationships RESEARCH-based career.
 Levels: Freshman, Sophomores, Juniors and Seniors (non graduating)
 Citizenship Requirements: US Citizens
-Deadline to Apply: TBD for 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of North Carolina at Charlotte
 Research Experiences for Undergraduates (REU) program engages undergraduate students in the state of the art in cybersecurity and artificial intelligence with a variety of cutting-edge domains. The program immerses students in a truly collaborative research community. We teach research skills through training sessions and experiential, hands-on learning, while students are active contributors to a community of practice that includes faculty, graduate students, and peers.
 Levels: Freshmen, Sophomores, Juniors, Seniors and graduate students
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: February 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of Central Florida Research in Materials for Energy Applications
 This REU site offers research training to highly motivated undergraduate students within the common theme of novel materials for energy applications. Three specific areas within this theme are targeted: 1) Materials for catalysis; 2) Quantum materials for energy needs; and 3) Transparent conducting thin films for photovoltaics.
@@ -465,26 +430,18 @@ Students will gain hands-on training in topics such as synthesis of two-dimensio
 The program seeks to to support undergraduates students majoring in physics, chemistry, or materials science who have just completed their freshman or sophomore years at an institution of higher education and are working toward a 4-year undergraduate degree. Priority will be given to under-represented students in STEM who have had limited or no previous research experience, and who are very excited about the possibility of a career in STEM. Special consideration will be given to veterans, non-traditional students (over 30 years old), students with disabilities, and students who are the first in their families to attend college/university.
 Levels: Freshmen, Sophomores, Juniors, Seniors and graduate students
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: March 14, 2026
+Deadline to Apply: TBD for 2027
 Apply
 This NSF-REU program is aimed at students who are interested in Physics and/or Astronomy and who want to learn more about physics research.
 Levels: Freshmen, Sophomores, Juniors, and non-graduating seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: February 28, 2026
-Apply
-Oklahoma State University &amp; University of Alabama in Huntsville
-The main goal of the National Science Foundation (NSF) funded Collaborative Research Experience for Undergraduates (REU) site is to increase undergraduate participation in research projects on technologies that lead to the development of Smart Personal Protective Equipment (SMAPP). The research projects on material for protective equipment, heat flux measurement in fire conditions, and human-robot interaction in dangerous environments will be conducted at the Division of Engineering Technology (DET), Oklahoma State University (OSU) , Stillwater, OK. The projects on wireless sensor development, circuit design, and artificial intelligence for human health monitoring will be offered at Electrical and Computer Engineering (ECE) at the University of Alabama in Huntsville (UAH), Huntsville, AL. The students have an option to choose their project.
-Applicants must be from Engineering/Engineering Technology/Applied Science majors or closely related fields
-Levels: Freshmen, Sophomores, Juniors and non-graduating Seniors
-Minimum GPA: 3.0
-Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: March 31, 2026 11:59 PM EST
+Deadline to Apply: TBD for 2027
 Apply
 The SFI Undergraduate Complexity Research (UCR) program provides a 10-week residential experience in complex systems science for undergraduate students. Students develop and carry out an independent research project in collaboration with an SFI mentor and as a member of the supportive UCR community. Students learn how to combine theory, methods, and data from the physical, natural, and social sciences to ask big questions about real-world complex systems using the rigorous methods employed at SFI. Through a series of seminars and workshops, students enhance their skills as researchers and prepare for the next steps in their academic and professional journeys.
 Levels: Freshmen, Sophomores, Juniors and Seniors All Levels
 Minimum GPA: No minimum GPA
 Citizenship Requirements: Applicants are welcome from any country. International students will need to be sponsored on an F-1 visa by their home institution (contact your international office at your university to inquire about CPT/OPT status).
-Deadline to Apply: January 2026
+Deadline to Apply: TBD for 2027
 Apply
 AMERICAN PHYSIOLOGICAL SOCIETY
 The Summer Undergraduate Research Fellowships (SURF) allow students to participate in hands-on research in the laboratory of an established researcher and APS member for 10 weeks. Students must have had less than nine months of prior laboratory experience.
@@ -497,7 +454,7 @@ pose their career questions to members of the APS
 Levels: Freshmen, Sophomores &amp; Juniors
 Citizenship Requirements: There are no citizenship requirements
 Minimum GPA: 3.0
-Deadline to Apply: February 2, 2026
+Deadline to Apply: February 2, 2027
 Apply
 Summer Scholars Program on Infectious Diseases in the Immunocompromised Host, Fred Hutchinson Cancer Center
 Opportunities
@@ -519,14 +476,14 @@ Viral Infections
 Promoting diversity and inclusion is a central focus of the program. The program strongly encourages candidates from diverse backgrounds, including underrepresented racial and ethnic groups, first-generation college students, students from low socio-economic backgrounds, and individuals with disabilities.
 Levels: Freshmen, Sophomore, Junior, and non-graduating Seniors
 Citizenship Requirements: US Citizens, Permanent Residents
-Deadline to Apply: January 30th, 2026.
+Deadline to Apply: TBD for 2027
 Apply
 RISE: Research in Sustainable (bio)Energy (Center for Advanced Bioenergy and Bioproduct Innovation, Department of Energy)
 The Center for Advanced Bioenergy and Bioproducts Innovation (CABBI) is pleased to present the RISE (Research Internship in Sustainable Bioenergy) which is a summer internship program offering bioenergy research opportunities for undergraduates from groups currently underrepresented in STEM.
 During the 10-week program, students gain experience in plant biology, agronomy, synthetic biology, genetics, environmental sciences, chemical engineering, and civil &amp; environmental engineering. Successful applicants will be given a $6,000 stipend; housing and travel are provided.
 Levels: Freshmen, Sophomore, Junior, and non-graduating Seniors
 Citizenship Requirements: US Citizens, Permanent Residents
-Deadline to Apply: February 15, 2026.
+Deadline to Apply: TBD for 2027.
 Apply
 University of Alabama
 The University of Alabama REU in Fluid Mechanics with Analysis Using Computations and Experiments is housed in the Department of Aerospace Engineering and Mechanics . This program spans 10 weeks and offers opportunities for up to 10 students from UA and other institutions across the nation.
@@ -535,9 +492,7 @@ flows, combustion studies, boundary layer measurements, wind tunnel studies on m
 Levels: Freshmen, Sophomores, Juniors and non graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply:
-Early Bird Deadline: February 20, 2026 (offers will begin right after early bird deadline)
-Final Application Deadline: March 15, 2026
+Deadline to Apply: TBD for 2027
 Apply
 CIRES Education &amp; Outreach at CU Boulder
 The Research Experience for Community College Students (RECCS) is a paid summer research experience program open to all Colorado (and CO&#8217;s surrounding states) community college students. The goal of RECCS is to give community college students an authentic research experience at CU Boulder, ranked #1 in the world for geosciences . The program allows students to explore environmental or geosciences and gain the confidence to transition to a four-year program in the STEM (Science Technology Engineering Math) disciplines.
@@ -547,27 +502,27 @@ Students from rural areas are particularly encouraged to apply. The program seek
 Levels: Community College Students attending a community college in Colorado, Kansas, Nebraska, New Mexico, or Wyoming
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply: February 9, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Massachusetts Institute of Technology (MIT)
 The MIT Summer Research Program (MSRP) seeks to promote the value of graduate education; to improve the research enterprise through increased diversity; and to prepare and recruit the best and brightest for graduate education at MIT
 Levels: Sophomores, Juniors &amp; Non-Graduating Seniors
 Citizenship Requirements: U.S. citizens, permanent resident, non-U.S. citizen with DACA, or international student with appropriate visa and work authorizations
 Minimum GPA: 3.5
-Deadline to Apply: January 20, 2026
+Deadline to Apply: January 19, 2027 at 11:59 PM ET
 Apply
 The Brandeis Materials Research Science and Engineering Center (MRSEC) announces its &#8220;Bioinspired Soft Materials” Research Experience for Undergraduates (REU) program for summer 2021. The REU is a summer research program that will fund undergraduate students assigned to MRSEC laboratories.
 Levels: Freshmen, Sophomores, Juniors &amp; Non-Graduating Seniors
 Minimum GPA: Not Specified
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: February 2, 2026. 11:59 EST
+Deadline to Apply: TBD for 2027
 Apply
 Artificial Intelligence for Computational Creativity
 This NSF Summer REU Sit is a 9-week, fully-funded, summer residential program which brings students to the Brown University campus June 6 &#8212; August 5 2022 to conduct original research with computer science faculty and graduate students. Our intellectual focus is creative applications of artificial intelligence: potential research topics include creative generative models (of visual and textual content), detecting “fake” generated content, AI for game playing, user experience design for creative AI systems, and more. Research in this field is poised to revolutionize the means of personal expression for everyone: in writing, photography, design, architecture, and more.
 Levels: Freshmen, Sophomores, Juniors &amp; Non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: No minimum GPA but students should be in good academic standing
-Deadline to Apply: February 3, 2026.
+Deadline to Apply: TBD for 2027
 Apply
 Carnegie Mellon&#8217;s Research Experiences for Undergraduates in Software Engineering (REUSE) program is an opportunity for undergraduate students to spend a summer working with some of the world&#8217;s leading Software Engineering faculty researchers. A number of projects are available in diverse areas which may include automated bug repair, mining software repositories, green computing, requirements engineering, program analysis, programming languages, and usable programming tools. Accepted students will work closely with CMU faculty and researchers on research problems with the potential for publication and significant impact on the future practice of software engineering.
 This program is especially interested in promoting research opportunities for students traditionally underrepresented in computer science, and for first- and second-year undergraduate students. Neither research experience nor advanced coursework in computer science or software engineering is required.
@@ -576,7 +531,7 @@ Minimum GPA: Not Specified
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
 If you are on a student visa and you are accepted to REUSE, you will
 need to apply for CPT or OPT at your home institution before the program starts.
-Deadline to Apply: February 1, 2026 at 11:59pm ET
+Deadline to Apply: TBD for 2027
 Apply
 The Ohio State University
 “This REU site program will enhance the knowledge and skill level of a cohort of undergraduate students through empowering, hands-on, and interdisciplinary research experiences in advanced knowledge and technologies for Resilient and Sustainable Infrastructure Systems. This summer experience supports you to be future researchers and members of the workforce in the civil, environmental, and geodetic engineering society.”
@@ -584,28 +539,28 @@ All STEM Majors invited to Apply!
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
 Citizenship Requirements: US Citizens, Permanent Residents
 Minimum GPA:3.0
-Deadline to Apply: February 20, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Brown University Biology of Animal movement and performance
 &#8220;Brown University is home to a group of scientists who conduct cutting-edge research on the causes and consequences of animal movement and performance. Focal species span flies to humans to dinosaurs, and work is done at nearly all levels of analysis. Our REU program aims to bring students into this vibrant community, where they can work with a diverse set of mentor to learn how to perform research. At the same time, REU participants will partake in a rigorous professional development program that fosters inclusivity and community, while providing enduring and continuous support for careers in academia and research.&#8221;
 Levels: Freshmen, Sophomores, Juniors &amp; Non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply: TBD for 2026
+Deadline to Apply: TBD for 2027
 Apply
 Center for Oldest Ice Exploration (COLDEX) REU program
 COLDEX is a multi-institution collaboration to explore Antarctica for the oldest possible polar ice samples and analyze those samples to understand the evolution and future of Earth’s climate system. It will also create and deliver novel educational and professional development programs for teachers, faculty and early career scientists, develop and implement programs to help make polar science more diverse and inclusive, and transfer scientific knowledge to stakeholders and the public
 Levels: Freshmen, Sophomores, Juniors, Seniors or Recent Graduates
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: No minimum GPA but students should be in good academic standing
-Deadline to Apply: February 1, 2026 11:59 EST
+Deadline to Apply: TBD for 2027
 Apply
 Future Leaders in Aerospace and Mechanical Engineering (FLAME)
 The Cornell FLAME Summer Program provides URM students a unique opportunity to launch into a Ph.D. program through enhanced summer research experience and through a subsequent fast-tracked/prioritized admission into the Cornell MAE Ph.D. program with tailored programmatic and financial support. It is designed for students interested in Advanced Manufacturing and Materials, Biomechanics, Bioengineering, Energy and Sustainability, Robotics and Autonomy, and Space Science and Engineering.
 Levels: Freshmen, Sophomores, Juniors, &amp; Non-Graduating Seniors
 Citizenship Requirements: Not Specified
 Minimum GPA: Not specified but students should be in good academic standing
-Deadline to Apply: TBD for 2026
+Deadline to Apply: TBD for 2027
 Apply
 NSF REU Site: Cyberinfrastructure Research 4 Social Change
 The University of Texas at Austin
@@ -614,14 +569,14 @@ Students gain skills in advanced programming and problem solving and use the CI 
 Levels: Freshmen, Sophomores, Juniors &amp; non-graduating Seniors
 Minimum GPA: no minimum GPA but should be in good standing.
 Citizenship Requirements: US Citizens &amp; Permanent Residents.
-Deadline to Apply: Rolling admissions apply before April 1, 2026 at 11:59 pm Eastern.
+Deadline to Apply: TBD for 2027
 Apply
 AUBURN UNIVERSITY
 “The National Science Foundation (NSF) and Established Program to Stimulate Competitive Research (EPSCoR) funded Collaborative Approaches among Scientists and Engineers (CASE) Research Experience is a 10-week research program for undergraduates located at Auburn University. Field and laboratory research projects are available for students majoring in STEM disciplines including chemistry, biology, physics, and all branches of engineering.”
 Levels: Freshmen, Sophomores, Juniors &amp; Non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: Not Specified
-Deadline to Apply: February 7, 2026
+Deadline to Apply: TBD for 2027
 Apply
 UNIVERSITY OF ARKANSAS
 Physics Research Experience for Undergraduate Students
@@ -629,14 +584,14 @@ Selected undergraduate students perform frontier research for 10 weeks during th
 Levels: Freshmen, Sophomores, Juniors, and Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply: March 1, 2026
+Deadline to Apply: March 15, 2027
 Apply
 “The Future of Food: Opportunities and Careers for Undergraduate Student (F2OCUS) Fellowship Program aims to provide undergraduate students with experiential learning opportunities to increase their understanding of the future of food systems as it relates to enhancing the safety, quality, and security of our food supply through knowledge sharing, capacity building, and leadership development.”
 Priority will be given to students from traditionally underserved minorities, first-generation college students, and students from institutions with limited research opportunities.
 Levels: Freshmen, Sophomores, Juniors, and Non-graduating Seniors
 Minimum GPA: Not Specified
 Citizenship Requirements: US Citizen &amp; Permanent Residents
-Deadline to Apply: February 27, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Boston University Photonics Undergraduate Research Summer Experience
 This REU Site is focused on engineering and nanotechnology. Interested undergraduate students from 2- and 4-year institutions are encouraged to apply for this opportunity to participate in authentic cutting-edge research projects at Boston University. Faculty and graduate student mentors from multiple disciplines at BU work with students to develop skills needed to excel in academic and industry research environments. Research projects are interdisciplinary and may involve Biomedical, Mechanical, Electrical &amp; Computer, and Materials Science Engineering; Physics, Chemistry, and Biology; and Photonics and Optics.
@@ -654,29 +609,21 @@ This REU program run through the UB Geologic and Climate Hazards Center offers s
 Levels: Freshmen, Sophomores, Juniors, and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: Not specified
-Deadline to Apply: January 31, 2026 5:00 pm EST
+Deadline to Apply: TBD for 2027
 Apply
 CalTech LIGO SURF
 Undergraduate students in physics, astronomy and engineering are invited to participate in the development of gravitational-wave astronomy through the Caltech LIGO Summer Undergraduate Research Fellowships (SURF) program.
 Levels: Freshmen, Sophomores, Juniors, and Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: Not specified
-Deadline to Apply: Dates for January 11, 2025
+Deadline to Apply: TBD for 2027
 Apply
 Cincinati CHILDREN’S HOSPITAL
 Participants in Cincinnati Children&#8217;s Hospital&#8217;s Summer Undergraduate Research Fellowship will you will meet students from all around the country who have come to Cincinnati for the summer to learn about careers in biomedical research. Participants will gain hands-on experience in cutting-edge laboratories, working under the supervision of our world-renowned research faculty and take full advantage of the opportunities available in a professional research environment. All majors are accepted, however, students should have an interest in a career in biomedical research or medicine.
 Levels: Freshmen, Sophomores, Juniors, and non-graduating Seniors
 Citizenship Status: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply: February 1, 2026
-Apply
-CITY COLLEGE OF NEW YORK
-The Biochemistry, Biophysics and Biodesign (B3) research experience for undergraduates (REU) is a National Science Foundation supported summer program at the City College of New York (CCNY).
-10 students are embedded into faculty research labs in the Departments of Chemistry &amp; Biochemistry, Biology, and Physics in the Science Division, the Biomedical Engineering and Chemical Engineering at the Grove School of Engineering, and the CUNY School of Medicine. Experiences at the laboratory bench or in front of a computer are supplemented with activities to promote interactions between students, peers, senior colleagues, faculty mentors, and to expose students to science in / out of the laboratory.
-Levels: Freshmen, Sophomores, Juniors and Non Graduating Seniors
-Minimum GPA: 3.0
-Citizenship Requirements: US Citizen or Permanent Residents
-Deadline to Apply: Dates for summer 2026 TBD
+Deadline to Apply: February 1, 2027
 Apply
 CLEMSON UNIVERSITY REU
 REU Site: Nature&#8217;s machinery through the prism of physics, biology, chemistry and engineering
@@ -690,7 +637,7 @@ Students who have completed their bachelor’s degree are not eligible
 Levels: Rising Sophomores, Juniors, and non-graduating Seniors
 Minimum GPA: 3.2
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline to Apply: February 20, 2026
+Deadline to Apply: TBD for 2027
 Apply
 COLORADO STATE UNIVERSITY
 REU Site in Molecular Biosciences &amp; Colorado State University
@@ -699,7 +646,7 @@ This program allows students to participate in active research in a wide range o
 Levels: Freshmen, Sophomores, Juniors &amp; non-graduating Seniors
 Citizenship Requirements: US Citizens
 Minimum GPA: not specified
-Deadline to Apply: February 2, 2026
+Deadline to Apply: February 1, 2027
 Apply
 Ultraintense Lasers and Ultraintense Fields
 Colorado State University, Fort Collins, and University of California, Berkeley.
@@ -707,15 +654,7 @@ The Extreme Ultraviolet Engineering Research Center (EUV ERC), founded by NSF in
 Levels: Freshmen, Sophomores, Juniors &amp; non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: 2.8
-Deadline to Apply: February 8, 2026, at 11:59 PM MST.
-Apply
-University of Connecticut
-The UConn Physiology and Neurobiology Research Experiences for Undergrads (REU) is an NSF-funded program offering undergraduates a paid summer research internship. Participants will spend 10 weeks with UConn faculty and graduate students, engaging in graduate-level research projects on a host of different physiological systems. In addition to their scientific work, students will also participate in career and graduate school workshops as well as social events. The program culminates with a symposium where students will present a scientific poster covering their research.
-Applications are encouraged from First Generation College Students as well as US Veterans.
-Levels: Freshman, Sophomores, Juniors, non graduating Seniors
-Minimum GPA: not specified
-Citizenship Requirements: US Citizens
-Deadline to Apply: Rolling basis. Reviews start mid January 2026
+Deadline to Apply: February 8, 2027, at 11:59 PM MST.
 Apply
 Mystic Aquarium &#8211; UConn Research Experiences for Undergraduates (REU) Internship
 This REU program offers a unique collaboration between the renowned Mystic Aquarium and a leading institute of higher education, the University of Connecticut, Avery Point, located on Long Island Sound. In fact, this is are the only aquarium in the U.S. to have an REU!
@@ -723,7 +662,7 @@ First generation college students, community college students, two year college 
 Levels: Freshman, Sophomores, Juniors, non graduating Seniors
 Minimum GPA: not specified
 Citizenship Requirements: US Citizens
-Deadline to Apply: March 1, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Cornell NanoScale Science &amp; Technology Facility (CNF) is a national user facility that supports a broad range of nanoscale science and technology projects by providing state-of-the-art resources coupled with expert staff support. CNF has been serving the science and engineering community since 1977! Over 700 users per year (50% of whom come from outside Cornell) use the fabrication, synthesis, computation, characterization, and integration resources of CNF to build structures, devices, and systems from atomic to complex length-scales. Our CNF REU research projects encompass chemistry, nanoscale electronics, materials processing, physical sciences, engineering, and life sciences, with a strong inter-disciplinary emphasis.
 CNF REU interns interact with researchers from academia and industry, work with Cornell faculty and graduate students, learn hands-on nanofabrication processes, train on a variety of nanofab tools, and become independent nanoscale researchers in their own right. The CNF REU Program runs from approximately the first week of June thru the first week of August and the first two weeks of our ten-week program include intense training, including attending our short course, Technology &amp; Characterization at the Nanoscale (CNF TCN), and attending our three-part New User Training. The summer typically concludes with a Nano-Convocation on Cornell campus so that mentors can attend, and then a three-day National Nanotechnology Coordinated Infrastructure (NNCI) REU Convocation . Finally, each CNF REU intern writes a two-page report that is published as part of the CNF Research Accomplishments .
@@ -731,14 +670,14 @@ CNF REU interns receive a $6,000 stipend, plus housing and reasonable travel exp
 Levels: Freshman, Sophomores, Juniors, non graduating Seniors
 Minimum GPA: not specified
 Citizenship Requirements: US Citizens &amp; Permanent Residents
-Deadline: February 8, 2026
+Deadline: TBD for 2027
 Apply
 RISE (Research Internship in Sustainable Biology) is a summer internship program offering bioenergy research opportunities for undergraduates from groups currently underrepresented in STEM.
 During the 10-week program, students gain experience in plant biology, agronomy, synthetic biology, genetics, environmental sciences, chemical engineering, and civil &amp; environmental engineering. Successful applicants will be given a $6,000 stipend; housing and travel are provided.
 Levels: Freshmen, Sophomores, Juniors &amp; Non-Graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA : No Minimum GPA
-Deadline to Apply: Feb. 15, 2026
+Deadline to Apply: TBD for 2027
 Apply
 Emory University
 Combining Models with Data Summer 2025
@@ -747,7 +686,7 @@ The site’s core activity is a six-week on-site research and training that will
 Levels: College Freshmen, Sophomores, Juniors, and Seniors.
 Minimum GPA: No Minimum GPA
 Citizenship Requirements: There are no citizenship requirements. Students must be enrolled at a US Institution.
-Deadline to Apply: Rolling Admissions with March 1, 2026 Deadline
+Deadline to Apply: TBD for 2027
 Apply
 UNIVERSITY OF GEORGIA
 The REU program will provide an interdisciplinary research experience at the interface of nanotechnology and biomedicine to undergraduate students from other institutions, leveraging the diverse interdisciplinary expertise, resources, and training opportunities in this area at University of Georgia (UGA).
@@ -755,14 +694,14 @@ Students will participate in interdisciplinary research projects that apply nano
 Levels: Freshmen, Sophomores, Juniors, Seniors
 Citizenship Requirements: US citizen or permanent residents.
 Minimum GPA: N/A
-Deadline to Apply: February 15, 2026
+Deadline to Apply: TBD for 2027
 Apply
 GEORGIA INSTITUTE OF TECHNOLOGY
 Founded in 1992 by Dr. Gary May, a former Dean of the Georgia Tech College of Engineering, the Summer Undergraduate Research in Engineering/Sciences (S.U.R.E.) program is committed to increasing the number of qualified students who are traditionally under-represented in STEM fields. These include but are not limited to students from racial/ethnic minority groups, women, or first generation college students.
 Levels: Freshmen, Sophomores, Juniors, and Seniors
 Minimum GPA: 2.75
 Citizenship Requirements: U.S. Citizen &amp; Permanent Residents
-Deadline to Apply: February 15, 2026
+Deadline to Apply: TBD for 2027
 Apply
 HARVARD UNIVERSITY
 Harvard has 7 REU programs that are coordinated through the John A. Paulson School of Engineering and Applied Sciences. Students spend their summers working with faculty. The program provides professional development activities designed to foster interest in graduate school and careers in research.
@@ -770,7 +709,7 @@ Levels: Freshmen, Sophomores, Juniors, and Seniors
 Minimum GPA: Not specified
 Citizenship Requirements: 5 of Harvard’s programs require that candidates be US Citizens or Permanent Resident’s.
 International students are encouraged to visit this link to verify their eligibility.
-Deadline to Apply: February 1, 2025 11:59 EST
+Deadline to Apply: TBD for 2027
 Apply
 Harvard
 Harvard &amp; Smithsonian Astrophysical Observatory
@@ -778,14 +717,14 @@ SAO is once again offering11 exciting ten-week summer Astronomy research interns
 Levels: Freshmen, Sophomores, Juniors, and Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: Not Specified
-Deadline to Apply: February 10, 2026
+Deadline to Apply: TBD for 2027
 Apply
 University of Hawaii Institute for Astronomy
 The Institute for Astronomy (IfA) at the University of Hawai`i, Mānoa expects is offering research internships for the summer. Internships are funded through NASA and NSF grants to individual faculty members and the NSF REU program. The IfA REU program will provide undergraduates who are considering a career in science with the opportunity to work with astronomers at the IfA who conduct cutting-edge research in a wide range of astrophysical disciplines and in the development of new telescopes, instruments, and adaptive optics. The IfA research web site presents a comprehensive list of these projects.
 Levels: Freshmen, Sophomore, Junior, Senior (not Graduating)
 Citizenship Requirements: US Citizens
 Minimum GPA: no minimum GPA
-Deadline to Apply: January 31, 2026 (Hawaii Standard time)
+Deadline to Apply: TBD for 2027
 Apply
 UIUC Center for Digital Agriculture REU
 The CDA REU program is a 10-week paid on-site opportunity hosted by the Center for Digital Agriculture at the University of Illinois Urbana-Champaign . It brings together students with backgrounds in computation, agriculture, and biosystems and provides valuable hands-on training to work in academia, industry, and beyond.
@@ -793,7 +732,7 @@ This program is designed to equip REU participants with the necessary skills to 
 Levels: Freshmen, Sophomores Juniors and non-graduating Seniors
 Citizenship Requirements: US Citizens &amp; Permanent Residents
 Minimum GPA: 3.0
-Deadline to Apply: February 16, 2026 (11:59 pm EST)
+Deadline to Apply: TBD for 2027
 Apply
 Illinois Materials Research Science and Engineering Center REU – University of Illinois Urbana-Champaign
 The Illinois MRSEC is excited to offer an NSF-sponsored Research Experiences for Undergraduates (REU) program. Our ten week summer research program offers undergraduate students the opportunity to work closely with MRSEC faculty mentors on solving a challenging, meaningful scientific question through taking part in the interdisciplinary Illinois MRSEC research. The program also provides training to help students in their professional development as scientists and engineers, with particular emphasis on those skills related to communicating their scientific discoveries to help broaden its reach and make science more accessible.
@@ -1468,6 +1407,8 @@ Apply
 Amazon.com
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
 Share this:
 Share on Facebook (Opens in new window)
 Facebook
@@ -1484,6 +1425,11 @@ Reddit
 Like this:
 Like Loading…
 Leave a Reply Cancel reply
+Comment
+Name
+Email
+Website
+&#916;
 This site uses Akismet to reduce spam. Learn how your comment data is processed.
 Search for:
 Post Types

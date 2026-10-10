@@ -31,6 +31,28 @@ Save Job Alert
 Save Alert
 Maximum of 25 job preferences reached.
 Top Internship Finance Jobs
+Spectrum
+2027 Summer Intern: Strategic Tax - Income - Corporate
+<age> Saved
+In-Office
+Charlotte, NC, USA
+Internship
+Internship
+Information Technology &#x2022; Internet of Things &#x2022; Mobile &#x2022; On-Demand &#x2022; Software
+Paid, full-time tax internship supporting state income tax audits, legislative change tracking, bill analysis, file organization, and resolution of outstanding governmental debts. The intern will work with department teams, participate in professional development and networking activities, and gain exposure to corporate tax within the telecommunications industry.
+Top Skills:
+Excel
+Liberty Mutual Insurance
+Surety Underwriting Internship - Summer 2027
+<age> Saved
+Hybrid
+7 Locations
+27K-29K Hourly
+Internship
+27K-29K Hourly
+Internship
+Artificial Intelligence &#x2022; Fintech &#x2022; Insurance &#x2022; Marketing Tech &#x2022; Software &#x2022; Analytics
+An 11-week surety underwriting internship involving financial analysis, business risk assessment, relationship management, and decision-making. The intern will work with experienced underwriters, help evaluate financial strength and bonding capacity, and participate in training, mentorship, job shadowing, professional development, and the AFSB curriculum. Applicants must be pursuing a relevant bachelor’s degree, maintain a minimum 3.0 GPA, and have permanent U.S. work authorization.
 The Options Clearing Corporation (OCC)
 Summer Intern - Market Risk
 <age> Saved
@@ -44,17 +66,6 @@ Big Data &#x2022; Cloud &#x2022; Fintech &#x2022; Information Technology &#x2022
 Supports daily market risk monitoring for clearing members, positions, and collateral. Builds Python scripts and reports using large datasets, applies stress-testing methodologies, follows financial markets and assesses portfolio impacts, and assists with research, data pulls, and documentation. Collaborates with quantitative risk and IT teams and presents a summer project. The internship is a 12-week hybrid program for enrolled undergraduate or graduate students.
 Top Skills:
 Bloomberg Confluence Excel JIRA PowerPoint Python SQL Word
-Liberty Mutual Insurance
-Underwriting Internship Program - Global Risk Solutions - Summer 2027
-<age> Saved
-Hybrid
-6 Locations
-27K-29K Hourly
-Internship
-27K-29K Hourly
-Internship
-Artificial Intelligence &#x2022; Fintech &#x2022; Insurance &#x2022; Marketing Tech &#x2022; Software &#x2022; Analytics
-An 11-week underwriting internship supporting Liberty Mutual’s Global Risk Solutions team. The intern will analyze business and financial information, evaluate and price commercial insurance risks, contribute to underwriting projects, and develop analytical, decision-making, communication, negotiation, and relationship-building skills. The program includes professional development, networking, and exposure to commercial and specialty insurance products. Applicants must be pursuing a relevant bachelor’s degree, maintain a 3.0 GPA, and have permanent U.S. work authorization.
 Lowe&#x2019;s
 Finance Intern - Undergrad Internship - Summer 2027
 <age> Saved
@@ -79,6 +90,10 @@ Cloud &#x2022; Fintech &#x2022; Software &#x2022; Business Intelligence &#x2022;
 Tax interns prepare individual, business, and fiduciary tax returns and projections; research tax issues; use tax and accounting software; analyze data; respond to client requests; gather information; conduct tax interviews; and identify process improvements. They gain hands-on experience supporting client engagements while developing accounting, tax, administrative, communication, and professional skills.
 Top Skills:
 Accounting Software Tax Software
+New
+Cut your apply time in half.
+Use our AI Assistant to automatically fill your job applications.
+Use For Free
 PwC
 Charlotte - Digital Assurance &amp; Transparency (DAT) - Intern - Summer 2027
 <age> Saved
@@ -92,10 +107,6 @@ Artificial Intelligence &#x2022; Professional Services &#x2022; Business Intelli
 Supports digital assurance and audit teams through research, basic data analysis, compliance and governance activities, and application of auditing methodologies. Participates in testing artificial intelligence platforms and applying cloud engineering principles to audit processes. Collaborates with experienced auditors, gathers information to support decision-making, and develops professional skills through feedback, observation, and hands-on client service assignments.
 Top Skills:
 Artificial Intelligence Cloud Engineering
-New
-Track Smarter, Apply Better.
-Ditch the spreadsheets. Organize your job search with our free Application Tracker.
-Use For Free
 New York Life
 2027 Financial Products, Strategy &amp; Modeling Summer Internship
 <age> Saved
@@ -146,19 +157,6 @@ Agency &#x2022; Fintech &#x2022; Payments &#x2022; Sharing Economy &#x2022; Soci
 Paid, full-time summer internship supporting internal audit-related projects at the Federal Reserve Bank of Chicago. Interns will gain exposure to bank operations, interpret data and analytics, develop insights, support decision-making, present information, and collaborate with internal and external stakeholders. The role is onsite for 40 hours per week over 10–12 consecutive weeks.
 Top Skills:
 Excel Microsoft Word
-Cox Enterprises
-Accounting Intern
-<age> Saved
-Hybrid
-Atlanta, GA, USA
-22-33 Hourly
-Internship
-22-33 Hourly
-Internship
-Artificial Intelligence &#x2022; Automotive &#x2022; Greentech &#x2022; Information Technology &#x2022; Machine Learning &#x2022; Software &#x2022; Cybersecurity
-Accounting Intern supports corporate accounting through financial statement analysis, journal entries, balance sheet accuracy checks, reconciliations, computations, reporting, and special projects. The role provides hands-on training, cross-functional collaboration, and exposure to business projects while developing analytical, communication, organizational, and problem-solving skills.
-Top Skills:
-Microsoft Office Suite
 1
 2
 3
@@ -166,7 +164,7 @@ Microsoft Office Suite
 5
 ...
 ...
-207
+200
 Let Your Resume Do The Work
 Upload your resume to be matched with jobs you're a great fit for.
 All Filters

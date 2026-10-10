@@ -2,6 +2,24 @@ https://evercore.tal.net/vx/mobile-0/appcentre-1/brand-6/candidate/jobboard/vaca
 Students and Graduates
 Evercore
 <timestamp>
+https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3420-2027-Graduate-Programme-Real-Estate-Strategic-Advisory-RESA-Frankfurt/en-GB
+2027 Graduate Programme - Real Estate Strategic Advisory (RESA), Frankfurt
+<timestamp>
+<timestamp>
+Title:2027 Graduate Programme - Real Estate Strategic Advisory (RESA), Frankfurt
+Application Deadline:13 Nov 2026 05:30 PM GMT
+https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3421-2027-Real-Estate-Strategic-Advisory-RESA-Internship-Frankfurt/en-GB
+2027 Real Estate Strategic Advisory (RESA) Internship - Frankfurt
+<timestamp>
+<timestamp>
+Title:2027 Real Estate Strategic Advisory (RESA) Internship - Frankfurt
+Application Deadline:13 Nov 2026 05:30 PM GMT
+https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3419-2027-Paris-Off-Cycle-Internship-Industrials-Team-January-2027-start/en-GB
+2027 Paris Off-Cycle Internship - Industrials Team (January 2027 start)
+<timestamp>
+<timestamp>
+Title:2027 Paris Off-Cycle Internship - Industrials Team (January 2027 start)
+Application Deadline:1 Nov 2026 03:55 AM GMT
 https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3084-Madrid-Off-Cycle-Internship-Jan-June-2027/en-GB
 Madrid Off-Cycle Internship (Jan - June 2027)
 <timestamp>
@@ -14,12 +32,6 @@ https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/
 <timestamp>
 Title:2027 Graduate Analyst, Communications &amp; Digital Infrastructure Team, Paris, EMEA
 Application Deadline:29 Nov 2026 11:55 PM GMT
-https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3348-Private-Capital-Advisory-Credit-Advisory-Off-Cycle-Internship-Jan-June-2027/en-GB
-Private Capital Advisory - Credit Advisory Off-Cycle Internship (Jan - June 2027)
-<timestamp>
-<timestamp>
-Title:Private Capital Advisory - Credit Advisory Off-Cycle Internship (Jan - June 2027)
-Application Deadline:12 Oct 2026 04:55 AM BST
 https://evercore.tal.net/vx/mobile-0/appcentre-ext/brand-4/candidate/so/pm/1/pl/2/opp/3342-2028-Capital-Markets-Advisory-Structured-Capital-Solutions-Summer-Analyst-Program-New-York/en-GB
 2028 Capital Markets Advisory: Structured Capital Solutions Summer Analyst Program – New York
 <timestamp>

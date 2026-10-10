@@ -135,6 +135,7 @@ ALDW-PIO-MISP/ALDW Program Integration - Mission Integration &amp; Special Proje
 ALDWP-SPM / Stockpile Production Management
 AOT-AE/ APPLIED ELECTRODYNAMICS
 AOT-AE/Applied Electrodynamics
+AOT-DO/Accelerator Operations &amp; Technology
 AOT-DO/Accelerator Operations &amp; Technology Division
 AOT-IC / Instrumentation &amp; Controls
 AOT-IC/ Operations and Techonology Instrumentation and Controls
@@ -202,6 +203,7 @@ DP-IPO/Detonator Production - Infrastructure Planning Office
 E-11/Weapons Product Definition
 E-11/Weapons Product Design
 E-13/Advanced Engineering Analysis
+E-2 / Mission Concepts
 E-2/Mission Concepts
 E-2/Project Engineering
 E-3 / Automation, Robotics &amp; Controls
@@ -329,6 +331,7 @@ MPA-CINT/Center For Integrated Nanotechnologies
 MPA-CINT/Center For Integrated Nanotechnologies Group
 MPA-MAG Lab NHMFL Group (MPA-MAGLAB)
 MPA-MAG LAB NHMFL GROUP/MPA-MAGLAB
+MPA-MAGLAB / MPA-MAG LAB NHMFL GROUP
 MPA-MAGLAB/ National High Magnetic Field Laboratory
 MPA-Q/MPA-Quantum
 MSS-APT/Automation &amp; Predictive Technologies
@@ -377,6 +380,7 @@ Operations Support/TA55-OPS1
 OSH-DO/Occupational Safety &amp; Health Division
 OSH-DS/Occupational Safety and Health Deployed Services
 OSH-ISH/Occupational Safety and Health Industrial Safety &amp; Hygiene
+P-1 / Dynamic Imaging And Radiography
 P-2/Applied &amp; Fundamental Physics Group
 P-2/Fundamental &amp; Applied Physics
 P-3 / Nuclear And Particle Physics and Applications
@@ -597,6 +601,7 @@ ALDW-PIO-MISP/ALDW Program Integration - Mission Integration &amp; Special Proje
 ALDWP-SPM / Stockpile Production Management
 AOT-AE/ APPLIED ELECTRODYNAMICS
 AOT-AE/Applied Electrodynamics
+AOT-DO/Accelerator Operations &amp; Technology
 AOT-DO/Accelerator Operations &amp; Technology Division
 AOT-IC / Instrumentation &amp; Controls
 AOT-IC/ Operations and Techonology Instrumentation and Controls
@@ -664,6 +669,7 @@ DP-IPO/Detonator Production - Infrastructure Planning Office
 E-11/Weapons Product Definition
 E-11/Weapons Product Design
 E-13/Advanced Engineering Analysis
+E-2 / Mission Concepts
 E-2/Mission Concepts
 E-2/Project Engineering
 E-3 / Automation, Robotics &amp; Controls
@@ -791,6 +797,7 @@ MPA-CINT/Center For Integrated Nanotechnologies
 MPA-CINT/Center For Integrated Nanotechnologies Group
 MPA-MAG Lab NHMFL Group (MPA-MAGLAB)
 MPA-MAG LAB NHMFL GROUP/MPA-MAGLAB
+MPA-MAGLAB / MPA-MAG LAB NHMFL GROUP
 MPA-MAGLAB/ National High Magnetic Field Laboratory
 MPA-Q/MPA-Quantum
 MSS-APT/Automation &amp; Predictive Technologies
@@ -839,6 +846,7 @@ Operations Support/TA55-OPS1
 OSH-DO/Occupational Safety &amp; Health Division
 OSH-DS/Occupational Safety and Health Deployed Services
 OSH-ISH/Occupational Safety and Health Industrial Safety &amp; Hygiene
+P-1 / Dynamic Imaging And Radiography
 P-2/Applied &amp; Fundamental Physics Group
 P-2/Fundamental &amp; Applied Physics
 P-3 / Nuclear And Particle Physics and Applications
@@ -1075,8 +1083,9 @@ Job Title
 Job Number
 Organization
 City, State
+WP-TNT Technical Scholars Internship Program IRC146210 PAT-2 / Technical And Personnel Pipelines Los Alamos, NM
+Mechanical &amp; Thermal Engineering Undergraduate Intern IRC146212 E-2 / Mission Concepts Los Alamos, NM
 Undergraduate Information Technology Internship IRC146184 CIO / Chief Information Officer Los Alamos, NM
-Graduate Computational Nuclear Engineer or Software Developer IRC146141 NEN-5 / Nuclear Systems Los Alamos, NM
 Undergrad Student SA 1 IRC146134 PT-3 / Plutonium Assembly &amp; Welding Los Alamos, NM
 Intelligence and Space Research Division Undergraduate Internship IRC146105 ISR-DO/Intelligence and Space Research Los Alamos, NM
 Mechanical and Electrochemical Undergraduate Student IRC146029 MPA-11 / Materials Synthesis and Integrated Devices Los Alamos, NM
@@ -1085,7 +1094,6 @@ PWDI Administrative Scholars Internship Program IRC145910 PAT-2 / Technical And 
 High Performance Computing Undergraduate Student IRC145851 HPC-DO/High Performance Computing Los Alamos, NM
 Undergraduate Student IRC145847 Product Realization and Reliability Office (PRRO) Los Alamos, NM
 PWDI Scholars Internship Program IRC145845 PAT-2 / Technical And Personnel Pipelines Los Alamos, NM
-Engineer Internship IRC145463 PFE-DO/PLUTONIUM FACILITIES ENGINEERING DIVISION OFFICE Los Alamos, NM
 Fire Protection Undergraduate Student ST IRC145404 ES-FP/Fire Protection-Group Office Los Alamos, NM
 Load more jobs Load more jobs
 Showing 12 out of 19
